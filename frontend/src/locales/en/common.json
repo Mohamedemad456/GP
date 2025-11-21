@@ -1,0 +1,17 @@
+{
+  "welcome": "Welcome",
+  "hello": "Hello",
+  "goodbye": "Goodbye",
+  "loading": "Loading...",
+  "error": "An error occurred",
+  "success": "Success",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "save": "Save",
+  "delete": "Delete",
+  "edit": "Edit",
+  "search": "Search",
+  "home": "Home",
+  "about": "About",
+  "contact": "Contact"
+}

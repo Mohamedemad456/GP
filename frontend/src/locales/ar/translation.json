@@ -1,0 +1,40 @@
+{
+  "title": "تطبيقي",
+  "description": "مرحباً بك في تطبيقنا",
+  "greeting": "مرحباً، {{name}}!",
+  "items_zero": "لا توجد عناصر",
+  "items_one": "عنصر واحد",
+  "items_other": "{{count}} عنصر",
+  "navigation": {
+    "logo": "سيارتي",
+    "home": "الرئيسية",
+    "about": "حول",
+    "contact": "اتصل بنا",
+    "login": "تسجيل الدخول"
+  },
+  "buttons": {
+    "submit": "إرسال",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "delete": "حذف"
+  },
+  "auth": {
+    "backToHome": "العودة إلى الصفحة الرئيسية",
+    "heading": "مرحباً بعودتك",
+    "subheading": "سجّل الدخول للوصول إلى حسابك",
+    "emailLabel": "البريد الإلكتروني",
+    "emailPlaceholder": "you@example.com",
+    "passwordLabel": "كلمة المرور",
+    "passwordPlaceholder": "••••••••",
+    "signIn": "تسجيل الدخول",
+    "noAccount": "ليس لديك حساب؟",
+    "signUp": "أنشئ حساباً",
+    "toastTitle": "مرحباً بعودتك!",
+    "toastDescription": "تم تسجيل الدخول بنجاح."
+  },
+  "hero": {
+    "title": "ابحث عن سيارتك المثالية",
+    "subtitle": "اكتشف مركبات رائعة بأسعار لا تقبل المنافسة",
+    "cta": "استكشف الآن"
+  }
+}

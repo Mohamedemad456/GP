@@ -1,0 +1,40 @@
+{
+  "title": "My Application",
+  "description": "Welcome to our application",
+  "greeting": "Hello, {{name}}!",
+  "items_zero": "No items",
+  "items_one": "One item",
+  "items_other": "{{count}} items",
+  "navigation": {
+    "logo": "Sayarti",
+    "home": "Home",
+    "about": "About",
+    "contact": "Contact",
+    "login": "Login"
+  },
+  "buttons": {
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete"
+  },
+  "auth": {
+    "backToHome": "Back to Home",
+    "heading": "Welcome Back",
+    "subheading": "Log in to access your account",
+    "emailLabel": "Email",
+    "emailPlaceholder": "you@example.com",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "••••••••",
+    "signIn": "Sign In",
+    "noAccount": "Don't have an account?",
+    "signUp": "Sign up",
+    "toastTitle": "Welcome back!",
+    "toastDescription": "You've successfully logged in."
+  },
+  "hero": {
+    "title": "Find Your Perfect Car",
+    "subtitle": "Discover amazing vehicles at unbeatable prices",
+    "cta": "Explore Now"
+  }
+}
