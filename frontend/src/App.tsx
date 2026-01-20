@@ -2,7 +2,8 @@ import { useEffect, useMemo } from "react"
 import { Route, Routes } from "react-router-dom"
 
 import { Toaster } from "@/lib"
-import Auth from "@/pages/(auth)/auth"
+import Login from "@/pages/(auth)/login"
+import Signup from "@/pages/(auth)/signup"
 import Home from "@/pages/(public)/home"
 import Layout from "./components/Layout"
 
@@ -29,7 +30,8 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
         </Route>
-        <Route path="/auth" element={<Auth />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
       </Routes>
       <Toaster position={toasterPosition} richColors />
     </>

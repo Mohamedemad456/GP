@@ -117,7 +117,7 @@ const Navbar = () => {
             {!isRTL ? (
               <>
                 <LanguageSwitcher />
-                <Link to="/auth">
+                <Link to="/login">
                   <motion.div
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -131,7 +131,7 @@ const Navbar = () => {
                     </Button>
                   </motion.div>
                 </Link>
-                <Link to="/auth">
+                <Link to="/signup">
                   <motion.div
                     whileHover={{
                       scale: 1.05,

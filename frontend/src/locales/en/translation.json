@@ -30,7 +30,17 @@
     "noAccount": "Don't have an account?",
     "signUp": "Sign up",
     "toastTitle": "Welcome back!",
-    "toastDescription": "You've successfully logged in."
+    "toastDescription": "You've successfully logged in.",
+    "signupHeading": "Create Account",
+    "signupSubheading": "Join AutoElite today",
+    "nameLabel": "Full Name",
+    "namePlaceholder": "John Doe",
+    "confirmPasswordLabel": "Confirm Password",
+    "hasAccount": "Already have an account?",
+    "signupToastTitle": "Account created!",
+    "signupToastDescription": "Welcome to AutoElite",
+    "passwordMismatchTitle": "Passwords don't match",
+    "passwordMismatchDescription": "Please make sure both passwords are the same"
   },
   "hero": {
     "title": "Find Your Perfect Car",
