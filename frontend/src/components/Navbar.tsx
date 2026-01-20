@@ -125,7 +125,7 @@ const Navbar = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="transition-smooth hover:bg-primary hover:text-primary-foreground hover:border-primary font-mono"
+                      className="transition-smooth hover:bg-primary hover:text-primary-foreground hover:border-primary font-sans"
                     >
                       {t("navigation.login")}
                     </Button>
@@ -141,7 +141,7 @@ const Navbar = () => {
                   >
                     <Button
                       size="sm"
-                      className="bg-primary text-primary-foreground hover:glow-primary transition-smooth font-mono"
+                      className="bg-primary text-primary-foreground hover:glow-primary transition-smooth font-sans"
                     >
                       {t("auth.signUp")}
                     </Button>
@@ -160,7 +160,7 @@ const Navbar = () => {
                   >
                     <Button
                       size="sm"
-                      className="bg-primary text-primary-foreground hover:glow-primary transition-smooth font-mono"
+                      className="bg-primary text-primary-foreground hover:glow-primary transition-smooth font-sans"
                     >
                       {t("auth.signUp")}
                     </Button>
@@ -174,7 +174,7 @@ const Navbar = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="transition-smooth hover:bg-primary hover:text-primary-foreground hover:border-primary font-mono"
+                      className="transition-smooth hover:bg-primary hover:text-primary-foreground hover:border-primary font-sans"
                     >
                       {t("navigation.login")}
                     </Button>

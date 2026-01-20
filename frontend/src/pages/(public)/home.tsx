@@ -49,7 +49,7 @@ const Home = () => {
               >
                 <Button
                   size="lg"
-                  className="bg-primary text-primary-foreground hover:glow-primary transition-smooth font-mono text-lg px-8 py-6"
+                  className="bg-primary text-primary-foreground hover:glow-primary transition-smooth font-sans text-lg px-8 py-6"
                 >
                   {t("hero.cta")}
                   <ArrowRight
