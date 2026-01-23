@@ -21,6 +21,11 @@ const Login = () => {
     toast(t("auth.toastTitle"), {
       description: t("auth.toastDescription"),
     });
+    navigate("/");
+    setFormData({
+      email: "",
+      password: "",
+    });
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
