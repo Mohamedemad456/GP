@@ -20,6 +20,7 @@ const Navbar = () => {
     { name: t("navigation.contact"), path: "/contact" },
   ];
 
+  
   const isActive = (path: string) => location.pathname === path;
 
   return (
