@@ -25,23 +25,23 @@ services:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: ed-zookeeper:2181
       
-      # 1. DEFINE LISTENER NAMES
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      # 1. LISTENERS: Binds ports inside the container
+      KAFKA_LISTENERS: INTERNAL://0.0.0.0:29092,EXTERNAL://0.0.0.0:9092
       
-      # 2. ADVERTISE LISTENERS (What clients see)
-      # - Spark (inside Docker) uses 'ed-kafka:29092' (INTERNAL)
-      # - Python Script (Localhost) uses 'localhost:9092' (EXTERNAL)
+      # 2. ADVERTISED: Tells clients where to connect
+      #    - Internal (Spark): ed-kafka:29092
+      #    - External (Your Script): localhost:9092
       KAFKA_ADVERTISED_LISTENERS: INTERNAL://ed-kafka:29092,EXTERNAL://localhost:9092
       
-      # 3. INTER-BROKER (Internal communication)
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       
-      # 4. CRITICAL: FORCE SINGLE NODE SETTINGS (Prevents crashing on start)
+      # 3. STABILITY: Single-node settings to prevent crashes
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       
-      # 5. AUTO-CREATE TOPICS (Replaces the broken KAFKA_CREATE_TOPICS var)
+      # 4. AUTO-CREATE TOPIC
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
     
     restart: always
@@ -50,25 +50,25 @@ services:
     networks:
       - data-network
 
-  # --- SPARK ---
+  # --- SPARK (JUPYTER) ---
   ed-pyspark-jupyter:
     image: jupyter/pyspark-notebook:spark-3.3.0
     container_name: ed-pyspark-jupyter-lab
     user: root
     ports:
-      - "8889:8888"
-      - "4042:4041"
+      - "8889:8888" # Jupyter UI
     environment:
       JUPYTER_PORT: 8889
-      SPARK_UI_PORT: 4042
       GRANT_SUDO: "yes"
-      # Critical: Packages for Kafka and MySQL
+      # Critical Packages for Kafka + MySQL support
       PYSPARK_SUBMIT_ARGS: "--packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.0,mysql:mysql-connector-java:8.0.28 pyspark-shell"
     volumes:
       - ./notebooks:/home/jovyan/work
       - streaming_data:/data:rw
     networks:
       - data-network
+    # COMMAND TO DISABLE TOKEN (One-click login)
+    command: start-notebook.sh --NotebookApp.token=''
 
   # --- DATABASE ---
   database:
