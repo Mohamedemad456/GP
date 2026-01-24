@@ -24,50 +24,41 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: ed-zookeeper:2181
-      
-      # 1. LISTENERS: Binds ports inside the container
       KAFKA_LISTENERS: INTERNAL://0.0.0.0:29092,EXTERNAL://0.0.0.0:9092
-      
-      # 2. ADVERTISED: Tells clients where to connect
-      #    - Internal (Spark): ed-kafka:29092
-      #    - External (Your Script): localhost:9092
       KAFKA_ADVERTISED_LISTENERS: INTERNAL://ed-kafka:29092,EXTERNAL://localhost:9092
-      
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
-      
-      # 3. STABILITY: Single-node settings to prevent crashes
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      
-      # 4. AUTO-CREATE TOPIC
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-    
     restart: always
     volumes:
       - kafka_data:/var/lib/kafka/data
     networks:
       - data-network
 
-  # --- SPARK (JUPYTER) ---
+  # --- SPARK (Custom Build) ---
   ed-pyspark-jupyter:
-    image: jupyter/pyspark-notebook:spark-3.3.0
+    # BUILD from the Dockerfile in the current directory (.)
+    build: .
     container_name: ed-pyspark-jupyter-lab
     user: root
     ports:
-      - "8889:8888" # Jupyter UI
+      - "8889:8888"
+      - "4042:4041"
     environment:
       JUPYTER_PORT: 8889
+      SPARK_UI_PORT: 4042
       GRANT_SUDO: "yes"
-      # Critical Packages for Kafka + MySQL support
       PYSPARK_SUBMIT_ARGS: "--packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.0,mysql:mysql-connector-java:8.0.28 pyspark-shell"
     volumes:
-      - ./notebooks:/home/jovyan/work
+      # Map current folder so 'producer_container.py' appears inside /home/jovyan/work
+      - ./:/home/jovyan/work
       - streaming_data:/data:rw
     networks:
       - data-network
-    # COMMAND TO DISABLE TOKEN (One-click login)
+    # Disable token for easy login
     command: start-notebook.sh --NotebookApp.token=''
 
   # --- DATABASE ---
