@@ -20,6 +20,7 @@ const Navbar = () => {
     { name: t("navigation.contact"), path: "/contact" },
   ];
 
+  
   const isActive = (path: string) => location.pathname === path;
 
   return (
@@ -117,7 +118,7 @@ const Navbar = () => {
             {!isRTL ? (
               <>
                 <LanguageSwitcher />
-                <Link to="/auth">
+                <Link to="/login">
                   <motion.div
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -125,13 +126,13 @@ const Navbar = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="transition-smooth hover:bg-primary hover:text-primary-foreground hover:border-primary font-mono"
+                      className="transition-smooth hover:bg-primary hover:text-primary-foreground hover:border-primary font-sans"
                     >
                       {t("navigation.login")}
                     </Button>
                   </motion.div>
                 </Link>
-                <Link to="/auth">
+                <Link to="/signup">
                   <motion.div
                     whileHover={{
                       scale: 1.05,
@@ -141,7 +142,7 @@ const Navbar = () => {
                   >
                     <Button
                       size="sm"
-                      className="bg-primary text-primary-foreground hover:glow-primary transition-smooth font-mono"
+                      className="bg-primary text-primary-foreground hover:glow-primary transition-smooth font-sans"
                     >
                       {t("auth.signUp")}
                     </Button>
@@ -150,7 +151,7 @@ const Navbar = () => {
               </>
             ) : (
               <>
-                <Link to="/auth">
+                <Link to="/signup">
                   <motion.div
                     whileHover={{
                       scale: 1.05,
@@ -160,13 +161,13 @@ const Navbar = () => {
                   >
                     <Button
                       size="sm"
-                      className="bg-primary text-primary-foreground hover:glow-primary transition-smooth font-mono"
+                      className="bg-primary text-primary-foreground hover:glow-primary transition-smooth font-sans"
                     >
                       {t("auth.signUp")}
                     </Button>
                   </motion.div>
                 </Link>
-                <Link to="/auth">
+                <Link to="/login">
                   <motion.div
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -174,7 +175,7 @@ const Navbar = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="transition-smooth hover:bg-primary hover:text-primary-foreground hover:border-primary font-mono"
+                      className="transition-smooth hover:bg-primary hover:text-primary-foreground hover:border-primary font-sans"
                     >
                       {t("navigation.login")}
                     </Button>

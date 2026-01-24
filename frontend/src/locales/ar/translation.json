@@ -30,7 +30,17 @@
     "noAccount": "ليس لديك حساب؟",
     "signUp": "أنشئ حساباً",
     "toastTitle": "مرحباً بعودتك!",
-    "toastDescription": "تم تسجيل الدخول بنجاح."
+    "toastDescription": "تم تسجيل الدخول بنجاح.",
+    "signupHeading": "إنشاء حساب",
+    "signupSubheading": "انضم إلى AutoElite اليوم",
+    "nameLabel": "الاسم الكامل",
+    "namePlaceholder": "أحمد محمد",
+    "confirmPasswordLabel": "تأكيد كلمة المرور",
+    "hasAccount": "لديك حساب بالفعل؟",
+    "signupToastTitle": "تم إنشاء الحساب!",
+    "signupToastDescription": "مرحباً بك في AutoElite",
+    "passwordMismatchTitle": "كلمات المرور غير متطابقة",
+    "passwordMismatchDescription": "يرجى التأكد من تطابق كلمتي المرور"
   },
   "hero": {
     "title": "ابحث عن سيارتك المثالية",
