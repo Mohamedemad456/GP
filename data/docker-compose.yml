@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+  # --- ZOOKEEPER ---
+  ed-zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    container_name: ed-zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - data-network
+
+  # --- KAFKA ---
+  ed-kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: ed-kafka
+    depends_on:
+      - ed-zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: ed-zookeeper:2181
+      
+      # 1. DEFINE LISTENER NAMES
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      
+      # 2. ADVERTISE LISTENERS (What clients see)
+      # - Spark (inside Docker) uses 'ed-kafka:29092' (INTERNAL)
+      # - Python Script (Localhost) uses 'localhost:9092' (EXTERNAL)
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://ed-kafka:29092,EXTERNAL://localhost:9092
+      
+      # 3. INTER-BROKER (Internal communication)
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      
+      # 4. CRITICAL: FORCE SINGLE NODE SETTINGS (Prevents crashing on start)
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      
+      # 5. AUTO-CREATE TOPICS (Replaces the broken KAFKA_CREATE_TOPICS var)
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    
+    restart: always
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    networks:
+      - data-network
+
+  # --- SPARK ---
+  ed-pyspark-jupyter:
+    image: jupyter/pyspark-notebook:spark-3.3.0
+    container_name: ed-pyspark-jupyter-lab
+    user: root
+    ports:
+      - "8889:8888"
+      - "4042:4041"
+    environment:
+      JUPYTER_PORT: 8889
+      SPARK_UI_PORT: 4042
+      GRANT_SUDO: "yes"
+      # Critical: Packages for Kafka and MySQL
+      PYSPARK_SUBMIT_ARGS: "--packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.0,mysql:mysql-connector-java:8.0.28 pyspark-shell"
+    volumes:
+      - ./notebooks:/home/jovyan/work
+      - streaming_data:/data:rw
+    networks:
+      - data-network
+
+  # --- DATABASE ---
+  database:
+    image: mysql:8.0
+    container_name: database
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+    volumes:
+      - database-data:/var/lib/mysql
+    networks:
+      - data-network
+
+volumes:
+  streaming_data:
+  database-data:
+  kafka_data:
+
+networks:
+  data-network:
+    driver: bridge
