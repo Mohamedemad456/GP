@@ -12,7 +12,7 @@ PAGES_TO_SCRAPE = 696
 KAFKA_TOPIC = "car-listings"
 # Use 'localhost:9092' if running outside Docker.
 # Use 'ed-kafka:29092' (or your kafka service name) if running inside Docker.
-KAFKA_BOOTSTRAP_SERVERS = ['ed-kafka:29092'] 
+KAFKA_BOOTSTRAP_SERVERS = ['localhost:9092']
 
 # --- INITIALIZE PRODUCER ---
 print(f"Connecting to Kafka at {KAFKA_BOOTSTRAP_SERVERS}...")
