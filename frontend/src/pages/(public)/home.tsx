@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { Button } from "@/lib";
+import { Button } from "@gp/design-system";
 import { ArrowRight } from "lucide-react";
 import heroCarImage from "@/assets/hero-car.jpg";
 
