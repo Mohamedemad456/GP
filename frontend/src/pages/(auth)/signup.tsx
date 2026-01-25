@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Button } from "@/lib";
-import { Input } from "@/lib";
+import { Button, Input } from "@gp/design-system";
 import { useToast } from "@/hooks/use-toast";
 import { Car, ArrowLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
