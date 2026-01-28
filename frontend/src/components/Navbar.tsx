@@ -95,15 +95,25 @@ const Navbar = () => {
                   }`}
                 >
                   {link.name}
-                  <motion.span
-                    className={`absolute -bottom-1 w-full h-0.5 bg-primary ${
-                      isRTL ? "right-0" : "left-0"
-                    }`}
-                    initial={{ scaleX: isActive(link.path) ? 1 : 0 }}
-                    whileHover={{ scaleX: 1 }}
-                    transition={{ duration: 0.3 }}
-                    style={{ originX: isRTL ? 1 : 0 }}
-                  />
+                  {isActive(link.path) ? (
+                    <motion.span
+                      className={`absolute -bottom-1 w-full h-0.5 bg-primary ${
+                        isRTL ? "right-0" : "left-0"
+                      }`}
+                      layoutId="navbar-active-underline"
+                      transition={{ type: "spring", stiffness: 500, damping: 40 }}
+                      style={{ originX: isRTL ? 1 : 0 }}
+                    />
+                  ) : (
+                    <motion.span
+                      className={`absolute -bottom-1 w-full h-0.5 bg-primary/0 ${
+                        isRTL ? "right-0" : "left-0"
+                      }`}
+                      whileHover={{ backgroundColor: "hsl(var(--primary))" }}
+                      transition={{ duration: 0.2 }}
+                      style={{ originX: isRTL ? 1 : 0 }}
+                    />
+                  )}
                 </Link>
               </motion.div>
             ))}
