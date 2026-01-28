@@ -1,3 +1,44 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@500;600;700&family=Tajawal:wght@400;500;700&display=swap");
 @import "tailwindcss";
 @import "@gp/design-system/styles.css";
+
+@layer utilities {
+  /* Clean, professional page background */
+  .hero-gradient {
+    background:
+      radial-gradient(
+        900px 520px at 50% -10%,
+        color-mix(in oklch, var(--primary) 12%, transparent),
+        transparent 60%
+      ),
+      linear-gradient(
+        to bottom,
+        color-mix(in oklch, var(--background) 96%, transparent),
+        color-mix(in oklch, var(--muted) 25%, var(--background))
+      );
+  }
+
+  /* Optional: very subtle texture */
+  .noise {
+    background-image: radial-gradient(
+      circle at 1px 1px,
+      color-mix(in oklch, var(--foreground) 6%, transparent) 1px,
+      transparent 0
+    );
+    background-size: 18px 18px;
+    opacity: 0.08;
+    pointer-events: none;
+  }
+
+  /* Elegant surface */
+  .glass {
+    background-color: color-mix(in oklch, var(--card) 92%, transparent);
+    backdrop-filter: blur(10px);
+    border: 1px solid color-mix(in oklch, var(--border) 85%, transparent);
+  }
+
+  /* Soft, professional elevation */
+  .shadow-elevated {
+    box-shadow: var(--shadow-md);
+  }
+}

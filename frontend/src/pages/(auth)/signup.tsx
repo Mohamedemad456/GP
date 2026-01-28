@@ -39,30 +39,29 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 hero-gradient py-12 flex-col">
-      <div className="flex items-center justify-between w-full mb-8">
-      <div className="fixed top-6 right-6">
+    <div className="min-h-screen flex items-center justify-center px-4 hero-gradient py-12">
+      <div className="fixed top-6 right-6 z-20">
         <LanguageSwitcher />
       </div>
       <Link
         to="/"
-        className="fixed top-6 left-6 flex items-center space-x-2 text-muted-foreground hover:text-foreground transition-fast group"
+        className="fixed top-6 left-6 z-20 flex items-center gap-2 text-muted-foreground hover:text-foreground transition-fast group"
       >
         <ArrowLeft className="h-5 w-5 group-hover:-translate-x-1 transition-smooth" />
         <span>{t("auth.backToHome")}</span>
       </Link>
-      </div>
+
       <div className="w-full max-w-md">
-        <div className="bg-card p-8 rounded-2xl border border-border shadow-2xl animate-scale-in">
+        <div className="bg-card/95 p-8 rounded-2xl border border-border/60 shadow-xl animate-scale-in">
           {/* Logo */}
           <div className="flex justify-center mb-8">
-            <div className="bg-primary p-3 rounded-xl">
+            <div className="bg-primary p-3 rounded-2xl shadow-sm">
               <Car className="h-8 w-8 text-primary-foreground" />
             </div>
           </div>
 
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold mb-2">{t("auth.signupHeading")}</h1>
+            <h1 className="text-3xl font-bold mb-2 font-heading">{t("auth.signupHeading")}</h1>
             <p className="text-muted-foreground">{t("auth.signupSubheading")}</p>
           </div>
 
@@ -78,7 +77,7 @@ const Signup = () => {
                 required
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full bg-secondary border-border focus:border-primary transition-smooth"
+                className="w-full bg-background border-border/70 focus:border-primary transition-smooth"
                 placeholder={t("auth.namePlaceholder")}
               />
             </div>
@@ -94,7 +93,7 @@ const Signup = () => {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full bg-secondary border-border focus:border-primary transition-smooth"
+                className="w-full bg-background border-border/70 focus:border-primary transition-smooth"
                 placeholder={t("auth.emailPlaceholder")}
               />
             </div>
@@ -110,7 +109,7 @@ const Signup = () => {
                 required
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full bg-secondary border-border focus:border-primary transition-smooth"
+                className="w-full bg-background border-border/70 focus:border-primary transition-smooth"
                 placeholder={t("auth.passwordPlaceholder")}
               />
             </div>
@@ -126,7 +125,7 @@ const Signup = () => {
                 required
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className="w-full bg-secondary border-border focus:border-primary transition-smooth"
+                className="w-full bg-background border-border/70 focus:border-primary transition-smooth"
                 placeholder={t("auth.passwordPlaceholder")}
               />
             </div>
