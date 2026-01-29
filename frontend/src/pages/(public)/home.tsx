@@ -247,17 +247,17 @@ const Home = () => {
             >
               <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/40 px-3 py-2 sm:px-4 backdrop-blur-md shadow-sm max-w-full">
                 <span className="h-2 w-2 rounded-full bg-primary shrink-0" />
-                <span className="text-xs sm:text-sm text-muted-foreground break-words">
+                <span className="text-xs sm:text-sm text-muted-foreground wrap-break-word">
                   {t("home.heroBadge", {
                     defaultValue: "Verified listings • Best deals",
                   })}
                 </span>
               </div>
 
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 text-foreground drop-shadow-lg font-heading px-2 break-words">
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 text-foreground drop-shadow-lg font-heading px-2 wrap-break-word">
                 {t("hero.title")}
               </h1>
-              <p className="text-base sm:text-xl lg:text-2xl text-muted-foreground mb-6 sm:mb-8 max-w-2xl mx-auto drop-shadow-md px-2 break-words">
+              <p className="text-base sm:text-xl lg:text-2xl text-muted-foreground mb-6 sm:mb-8 max-w-2xl mx-auto drop-shadow-md px-2 wrap-break-word">
                 {t("hero.subtitle")}
               </p>
               <motion.div
@@ -271,7 +271,7 @@ const Home = () => {
                       size="lg"
                       className="w-full sm:w-auto bg-primary text-primary-foreground hover:glow-primary transition-smooth font-sans text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6"
                     >
-                      <span className="break-words">{t("hero.cta")}</span>
+                      <span className="wrap-break-word">{t("hero.cta")}</span>
                       <ArrowRight
                         className={`ml-2 h-4 w-4 sm:h-5 sm:w-5 inline-block shrink-0 ${isRTL ? "rotate-180" : ""}`}
                       />
@@ -283,7 +283,7 @@ const Home = () => {
                       variant="outline"
                       className="w-full sm:w-auto bg-background/40 backdrop-blur-md text-sm sm:text-base px-6 sm:px-8 py-5 sm:py-6"
                     >
-                      <span className="break-words">
+                      <span className="wrap-break-word">
                         {t("home.heroSecondaryCta", {
                           defaultValue: "How it works",
                         })}
@@ -805,7 +805,7 @@ const Home = () => {
                   size="lg"
                   className="w-full sm:w-auto bg-primary text-primary-foreground hover:glow-primary"
                 >
-                  <span className="break-words">{t("home.cta.contact")}</span>
+                  <span className="wrap-break-word">{t("home.cta.contact")}</span>
                 </Button>
               </Link>
               <Link to="/about" className="w-full sm:w-auto">
@@ -814,7 +814,7 @@ const Home = () => {
                   variant="outline"
                   className="w-full sm:w-auto"
                 >
-                  <span className="break-words">{t("home.cta.learnMore")}</span>
+                  <span className="wrap-break-word">{t("home.cta.learnMore")}</span>
                 </Button>
               </Link>
             </div>
