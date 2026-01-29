@@ -1,4 +1,4 @@
-import { memo, useMemo, useState } from "react";
+import { memo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Car } from "lucide-react";
 import { Button } from "@/lib";
@@ -87,36 +87,13 @@ const Navbar = memo(() => {
               >
                 <Link
                   to={link.path}
-                  className={`text-sm font-medium transition-smooth relative group font-heading ${
+                  className={`block py-2 px-3 text-sm font-medium transition-smooth font-heading border-b-2 min-w-18 text-center ${
                     isActive(link.path)
-                      ? "text-primary"
-                      : "text-muted-foreground hover:text-foreground"
+                      ? "text-primary border-primary"
+                      : "border-transparent text-muted-foreground hover:text-foreground hover:border-primary/30"
                   }`}
                 >
                   {link.name}
-                  {isActive(link.path) ? (
-                    <motion.span
-                      className={`absolute -bottom-1 w-full h-0.5 bg-primary ${
-                        isRTL ? "right-0" : "left-0"
-                      }`}
-                      layoutId="navbar-active-underline"
-                      transition={{
-                        type: "spring",
-                        stiffness: 500,
-                        damping: 40,
-                      }}
-                      style={{ originX: isRTL ? 1 : 0 }}
-                    />
-                  ) : (
-                    <motion.span
-                      className={`absolute -bottom-1 w-full h-0.5 bg-primary/0 ${
-                        isRTL ? "right-0" : "left-0"
-                      }`}
-                      whileHover={{ backgroundColor: "hsl(var(--primary))" }}
-                      transition={{ duration: 0.2 }}
-                      style={{ originX: isRTL ? 1 : 0 }}
-                    />
-                  )}
                 </Link>
               </motion.div>
             ))}

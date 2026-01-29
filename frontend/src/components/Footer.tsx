@@ -13,7 +13,10 @@ const Footer = memo(() => {
   const year = useMemo(() => new Date().getFullYear(), []);
 
   return (
-    <footer className="mt-10 border-t border-border bg-background/90 backdrop-blur-lg">
+    <footer
+      className="mt-10 border-t border-border bg-background/90 backdrop-blur-lg"
+      dir={isRTL ? "rtl" : "ltr"}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
         <div
           className={`grid gap-8 md:grid-cols-3 items-start ${
@@ -39,9 +42,7 @@ const Footer = memo(() => {
               {t("footer.quickLinks")}
             </h3>
             <nav
-              className={`flex flex-col gap-2 text-sm ${
-                isRTL ? "items-end" : "items-start"
-              }`}
+              className={`flex flex-col gap-2 text-sm items-start`}
             >
               <Link
                 to="/"
