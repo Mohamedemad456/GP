@@ -240,5 +240,14 @@
       "description": "Check out our FAQ section for quick answers",
       "button": "View FAQ"
     }
+  },
+  "footer": {
+    "tagline": "Smart, transparent car marketplace for the GCC.",
+    "quickLinks": "Quick links",
+    "contact": "Contact",
+    "emailLabel": "Email",
+    "phoneLabel": "Phone",
+    "socialLabel": "Follow us",
+    "copyright": "© {{year}} Sayarti. All rights reserved."
   }
 }

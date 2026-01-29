@@ -142,7 +142,10 @@ const DEMO_CARS: CarListing[] = [
 
 const Home = () => {
   const { t, i18n } = useTranslation();
-  const isRTL = i18n.language?.startsWith("ar") ?? false;
+  const isRTL = useMemo(
+    () => i18n.language?.startsWith("ar") ?? false,
+    [i18n.language],
+  );
 
   const [query, setQuery] = useState("");
   const [make, setMake] = useState<string>("all");
@@ -215,7 +218,7 @@ const Home = () => {
   );
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen overflow-x-hidden">
       {/* Hero Section with Parallax Background */}
       <section className="relative h-screen overflow-hidden">
         {/* Fixed Background Image with Parallax Effect */}
@@ -242,19 +245,19 @@ const Home = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
             >
-              <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/40 px-4 py-2 backdrop-blur-md shadow-sm">
-                <span className="h-2 w-2 rounded-full bg-primary" />
-                <span className="text-sm text-muted-foreground">
+              <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/40 px-3 py-2 sm:px-4 backdrop-blur-md shadow-sm max-w-full">
+                <span className="h-2 w-2 rounded-full bg-primary shrink-0" />
+                <span className="text-xs sm:text-sm text-muted-foreground break-words">
                   {t("home.heroBadge", {
                     defaultValue: "Verified listings • Best deals",
                   })}
                 </span>
               </div>
 
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 text-foreground drop-shadow-lg font-heading">
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 text-foreground drop-shadow-lg font-heading px-2 break-words">
                 {t("hero.title")}
               </h1>
-              <p className="text-xl sm:text-2xl text-muted-foreground mb-8 max-w-2xl mx-auto drop-shadow-md">
+              <p className="text-base sm:text-xl lg:text-2xl text-muted-foreground mb-6 sm:mb-8 max-w-2xl mx-auto drop-shadow-md px-2 break-words">
                 {t("hero.subtitle")}
               </p>
               <motion.div
@@ -262,27 +265,29 @@ const Home = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
               >
-                <div className="flex flex-wrap items-center justify-center gap-3">
-                  <a href="#browse">
+                <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 px-2">
+                  <a href="#browse" className="w-full sm:w-auto">
                     <Button
                       size="lg"
-                      className="bg-primary text-primary-foreground hover:glow-primary transition-smooth font-sans text-lg px-8 py-6"
+                      className="w-full sm:w-auto bg-primary text-primary-foreground hover:glow-primary transition-smooth font-sans text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6"
                     >
-                      {t("hero.cta")}
+                      <span className="break-words">{t("hero.cta")}</span>
                       <ArrowRight
-                        className={`ml-2 h-5 w-5 inline-block ${isRTL ? "rotate-180" : ""}`}
+                        className={`ml-2 h-4 w-4 sm:h-5 sm:w-5 inline-block shrink-0 ${isRTL ? "rotate-180" : ""}`}
                       />
                     </Button>
                   </a>
-                  <Link to="/about">
+                  <Link to="/about" className="w-full sm:w-auto">
                     <Button
                       size="lg"
                       variant="outline"
-                      className="bg-background/40 backdrop-blur-md"
+                      className="w-full sm:w-auto bg-background/40 backdrop-blur-md text-sm sm:text-base px-6 sm:px-8 py-5 sm:py-6"
                     >
-                      {t("home.heroSecondaryCta", {
-                        defaultValue: "How it works",
-                      })}
+                      <span className="break-words">
+                        {t("home.heroSecondaryCta", {
+                          defaultValue: "How it works",
+                        })}
+                      </span>
                     </Button>
                   </Link>
                 </div>
@@ -344,14 +349,14 @@ const Home = () => {
           <Card className="border-border/60 bg-background/60 backdrop-blur-md">
             <CardContent className="p-4 sm:p-6">
               <div className="grid gap-3 md:grid-cols-12">
-                <div className="md:col-span-4">
+                <div className="sm:col-span-2 md:col-span-4">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
                       placeholder={t("home.browse.searchPlaceholder")}
-                      className="pl-9"
+                      className="pl-9 w-full min-w-0"
                     />
                   </div>
                 </div>
@@ -373,11 +378,11 @@ const Home = () => {
                   </select>
                 </div>
 
-                <div className="md:col-span-2">
+                <div className="sm:col-span-1 md:col-span-2">
                   <select
                     value={bodyType}
                     onChange={(e) => setBodyType(e.target.value)}
-                    className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                    className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] min-w-0"
                   >
                     <option value="all">
                       {t("home.browse.filters.bodyAll")}
@@ -437,10 +442,10 @@ const Home = () => {
                   </select>
                 </div>
 
-                <div className="md:col-span-3 flex gap-2">
+                <div className="sm:col-span-2 md:col-span-3 flex flex-col gap-2 sm:flex-row">
                   <Button
                     variant="outline"
-                    className="w-full"
+                    className="w-full sm:w-auto min-w-0"
                     onClick={() => {
                       setQuery("");
                       setMake("all");
@@ -450,11 +455,11 @@ const Home = () => {
                       setSort("featured");
                     }}
                   >
-                    {t("home.browse.clear")}
+                    <span className="truncate">{t("home.browse.clear")}</span>
                   </Button>
-                  <Link to="/contact" className="w-full">
-                    <Button className="w-full bg-primary text-primary-foreground hover:glow-primary">
-                      {t("home.browse.help")}
+                  <Link to="/contact" className="w-full sm:w-auto min-w-0">
+                    <Button className="w-full sm:w-auto bg-primary text-primary-foreground hover:glow-primary min-w-0">
+                      <span className="truncate">{t("home.browse.help")}</span>
                     </Button>
                   </Link>
                 </div>
@@ -488,69 +493,80 @@ const Home = () => {
                     viewport={{ once: true }}
                     transition={{ delay: Math.min(idx, 6) * 0.04 }}
                   >
-                    <Card className="group h-full overflow-hidden border-border/60 hover:shadow-lg transition-smooth flex flex-col">
-                      <div className="relative aspect-16/10 bg-linear-to-br from-muted/40 to-muted/10">
+                    <Card className="group h-full overflow-hidden border-border/60 hover:shadow-lg transition-smooth flex flex-col min-w-0">
+                      <div className="relative aspect-16/10 bg-linear-to-br from-muted/40 to-muted/10 min-w-0">
                         <div className="absolute inset-0 bg-linear-to-t from-background/70 via-transparent to-transparent" />
-                        <div className="absolute left-4 top-4 flex gap-2">
+                        <div className="absolute left-2 top-2 sm:left-4 sm:top-4 flex gap-1 sm:gap-2 flex-wrap">
                           {car.featured ? (
-                            <Badge className="bg-primary text-primary-foreground px-3 py-1">
-                              {t("home.browse.featured")}
+                            <Badge className="bg-primary text-primary-foreground px-2 py-0.5 sm:px-3 sm:py-1 text-xs">
+                              <span className="truncate">
+                                {t("home.browse.featured")}
+                              </span>
                             </Badge>
                           ) : null}
-                          <Badge variant="secondary" className="px-3 py-1">
-                            {car.bodyType}
+                          <Badge
+                            variant="secondary"
+                            className="px-2 py-0.5 sm:px-3 sm:py-1 text-xs"
+                          >
+                            <span className="truncate">{car.bodyType}</span>
                           </Badge>
                         </div>
-                        <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
-                          <div>
-                            <div className="text-sm text-muted-foreground">
+                        <div className="absolute bottom-2 left-2 right-2 sm:bottom-4 sm:left-4 sm:right-4 flex items-end justify-between gap-2 min-w-0">
+                          <div className="min-w-0 flex-1">
+                            <div className="text-xs sm:text-sm text-muted-foreground truncate">
                               {car.location}
                             </div>
-                            <div className="text-xl font-bold font-heading">
+                            <div className="text-base sm:text-xl font-bold font-heading truncate">
                               {car.make} {car.model}
                             </div>
-                            <div className="text-sm text-muted-foreground">
+                            <div className="text-xs sm:text-sm text-muted-foreground">
                               {car.year}
                             </div>
                           </div>
-                          <div className="text-right">
+                          <div className="text-right shrink-0">
                             <div className="text-xs text-muted-foreground">
                               {t("home.browse.priceFrom")}
                             </div>
-                            <div className="text-lg font-semibold text-primary">
+                            <div className="text-sm sm:text-lg font-semibold text-primary whitespace-nowrap">
                               {currency.format(car.price)}
                             </div>
                           </div>
                         </div>
                       </div>
 
-                      <CardContent className="p-4 flex flex-col h-full">
-                        <div className="grid grid-cols-3 gap-3 text-xs text-muted-foreground">
-                          <div className="flex items-center gap-2">
-                            <Gauge className="h-4 w-4 text-foreground/70" />
-                            <span>{car.mileageKm.toLocaleString()} km</span>
+                      <CardContent className="p-3 sm:p-4 flex flex-col h-full min-w-0">
+                        <div className="grid grid-cols-3 gap-2 sm:gap-3 text-xs text-muted-foreground min-w-0">
+                          <div className="flex items-center gap-1 sm:gap-2 min-w-0">
+                            <Gauge className="h-3 w-3 sm:h-4 sm:w-4 text-foreground/70 shrink-0" />
+                            <span className="truncate">
+                              {car.mileageKm.toLocaleString()} km
+                            </span>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <Fuel className="h-4 w-4 text-foreground/70" />
-                            <span>{car.fuel}</span>
+                          <div className="flex items-center gap-1 sm:gap-2 min-w-0">
+                            <Fuel className="h-3 w-3 sm:h-4 sm:w-4 text-foreground/70 shrink-0" />
+                            <span className="truncate">{car.fuel}</span>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <span className="h-4 w-4 inline-flex items-center justify-center rounded bg-muted text-foreground/70">
+                          <div className="flex items-center gap-1 sm:gap-2 min-w-0">
+                            <span className="h-3 w-3 sm:h-4 sm:w-4 inline-flex items-center justify-center rounded bg-muted text-foreground/70 shrink-0 text-[10px] sm:text-xs">
                               A
                             </span>
-                            <span>{car.transmission}</span>
+                            <span className="truncate">{car.transmission}</span>
                           </div>
                         </div>
 
-                        <div className="mt-auto pt-4 flex gap-2">
+                        <div className="mt-auto pt-3 sm:pt-4 flex gap-2 min-w-0">
                           <Button
                             variant="outline"
-                            className="flex-1 transition-smooth"
+                            className="flex-1 transition-smooth min-w-0"
                           >
-                            {t("home.browse.viewDetails")}
+                            <span className="truncate text-xs sm:text-sm">
+                              {t("home.browse.viewDetails")}
+                            </span>
                           </Button>
-                          <Button className="flex-1 bg-primary text-primary-foreground hover:glow-primary">
-                            {t("home.browse.save")}
+                          <Button className="flex-1 bg-primary text-primary-foreground hover:glow-primary min-w-0">
+                            <span className="truncate text-xs sm:text-sm">
+                              {t("home.browse.save")}
+                            </span>
                           </Button>
                         </div>
                       </CardContent>
@@ -783,18 +799,22 @@ const Home = () => {
             <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
               {t("home.cta.description")}
             </p>
-            <div className="flex gap-4 justify-center flex-wrap">
-              <Link to="/contact">
+            <div className="flex gap-3 sm:gap-4 justify-center flex-wrap px-2">
+              <Link to="/contact" className="w-full sm:w-auto">
                 <Button
                   size="lg"
-                  className="bg-primary text-primary-foreground hover:glow-primary"
+                  className="w-full sm:w-auto bg-primary text-primary-foreground hover:glow-primary"
                 >
-                  {t("home.cta.contact")}
+                  <span className="break-words">{t("home.cta.contact")}</span>
                 </Button>
               </Link>
-              <Link to="/about">
-                <Button size="lg" variant="outline">
-                  {t("home.cta.learnMore")}
+              <Link to="/about" className="w-full sm:w-auto">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                >
+                  <span className="break-words">{t("home.cta.learnMore")}</span>
                 </Button>
               </Link>
             </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Car } from "lucide-react";
 import { Button } from "@/lib";
@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "./LanguageSwitcher";
 
-const Navbar = () => {
+const Navbar = memo(() => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const { t, i18n } = useTranslation();
@@ -20,7 +20,6 @@ const Navbar = () => {
     { name: t("navigation.contact"), path: "/contact" },
   ];
 
-  
   const isActive = (path: string) => location.pathname === path;
 
   return (
@@ -101,7 +100,11 @@ const Navbar = () => {
                         isRTL ? "right-0" : "left-0"
                       }`}
                       layoutId="navbar-active-underline"
-                      transition={{ type: "spring", stiffness: 500, damping: 40 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 500,
+                        damping: 40,
+                      }}
                       style={{ originX: isRTL ? 1 : 0 }}
                     />
                   ) : (
@@ -300,6 +303,8 @@ const Navbar = () => {
       </AnimatePresence>
     </motion.nav>
   );
-};
+});
+
+Navbar.displayName = "Navbar";
 
 export default Navbar;
