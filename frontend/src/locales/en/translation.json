@@ -30,11 +30,224 @@
     "noAccount": "Don't have an account?",
     "signUp": "Sign up",
     "toastTitle": "Welcome back!",
-    "toastDescription": "You've successfully logged in."
+    "toastDescription": "You've successfully logged in.",
+    "signupHeading": "Create Account",
+    "signupSubheading": "Join AutoElite today",
+    "nameLabel": "Full Name",
+    "namePlaceholder": "John Doe",
+    "confirmPasswordLabel": "Confirm Password",
+    "hasAccount": "Already have an account?",
+    "signupToastTitle": "Account created!",
+    "signupToastDescription": "Welcome to AutoElite",
+    "passwordMismatchTitle": "Passwords don't match",
+    "passwordMismatchDescription": "Please make sure both passwords are the same"
   },
   "hero": {
     "title": "Find Your Perfect Car",
     "subtitle": "Discover amazing vehicles at unbeatable prices",
     "cta": "Explore Now"
+  },
+  "home": {
+    "heroBadge": "Verified listings • Best deals",
+    "heroSecondaryCta": "How it works",
+    "browse": {
+      "title": "Browse Cars",
+      "subtitle": "Search, filter, and compare — find your next car in minutes.",
+      "results": "{{count}} results",
+      "searchPlaceholder": "Search make, model, year, location...",
+      "filters": {
+        "makeAll": "All makes",
+        "bodyAll": "All body types",
+        "minPrice": "Min price",
+        "maxPrice": "Max price"
+      },
+      "sort": {
+        "featured": "Featured",
+        "priceAsc": "Price: Low to High",
+        "priceDesc": "Price: High to Low",
+        "yearDesc": "Newest year"
+      },
+      "clear": "Clear",
+      "help": "Need help?",
+      "featured": "Featured",
+      "priceFrom": "From",
+      "viewDetails": "View details",
+      "save": "Save",
+      "empty": {
+        "title": "No cars found",
+        "subtitle": "Try adjusting your search or filters."
+      }
+    },
+    "features": {
+      "title": "Why Choose Us",
+      "subtitle": "Everything you need to find your perfect vehicle",
+      "search": {
+        "title": "Advanced Search",
+        "description": "Filter by make, model, price, and more to find exactly what you're looking for"
+      },
+      "verified": {
+        "title": "Verified Listings",
+        "description": "All vehicles are thoroughly inspected and verified for quality and authenticity"
+      },
+      "bestPrice": {
+        "title": "Best Prices",
+        "description": "Compare prices from multiple dealers and get the best deals available"
+      },
+      "support": {
+        "title": "24/7 Support",
+        "description": "Our team is always ready to help you with any questions or concerns"
+      }
+    },
+    "testimonials": {
+      "title": "What Our Customers Say",
+      "subtitle": "Don't just take our word for it - hear from our satisfied customers",
+      "testimonial1": {
+        "name": "Sarah Johnson",
+        "role": "Car Buyer",
+        "content": "Found my dream car in just a few days! The platform is so easy to use and the support team was incredibly helpful throughout the process."
+      },
+      "testimonial2": {
+        "name": "Michael Chen",
+        "role": "First-time Buyer",
+        "content": "As someone new to buying cars, I was nervous. But Sayarti made everything simple and transparent. Highly recommend!"
+      },
+      "testimonial3": {
+        "name": "Emma Williams",
+        "role": "Car Enthusiast",
+        "content": "The best car marketplace I've used. Great selection, verified listings, and excellent customer service. Five stars!"
+      }
+    },
+    "whyChoose": {
+      "title": "Why Choose Sayarti",
+      "subtitle": "Your trusted partner in finding the perfect vehicle",
+      "reason1": "Wide selection of verified vehicles from trusted dealers",
+      "reason2": "Transparent pricing with no hidden fees",
+      "reason3": "Expert support team available 24/7",
+      "reason4": "Secure and easy transaction process",
+      "cardTitle": "Trusted by Thousands",
+      "cardDescription": "Join over 50,000 satisfied customers who found their perfect car through Sayarti",
+      "learnMore": "Learn More"
+    },
+    "cta": {
+      "title": "Ready to Find Your Perfect Car?",
+      "description": "Start browsing our extensive collection of verified vehicles today",
+      "contact": "Contact Us",
+      "learnMore": "Learn More"
+    }
+  },
+  "about": {
+    "hero": {
+      "title": "About Sayarti",
+      "subtitle": "Your trusted partner in finding the perfect vehicle"
+    },
+    "stats": {
+      "customers": "Happy Customers",
+      "vehicles": "Vehicles Listed",
+      "years": "Years of Experience",
+      "satisfaction": "Satisfaction Rate"
+    },
+    "mission": {
+      "title": "Our Mission",
+      "description": "At Sayarti, we're dedicated to revolutionizing the car buying experience. We believe that finding your perfect vehicle should be simple, transparent, and stress-free.",
+      "description2": "Our platform connects buyers with trusted dealers, providing verified listings, competitive pricing, and exceptional customer support every step of the way.",
+      "cardTitle": "Building Trust",
+      "cardDescription": "We've built our reputation on trust, transparency, and exceptional service. Every vehicle on our platform is verified, and every dealer is carefully vetted."
+    },
+    "values": {
+      "title": "Our Values",
+      "subtitle": "The principles that guide everything we do",
+      "trust": {
+        "title": "Trust",
+        "description": "We build lasting relationships through transparency and honesty in every interaction"
+      },
+      "quality": {
+        "title": "Quality",
+        "description": "We maintain the highest standards in vehicle verification and dealer partnerships"
+      },
+      "innovation": {
+        "title": "Innovation",
+        "description": "We continuously improve our platform with cutting-edge technology and features"
+      },
+      "customer": {
+        "title": "Customer First",
+        "description": "Your satisfaction is our top priority, and we go above and beyond to exceed expectations"
+      }
+    },
+    "cta": {
+      "title": "Join Us on This Journey",
+      "description": "Whether you're buying or selling, we're here to help you every step of the way",
+      "contact": "Get in Touch",
+      "explore": "Explore Vehicles"
+    }
+  },
+  "contact": {
+    "hero": {
+      "title": "Get in Touch",
+      "subtitle": "We're here to help you find your perfect car"
+    },
+    "form": {
+      "title": "Send us a Message",
+      "description": "Fill out the form below and we'll get back to you as soon as possible",
+      "name": {
+        "label": "Full Name",
+        "placeholder": "John Doe"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "you@example.com"
+      },
+      "phone": {
+        "label": "Phone Number",
+        "placeholder": "+1 (555) 000-0000"
+      },
+      "subject": {
+        "label": "Subject",
+        "placeholder": "How can we help?"
+      },
+      "message": {
+        "label": "Message",
+        "placeholder": "Tell us more about your inquiry..."
+      },
+      "submit": "Send Message",
+      "submitting": "Sending...",
+      "success": {
+        "title": "Message Sent!",
+        "description": "We'll get back to you within 24 hours."
+      }
+    },
+    "info": {
+      "title": "Contact Information",
+      "description": "Reach out to us through any of these channels",
+      "email": {
+        "title": "Email",
+        "content": "info@sayarti.com"
+      },
+      "phone": {
+        "title": "Phone",
+        "content": "+1 (555) 123-4567"
+      },
+      "address": {
+        "title": "Address",
+        "content": "123 Car Street, Auto City, AC 12345"
+      },
+      "hours": {
+        "title": "Business Hours",
+        "content": "Mon - Fri: 9:00 AM - 6:00 PM"
+      }
+    },
+    "faq": {
+      "title": "Have Questions?",
+      "description": "Check out our FAQ section for quick answers",
+      "button": "View FAQ"
+    }
+  },
+  "footer": {
+    "tagline": "Smart, transparent car marketplace for the GCC.",
+    "quickLinks": "Quick links",
+    "contact": "Contact",
+    "emailLabel": "Email",
+    "phoneLabel": "Phone",
+    "socialLabel": "Follow us",
+    "copyright": "© {{year}} Sayarti. All rights reserved."
   }
 }
