@@ -1,0 +1,6 @@
+@Karna.APIs_HostAddress = http://localhost:5082
+
+GET {{Karna.APIs_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
