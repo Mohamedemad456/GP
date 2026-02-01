@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>697d53a7-c822-487b-b7be-ff671877cb10</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.2" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\" />
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Karna.APIs.Controllers\Karna.APIs.Controllers.csproj" />
+    <ProjectReference Include="..\Karna.Core.Application\Karna.Core.Application.csproj" />
+    <ProjectReference Include="..\Karna.Infrastructure.Persistence\Karna.Infrastructure.Persistence.csproj" />
+    <ProjectReference Include="..\Karna.Infrastructure\Karna.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
