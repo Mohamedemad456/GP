@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/APIs/">
+    <Project Path="Karna.APIs.Controllers/Karna.APIs.Controllers.csproj" />
+    <Project Path="Karna.APIs/Karna.APIs.csproj" />
+  </Folder>
+  <Folder Name="/src/Core/">
+    <Project Path="Karna.Core.Application.Abstraction/Karna.Core.Application.Abstraction.csproj" />
+    <Project Path="Karna.Core.Application/Karna.Core.Application.csproj" />
+    <Project Path="Karna.Core.Domain/Karna.Core.Domain.csproj" />
+  </Folder>
+  <Folder Name="/src/Infrastructure/">
+    <Project Path="Karna.Infrastructure.Persistence/Karna.Infrastructure.Persistence.csproj" />
+    <Project Path="Karna.Infrastructure/Karna.Infrastructure.csproj" />
+  </Folder>
+</Solution>

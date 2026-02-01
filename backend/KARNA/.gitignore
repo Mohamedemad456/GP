@@ -1,0 +1,94 @@
+##################################
+# Visual Studio / IDEs
+##################################
+.vs/
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.rsuser
+
+##################################
+# Build Output
+##################################
+bin/
+obj/
+out/
+artifacts/
+
+##################################
+# Logs
+##################################
+*.log
+logs/
+
+##################################
+# App Settings (Local / Secrets)
+##################################
+appsettings.Development.json
+appsettings.Local.json
+appsettings.Staging.json
+appsettings.*.json
+
+##################################
+# Environment Variables
+##################################
+.env
+.env.*
+*.env
+
+##################################
+# Secrets / Certificates
+##################################
+secrets.json
+*.pfx
+*.snk
+*.key
+*.crt
+
+##################################
+# Publish Output
+##################################
+publish/
+*.publishsettings
+
+##################################
+# Test Results
+##################################
+TestResults/
+*.trx
+coverage/
+
+##################################
+# Entity Framework Core
+##################################
+# ❗ IMPORTANT:
+# We keep main migration files
+# Ignore only auto-generated designer/snapshot if needed
+Migrations/*.Designer.cs
+Migrations/*_Snapshot.cs
+
+##################################
+# Docker
+##################################
+# Keep base docker files
+docker-compose.override.yml
+Dockerfile.*
+.dockerignore
+
+##################################
+# OS Junk
+##################################
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+##################################
+# Temporary / Backup
+##################################
+*.tmp
+*.bak
+*.swp
+*~
