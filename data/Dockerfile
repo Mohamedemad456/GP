@@ -4,23 +4,32 @@ FROM jupyter/pyspark-notebook:spark-3.3.0
 # Switch to root to install system packages
 USER root
 
-# 1. Update pip and install Python libraries
-# We include 'lxml' here since you wanted it for speed
+# --- 1. INSTALL GOOGLE CHROME (For Selenium) ---
+# We add Google's key, add the repo, and install the stable browser
+RUN apt-get update && apt-get install -y wget gnupg2 && \
+    wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - && \
+    sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list' && \
+    apt-get update && \
+    apt-get install -y google-chrome-stable
+
+# --- 2. INSTALL PYTHON LIBRARIES ---
+# Added 'selenium' and 'webdriver-manager' to the list
 RUN pip install --no-cache-dir \
     kafka-python \
     playwright \
+    selenium \
+    webdriver-manager \
     lxml \
     beautifulsoup4 \
     pandas
 
-# 2. Install Playwright Browsers & Dependencies
-# This automatically downloads Chromium and all the Linux libraries needed to run it.
+# --- 3. INSTALL PLAYWRIGHT BROWSERS ---
+# This installs the browsers specifically for Playwright
 RUN playwright install chromium
 RUN playwright install-deps chromium
 
-# 3. Set the working directory
+# --- 4. SETUP WORKSPACE ---
 WORKDIR /home/jovyan/work
 
-# (Optional) Switch back to the default user if you prefer, 
-# but keeping root avoids permission issues with some scripts.
-# USER jovyan
+# Final clean up to keep image size down (Optional)
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*

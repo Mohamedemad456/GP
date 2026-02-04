@@ -10,7 +10,27 @@ import csv
 import threading
 import concurrent.futures
 import math
-import re  # Added for robust text extraction
+import re
+import json
+from kafka import KafkaProducer  # <--- NEW IMPORT
+
+# --- KAFKA CONFIGURATION ---
+KAFKA_TOPIC = "car-listings"
+KAFKA_BOOTSTRAP_SERVERS = ['ed-kafka:29092']  # Internal Docker Address
+
+# --- INITIALIZE PRODUCER ---
+# We do this globally so all threads use the same connection
+print(f"Connecting to Kafka at {KAFKA_BOOTSTRAP_SERVERS}...")
+try:
+    producer = KafkaProducer(
+        bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,
+        value_serializer=lambda x: json.dumps(x).encode('utf-8')
+    )
+    print("✅ Kafka Producer connected!")
+except Exception as e:
+    print(f"⚠️ Kafka connection failed: {e}")
+    print("   (The script will continue scraping to CSV anyway)")
+    producer = None
 
 class DubizzleCarScraper:
     def __init__(self, headless=True):
@@ -39,17 +59,14 @@ class DubizzleCarScraper:
             print(f"Error loading page: {e}")
             return
         
-        # FIX 1: Wait for "EGP" to appear. 
-        # This guarantees that the listings (which contain prices) have actually loaded.
         try:
             self.wait.until(EC.text_to_be_present_in_element((By.TAG_NAME, "body"), "EGP"))
         except:
             print("Error: content (EGP) never loaded on page")
             return
 
-        time.sleep(2) # Brief pause for layout to settle
+        time.sleep(2)
         
-        # Scroll to load all lazy images/items
         try:
             for _ in range(3):
                 self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
@@ -59,14 +76,10 @@ class DubizzleCarScraper:
         
         soup = BeautifulSoup(self.driver.page_source, 'html.parser')
         
-        # FIX 2: Broad Selector
-        # Instead of looking for specific class names, we grab ALL list items ('li')
-        # and check if they look like a car listing (contain 'EGP').
         raw_listings = soup.find_all('li')
         listings = [x for x in raw_listings if "EGP" in x.get_text()]
         
         if not listings:
-            # Fallback: Try looking for articles if LI method fails
             raw_listings = soup.find_all('article')
             listings = [x for x in raw_listings if "EGP" in x.get_text()]
 
@@ -78,53 +91,57 @@ class DubizzleCarScraper:
                 if car_data and car_data['url'] not in self.seen_urls:
                     self.seen_urls.add(car_data['url'])
                     self.cars_data.append(car_data)
+                    
+                    # --- KAFKA INJECTION POINT ---
+                    if producer:
+                        # Clean price for database (remove commas/currency text)
+                        clean_data = car_data.copy()
+                        # Ensure price is just a number string "1500000"
+                        if 'price_egp' in clean_data:
+                             clean_data['price_egp'] = re.sub(r'[^\d]', '', str(clean_data['price_egp']))
+                        if 'mileage_km' in clean_data:
+                             clean_data['mileage_km'] = re.sub(r'[^\d]', '', str(clean_data['mileage_km']))
+                        
+                        clean_data['source'] = 'dubizzle'
+                        producer.send(KAFKA_TOPIC, clean_data)
+
             except Exception as e:
-                # print(f"Skipping bad listing: {e}")
                 continue
+        
+        # Flush regularly to keep data moving
+        if producer: producer.flush()
 
     def extract_car_data(self, listing, page_num, transmission_type):
-        """Extract data using Regex and Text Analysis (Classes break too easily)"""
         try:
             car = {}
-            text_content = listing.get_text(" ", strip=True) # Get all text in one string
+            text_content = listing.get_text(" ", strip=True)
             
-            # 1. URL
             link_elem = listing.find('a', href=True)
             if not link_elem: return None
             raw_link = link_elem['href']
             car['url'] = 'https://www.dubizzle.com.eg' + raw_link if not raw_link.startswith('http') else raw_link
             
-            # 2. Price (Find 'EGP' followed by numbers)
-            # Looks for "EGP 1,234,567" or similar patterns
             price_match = re.search(r'EGP\s*[\d,]+', text_content)
             car['price_egp'] = price_match.group(0) if price_match else "N/A"
 
-            # 3. Year (Find any 4-digit number between 1980 and 2027)
             year_match = re.search(r'\b(19[8-9]\d|20[0-2]\d)\b', text_content)
             car['year'] = year_match.group(0) if year_match else "N/A"
 
-            # 4. Mileage (Find number followed by 'km' or 'Km')
             km_match = re.search(r'[\d,]+\s*[kK]m', text_content)
             car['mileage_km'] = km_match.group(0) if km_match else "N/A"
             
-            # 5. Title (Usually the text inside the Heading tag)
             title_elem = listing.find(['h2', 'h3', 'h4'])
             if title_elem:
                 car['title'] = title_elem.get_text(strip=True)
             else:
-                # Fallback: If no heading, assume title is the aria-label of the link
                 car['title'] = link_elem.get('aria-label', link_elem.get('title', 'N/A'))
 
-            # 6. Location (Everything else is hard, but location is usually at the end)
-            # We will search for common Egyptian cities to be safe, or take the last span
-            # This is a simple heuristic:
             spans = listing.find_all('span')
             if spans:
-                car['location'] = spans[-1].get_text(strip=True) # Often the last item is location/time
+                car['location'] = spans[-1].get_text(strip=True)
             else:
                 car['location'] = "N/A"
 
-            # 7. Transmission
             if transmission_type.lower() == "manual":
                 car['transmission'] = "Manual"
             elif transmission_type.lower() == "automatic":
@@ -132,7 +149,6 @@ class DubizzleCarScraper:
             else:
                 car['transmission'] = "N/A"
 
-            # 8. Fuel Type
             fuel_types = ['Benzine', 'Natural Gas', 'Diesel', 'Electric', 'Hybrid']
             if any(ft in text_content for ft in fuel_types):
                 for ft in fuel_types:
@@ -153,7 +169,6 @@ class DubizzleCarScraper:
     def close(self):
         self.driver.quit()
 
-# --- Worker Function (Unchanged logic, just updated for new class) ---
 def scrape_batch(page_range, base_url, headless=True, transmission_type=""):
     start_page, end_page = page_range
     print(f"Worker started for pages {start_page} to {end_page}")
@@ -170,14 +185,12 @@ def scrape_batch(page_range, base_url, headless=True, transmission_type=""):
 
 if __name__ == "__main__":
 
-    TOTAL_PAGES_TO_SCRAPE = 2 # Number of pages will be 200 after the pipeline
-    NUM_WORKERS = 1 # Number workers for each type of transmission max 3 after the pipeline
+    TOTAL_PAGES_TO_SCRAPE = 2
+    NUM_WORKERS = 1
     HEADLESS_MODE = True
     all_cars = []
 
-
     def scrape_manual_cars():
-    
         BASE_URL = "https://www.dubizzle.com.eg/en/vehicles/cars-for-sale/used/?filter=transmission_eq_1"  
         pages_per_worker = math.ceil(TOTAL_PAGES_TO_SCRAPE / NUM_WORKERS)
         batches = []
@@ -200,10 +213,8 @@ if __name__ == "__main__":
                     all_cars.extend(data)
                 except Exception as exc:
                     print(f"Worker exception: {exc}")
-    
 
     def scrape_automatic_cars():
-    
         BASE_URL = "https://www.dubizzle.com.eg/en/vehicles/cars-for-sale/used/?filter=transmission_eq_2"  
         pages_per_worker = math.ceil(TOTAL_PAGES_TO_SCRAPE / NUM_WORKERS)
         batches = []
@@ -249,3 +260,6 @@ if __name__ == "__main__":
             writer.writeheader()
             writer.writerows(unique_cars_list)
         print("Saved to dubizzle_cars_parallel.csv")
+        
+    # Close Producer
+    if producer: producer.close()
