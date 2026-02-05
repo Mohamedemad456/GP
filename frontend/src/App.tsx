@@ -10,6 +10,7 @@ const About = lazy(() => import("@/pages/(public)/about"));
 const Contact = lazy(() => import("@/pages/(public)/contact"));
 const Login = lazy(() => import("@/pages/(auth)/login"));
 const Signup = lazy(() => import("@/pages/(auth)/signup"));
+const Onboarding = lazy(() => import("@/pages/(auth)/onboarding"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -46,6 +47,7 @@ function App() {
           </Route>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/onboarding" element={<Onboarding />} />
         </Routes>
       </Suspense>
       <Toaster position={toasterPosition} richColors />

@@ -42,6 +42,23 @@
     "passwordMismatchTitle": "Passwords don't match",
     "passwordMismatchDescription": "Please make sure both passwords are the same"
   },
+  "onboarding": {
+    "role": {
+      "title": "What brings you here?",
+      "subtitle": "Help us personalize your experience",
+      "buyer": "I'm a Buyer",
+      "buyerDesc": "Looking to find my perfect car",
+      "seller": "I'm a Seller",
+      "sellerDesc": "Looking to list my vehicles"
+    },
+    "skip": "Skip for now",
+    "favorites": {
+      "title": "Pick your top 3 favorites",
+      "subtitle": "Select up to {{count}} car models you're interested in",
+      "selected": "{{count}} of {{max}} selected",
+      "continue": "Continue"
+    }
+  },
   "hero": {
     "title": "Find Your Perfect Car",
     "subtitle": "Discover amazing vehicles at unbeatable prices",
