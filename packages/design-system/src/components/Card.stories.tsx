@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react"
+import type { Meta, StoryObj } from "@storybook/react";
 import {
   Card,
   CardHeader,
@@ -7,9 +7,9 @@ import {
   CardContent,
   CardFooter,
   CardAction,
-} from "./card"
-import { Button } from "./button"
-import { Input } from "./input"
+} from "./card";
+import { Button } from "./button";
+import { Input } from "./input";
 
 const meta: Meta<typeof Card> = {
   title: "Design System/Card",
@@ -18,11 +18,11 @@ const meta: Meta<typeof Card> = {
     layout: "centered",
   },
   tags: ["autodocs"],
-}
+};
 
-export default meta
+export default meta;
 
-type Story = StoryObj<typeof Card>
+type Story = StoryObj<typeof Card>;
 
 export const Default: Story = {
   render: () => (
@@ -41,7 +41,7 @@ export const Default: Story = {
       </CardFooter>
     </Card>
   ),
-}
+};
 
 export const WithAction: Story = {
   render: () => (
@@ -62,7 +62,7 @@ export const WithAction: Story = {
       </CardContent>
     </Card>
   ),
-}
+};
 
 export const LoginForm: Story = {
   render: () => (
@@ -86,4 +86,4 @@ export const LoginForm: Story = {
       </CardFooter>
     </Card>
   ),
-}
+};

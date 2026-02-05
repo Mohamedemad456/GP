@@ -42,6 +42,23 @@
     "passwordMismatchTitle": "كلمات المرور غير متطابقة",
     "passwordMismatchDescription": "يرجى التأكد من تطابق كلمتي المرور"
   },
+  "onboarding": {
+    "role": {
+      "title": "ما الذي أتى بك هنا؟",
+      "subtitle": "ساعدنا في تخصيص تجربتك",
+      "buyer": "مشتري",
+      "buyerDesc": "أبحث عن سيارتي المثالية",
+      "seller": "بائع",
+      "sellerDesc": "أبحث عن إدراج مركباتي"
+    },
+    "skip": "تخطي الآن",
+    "favorites": {
+      "title": "اختر أفضل 3 ماركات لديك",
+      "subtitle": "اختر حتى {{count}} موديلات سيارات تهتم بها",
+      "selected": "{{count}} من {{max}} محددة",
+      "continue": "متابعة"
+    }
+  },
   "hero": {
     "title": "ابحث عن سيارتك المثالية",
     "subtitle": "اكتشف مركبات رائعة بأسعار لا تقبل المنافسة",

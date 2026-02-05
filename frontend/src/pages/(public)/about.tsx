@@ -11,12 +11,7 @@ import {
   CardTitle,
 } from "@gp/design-system";
 import { Award, Car, Heart, Shield, TrendingUp, Users } from "lucide-react";
-
-type ValueItem = {
-  icon: typeof Shield;
-  title: string;
-  description: string;
-};
+import type { ValueItem } from "@/types";
 
 const About = () => {
   const { t, i18n } = useTranslation();
