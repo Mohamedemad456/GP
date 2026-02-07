@@ -24,20 +24,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import heroCarImage from "@/assets/hero-car.jpg";
-
-type CarListing = {
-  id: string;
-  make: string;
-  model: string;
-  year: number;
-  price: number;
-  mileageKm: number;
-  fuel: "Gasoline" | "Hybrid" | "Electric";
-  transmission: "Automatic" | "Manual";
-  bodyType: "Sedan" | "SUV" | "Hatchback" | "Coupe" | "Pickup";
-  location: string;
-  featured?: boolean;
-};
+import type { CarListing } from "@/types";
 
 const DEMO_CARS: CarListing[] = [
   {

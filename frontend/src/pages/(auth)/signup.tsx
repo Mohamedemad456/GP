@@ -23,11 +23,11 @@ const Signup = () => {
       error(t("auth.passwordMismatchTitle"), {
         description: t("auth.passwordMismatchDescription"),
       });
-    } else {    
+    } else {
       success(t("auth.signupToastTitle"), {
         description: t("auth.signupToastDescription"),
       });
-      setTimeout(() => navigate("/"), 1000);
+      setTimeout(() => navigate("/onboarding"), 1000);
     }
   };
 
@@ -61,8 +61,12 @@ const Signup = () => {
           </div>
 
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold mb-2 font-heading">{t("auth.signupHeading")}</h1>
-            <p className="text-muted-foreground">{t("auth.signupSubheading")}</p>
+            <h1 className="text-3xl font-bold mb-2 font-heading">
+              {t("auth.signupHeading")}
+            </h1>
+            <p className="text-muted-foreground">
+              {t("auth.signupSubheading")}
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -99,7 +103,10 @@ const Signup = () => {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium mb-2">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium mb-2"
+              >
                 {t("auth.passwordLabel")}
               </label>
               <Input
@@ -115,7 +122,10 @@ const Signup = () => {
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium mb-2">
+              <label
+                htmlFor="confirmPassword"
+                className="block text-sm font-medium mb-2"
+              >
                 {t("auth.confirmPasswordLabel")}
               </label>
               <Input
@@ -142,7 +152,10 @@ const Signup = () => {
           <div className="mt-6 text-center">
             <p className="text-sm text-muted-foreground">
               {t("auth.hasAccount")}{" "}
-              <Link to="/login" className="text-primary hover:underline font-medium">
+              <Link
+                to="/login"
+                className="text-primary hover:underline font-medium"
+              >
                 {t("auth.signIn")}
               </Link>
             </p>
