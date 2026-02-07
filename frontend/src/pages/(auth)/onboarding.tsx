@@ -1,30 +1,13 @@
-import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Car, ArrowLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import { RoleSlide, FavoriteModelsSlide } from "@/components/onboarding";
-import { OnboardingRole } from "@/types";
+import { FavoriteModelsSlide } from "@/components/onboarding";
 import { MOCK_CAR_MODELS } from "@/data/mocks/cars";
 
 const Onboarding = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const [step, setStep] = useState<1 | 2>(1);
-  const [role, setRole] = useState<OnboardingRole | null>(null);
-
-  const handleRoleSelect = (selectedRole: OnboardingRole) => {
-    setRole(selectedRole);
-    if (selectedRole === OnboardingRole.Seller) {
-      navigate("/", { replace: true });
-    } else {
-      setStep(2);
-    }
-  };
-
-  const handleSkip = () => {
-    navigate("/", { replace: true });
-  };
 
   const handleFavoritesSubmit = (selectedIds: string[]) => {
     // TODO: Persist selectedIds to API or localStorage when backend is ready
@@ -53,29 +36,10 @@ const Onboarding = () => {
             </div>
           </div>
 
-          <div className="flex justify-center gap-2 mb-8">
-            <span
-              className={`h-1.5 w-12 rounded-full transition-colors ${
-                step === 1 ? "bg-primary" : "bg-primary/30"
-              }`}
-            />
-            <span
-              className={`h-1.5 w-12 rounded-full transition-colors ${
-                step === 2 ? "bg-primary" : "bg-muted"
-              }`}
-            />
-          </div>
-
-          {step === 1 && (
-            <RoleSlide onSelect={handleRoleSelect} onSkip={handleSkip} />
-          )}
-
-          {step === 2 && role === OnboardingRole.Buyer && (
-            <FavoriteModelsSlide
-              carModels={MOCK_CAR_MODELS}
-              onSubmit={handleFavoritesSubmit}
-            />
-          )}
+          <FavoriteModelsSlide
+            carModels={MOCK_CAR_MODELS}
+            onSubmit={handleFavoritesSubmit}
+          />
         </div>
       </div>
     </div>
