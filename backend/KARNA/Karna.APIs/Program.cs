@@ -1,25 +1,34 @@
 
+
+using Karna.APIs.Extensions;
+using Karna.Infrastructure.Persistence.DependencyInjection;
+
 namespace Karna.APIs
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
-            var builder = WebApplication.CreateBuilder(args);
+            var webApplicationBuilder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
 
-            builder.Services.AddControllers();
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-            builder.Services.AddOpenApi();
+            webApplicationBuilder.Services.AddControllers();
+            webApplicationBuilder.Services.AddEndpointsApiExplorer();
+            webApplicationBuilder.Services.AddSwaggerGen();
 
-            var app = builder.Build();
+            webApplicationBuilder.Services.AddPersistenceDI(webApplicationBuilder.Configuration);
+
+			var app = webApplicationBuilder.Build();
+
+			await app.InitializeDbAsync();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                app.MapOpenApi();
-            }
+                app.UseSwagger();
+                app.UseSwaggerUI();
+			}
 
             app.UseHttpsRedirection();
 
@@ -28,7 +37,7 @@ namespace Karna.APIs
 
             app.MapControllers();
 
-            app.Run();
+            await app.RunAsync();
         }
     }
 }
