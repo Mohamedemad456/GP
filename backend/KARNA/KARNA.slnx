@@ -1,4 +1,8 @@
 <Solution>
+  <Folder Name="/docs/">
+    <File Path="../../../Karna_GP_ERD.pdf" />
+    <File Path="../../../ref_structure.txt" />
+  </Folder>
   <Folder Name="/src/" />
   <Folder Name="/src/APIs/">
     <Project Path="Karna.APIs.Controllers/Karna.APIs.Controllers.csproj" />
