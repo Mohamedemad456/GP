@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Karna.Infrastructure.Persistence._Initializers
 {
-	internal class StoreDbInitializer(AppDbContext _dbContext) : DbInitializer(_dbContext), IStoreDbInitializer
+	internal sealed class AppDbInitializer(AppDbContext _dbContext) : DbInitializer(_dbContext), IAppDbInitializer
 	{
 		public override async Task SeedDbAsync()
 		{

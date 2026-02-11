@@ -17,7 +17,8 @@ namespace Karna.APIs
             webApplicationBuilder.Services.AddEndpointsApiExplorer();
             webApplicationBuilder.Services.AddSwaggerGen();
 
-            webApplicationBuilder.Services.AddPersistenceDI(webApplicationBuilder.Configuration);
+            webApplicationBuilder.Services.AddPersistenceServices(webApplicationBuilder.Configuration);
+            webApplicationBuilder.Services.AddIdentityServices(webApplicationBuilder.Configuration);
 
 			var app = webApplicationBuilder.Build();
 

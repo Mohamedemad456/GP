@@ -8,13 +8,16 @@ namespace Karna.APIs.Extensions
 		{
 			using var scope = app.Services.CreateAsyncScope();
 			var services = scope.ServiceProvider;
-			var appDbContextInitializer = services.GetRequiredService<IStoreDbInitializer>();
+			var appIdentityDbContextInitializer = services.GetRequiredService<IAppIdentityDbInitializer>();
+			var appDbContextInitializer = services.GetRequiredService<IAppDbInitializer>();
 
 			var loggerFactory = services.GetRequiredService<ILoggerFactory>();
 
 			try
 			{
+				await appIdentityDbContextInitializer.InitializeDbAsync();
 				await appDbContextInitializer.InitializeDbAsync();
+
 			}
 			catch (Exception ex)
 			{
