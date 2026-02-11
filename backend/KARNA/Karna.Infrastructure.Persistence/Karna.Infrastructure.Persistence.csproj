@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="10.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.2">
       <PrivateAssets>all</PrivateAssets>
@@ -18,10 +19,12 @@
   <ItemGroup>
     <ProjectReference Include="..\Karna.Core.Application.Abstraction\Karna.Core.Application.Abstraction.csproj" />
     <ProjectReference Include="..\Karna.Core.Domain\Karna.Core.Domain.csproj" />
+    <ProjectReference Include="..\Karna.Infrastructure\Karna.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="_Data\Migrations\" />
+    <Folder Include="_Identity\Migrations\" />
   </ItemGroup>
 
 </Project>

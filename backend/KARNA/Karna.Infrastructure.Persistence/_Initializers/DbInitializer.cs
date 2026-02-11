@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Karna.Infrastructure.Persistence._Initializers
 {
-	internal abstract class DbInitializer(AppDbContext _dbContext) : IDbInitializer
+	internal abstract class DbInitializer(DbContext _dbContext) : IDbInitializer
 	{
 		
 		public virtual async Task InitializeDbAsync()

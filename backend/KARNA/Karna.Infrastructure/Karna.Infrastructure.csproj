@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Karna.Core.Application.Abstraction\Karna.Core.Application.Abstraction.csproj" />
     <ProjectReference Include="..\Karna.Core.Domain\Karna.Core.Domain.csproj" />
   </ItemGroup>
