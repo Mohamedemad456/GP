@@ -4,9 +4,10 @@ using System.Text;
 
 namespace Karna.Core.Domain.Enums
 {
-	public enum PreferredContactMethod
+	public enum ContactMethod
 	{
-		phone = 1,
-		whatsapp = 2
+		Phone = 1,
+		Wahatsapp = 2,
+		Both = 3
 	}
 }
