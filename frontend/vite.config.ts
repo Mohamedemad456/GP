@@ -15,11 +15,14 @@ export default defineConfig({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+    dedupe: ["react", "react-dom"],
   },
   optimizeDeps: {
-    include: ["@gp/design-system"],
-    // Exclude large dependencies from pre-bundling if needed
-    exclude: [],
+    dedupe: ["react", "react-dom"],
+    exclude: ["@gp/design-system"],
+  },
+  ssr: {
+    noExternal: ["@gp/design-system"],
   },
   build: {
     // Enable minification
