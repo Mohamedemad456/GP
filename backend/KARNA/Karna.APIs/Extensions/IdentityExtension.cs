@@ -1,7 +1,6 @@
 ﻿using Karna.Infrastructure.Identity;
 using Karna.Infrastructure.Persistence._Identity;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
 
 namespace Karna.APIs.Extensions
 {
@@ -9,6 +8,7 @@ namespace Karna.APIs.Extensions
 	{
 		public static IServiceCollection AddIdentityServices(this IServiceCollection services, IConfiguration configuration)
 		{
+
 			services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(identityOptions =>
 			{
 				identityOptions.Password.RequiredLength = 8;
