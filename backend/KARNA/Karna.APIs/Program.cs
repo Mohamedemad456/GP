@@ -1,6 +1,7 @@
 
 
 using Karna.APIs.Extensions;
+using Karna.Infrastructure.DependencyInjection;
 using Karna.Infrastructure.Persistence.DependencyInjection;
 
 namespace Karna.APIs
@@ -19,6 +20,8 @@ namespace Karna.APIs
 
             webApplicationBuilder.Services.AddPersistenceServices(webApplicationBuilder.Configuration);
             webApplicationBuilder.Services.AddIdentityServices(webApplicationBuilder.Configuration);
+            webApplicationBuilder.Services.AddInfrastructureServices(webApplicationBuilder.Configuration);
+			
 
 			var app = webApplicationBuilder.Build();
 
@@ -33,10 +36,11 @@ namespace Karna.APIs
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
-            app.MapControllers();
+			app.MapControllers();
 
             await app.RunAsync();
         }
