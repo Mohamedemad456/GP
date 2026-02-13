@@ -30,6 +30,22 @@ services:
 
       
   # =======================
+  # AI Service (FastAPI)
+  # =======================
+  ai-service:
+    container_name: karna_ai_service
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+
+  # =======================
   # Backend (.NET API)
   # =======================
   backend:
