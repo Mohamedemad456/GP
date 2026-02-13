@@ -18,6 +18,8 @@ namespace Karna.APIs.Extensions
 				await appIdentityDbContextInitializer.InitializeDbAsync();
 				await appDbContextInitializer.InitializeDbAsync();
 
+				await appIdentityDbContextInitializer.SeedDbAsync();
+				await appDbContextInitializer.SeedDbAsync();
 			}
 			catch (Exception ex)
 			{
