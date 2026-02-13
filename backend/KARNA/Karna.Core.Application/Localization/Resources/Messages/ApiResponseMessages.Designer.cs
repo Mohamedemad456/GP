@@ -61,11 +61,92 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Added to favorites..
+        /// </summary>
+        public static string FavoriteAdded {
+            get {
+                return ResourceManager.GetString("FavoriteAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Removed from favorites..
+        /// </summary>
+        public static string FavoriteRemoved {
+            get {
+                return ResourceManager.GetString("FavoriteRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Listing created successfully..
         /// </summary>
         public static string ListingCreated {
             get {
                 return ResourceManager.GetString("ListingCreated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Listing deleted successfully..
+        /// </summary>
+        public static string ListingDeleted {
+            get {
+                return ResourceManager.GetString("ListingDeleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Listing updated successfully..
+        /// </summary>
+        public static string ListingUpdated {
+            get {
+                return ResourceManager.GetString("ListingUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Login successful..
+        /// </summary>
+        public static string LoginSuccess {
+            get {
+                return ResourceManager.GetString("LoginSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Logged out successfully..
+        /// </summary>
+        public static string LogoutSuccess {
+            get {
+                return ResourceManager.GetString("LogoutSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Operation completed successfully..
+        /// </summary>
+        public static string OperationSuccess {
+            get {
+                return ResourceManager.GetString("OperationSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Password changed successfully..
+        /// </summary>
+        public static string PasswordChanged {
+            get {
+                return ResourceManager.GetString("PasswordChanged", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Profile updated successfully..
+        /// </summary>
+        public static string ProfileUpdated {
+            get {
+                return ResourceManager.GetString("ProfileUpdated", resourceCulture);
             }
         }
         
