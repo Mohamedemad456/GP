@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, useMemo } from "react";
 import { Route, Routes } from "react-router-dom";
 
 import { Toaster } from "@/lib";
+import { PageLoader } from "@gp/design-system";
 import Layout from "./components/Layout";
 
 // Lazy load route components for code splitting
@@ -15,13 +16,10 @@ const AdminLayout = lazy(() => import("@/pages/(admin)/AdminLayout"));
 const Analytics = lazy(() => import("@/pages/(admin)/analytics"));
 const UsersPending = lazy(() => import("@/pages/(admin)/users-pending"));
 const CarsPending = lazy(() => import("@/pages/(admin)/cars-pending"));
-
-// Loading fallback component
-const PageLoader = () => (
-  <div className="flex items-center justify-center min-h-screen">
-    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
-  </div>
-);
+const SellerLayout = lazy(() => import("@/pages/(seller)/SellerLayout"));
+const SellerAnalytics = lazy(() => import("@/pages/(seller)/analytics"));
+const SellerListings = lazy(() => import("@/pages/(seller)/listings"));
+const AddListing = lazy(() => import("@/pages/(seller)/add-listing"));
 
 function App() {
   const storedLanguage =
@@ -56,6 +54,11 @@ function App() {
             <Route index element={<Analytics />} />
             <Route path="users-pending" element={<UsersPending />} />
             <Route path="cars-pending" element={<CarsPending />} />
+          </Route>
+          <Route path="/seller" element={<SellerLayout />}>
+            <Route index element={<SellerAnalytics />} />
+            <Route path="listings" element={<SellerListings />} />
+            <Route path="add-listing" element={<AddListing />} />
           </Route>
         </Routes>
       </Suspense>

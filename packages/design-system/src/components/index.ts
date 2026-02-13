@@ -46,6 +46,16 @@ export {
   TableCaption,
 } from "./table";
 export {
+  Select,
+  SelectGroup,
+  SelectValue,
+  SelectTrigger,
+  SelectContent,
+  SelectLabel,
+  SelectItem,
+  SelectSeparator,
+} from "./select";
+export {
   Sidebar,
   SidebarContent,
   SidebarFooter,
@@ -71,3 +81,5 @@ export {
   SidebarTrigger,
   useSidebar,
 } from "./sidebar";
+
+export { default as PageLoader } from "./page-loader";

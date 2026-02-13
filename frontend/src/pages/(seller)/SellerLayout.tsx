@@ -1,13 +1,6 @@
 import { memo, useCallback, useMemo } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
-import {
-  Users,
-  Car,
-  LayoutDashboard,
-  BarChart3,
-  LogOut,
-  Languages,
-} from "lucide-react";
+import { BarChart3, Car, LogOut, Languages, Plus, List } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
   SidebarProvider,
@@ -27,7 +20,7 @@ import {
   Separator,
 } from "@gp/design-system";
 
-const AdminLayout = memo(() => {
+const SellerLayout = memo(() => {
   const location = useLocation();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
@@ -55,89 +48,93 @@ const AdminLayout = memo(() => {
       >
         <SidebarHeader className="border-sidebar-border border-b h-14 justify-center">
           <div className="flex items-center gap-2 px-2 font-semibold text-sidebar-foreground">
-            <LayoutDashboard className="size-5 shrink-0" />
-            <span className="truncate">{t("admin.sidebar.title")}</span>
+            <Car className="size-5 shrink-0" />
+            <span className="truncate">{t("seller.sidebar.title")}</span>
           </div>
         </SidebarHeader>
+
         <SidebarContent>
+          {/* Overview */}
           <SidebarGroup>
-            <SidebarGroupLabel>{t("admin.sidebar.overview")}</SidebarGroupLabel>
+            <SidebarGroupLabel>
+              {t("seller.sidebar.overview")}
+            </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem>
                   <SidebarMenuButton
                     asChild
-                    tooltip={t("admin.sidebar.analytics")}
-                    isActive={location.pathname === "/admin"}
+                    tooltip={t("seller.sidebar.analytics")}
+                    isActive={location.pathname === "/seller"}
                   >
-                    <NavLink to="/admin" end>
+                    <NavLink to="/seller" end>
                       <BarChart3 className="size-4" />
-                      <span>{t("admin.sidebar.analytics")}</span>
+                      <span>{t("seller.sidebar.analytics")}</span>
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
+
+          {/* Listings Management */}
           <SidebarGroup>
-            <SidebarGroupLabel>
-              {t("admin.sidebar.moderation")}
-            </SidebarGroupLabel>
+            <SidebarGroupLabel>{t("seller.sidebar.manage")}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {[
-                  {
-                    label: t("admin.sidebar.usersPending"),
-                    icon: Users,
-                    to: "/admin/users-pending",
-                  },
-                  {
-                    label: t("admin.sidebar.carsPostsPending"),
-                    icon: Car,
-                    to: "/admin/cars-pending",
-                  },
-                ].map((item) => (
-                  <SidebarMenuItem key={item.to}>
-                    <SidebarMenuButton
-                      asChild
-                      tooltip={item.label}
-                      isActive={location.pathname === item.to}
-                    >
-                      <NavLink to={item.to}>
-                        <item.icon className="size-4" />
-                        <span>{item.label}</span>
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    tooltip={t("seller.sidebar.myListings")}
+                    isActive={location.pathname === "/seller/listings"}
+                  >
+                    <NavLink to="/seller/listings">
+                      <List className="size-4" />
+                      <span>{t("seller.sidebar.myListings")}</span>
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    tooltip={t("seller.sidebar.addListing")}
+                    isActive={location.pathname === "/seller/add-listing"}
+                  >
+                    <NavLink to="/seller/add-listing">
+                      <Plus className="size-4" />
+                      <span>{t("seller.sidebar.addListing")}</span>
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
+
         <SidebarFooter className="border-sidebar-border border-t">
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton
-                tooltip={t("admin.sidebar.logout")}
+                tooltip={t("seller.sidebar.logout")}
                 onClick={() => {
-                  // TODO: Implement actual logout logic
                   navigate("/login");
                 }}
                 className="text-destructive hover:text-destructive hover:bg-destructive/10"
               >
                 <LogOut className="size-4" />
-                <span>{t("admin.sidebar.logout")}</span>
+                <span>{t("seller.sidebar.logout")}</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarFooter>
       </Sidebar>
+
       <SidebarInset>
         <header className="flex h-14 shrink-0 items-center gap-2 border-b border-border px-4 bg-background">
           <SidebarTrigger />
           <Separator orientation="vertical" className="h-5" />
           <span className="font-heading font-semibold text-foreground">
-            {t("admin.header.dashboard")}
+            {t("seller.header.dashboard")}
           </span>
           <div className={currentLang === "en" ? "ml-auto" : "mr-auto"}>
             <Button
@@ -162,6 +159,6 @@ const AdminLayout = memo(() => {
   );
 });
 
-AdminLayout.displayName = "AdminLayout";
+SellerLayout.displayName = "SellerLayout";
 
-export default AdminLayout;
+export default SellerLayout;

@@ -362,6 +362,192 @@
       "updatedAt": "Updated"
     }
   },
+  "seller": {
+    "sidebar": {
+      "title": "Seller Panel",
+      "overview": "Overview",
+      "manage": "Listings",
+      "analytics": "Analytics",
+      "myListings": "My Listings",
+      "addListing": "Add Listing",
+      "logout": "Logout"
+    },
+    "header": {
+      "dashboard": "Seller Dashboard"
+    },
+    "analytics": {
+      "title": "My Analytics",
+      "subtitle": "Track your listings performance, views, and sales at a glance.",
+      "totalListings": "Total Listings",
+      "activeListings": "Active Listings",
+      "totalViews": "Total Views",
+      "totalFavorites": "Total Favorites",
+      "carsSold": "Cars Sold",
+      "totalRevenue": "Total Revenue",
+      "vsLastMonth": "vs last month",
+      "monthlyPerformance": "Monthly Performance",
+      "monthlyPerformanceDesc": "Your listings metrics over the last 12 months",
+      "month": "Month",
+      "listed": "Listed",
+      "views": "Views",
+      "favorites": "Favorites",
+      "sold": "Sold",
+      "revenue": "Revenue",
+      "listingStatus": "Listings by Status",
+      "listingStatusDesc": "Breakdown of your listings across statuses",
+      "status": {
+        "active": "Active",
+        "pending": "Pending",
+        "sold": "Sold",
+        "rejected": "Rejected"
+      },
+      "topListings": "Top Performing Listings",
+      "topListingsDesc": "Your most viewed and favorited listings",
+      "recentActivity": "Recent Activity",
+      "recentActivityDesc": "Latest events on your listings",
+      "activity": {
+        "viewed": "Viewed",
+        "favorited": "Favorited",
+        "sold": "Sold",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      },
+      "revenueSummary": "Revenue Summary",
+      "revenueSummaryDesc": "Overview of your earnings and pending items",
+      "avgPerSale": "Avg. per Sale",
+      "pendingReview": "Pending Review",
+      "awaitingApproval": "awaiting approval"
+    },
+    "listings": {
+      "title": "My Listings",
+      "subtitle": "{{count}} listings found",
+      "addNew": "Add Listing",
+      "searchPlaceholder": "Search make, model, year...",
+      "views": "views",
+      "favorites": "favorites",
+      "sortBy": "Sort by",
+      "clearFilters": "Clear filters",
+      "filters": {
+        "status": "Status",
+        "allStatuses": "All statuses",
+        "active": "Active",
+        "pending": "Pending",
+        "sold": "Sold",
+        "rejected": "Rejected",
+        "fuelType": "Fuel Type",
+        "allFuel": "All fuel types",
+        "gasoline": "Gasoline",
+        "diesel": "Diesel",
+        "hybrid": "Hybrid",
+        "electric": "Electric",
+        "transmission": "Transmission",
+        "allTransmission": "All transmissions",
+        "automatic": "Automatic",
+        "manual": "Manual",
+        "condition": "Condition",
+        "allConditions": "All conditions"
+      },
+      "sort": {
+        "newest": "Newest first",
+        "oldest": "Oldest first",
+        "priceHigh": "Price: High to Low",
+        "priceLow": "Price: Low to High",
+        "mostViewed": "Most viewed",
+        "mostFavorited": "Most favorited"
+      },
+      "empty": {
+        "title": "No listings found",
+        "subtitle": "Try adjusting your search or filters, or add a new listing."
+      },
+      "detail": {
+        "vehicleDetails": "Vehicle Details",
+        "make": "Make",
+        "model": "Model",
+        "year": "Year",
+        "mileage": "Mileage",
+        "fuelType": "Fuel Type",
+        "transmission": "Transmission",
+        "engineSize": "Engine Size",
+        "color": "Color",
+        "conditionGrade": "Condition Grade",
+        "pricing": "Pricing",
+        "basePrice": "Base Price",
+        "deduction": "Deduction",
+        "suggestedPrice": "Suggested Price",
+        "listingPrice": "Listing Price",
+        "engagement": "Engagement",
+        "views": "Views",
+        "favorites": "Favorites",
+        "createdAt": "Listed on",
+        "updatedAt": "Updated on",
+        "rejectionReason": "Rejection Reason"
+      }
+    },
+    "addListing": {
+      "title": "Add New Listing",
+      "subtitle": "Fill in the details below to submit your car listing for review.",
+      "submit": "Submit Listing",
+      "images": {
+        "title": "Vehicle Photos",
+        "description": "Upload at least {{min}} and up to {{max}} photos of your vehicle. The first image will be the cover photo.",
+        "dropzone": "Click or drag & drop to upload images",
+        "formats": "PNG, JPG, WEBP up to 10MB each",
+        "uploaded": "uploaded",
+        "cover": "Cover"
+      },
+      "vehicleInfo": {
+        "title": "Vehicle Information",
+        "description": "Provide details about your vehicle"
+      },
+      "pricing": {
+        "title": "Pricing",
+        "description": "Set your asking price in SAR"
+      },
+      "descriptionSection": {
+        "title": "Description",
+        "description": "Write a detailed description of your vehicle to attract buyers"
+      },
+      "fields": {
+        "make": "Make",
+        "model": "Model",
+        "year": "Year",
+        "mileage": "Mileage (km)",
+        "fuelType": "Fuel Type",
+        "transmission": "Transmission",
+        "engineSize": "Engine Size",
+        "color": "Color",
+        "conditionGrade": "Condition Grade",
+        "listingPrice": "Listing Price",
+        "description": "Description"
+      },
+      "placeholders": {
+        "make": "Select make",
+        "model": "Select model",
+        "year": "Select year",
+        "mileage": "e.g. 25000",
+        "fuelType": "Select fuel type",
+        "transmission": "Select transmission",
+        "engineSize": "e.g. 2.5L",
+        "color": "Select color",
+        "conditionGrade": "Select grade",
+        "listingPrice": "e.g. 120000",
+        "description": "Describe your vehicle's features, condition, history, and any notable aspects..."
+      },
+      "minChars": "min characters",
+      "errors": {
+        "required": "This field is required",
+        "invalidMileage": "Mileage must be a positive number",
+        "invalidPrice": "Price must be greater than 0",
+        "descriptionTooShort": "Description must be at least 20 characters",
+        "minImages": "Please upload at least {{min}} images",
+        "fixErrors": "Please fix the errors in the form before submitting"
+      },
+      "success": {
+        "title": "Listing submitted!",
+        "description": "Your listing has been submitted for review. You will be notified once it is approved."
+      }
+    }
+  },
   "footer": {
     "tagline": "Smart, transparent car marketplace for the GCC.",
     "quickLinks": "Quick links",
