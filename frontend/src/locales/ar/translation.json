@@ -362,6 +362,192 @@
       "updatedAt": "تاريخ التحديث"
     }
   },
+  "seller": {
+    "sidebar": {
+      "title": "لوحة البائع",
+      "overview": "نظرة عامة",
+      "manage": "الإعلانات",
+      "analytics": "التحليلات",
+      "myListings": "إعلاناتي",
+      "addListing": "إضافة إعلان",
+      "logout": "تسجيل الخروج"
+    },
+    "header": {
+      "dashboard": "لوحة تحكم البائع"
+    },
+    "analytics": {
+      "title": "تحليلاتي",
+      "subtitle": "تتبع أداء إعلاناتك والمشاهدات والمبيعات في لمحة.",
+      "totalListings": "إجمالي الإعلانات",
+      "activeListings": "الإعلانات النشطة",
+      "totalViews": "إجمالي المشاهدات",
+      "totalFavorites": "إجمالي المفضلة",
+      "carsSold": "السيارات المباعة",
+      "totalRevenue": "إجمالي الإيرادات",
+      "vsLastMonth": "مقارنة بالشهر الماضي",
+      "monthlyPerformance": "الأداء الشهري",
+      "monthlyPerformanceDesc": "مقاييس إعلاناتك خلال آخر 12 شهراً",
+      "month": "الشهر",
+      "listed": "مدرجة",
+      "views": "المشاهدات",
+      "favorites": "المفضلة",
+      "sold": "المباعة",
+      "revenue": "الإيرادات",
+      "listingStatus": "الإعلانات حسب الحالة",
+      "listingStatusDesc": "توزيع إعلاناتك عبر الحالات",
+      "status": {
+        "active": "نشط",
+        "pending": "قيد الانتظار",
+        "sold": "مباع",
+        "rejected": "مرفوض"
+      },
+      "topListings": "أفضل الإعلانات أداءً",
+      "topListingsDesc": "إعلاناتك الأكثر مشاهدة وتفضيلاً",
+      "recentActivity": "النشاط الأخير",
+      "recentActivityDesc": "آخر الأحداث على إعلاناتك",
+      "activity": {
+        "viewed": "تمت المشاهدة",
+        "favorited": "تمت الإضافة للمفضلة",
+        "sold": "تم البيع",
+        "approved": "تمت الموافقة",
+        "rejected": "تم الرفض"
+      },
+      "revenueSummary": "ملخص الإيرادات",
+      "revenueSummaryDesc": "نظرة عامة على أرباحك والعناصر المعلقة",
+      "avgPerSale": "المتوسط لكل بيعة",
+      "pendingReview": "قيد المراجعة",
+      "awaitingApproval": "بانتظار الموافقة"
+    },
+    "listings": {
+      "title": "إعلاناتي",
+      "subtitle": "تم العثور على {{count}} إعلان",
+      "addNew": "إضافة إعلان",
+      "searchPlaceholder": "ابحث عن الماركة، الموديل، السنة...",
+      "views": "مشاهدة",
+      "favorites": "مفضلة",
+      "sortBy": "ترتيب حسب",
+      "clearFilters": "مسح الفلاتر",
+      "filters": {
+        "status": "الحالة",
+        "allStatuses": "جميع الحالات",
+        "active": "نشط",
+        "pending": "قيد الانتظار",
+        "sold": "مباع",
+        "rejected": "مرفوض",
+        "fuelType": "نوع الوقود",
+        "allFuel": "جميع أنواع الوقود",
+        "gasoline": "بنزين",
+        "diesel": "ديزل",
+        "hybrid": "هجين",
+        "electric": "كهربائي",
+        "transmission": "ناقل الحركة",
+        "allTransmission": "جميع أنواع النقل",
+        "automatic": "أوتوماتيك",
+        "manual": "يدوي",
+        "condition": "الحالة",
+        "allConditions": "جميع الحالات"
+      },
+      "sort": {
+        "newest": "الأحدث أولاً",
+        "oldest": "الأقدم أولاً",
+        "priceHigh": "السعر: الأعلى إلى الأقل",
+        "priceLow": "السعر: الأقل إلى الأعلى",
+        "mostViewed": "الأكثر مشاهدة",
+        "mostFavorited": "الأكثر تفضيلاً"
+      },
+      "empty": {
+        "title": "لم يتم العثور على إعلانات",
+        "subtitle": "جرّب تعديل البحث أو الفلاتر، أو أضف إعلاناً جديداً."
+      },
+      "detail": {
+        "vehicleDetails": "تفاصيل المركبة",
+        "make": "الماركة",
+        "model": "الموديل",
+        "year": "السنة",
+        "mileage": "المسافة المقطوعة",
+        "fuelType": "نوع الوقود",
+        "transmission": "ناقل الحركة",
+        "engineSize": "حجم المحرك",
+        "color": "اللون",
+        "conditionGrade": "درجة الحالة",
+        "pricing": "التسعير",
+        "basePrice": "السعر الأساسي",
+        "deduction": "الخصم",
+        "suggestedPrice": "السعر المقترح",
+        "listingPrice": "سعر الإعلان",
+        "engagement": "التفاعل",
+        "views": "المشاهدات",
+        "favorites": "المفضلة",
+        "createdAt": "تاريخ الإدراج",
+        "updatedAt": "تاريخ التحديث",
+        "rejectionReason": "سبب الرفض"
+      }
+    },
+    "addListing": {
+      "title": "إضافة إعلان جديد",
+      "subtitle": "املأ التفاصيل أدناه لتقديم إعلان سيارتك للمراجعة.",
+      "submit": "إرسال الإعلان",
+      "images": {
+        "title": "صور المركبة",
+        "description": "ارفع {{min}} صور على الأقل وحتى {{max}} صور لمركبتك. الصورة الأولى ستكون صورة الغلاف.",
+        "dropzone": "انقر أو اسحب وأفلت لرفع الصور",
+        "formats": "PNG، JPG، WEBP بحجم أقصى 10 ميغابايت لكل صورة",
+        "uploaded": "مرفوعة",
+        "cover": "الغلاف"
+      },
+      "vehicleInfo": {
+        "title": "معلومات المركبة",
+        "description": "قدّم تفاصيل عن مركبتك"
+      },
+      "pricing": {
+        "title": "التسعير",
+        "description": "حدد السعر المطلوب بالريال السعودي"
+      },
+      "descriptionSection": {
+        "title": "الوصف",
+        "description": "اكتب وصفاً تفصيلياً لمركبتك لجذب المشترين"
+      },
+      "fields": {
+        "make": "الماركة",
+        "model": "الموديل",
+        "year": "السنة",
+        "mileage": "المسافة المقطوعة (كم)",
+        "fuelType": "نوع الوقود",
+        "transmission": "ناقل الحركة",
+        "engineSize": "حجم المحرك",
+        "color": "اللون",
+        "conditionGrade": "درجة الحالة",
+        "listingPrice": "سعر الإعلان",
+        "description": "الوصف"
+      },
+      "placeholders": {
+        "make": "اختر الماركة",
+        "model": "اختر الموديل",
+        "year": "اختر السنة",
+        "mileage": "مثال: 25000",
+        "fuelType": "اختر نوع الوقود",
+        "transmission": "اختر ناقل الحركة",
+        "engineSize": "مثال: 2.5L",
+        "color": "اختر اللون",
+        "conditionGrade": "اختر الدرجة",
+        "listingPrice": "مثال: 120000",
+        "description": "صف ميزات مركبتك وحالتها وتاريخها وأي جوانب ملحوظة..."
+      },
+      "minChars": "حد أدنى من الأحرف",
+      "errors": {
+        "required": "هذا الحقل مطلوب",
+        "invalidMileage": "المسافة المقطوعة يجب أن تكون رقماً إيجابياً",
+        "invalidPrice": "السعر يجب أن يكون أكبر من 0",
+        "descriptionTooShort": "الوصف يجب أن يكون 20 حرفاً على الأقل",
+        "minImages": "يرجى رفع {{min}} صور على الأقل",
+        "fixErrors": "يرجى إصلاح الأخطاء في النموذج قبل الإرسال"
+      },
+      "success": {
+        "title": "تم إرسال الإعلان!",
+        "description": "تم إرسال إعلانك للمراجعة. سيتم إعلامك عند الموافقة عليه."
+      }
+    }
+  },
   "footer": {
     "tagline": "منصة ذكية وشفافة لبيع وشراء السيارات في الخليج.",
     "quickLinks": "روابط سريعة",
