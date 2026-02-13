@@ -1,0 +1,300 @@
+/* ─── Full-screen centered wrapper ─────────────────────────────────────── */
+.page-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 14rem;
+  gap: 2rem;
+  background-color: var(--background);
+  animation: page-loader-fade-in 0.3s ease-out;
+}
+
+.page-loader--fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+}
+
+.page-loader--embedded {
+  position: absolute;
+  inset: 0;
+}
+
+/* ─── Scene (car + strikes + road container) ───────────────────────────── */
+.page-loader__scene {
+  position: relative;
+  width: 12em;
+  height: 7em;
+  font-size: 16px;
+}
+
+/* ─── Car body ─────────────────────────────────────────────────────────── */
+.page-loader__car {
+  position: absolute;
+  width: 11.7em;
+  height: 2em;
+  background-color: var(--primary);
+  top: 1.5em;
+  border-radius: 0 5em 1em 0 / 0 4em 1em 0;
+  animation: page-loader-bounce 0.8s infinite linear;
+}
+
+/* Windshield layer (kept behind body) */
+.page-loader__windshield {
+  position: absolute;
+  width: 2.85em;
+  height: 2.7em;
+  background-color: var(--primary-foreground);
+  opacity: 0.3;
+  border-radius: 0.35em 2.1em 0 0 / 0.35em 1.9em 0 0;
+  right: 4.1em;
+  top: -2.15em;
+  z-index: 1;
+}
+
+/* Hood / front slope */
+.page-loader__car::before {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 0;
+  top: -0.5em;
+  border: 0.6em solid transparent;
+  border-left-width: 0;
+  border-right-color: var(--primary);
+  transform-origin: left;
+  transform: rotate(-45deg);
+}
+
+/* Cabin / roof */
+.page-loader__body {
+  position: absolute;
+  width: 7.5em;
+  height: 3.5em;
+  box-sizing: border-box;
+  border: 0.4em solid var(--primary);
+  border-radius: 3em 4.5em 0 0 / 3em 4em 0 0;
+  top: -1.5em;
+  left: 1.2em;
+  z-index: 3;
+}
+
+/* Window area */
+.page-loader__body::before {
+  content: "";
+  position: absolute;
+  width: 3.5em;
+  height: inherit;
+  background-color: var(--primary);
+  border-top-left-radius: inherit;
+  left: -0.4em;
+  top: -0.4em;
+  z-index: 3;
+}
+
+/* Windshield moved to dedicated element for predictable layering */
+
+/* ─── Wheels ───────────────────────────────────────────────────────────── */
+.page-loader__wheels::before,
+.page-loader__wheels::after {
+  content: "";
+  position: absolute;
+  box-sizing: border-box;
+  width: 2.6em;
+  height: 2.6em;
+  background-color: var(--background);
+  border-radius: 50%;
+  bottom: -1em;
+  border: 0.3em solid var(--foreground);
+  background-image:
+    linear-gradient(
+      135deg,
+      transparent 45%,
+      var(--foreground) 46%,
+      var(--foreground) 54%,
+      transparent 55%
+    ),
+    linear-gradient(
+      90deg,
+      transparent 45%,
+      var(--foreground) 46%,
+      var(--foreground) 54%,
+      transparent 55%
+    ),
+    linear-gradient(
+      45deg,
+      transparent 45%,
+      var(--foreground) 46%,
+      var(--foreground) 54%,
+      transparent 55%
+    ),
+    linear-gradient(
+      0deg,
+      transparent 45%,
+      var(--foreground) 46%,
+      var(--foreground) 54%,
+      transparent 55%
+    ),
+    radial-gradient(
+      var(--foreground) 29%,
+      transparent 30%,
+      transparent 50%,
+      var(--foreground) 51%
+    );
+  animation: page-loader-wheel-spin 0.5s linear infinite;
+}
+
+.page-loader__wheels::before {
+  left: 1.2em;
+}
+
+.page-loader__wheels::after {
+  right: 0.8em;
+}
+
+/* ─── Speed strikes ────────────────────────────────────────────────────── */
+.page-loader__strikes {
+  position: absolute;
+  width: 1em;
+  height: 3em;
+  left: -1em;
+  top: 1.5em;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.page-loader__strikes span {
+  height: 0.15em;
+  border-radius: 1em;
+  background-color: var(--primary);
+  opacity: 0.6;
+  animation: page-loader-drift 0.2s linear infinite;
+  animation-delay: calc(var(--n) * -0.05s);
+}
+
+.page-loader__strikes span:nth-child(1) {
+  --n: 1;
+}
+.page-loader__strikes span:nth-child(2) {
+  --n: 2;
+}
+.page-loader__strikes span:nth-child(3) {
+  --n: 3;
+}
+.page-loader__strikes span:nth-child(4) {
+  --n: 4;
+}
+.page-loader__strikes span:nth-child(5) {
+  --n: 5;
+}
+
+/* ─── Road ─────────────────────────────────────────────────────────────── */
+.page-loader__road {
+  position: absolute;
+  bottom: 0;
+  left: -2em;
+  right: -2em;
+  height: 0.6em;
+  background-color: var(--muted);
+  border-radius: 0.3em;
+  overflow: hidden;
+}
+
+.page-loader__road-line {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 200%;
+  height: 0.12em;
+  transform: translateY(-50%);
+  background: repeating-linear-gradient(
+    90deg,
+    var(--muted-foreground) 0,
+    var(--muted-foreground) 1em,
+    transparent 1em,
+    transparent 2em
+  );
+  opacity: 0.5;
+  animation: page-loader-road-scroll 0.4s linear infinite;
+}
+
+/* ─── Loading text ─────────────────────────────────────────────────────── */
+.page-loader__text {
+  font-family: var(--font-heading);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  animation: page-loader-pulse 1.5s ease-in-out infinite;
+}
+
+/* ─── Keyframes ────────────────────────────────────────────────────────── */
+@keyframes page-loader-bounce {
+  0% {
+    transform: translate(0.2em, 0.1em) rotate(0deg);
+  }
+  20% {
+    transform: translate(0.1em, 0.2em) rotate(1deg);
+  }
+  40% {
+    transform: translate(0.1em, -0.1em) rotate(-1deg);
+  }
+  60% {
+    transform: translate(-0.1em, 0.2em) rotate(0deg);
+  }
+  80% {
+    transform: translate(-0.1em, 0.1em) rotate(1deg);
+  }
+  100% {
+    transform: translate(0.2em, 0.1em) rotate(-1deg);
+  }
+}
+
+@keyframes page-loader-wheel-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@keyframes page-loader-drift {
+  from {
+    transform: translateX(3.5em);
+  }
+  to {
+    transform: translateX(-8em);
+    opacity: 0;
+  }
+}
+
+@keyframes page-loader-road-scroll {
+  from {
+    transform: translateY(-50%) translateX(0);
+  }
+  to {
+    transform: translateY(-50%) translateX(-2em);
+  }
+}
+
+@keyframes page-loader-pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes page-loader-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
