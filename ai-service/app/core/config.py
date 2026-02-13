@@ -1,36 +1,49 @@
+import logging
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pathlib import Path
 
-ROOT_DIR = Path(__file__).resolve().parent.parent.parent.parent
+logger = logging.getLogger(__name__)
+
+# Points to ai-service/ root (works both locally and inside Docker)
+SERVICE_DIR = Path(__file__).resolve().parent.parent.parent
+
+# Walk up to find the repo-level .env (GP/.env) — used for local dev.
+# Inside Docker the file won't exist; pydantic-settings will simply
+# fall back to real environment variables injected by docker-compose.
+REPO_ENV = SERVICE_DIR.parent / ".env"
+
 
 class Settings(BaseSettings):
-    cerebras_api_key: str    
-    cerebras_base_url: str = "https://api.cerebras.ai/v1"
-    cerebras_model: str = "qwen-3-235b-a22b-instruct-2507"
-    groq_model: str = "llama-3.3-70b-versatile"
+    # ── Groq (primary provider) ─────────────────────────────────
     groq_api_key: str
     groq_base_url: str
+    groq_model: str = "llama-3.3-70b-versatile"
+
+    # ── Gemini (fallback provider) ──────────────────────────────
     gemini_api_key: str
     gemini_model: str = "gemini-3-flash-preview"
 
+    # ── CORS (comma-separated origins, default allows all) ─────
+    cors_origins: str = "*"
 
     model_config = SettingsConfigDict(
-        env_file=ROOT_DIR / ".env",
-        case_sensitive=False
+        env_file=str(REPO_ENV),
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        # Don't crash when .env is missing (Docker injects env vars directly)
+        extra="ignore",
     )
-        
+
+
 settings = Settings()
 
-# Test
-if __name__ == "__main__":
-    # print("Cerebras API Key Loaded:", "****" + settings.cerebras_api_key[-4:])
-    # print("Cerebras API Base URL:", settings.cerebras_base_url)
-    # print("Cerebras Model:", settings.cerebras_model)
 
+if __name__ == "__main__":
     print("✅ Configuration loaded successfully!")
-    print("Groq API Key:", "****" + settings.groq_api_key[-4:])
-    print("Groq Base URL:", settings.groq_base_url)
-    print("Groq Model:", settings.groq_model)
-    print("Gemini API Key:", "****" + settings.gemini_api_key[-4:])
-    print("Gemini Model:", settings.gemini_model)
+    print(f"Groq API Key: ****{settings.groq_api_key[-4:]}")
+    print(f"Groq Base URL: {settings.groq_base_url}")
+    print(f"Groq Model: {settings.groq_model}")
+    print(f"Gemini API Key: ****{settings.gemini_api_key[-4:]}")
+    print(f"Gemini Model: {settings.gemini_model}")
+    print(f"CORS Origins: {settings.cors_origins}")
     
