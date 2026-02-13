@@ -46,6 +46,9 @@ namespace Karna.Infrastructure.DependencyInjection
 
 			services.AddScoped<ITokenService, JwtTokenService>();
 
+			
+			services.AddLocalization();
+			services.AddScoped<ILocalizationService, LocalizationService>();
 
 			return services;
 		}
