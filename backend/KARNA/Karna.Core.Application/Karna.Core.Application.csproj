@@ -11,4 +11,46 @@
     <ProjectReference Include="..\Karna.Core.Domain\Karna.Core.Domain.csproj" />
   </ItemGroup>
 
+	<ItemGroup>
+		<Compile Update="Localization\Resources\Enums\ContactMethod.Designer.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>ContactMethod.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Localization\Resources\Messages\ApiResponseMessages.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>ApiResponseMessages.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Localization\Resources\Messages\ErrorMessages.Designer.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>ErrorMessages.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Localization\Resources\Messages\ValidationMessages.Designer.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>ValidationMessages.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Localization\Resources\Enums\ContactMethod.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ContactMethod.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Localization\Resources\Messages\ApiResponseMessages.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>ApiResponseMessages.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Localization\Resources\Messages\ErrorMessages.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ErrorMessages.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Localization\Resources\Messages\ValidationMessages.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ValidationMessages.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>

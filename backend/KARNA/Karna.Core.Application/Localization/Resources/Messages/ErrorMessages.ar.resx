@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true" />
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="NotFound" xml:space="preserve">
+    <value>المورد المطلوب غير موجود</value>
+  </data>
+  <data name="Unauthorized" xml:space="preserve">
+    <value>غير مصرح لك بالوصول إلى هذا المورد</value>
+  </data>
+  <data name="Forbidden" xml:space="preserve">
+    <value>ليس لديك صلاحية للقيام بهذا الإجراء</value>
+  </data>
+  <data name="InternalServerError" xml:space="preserve">
+    <value>حدث خطأ داخلي في الخادم</value>
+  </data>
+  <data name="InvalidCredentials" xml:space="preserve">
+    <value>البريد الإلكتروني أو كلمة المرور غير صحيحة</value>
+  </data>
+  <data name="UserNotFound" xml:space="preserve">
+    <value>المستخدم غير موجود</value>
+  </data>
+  <data name="ListingNotFound" xml:space="preserve">
+    <value>الإعلان غير موجود</value>
+  </data>
+  <data name="UserAlreadyExists" xml:space="preserve">
+    <value>يوجد مستخدم بهذا البريد الإلكتروني بالفعل</value>
+  </data>
+  <data name="EmailAlreadyInUse" xml:space="preserve">
+    <value>هذا البريد الإلكتروني مستخدم بالفعل</value>
+  </data>
+  <data name="AccountLocked" xml:space="preserve">
+    <value>تم قفل حسابك. يرجى المحاولة لاحقاً</value>
+  </data>
+  <data name="AccountInactive" xml:space="preserve">
+    <value>حسابك غير نشط</value>
+  </data>
+</root>
