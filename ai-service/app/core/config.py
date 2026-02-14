@@ -7,10 +7,6 @@ logger = logging.getLogger(__name__)
 # Points to ai-service/ root (works both locally and inside Docker)
 SERVICE_DIR = Path(__file__).resolve().parent.parent.parent
 
-# Walk up to find the repo-level .env (GP/.env) — used for local dev.
-# Inside Docker the file won't exist; pydantic-settings will simply
-# fall back to real environment variables injected by docker-compose.
-
 REPO_ENV = SERVICE_DIR.parent / ".env"
 
 
