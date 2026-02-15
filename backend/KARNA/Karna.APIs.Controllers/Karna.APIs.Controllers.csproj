@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Karna.Core.Application.Abstraction\Karna.Core.Application.Abstraction.csproj" />
   </ItemGroup>
 
