@@ -44,6 +44,7 @@ class LLMService:
         self.system_prompt = self.config["system_prompt"]
         self.model_params = self.config["model_params"]
         self.timeout = self.config["timeout"]
+        self.few_shot_examples = self.config.get("few_shot_examples", [])
 
     def _load_config(self) -> dict:
         """Load chatbot configuration from YAML file."""
@@ -75,12 +76,15 @@ class LLMService:
             None: If Groq fails for any reason
         """
         try:
+            messages = [
+                    {"role": "system", "content": self.system_prompt},
+                ]
+            messages.extend(self.few_shot_examples)
+            messages.append({"role": "user", "content": user_message})
+
             response = await self.groq_client.chat.completions.create(
                 model=settings.groq_model,
-                messages=[
-                    {"role": "system", "content": self.system_prompt},
-                    {"role": "user", "content": user_message},
-                ],
+                messages=messages,
                 temperature=temperature,
                 max_tokens=max_tokens,
                 timeout=self.timeout,
