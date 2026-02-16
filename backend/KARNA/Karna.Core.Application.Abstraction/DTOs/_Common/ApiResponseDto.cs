@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Karna.Core.Application.DTOs._Common
+namespace Karna.Core.Application.Abstraction.DTOs._Common
 {
 	public class ApiResponseDto
 	{

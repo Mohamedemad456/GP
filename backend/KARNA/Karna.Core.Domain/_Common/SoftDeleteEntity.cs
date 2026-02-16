@@ -6,6 +6,6 @@ namespace Karna.Core.Domain._Common
 {
 	public abstract class SoftDeleteEntity : BaseAuditableEntity
 	{
-		public bool IsDeleted { get; protected set; }
+		public bool IsDeleted { get; set; }
 	}
 }

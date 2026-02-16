@@ -10,5 +10,6 @@ namespace Karna.Core.Application.Abstraction.Settings
 		public required string Audience { get; set; }
 		public required string Issuer { get; set; }
 		public required double ExpirationMinutes { get; set; }
+		public required double RefreshTokenExpirationDays { get; set; }
 	}
 }

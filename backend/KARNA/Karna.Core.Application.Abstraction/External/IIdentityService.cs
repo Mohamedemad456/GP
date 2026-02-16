@@ -1,0 +1,20 @@
+﻿using Karna.Core.Application.Abstraction.DTOs.Identity;
+using Microsoft.AspNetCore.Identity;
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Karna.Core.Application.Abstraction.External
+{
+	public interface IIdentityService
+	{
+		Task<UserIdentityDto> FindUserByUsernameAsync(string username);
+		Task<UserIdentityDto> FindUserByEmailAsync(string email);
+		Task<UserIdentityDto> FindUserByIdAsync(Guid userId);
+		Task<bool> CheckPasswordAsync(Guid userId, string password);
+		Task<bool> IsLockedOutAsync(Guid userId);
+		Task<IEnumerable<string>> GetUserRolesAsync(Guid userId);
+		Task RecordAccessFailedAsync(Guid userId);
+		Task ResetAccessFailedCountAsync(Guid userId);
+	}
+}

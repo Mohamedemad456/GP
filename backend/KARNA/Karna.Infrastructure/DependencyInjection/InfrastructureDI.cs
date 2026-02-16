@@ -1,12 +1,12 @@
 ﻿using Karna.Core.Application.Abstraction.External;
 using Karna.Core.Application.Abstraction.Settings;
+using Karna.Infrastructure.Identity;
 using Karna.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Collections.Generic;
 using System.Security.Claims;
 using System.Text;
 
@@ -45,8 +45,7 @@ namespace Karna.Infrastructure.DependencyInjection
 				});
 
 			services.AddScoped<ITokenService, JwtTokenService>();
-
-			
+			services.AddScoped<IIdentityService, IdentityServiceAdapter>();
 			services.AddLocalization();
 			services.AddScoped<ILocalizationService, LocalizationService>();
 

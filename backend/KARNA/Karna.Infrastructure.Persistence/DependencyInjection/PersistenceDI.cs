@@ -1,6 +1,8 @@
 ﻿using Karna.Core.Application.Abstraction.Initializers;
+using Karna.Core.Application.Abstraction.Persistence;
 using Karna.Infrastructure.Persistence._Data;
 using Karna.Infrastructure.Persistence._Data.Interceptors;
+using Karna.Infrastructure.Persistence._Data.Repositories;
 using Karna.Infrastructure.Persistence._Identity;
 using Karna.Infrastructure.Persistence._Initializers;
 using Microsoft.EntityFrameworkCore;
@@ -37,6 +39,8 @@ namespace Karna.Infrastructure.Persistence.DependencyInjection
 			});
 
 			services.AddScoped<IAppIdentityDbInitializer, AppIdentityDbInitializer>();
+
+			services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 			return services;
 		}
