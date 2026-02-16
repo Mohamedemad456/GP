@@ -26,8 +26,6 @@ namespace Karna.Infrastructure.Persistence._Data.Interceptors
 		{
 			if (dbContext is null) return;
 
-			
-
 			var entries = dbContext.ChangeTracker.Entries<BaseAuditableEntity>()
 				.Where(e => e.State is EntityState.Added or EntityState.Modified);
 			foreach (var entry in entries)
@@ -42,6 +40,15 @@ namespace Karna.Infrastructure.Persistence._Data.Interceptors
 
 					entry.Property(e => e.UpdatedAt).CurrentValue = now;
 				}
+			}
+
+			// Soft Delete: convert Delete -> Update with IsDeleted = true
+			var deletedEntries = dbContext.ChangeTracker.Entries<SoftDeleteEntity>()
+				.Where(e => e.State is EntityState.Deleted);
+			foreach (var entry in deletedEntries)
+			{
+				entry.State = EntityState.Modified;
+				entry.Entity.IsDeleted = true;
 			}
 		}
 	}

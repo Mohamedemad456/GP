@@ -1,0 +1,99 @@
+﻿using Karna.Core.Application.Abstraction.DTOs.Identity;
+using Karna.Core.Application.Abstraction.External;
+using Microsoft.AspNetCore.Identity;
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Karna.Infrastructure.Identity
+{
+	internal sealed class IdentityServiceAdapter(
+		UserManager<ApplicationUser> _userManager,
+		SignInManager<ApplicationUser> _signInManager
+	) : IIdentityService
+	{
+		public async Task<UserIdentityDto> FindUserByUsernameAsync(string username)
+		{
+			var user = await _userManager.FindByNameAsync(username);
+
+			return new UserIdentityDto
+			{
+				Found = user is not null,
+				UserId = user?.Id ?? Guid.Empty,
+				Email = user?.Email ?? string.Empty,
+				UserName = user?.UserName ?? string.Empty,
+				IsActive = user?.IsActive ?? false
+			};
+		}
+		public async Task<UserIdentityDto> FindUserByEmailAsync(string email)
+		{
+			var user = await _userManager.FindByEmailAsync(email);
+			return new UserIdentityDto
+			{
+				Found = user is not null,
+				UserId = user?.Id ?? Guid.Empty,
+				Email = user?.Email ?? string.Empty,
+				UserName = user?.UserName ?? string.Empty,
+				IsActive = user?.IsActive ?? false
+			};
+		}
+		public async Task<UserIdentityDto> FindUserByIdAsync(Guid userId)
+		{
+			var user = await _userManager.FindByIdAsync(userId.ToString());
+
+			return new UserIdentityDto
+			{
+				Found = user is not null,
+				UserId = user?.Id ?? Guid.Empty,
+				Email = user?.Email ?? string.Empty,
+				UserName = user?.UserName ?? string.Empty,
+				IsActive = user?.IsActive ?? false
+			};
+		}
+
+
+		public async Task<bool> CheckPasswordAsync(Guid userId, string password)
+		{
+			var user = await _userManager.FindByIdAsync(userId.ToString());
+			if (user is null) return false;
+
+			var result = await _signInManager.CheckPasswordSignInAsync(user, password, lockoutOnFailure: true);
+
+			return result.Succeeded;
+		}
+
+		public async Task<bool> IsLockedOutAsync(Guid userId)
+		{
+			var user = await _userManager.FindByIdAsync(userId.ToString());
+			if (user is null) return false;
+
+			return await _userManager.IsLockedOutAsync(user);
+		}
+
+		public async Task<IEnumerable<string>> GetUserRolesAsync(Guid userId)
+		{
+			var user = await _userManager.FindByIdAsync(userId.ToString());
+			if (user is null) return Enumerable.Empty<string>();
+
+			return await _userManager.GetRolesAsync(user);
+		}
+
+		public async Task RecordAccessFailedAsync(Guid userId)
+		{
+			var user = await _userManager.FindByIdAsync(userId.ToString());
+			if (user is not null)
+			{
+				await _userManager.AccessFailedAsync(user);
+			}
+		}
+
+		public async Task ResetAccessFailedCountAsync(Guid userId)
+		{
+			var user = await _userManager.FindByIdAsync(userId.ToString());
+			if (user is not null)
+			{
+				await _userManager.ResetAccessFailedCountAsync(user);
+			}
+		}
+	}
+}

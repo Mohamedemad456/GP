@@ -1,5 +1,6 @@
 using Karna.APIs.Extensions;
 using Karna.APIs.Middleware;
+using Karna.Core.Application.DependencyInjection;
 using Karna.Infrastructure.DependencyInjection;
 using Karna.Infrastructure.Persistence.DependencyInjection;
 
@@ -20,6 +21,7 @@ namespace Karna.APIs
 			webApplicationBuilder.Services.AddPersistenceServices(webApplicationBuilder.Configuration);
 			webApplicationBuilder.Services.AddIdentityServices(webApplicationBuilder.Configuration);
 			webApplicationBuilder.Services.AddInfrastructureServices(webApplicationBuilder.Configuration);
+			webApplicationBuilder.Services.AddApplicationServices(webApplicationBuilder.Configuration);
 
 
 			var app = webApplicationBuilder.Build();
