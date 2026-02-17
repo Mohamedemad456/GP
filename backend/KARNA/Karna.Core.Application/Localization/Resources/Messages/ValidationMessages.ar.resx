@@ -150,4 +150,13 @@
   <data name="InvalidYear" xml:space="preserve">
     <value>يرجى إدخال سنة صالحة</value>
   </data>
+  <data name="PasswordsDoNotMatch" xml:space="preserve">
+    <value>كلمات المرور غير متطابقة</value>
+  </data>
+  <data name="MinLengthExceeded" xml:space="preserve">
+    <value>الحد الأدنى للطول هو {0} أحرف</value>
+  </data>
+  <data name="EmailAlreadyInUse" xml:space="preserve">
+    <value>هذا البريد الإلكتروني مستخدم بالفعل</value>
+  </data>
 </root>

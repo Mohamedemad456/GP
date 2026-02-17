@@ -16,7 +16,9 @@ namespace Karna.Core.Application.Services
 		IUnitOfWork _unitOfWork,
 		ITokenService _tokenService,
 		IValidator<LoginDto> _loginValidator,
-		IOptions<JwtSettings> _jwtSettings,
+        IValidator<RegisterDto> _registerValidator,
+        UserManager<ApplicationUser> _userManager,
+        IOptions<JwtSettings> _jwtSettings,
 		ILocalizationService _localizer
 	) : IAuthService
 	{
@@ -187,5 +189,76 @@ namespace Karna.Core.Application.Services
 				}
 			};
 		}
-	}
+        public async Task<ApiResponse<TokenResponseDto>> RegisterAsync(RegisterDto registerDto, string? deviceInfo = null)
+		{
+        
+            var validationResult = await _registerValidator.ValidateAsync(registerDto);
+            if (!validationResult.IsValid)
+            {
+                return new ApiResponse<TokenResponseDto>
+                {
+                    Success = false,
+                    Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage))
+                };
+            }
+
+            var existingUser = await _identityService.FindUserByEmailAsync(registerDto.Email);
+            if (existingUser != null)
+            {
+                return new ApiResponse<TokenResponseDto>
+                {
+                    Success = false,
+                    Message = _localizer.GetValidationMessage("EmailAlreadyInUse")
+                };
+            }
+
+            var identityUser = new ApplicationUser
+            {
+                Id = Guid.NewGuid(),
+                UserName = registerDto.Name,  
+                Email = registerDto.Email,
+                IsActive = true,
+                EmailConfirmed = true
+            };
+
+            var result = await _userManager.CreateAsync(identityUser, registerDto.Password);
+            if (!result.Succeeded)
+            {
+                return new ApiResponse<TokenResponseDto>
+                {
+                    Success = false,
+                    Message = string.Join("; ", result.Errors.Select(e => e.Code))
+                };
+            }
+
+            if (!await _userManager.IsInRoleAsync(identityUser, "User"))
+            {
+                await _userManager.AddToRoleAsync(identityUser, "User");
+            }
+
+            var domainUser = new User
+            {
+                IdentityUserId = identityUser.Id,
+                Name = registerDto.Name,
+                WhatsAppNumber = registerDto.WhatsAppNumber
+            };
+
+            await _unitOfWork.GetRepository<User, Guid>().AddAsync(domainUser);
+            await _unitOfWork.CompleteAsync();
+
+            var tokenResponse = await GenerateAndSaveTokensAsync(new UserIdentityDto
+            {
+                UserId = identityUser.Id,
+                Email = identityUser.Email!,
+                UserName = registerDto.Name,
+                IsActive = true,
+                Found = true
+            }, deviceInfo);
+
+            return tokenResponse;
+
+
+        }
+
+    }
 }

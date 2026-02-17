@@ -150,4 +150,13 @@
   <data name="InvalidYear" xml:space="preserve">
     <value>Please enter a valid year.</value>
   </data>
+  <data name="PasswordsDoNotMatch" xml:space="preserve">
+    <value>Passwords do not match.</value>
+  </data>
+  <data name="MinLengthExceeded" xml:space="preserve">
+    <value>Minimum length is {0} characters.</value>
+  </data>
+  <data name="EmailAlreadyInUse" xml:space="preserve">
+    <value>This email is already in use.</value>
+  </data>
 </root>
