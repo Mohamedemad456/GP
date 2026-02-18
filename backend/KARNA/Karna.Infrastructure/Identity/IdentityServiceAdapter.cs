@@ -95,5 +95,51 @@ namespace Karna.Infrastructure.Identity
 				await _userManager.ResetAccessFailedCountAsync(user);
 			}
 		}
-	}
+
+        public async Task<(bool Succeeded, UserIdentityDto? User, IEnumerable<string> Errors)>
+        CreateUserAsync(string username, string email, string password)
+			{
+				var user = new ApplicationUser
+				{
+					Id = Guid.NewGuid(),
+					UserName = username,
+					Email = email,
+					IsActive = true,
+					EmailConfirmed = true
+				};
+
+				var result = await _userManager.CreateAsync(user, password);
+
+				if (!result.Succeeded)
+				{
+					return (
+						false,
+						null,
+						result.Errors.Select(e => e.Code)
+					);
+				}
+
+				return (
+					true,
+					new UserIdentityDto
+					{
+						UserId = user.Id,
+						Email = user.Email!,
+						UserName = user.UserName!,
+						IsActive = user.IsActive,
+						Found = true
+					},
+					Enumerable.Empty<string>()
+				);
+			}
+
+        public async Task AddToRoleAsync(Guid userId, string role)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user is null) return;
+
+            if (!await _userManager.IsInRoleAsync(user, role))
+                await _userManager.AddToRoleAsync(user, role);
+        }
+    }
 }

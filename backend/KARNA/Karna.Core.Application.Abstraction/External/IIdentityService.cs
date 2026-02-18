@@ -16,5 +16,9 @@ namespace Karna.Core.Application.Abstraction.External
 		Task<IEnumerable<string>> GetUserRolesAsync(Guid userId);
 		Task RecordAccessFailedAsync(Guid userId);
 		Task ResetAccessFailedCountAsync(Guid userId);
-	}
+        Task<(bool Succeeded, UserIdentityDto? User, IEnumerable<string> Errors)> CreateUserAsync(string username,
+																									string email,
+																									string password);
+        Task AddToRoleAsync(Guid userId, string role);
+    }
 }
