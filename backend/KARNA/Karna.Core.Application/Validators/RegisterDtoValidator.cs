@@ -4,7 +4,7 @@ using Karna.Core.Application.Abstraction.External;
 
 namespace Karna.Core.Application.Validators
 {
-    internal class RegisterDtoValidator : AbstractValidator<RegisterDto>
+    public class RegisterDtoValidator : AbstractValidator<RegisterDto>
     {
         public RegisterDtoValidator(ILocalizationService localizer)
         {
