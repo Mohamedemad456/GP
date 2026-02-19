@@ -18,6 +18,10 @@ namespace Karna.Core.Application.Validators
                 .EmailAddress().WithMessage(localizer.GetValidationMessage("InvalidEmail"))
                 .MaximumLength(100).WithMessage(localizer.GetValidationMessage("MaxLengthExceeded", 100));
 
+            RuleFor(x => x.PhoneNumber)
+                .NotEmpty().WithMessage(localizer.GetValidationMessage("RequiredField"))
+                .Matches(@"^\+?\d{7,15}$").WithMessage(localizer.GetValidationMessage("InvalidPhoneNumber"));
+
             RuleFor(x => x.WhatsAppNumber)
                 .Matches(@"^\+?\d{7,15}$")
                 .When(x => !string.IsNullOrEmpty(x.WhatsAppNumber))

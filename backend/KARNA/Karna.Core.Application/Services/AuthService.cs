@@ -212,8 +212,9 @@ namespace Karna.Core.Application.Services
                 };
             }
 
-            var (succeeded, createdUser, errors) =await _identityService.CreateUserAsync(registerDto.Email,
-																							registerDto.Password);
+            var (succeeded, createdUser, errors) = await _identityService.CreateUserAsync(registerDto.Email,
+																							registerDto.Password,
+																							registerDto.PhoneNumber);
 
             if (!succeeded || createdUser is null)
             {

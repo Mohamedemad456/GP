@@ -22,6 +22,7 @@ namespace Karna.Infrastructure.Identity
 				Found = user is not null,
 				UserId = user?.Id ?? Guid.Empty,
 				Email = user?.Email ?? string.Empty,
+				PhoneNumber = user?.PhoneNumber ?? string.Empty,
 				UserName = user?.UserName ?? string.Empty,
 				IsActive = user?.IsActive ?? false
 			};
@@ -34,6 +35,7 @@ namespace Karna.Infrastructure.Identity
 				Found = user is not null,
 				UserId = user?.Id ?? Guid.Empty,
 				Email = user?.Email ?? string.Empty,
+				PhoneNumber = user?.PhoneNumber ?? string.Empty,
 				UserName = user?.UserName ?? string.Empty,
 				IsActive = user?.IsActive ?? false
 			};
@@ -48,7 +50,7 @@ namespace Karna.Infrastructure.Identity
 				UserId = user?.Id ?? Guid.Empty,
 				Email = user?.Email ?? string.Empty,
 				UserName = user?.UserName ?? string.Empty,
-				PhoneNumber = user?.PhoneNumber,
+				PhoneNumber = user?.PhoneNumber ?? string.Empty,
 				IsActive = user?.IsActive ?? false
 			};
 		}
@@ -99,13 +101,14 @@ namespace Karna.Infrastructure.Identity
 		}
 
         public async Task<(bool Succeeded, UserIdentityDto? User, IEnumerable<string> Errors)>
-        CreateUserAsync(string email, string password)
+        CreateUserAsync(string email, string password, string phoneNumber)
 			{
 				var user = new ApplicationUser
 				{
 					Id = Guid.NewGuid(),
 					UserName = email,
 					Email = email,
+					PhoneNumber = phoneNumber,
 					IsActive = true,
 					EmailConfirmed = true
 				};
@@ -128,6 +131,7 @@ namespace Karna.Infrastructure.Identity
 						UserId = user.Id,
 						Email = user.Email!,
 						UserName = user.UserName!,
+						PhoneNumber = user.PhoneNumber,
 						IsActive = user.IsActive,
 						Found = true
 					},

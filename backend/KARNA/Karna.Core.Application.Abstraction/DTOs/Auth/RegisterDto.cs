@@ -8,6 +8,8 @@ namespace Karna.Core.Application.Abstraction.DTOs.Auth
         
         public required string Email { get; set; }
 
+        public required string PhoneNumber { get; set; }
+
         public string? WhatsAppNumber { get; set; }
 
         public required string Password { get; set; }
