@@ -8,6 +8,8 @@ namespace Karna.Core.Application.Abstraction.DTOs.Identity
 	{
 		public Guid UserId { get; set; }
 		public required string Email { get; set; }
+
+		public string? PhoneNumber { get; set; }
 		public required string UserName { get; set; }
 		public bool IsActive { get; set; }
 		public bool Found { get; set; }

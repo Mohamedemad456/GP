@@ -1,4 +1,5 @@
 ﻿using Karna.Core.Application.Abstraction.DTOs.Identity;
+using Karna.Core.Application.Abstraction.DTOs.User;
 using Karna.Core.Application.Abstraction.External;
 using Microsoft.AspNetCore.Identity;
 using System;
@@ -47,6 +48,7 @@ namespace Karna.Infrastructure.Identity
 				UserId = user?.Id ?? Guid.Empty,
 				Email = user?.Email ?? string.Empty,
 				UserName = user?.UserName ?? string.Empty,
+				PhoneNumber = user?.PhoneNumber,
 				IsActive = user?.IsActive ?? false
 			};
 		}
@@ -73,7 +75,7 @@ namespace Karna.Infrastructure.Identity
 		public async Task<IEnumerable<string>> GetUserRolesAsync(Guid userId)
 		{
 			var user = await _userManager.FindByIdAsync(userId.ToString());
-			if (user is null) return Enumerable.Empty<string>();
+			if (user is null) return [];
 
 			return await _userManager.GetRolesAsync(user);
 		}

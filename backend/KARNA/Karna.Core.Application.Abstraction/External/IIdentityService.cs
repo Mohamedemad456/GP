@@ -1,4 +1,5 @@
 ﻿using Karna.Core.Application.Abstraction.DTOs.Identity;
+using Karna.Core.Application.Abstraction.DTOs.User;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;

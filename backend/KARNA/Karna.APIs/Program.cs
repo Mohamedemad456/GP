@@ -1,5 +1,7 @@
 using Karna.APIs.Extensions;
 using Karna.APIs.Middleware;
+using Karna.APIs.Services;
+using Karna.Core.Application.Abstraction.External;
 using Karna.Core.Application.DependencyInjection;
 using Karna.Infrastructure.DependencyInjection;
 using Karna.Infrastructure.Persistence.DependencyInjection;
@@ -17,6 +19,8 @@ namespace Karna.APIs
 			webApplicationBuilder.Services.AddControllers();
 			webApplicationBuilder.Services.AddEndpointsApiExplorer();
 			webApplicationBuilder.Services.AddSwaggerGen();
+
+			webApplicationBuilder.Services.AddHttpContextAccessor().AddScoped<ICurrentUserService, CurrentUserService>();
 
 			webApplicationBuilder.Services.AddPersistenceServices(webApplicationBuilder.Configuration);
 			webApplicationBuilder.Services.AddIdentityServices(webApplicationBuilder.Configuration);
