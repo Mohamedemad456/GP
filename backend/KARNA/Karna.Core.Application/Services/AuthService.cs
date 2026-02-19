@@ -159,7 +159,7 @@ namespace Karna.Core.Application.Services
 			};
 		}
 
-		private async Task<ApiResponse<TokenResponseDto>> GenerateAndSaveTokensAsync(UserIdentityDto user, string? deviceInfo)
+		private async Task<ApiResponse<TokenResponseDto>> GenerateAndSaveTokensAsync(UserIdentityDto user, string? deviceInfo, string messageKey = "LoginSuccess")
 		{
 			var roles = await _identityService.GetUserRolesAsync(user.UserId);
 			var accessToken = _tokenService.GenerateToken(user.UserId, user.Email!, user.UserName!, roles);
@@ -179,7 +179,7 @@ namespace Karna.Core.Application.Services
 			return new ApiResponse<TokenResponseDto>
 			{
 				Success = true,
-				Message = _localizer.GetMessage("LoginSuccess"),
+				Message = _localizer.GetMessage(messageKey),
 				Data = new TokenResponseDto
 				{
 					AccessToken = accessToken,
@@ -240,10 +240,14 @@ namespace Karna.Core.Application.Services
 			catch (Exception)
             {
 				await _identityService.DeleteUserAsync(createdUser.UserId);
-				throw;
+				return new ApiResponse<TokenResponseDto>
+				{
+					Success = false,
+					Message = _localizer.GetErrorMessage("RegistrationFailed")
+				};
 			}
 
-            return await GenerateAndSaveTokensAsync(createdUser, deviceInfo);
+            return await GenerateAndSaveTokensAsync(createdUser, deviceInfo, "RegisterSuccess");
 
 
 

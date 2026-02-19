@@ -115,7 +115,7 @@ namespace Karna.Infrastructure.Identity
 					return (
 						false,
 						null,
-						result.Errors.Select(e => e.Code)
+						result.Errors.Select(e => e.Description)
 					);
 				}
 

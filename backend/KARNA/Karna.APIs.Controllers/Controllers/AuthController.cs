@@ -56,6 +56,7 @@ namespace Karna.APIs.Controllers.Controllers
 			return Ok(result);
 		}
 
+        [AllowAnonymous]
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         {

@@ -158,5 +158,14 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
                 return ResourceManager.GetString("UserNotFound", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Registration failed. Please try again..
+        /// </summary>
+        internal static string RegistrationFailed {
+            get {
+                return ResourceManager.GetString("RegistrationFailed", resourceCulture);
+            }
+        }
     }
 }
