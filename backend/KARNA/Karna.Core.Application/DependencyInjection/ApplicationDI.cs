@@ -17,6 +17,7 @@ namespace Karna.Core.Application.DependencyInjection
 			services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
 			services.AddScoped<IAuthService, AuthService>();
+			services.AddScoped<IUserService, UserService>();
 
 			return services;
 		}

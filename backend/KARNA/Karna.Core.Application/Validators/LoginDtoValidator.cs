@@ -9,9 +9,9 @@ namespace Karna.Core.Application.Validators
 		public LoginDtoValidator(ILocalizationService localizer)
 		{
 			RuleFor(x => x.Email)
-		   .NotEmpty().WithMessage("Email is required")
-		   .EmailAddress().WithMessage("Invalid email format")
-		   .MaximumLength(100);
+		   .NotEmpty().WithMessage(localizer.GetValidationMessage("RequiredField"))
+		   .EmailAddress().WithMessage(localizer.GetValidationMessage("InvalidEmail"))
+		   .MaximumLength(100).WithMessage(localizer.GetValidationMessage("MaxLengthExceeded", 100));
 
 			RuleFor(x => x.Password)
 				.NotEmpty().WithMessage(localizer.GetValidationMessage("RequiredField"))
