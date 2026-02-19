@@ -19,7 +19,7 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class ValidationMessages {
@@ -57,6 +57,15 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This email is already in use..
+        /// </summary>
+        internal static string EmailAlreadyInUse {
+            get {
+                return ResourceManager.GetString("EmailAlreadyInUse", resourceCulture);
             }
         }
         
@@ -106,6 +115,15 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Minimum length is {0} characters..
+        /// </summary>
+        internal static string MinLengthExceeded {
+            get {
+                return ResourceManager.GetString("MinLengthExceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Password must contain at least one digit..
         /// </summary>
         internal static string PasswordRequiresDigit {
@@ -138,6 +156,15 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         internal static string PasswordRequiresUpper {
             get {
                 return ResourceManager.GetString("PasswordRequiresUpper", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Passwords do not match..
+        /// </summary>
+        internal static string PasswordsDoNotMatch {
+            get {
+                return ResourceManager.GetString("PasswordsDoNotMatch", resourceCulture);
             }
         }
         

@@ -16,7 +16,8 @@ namespace Karna.Core.Application.Services
 		IUnitOfWork _unitOfWork,
 		ITokenService _tokenService,
 		IValidator<LoginDto> _loginValidator,
-		IOptions<JwtSettings> _jwtSettings,
+        IValidator<RegisterDto> _registerValidator,
+        IOptions<JwtSettings> _jwtSettings,
 		ILocalizationService _localizer
 	) : IAuthService
 	{
@@ -158,7 +159,7 @@ namespace Karna.Core.Application.Services
 			};
 		}
 
-		private async Task<ApiResponse<TokenResponseDto>> GenerateAndSaveTokensAsync(UserIdentityDto user, string? deviceInfo)
+		private async Task<ApiResponse<TokenResponseDto>> GenerateAndSaveTokensAsync(UserIdentityDto user, string? deviceInfo, string messageKey = "LoginSuccess")
 		{
 			var roles = await _identityService.GetUserRolesAsync(user.UserId);
 			var accessToken = _tokenService.GenerateToken(user.UserId, user.Email!, user.UserName!, roles);
@@ -178,7 +179,7 @@ namespace Karna.Core.Application.Services
 			return new ApiResponse<TokenResponseDto>
 			{
 				Success = true,
-				Message = _localizer.GetMessage("LoginSuccess"),
+				Message = _localizer.GetMessage(messageKey),
 				Data = new TokenResponseDto
 				{
 					AccessToken = accessToken,
@@ -187,5 +188,71 @@ namespace Karna.Core.Application.Services
 				}
 			};
 		}
-	}
+        public async Task<ApiResponse<TokenResponseDto>> RegisterAsync(RegisterDto registerDto, string? deviceInfo = null)
+
+        {
+        
+            var validationResult = await _registerValidator.ValidateAsync(registerDto);
+            if (!validationResult.IsValid)
+            {
+                return new ApiResponse<TokenResponseDto>
+                {
+                    Success = false,
+                    Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage))
+                };
+            }
+
+            var existingUser = await _identityService.FindUserByEmailAsync(registerDto.Email);
+            if (existingUser.Found)
+            {
+                return new ApiResponse<TokenResponseDto>
+                {
+                    Success = false,
+                    Message = _localizer.GetValidationMessage("EmailAlreadyInUse")
+                };
+            }
+
+            var (succeeded, createdUser, errors) = await _identityService.CreateUserAsync(registerDto.Email,
+																							registerDto.Password,
+																							registerDto.PhoneNumber);
+
+            if (!succeeded || createdUser is null)
+            {
+                return new ApiResponse<TokenResponseDto>
+                {
+                    Success = false,
+                    Message = string.Join("; ", errors)
+                };
+            }
+			try
+			{
+				await _identityService.AddToRoleAsync(createdUser.UserId, "User");
+
+				var domainUser = new User
+				{
+					IdentityUserId = createdUser.UserId,
+					Name = registerDto.Name,
+					WhatsAppNumber = registerDto.WhatsAppNumber
+				};
+
+				await _unitOfWork.GetRepository<User>().AddAsync(domainUser);
+				await _unitOfWork.CompleteAsync();
+			}
+			catch (Exception)
+            {
+				await _identityService.DeleteUserAsync(createdUser.UserId);
+				return new ApiResponse<TokenResponseDto>
+				{
+					Success = false,
+					Message = _localizer.GetErrorMessage("RegistrationFailed")
+				};
+			}
+
+            return await GenerateAndSaveTokensAsync(createdUser, deviceInfo, "RegisterSuccess");
+
+
+
+        }
+
+    }
 }

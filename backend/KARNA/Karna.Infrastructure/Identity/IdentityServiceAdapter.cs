@@ -22,6 +22,7 @@ namespace Karna.Infrastructure.Identity
 				Found = user is not null,
 				UserId = user?.Id ?? Guid.Empty,
 				Email = user?.Email ?? string.Empty,
+				PhoneNumber = user?.PhoneNumber ?? string.Empty,
 				UserName = user?.UserName ?? string.Empty,
 				IsActive = user?.IsActive ?? false
 			};
@@ -34,6 +35,7 @@ namespace Karna.Infrastructure.Identity
 				Found = user is not null,
 				UserId = user?.Id ?? Guid.Empty,
 				Email = user?.Email ?? string.Empty,
+				PhoneNumber = user?.PhoneNumber ?? string.Empty,
 				UserName = user?.UserName ?? string.Empty,
 				IsActive = user?.IsActive ?? false
 			};
@@ -48,7 +50,7 @@ namespace Karna.Infrastructure.Identity
 				UserId = user?.Id ?? Guid.Empty,
 				Email = user?.Email ?? string.Empty,
 				UserName = user?.UserName ?? string.Empty,
-				PhoneNumber = user?.PhoneNumber,
+				PhoneNumber = user?.PhoneNumber ?? string.Empty,
 				IsActive = user?.IsActive ?? false
 			};
 		}
@@ -98,6 +100,60 @@ namespace Karna.Infrastructure.Identity
 			}
 		}
 
-		
-	} 
+        public async Task<(bool Succeeded, UserIdentityDto? User, IEnumerable<string> Errors)>
+        CreateUserAsync(string email, string password, string phoneNumber)
+			{
+				var user = new ApplicationUser
+				{
+					Id = Guid.NewGuid(),
+					UserName = email,
+					Email = email,
+					PhoneNumber = phoneNumber,
+					IsActive = true,
+					EmailConfirmed = true
+				};
+
+				var result = await _userManager.CreateAsync(user, password);
+
+				if (!result.Succeeded)
+				{
+					return (
+						false,
+						null,
+						result.Errors.Select(e => e.Description)
+					);
+				}
+
+				return (
+					true,
+					new UserIdentityDto
+					{
+						UserId = user.Id,
+						Email = user.Email!,
+						UserName = user.UserName!,
+						PhoneNumber = user.PhoneNumber,
+						IsActive = user.IsActive,
+						Found = true
+					},
+					Enumerable.Empty<string>()
+				);
+			}
+
+        public async Task AddToRoleAsync(Guid userId, string role)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user is null) return;
+
+            if (!await _userManager.IsInRoleAsync(user, role))
+                await _userManager.AddToRoleAsync(user, role);
+        }
+
+        public async Task DeleteUserAsync(Guid userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user is null) return;
+
+            await _userManager.DeleteAsync(user);
+        }
+    }
 }

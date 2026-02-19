@@ -55,5 +55,18 @@ namespace Karna.APIs.Controllers.Controllers
 			var result = await _authService.LogoutFromAllDevicesAsync(Guid.Parse(userId));
 			return Ok(result);
 		}
-	}
+
+        [AllowAnonymous]
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
+        {
+            var deviceInfo = Request.Headers.UserAgent.ToString();
+            var result = await _authService.RegisterAsync(registerDto, deviceInfo);
+
+            if (!result.Success)
+                return BadRequest(result); 
+
+            return Ok(result);
+        }
+    }
 }

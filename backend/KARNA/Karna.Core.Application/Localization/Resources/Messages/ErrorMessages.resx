@@ -40,4 +40,7 @@
   <data name="AccountInactive" xml:space="preserve">
     <value>Your account is inactive.</value>
   </data>
+  <data name="RegistrationFailed" xml:space="preserve">
+    <value>Registration failed. Please try again.</value>
+  </data>
 </root>
