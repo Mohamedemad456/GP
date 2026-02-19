@@ -212,8 +212,7 @@ namespace Karna.Core.Application.Services
                 };
             }
 
-            var (succeeded, createdUser, errors) =await _identityService.CreateUserAsync(registerDto.Name,
-																							registerDto.Email,
+            var (succeeded, createdUser, errors) =await _identityService.CreateUserAsync(registerDto.Email,
 																							registerDto.Password);
 
             if (!succeeded || createdUser is null)
@@ -224,17 +223,25 @@ namespace Karna.Core.Application.Services
                     Message = string.Join("; ", errors)
                 };
             }
-            await _identityService.AddToRoleAsync(createdUser.UserId, "User");
+			try
+			{
+				await _identityService.AddToRoleAsync(createdUser.UserId, "User");
 
-            var domainUser = new User
+				var domainUser = new User
+				{
+					IdentityUserId = createdUser.UserId,
+					Name = registerDto.Name,
+					WhatsAppNumber = registerDto.WhatsAppNumber
+				};
+
+				await _unitOfWork.GetRepository<User>().AddAsync(domainUser);
+				await _unitOfWork.CompleteAsync();
+			}
+			catch (Exception)
             {
-                IdentityUserId = createdUser.UserId,
-                Name = registerDto.Name,
-                WhatsAppNumber = registerDto.WhatsAppNumber
-            };
-
-            await _unitOfWork.GetRepository<User>().AddAsync(domainUser);
-            await _unitOfWork.CompleteAsync();
+				await _identityService.DeleteUserAsync(createdUser.UserId);
+				throw;
+			}
 
             return await GenerateAndSaveTokensAsync(createdUser, deviceInfo);
 

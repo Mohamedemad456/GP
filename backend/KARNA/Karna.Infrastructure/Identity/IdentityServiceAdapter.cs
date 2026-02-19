@@ -97,12 +97,12 @@ namespace Karna.Infrastructure.Identity
 		}
 
         public async Task<(bool Succeeded, UserIdentityDto? User, IEnumerable<string> Errors)>
-        CreateUserAsync(string username, string email, string password)
+        CreateUserAsync(string email, string password)
 			{
 				var user = new ApplicationUser
 				{
 					Id = Guid.NewGuid(),
-					UserName = username,
+					UserName = email,
 					Email = email,
 					IsActive = true,
 					EmailConfirmed = true
@@ -140,6 +140,14 @@ namespace Karna.Infrastructure.Identity
 
             if (!await _userManager.IsInRoleAsync(user, role))
                 await _userManager.AddToRoleAsync(user, role);
+        }
+
+        public async Task DeleteUserAsync(Guid userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user is null) return;
+
+            await _userManager.DeleteAsync(user);
         }
     }
 }
