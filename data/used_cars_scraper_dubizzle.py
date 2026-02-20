@@ -118,7 +118,8 @@ class DubizzleCarScraper:
             # 6. Location (Everything else is hard, but location is usually at the end)
             # We will search for common Egyptian cities to be safe, or take the last span
             # This is a simple heuristic:
-            spans = listing.find_all('span')
+            spans = listing.find_all('span', class_='f7d5e47e')
+            
             if spans:
                 car['location'] = spans[-1].get_text(strip=True) # Often the last item is location/time
             else:
@@ -170,8 +171,8 @@ def scrape_batch(page_range, base_url, headless=True, transmission_type=""):
 
 if __name__ == "__main__":
 
-    TOTAL_PAGES_TO_SCRAPE = 2 # Number of pages will be 200 after the pipeline
-    NUM_WORKERS = 1 # Number workers for each type of transmission max 3 after the pipeline
+    TOTAL_PAGES_TO_SCRAPE = 200 # Number of pages will be 200 after the pipeline
+    NUM_WORKERS = 3 # Number workers for each type of transmission max 3 after the pipeline
     HEADLESS_MODE = True
     all_cars = []
 
