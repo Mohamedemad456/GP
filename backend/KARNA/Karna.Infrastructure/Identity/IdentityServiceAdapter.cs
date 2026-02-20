@@ -10,8 +10,9 @@ namespace Karna.Infrastructure.Identity
 {
 	internal sealed class IdentityServiceAdapter(
 		UserManager<ApplicationUser> _userManager,
-		SignInManager<ApplicationUser> _signInManager
-	) : IIdentityService
+		SignInManager<ApplicationUser> _signInManager,
+        ILocalizationService _localizer
+    ) : IIdentityService
 	{
 		public async Task<UserIdentityDto> FindUserByUsernameAsync(string username)
 		{
@@ -100,60 +101,78 @@ namespace Karna.Infrastructure.Identity
 			}
 		}
 
-        public async Task<(bool Succeeded, UserIdentityDto? User, IEnumerable<string> Errors)>
-        CreateUserAsync(string email, string password, string phoneNumber)
+		public async Task<(bool Succeeded, UserIdentityDto? User, IEnumerable<string> Errors)>
+		CreateUserAsync(string email, string password, string phoneNumber)
+		{
+			var user = new ApplicationUser
 			{
-				var user = new ApplicationUser
-				{
-					Id = Guid.NewGuid(),
-					UserName = email,
-					Email = email,
-					PhoneNumber = phoneNumber,
-					IsActive = true,
-					EmailConfirmed = true
-				};
+				Id = Guid.NewGuid(),
+				UserName = email,
+				Email = email,
+				PhoneNumber = phoneNumber,
+				IsActive = true,
+				EmailConfirmed = true
+			};
 
-				var result = await _userManager.CreateAsync(user, password);
+			var result = await _userManager.CreateAsync(user, password);
 
-				if (!result.Succeeded)
-				{
-					return (
-						false,
-						null,
-						result.Errors.Select(e => e.Description)
-					);
-				}
-
+			if (!result.Succeeded)
+			{
 				return (
-					true,
-					new UserIdentityDto
-					{
-						UserId = user.Id,
-						Email = user.Email!,
-						UserName = user.UserName!,
-						PhoneNumber = user.PhoneNumber,
-						IsActive = user.IsActive,
-						Found = true
-					},
-					Enumerable.Empty<string>()
+					false,
+					null,
+					result.Errors.Select(e => e.Description)
 				);
 			}
 
-        public async Task AddToRoleAsync(Guid userId, string role)
-        {
-            var user = await _userManager.FindByIdAsync(userId.ToString());
-            if (user is null) return;
+			return (
+				true,
+				new UserIdentityDto
+				{
+					UserId = user.Id,
+					Email = user.Email!,
+					UserName = user.UserName!,
+					PhoneNumber = user.PhoneNumber,
+					IsActive = user.IsActive,
+					Found = true
+				},
+				Enumerable.Empty<string>()
+			);
+		}
 
-            if (!await _userManager.IsInRoleAsync(user, role))
-                await _userManager.AddToRoleAsync(user, role);
-        }
+		public async Task AddToRoleAsync(Guid userId, string role)
+		{
+			var user = await _userManager.FindByIdAsync(userId.ToString());
+			if (user is null) return;
 
-        public async Task DeleteUserAsync(Guid userId)
-        {
-            var user = await _userManager.FindByIdAsync(userId.ToString());
-            if (user is null) return;
+			if (!await _userManager.IsInRoleAsync(user, role))
+				await _userManager.AddToRoleAsync(user, role);
+		}
 
-            await _userManager.DeleteAsync(user);
-        }
-    }
+		public async Task DeleteUserAsync(Guid userId)
+		{
+			var user = await _userManager.FindByIdAsync(userId.ToString());
+			if (user is null) return;
+
+			await _userManager.DeleteAsync(user);
+		}
+
+		public async Task<(bool Succeeded, IEnumerable<string> Errors)> ChangePassAsync(Guid userId, string oldPass, string newPass)
+		{
+			var user = await _userManager.FindByIdAsync(userId.ToString());
+
+			if (user is null)
+				return (
+						false,
+						new[] { _localizer.GetValidationMessage("UserNotFound") }
+						);
+
+            var result = await _userManager.ChangePasswordAsync(user, oldPass, newPass);
+
+            return (
+				result.Succeeded,
+				result.Errors.Select(e => e.Code)
+			);
+		}
+	}
 }

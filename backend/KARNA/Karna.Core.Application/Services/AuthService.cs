@@ -17,9 +17,11 @@ namespace Karna.Core.Application.Services
 		ITokenService _tokenService,
 		IValidator<LoginDto> _loginValidator,
         IValidator<RegisterDto> _registerValidator,
+		IValidator<ChangePasswordDto> _changePasswordValidator,
         IOptions<JwtSettings> _jwtSettings,
-		ILocalizationService _localizer
-	) : IAuthService
+		ILocalizationService _localizer,
+        ICurrentUserService _currentUserService
+    ) : IAuthService
 	{
 		public async Task<ApiResponse<TokenResponseDto>> LoginAsync(LoginDto loginDto, string? deviceInfo = null)
 		{
@@ -254,5 +256,44 @@ namespace Karna.Core.Application.Services
 
         }
 
+		public async Task<ApiResponseDto> ChangePassword(ChangePasswordDto dto)
+		{
+			var userId = _currentUserService.UserId;
+			if (userId == Guid.Empty)
+			{
+				return new ApiResponseDto
+				{
+					Success = false,
+					Message = _localizer.GetValidationMessage("Unauthorized")
+				};
+			}
+
+			var validationResult = await _changePasswordValidator.ValidateAsync(dto);
+            if (!validationResult.IsValid)
+            {
+                return new ApiResponseDto
+                {
+                    Success = false,
+                    Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage))
+                };
+            }
+
+            var (succeeded, errors) = await _identityService.ChangePassAsync(userId, dto.OldPassword, dto.NewPassword);
+
+            if (!succeeded)
+            {
+                return new ApiResponseDto
+                {
+                    Success = false,
+                    Message = string.Join("; ", errors)
+                };
+            }
+
+            return new ApiResponseDto
+            {
+                Success = true,
+                Message = _localizer.GetValidationMessage("PasswordChanged")
+            };
+        }
     }
 }

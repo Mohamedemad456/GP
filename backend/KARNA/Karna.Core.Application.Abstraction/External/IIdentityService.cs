@@ -22,6 +22,9 @@ namespace Karna.Core.Application.Abstraction.External
 																									string phoneNumber);
         Task AddToRoleAsync(Guid userId, string role);
 		Task DeleteUserAsync(Guid userId);
+		Task<(bool Succeeded, IEnumerable<string> Errors)> ChangePassAsync(Guid userId, 
+																			string oldPass, 
+																			string newPass);
 
-    }
+	}
 }
