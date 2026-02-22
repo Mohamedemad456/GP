@@ -149,10 +149,26 @@ namespace Karna.Infrastructure.Identity
 				await _userManager.AddToRoleAsync(user, role);
 		}
 
-		public async Task DeleteUserAsync(Guid userId)
-		{
-			var user = await _userManager.FindByIdAsync(userId.ToString());
-			if (user is null) return;
+        public async Task<(bool Succeeded, IEnumerable<string> Errors)> UpdateUserAsync(Guid userId, string userName, string phoneNumber)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user is null)
+                return (false, ["User not found."]);
+
+            user.UserName = userName;
+            user.PhoneNumber = phoneNumber;
+
+            var result = await _userManager.UpdateAsync(user);
+
+            return result.Succeeded
+                ? (true, Enumerable.Empty<string>())
+                : (false, result.Errors.Select(e => e.Description));
+        }
+
+        public async Task DeleteUserAsync(Guid userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user is null) return;
 
 			await _userManager.DeleteAsync(user);
 		}

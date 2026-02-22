@@ -34,10 +34,10 @@ namespace Karna.Infrastructure.Persistence._Data.Interceptors
 				if (entry.State is EntityState.Added)
 				{
 					entry.Property(e => e.CreatedAt).CurrentValue = now;
+					entry.Property(e => e.UpdatedAt).CurrentValue = now;
 				}
 				if (entry.State is EntityState.Modified)
 				{
-
 					entry.Property(e => e.UpdatedAt).CurrentValue = now;
 				}
 			}

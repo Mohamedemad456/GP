@@ -41,7 +41,7 @@ namespace Karna.Infrastructure.Persistence.DependencyInjection
 			services.AddScoped<IAppIdentityDbInitializer, AppIdentityDbInitializer>();
 
 			services.AddScoped<IUnitOfWork, UnitOfWork>();
-			services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+			//services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
 			return services;
 		}
