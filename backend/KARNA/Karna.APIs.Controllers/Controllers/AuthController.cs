@@ -20,18 +20,18 @@ namespace Karna.APIs.Controllers.Controllers
 
 			return Ok(result);
 		}
-        [AllowAnonymous]
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
-        {
-            var deviceInfo = Request.Headers.UserAgent.ToString();
-            var result = await _authService.RegisterAsync(registerDto, deviceInfo);
+		[AllowAnonymous]
+		[HttpPost("register")]
+		public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
+		{
+			var deviceInfo = Request.Headers.UserAgent.ToString();
+			var result = await _authService.RegisterAsync(registerDto, deviceInfo);
 
-            if (!result.Success)
-                return BadRequest(result); 
+			if (!result.Success)
+				return BadRequest(result);
 
-            return Ok(result);
-        }
+			return Ok(result);
+		}
 
 		[HttpPost("refresh")]
 		public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDto dto)
@@ -68,5 +68,16 @@ namespace Karna.APIs.Controllers.Controllers
 			return Ok(result);
 		}
 
+        [HttpPost("change-password")]
+        [Authorize]
+        public async Task<IActionResult> ChangePasswordAsync([FromBody] ChangePasswordDto dto)
+        {
+            var result = await _authService.ChangePasswordAsync(dto);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+        }
     }
 }

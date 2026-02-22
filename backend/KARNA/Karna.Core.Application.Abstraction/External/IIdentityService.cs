@@ -23,6 +23,9 @@ namespace Karna.Core.Application.Abstraction.External
         Task<(bool Succeeded, IEnumerable<string> Errors)> UpdateUserAsync(Guid userId, string userName, string phoneNumber);
         Task AddToRoleAsync(Guid userId, string role);
 		Task DeleteUserAsync(Guid userId);
+		Task<(bool Succeeded, IEnumerable<string> Errors)> ChangePassAsync(Guid userId, 
+																			string oldPass, 
+																			string newPass);
 
-    }
+	}
 }

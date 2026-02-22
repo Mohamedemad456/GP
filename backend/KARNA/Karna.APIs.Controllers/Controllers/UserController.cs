@@ -22,7 +22,7 @@ namespace Karna.APIs.Controllers.Controllers
 		}
 
 		[Authorize]
-		[HttpPut("profile")]
+		[HttpPut("update-profile")]
 		public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileDto dto)
 		{
 			var result = await _userService.UpdateProfileAsync(dto);
