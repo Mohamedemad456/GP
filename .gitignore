@@ -1,2 +1,7 @@
 
 *.csv
+
+.env
+
+# Ignore all files in the data directory
+data/*
