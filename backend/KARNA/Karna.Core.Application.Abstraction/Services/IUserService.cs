@@ -9,5 +9,6 @@ namespace Karna.Core.Application.Abstraction.Services
 	public interface IUserService
 	{
 		Task<ApiResponse<UserDto>> GetProfileAsync();
+		Task<ApiResponse<UserDto>> UpdateProfileAsync(UpdateProfileDto dto);
 	}
 }

@@ -6,5 +6,7 @@ namespace Karna.Core.Application.Abstraction.Persistence
 	{
 		IGenericRepository<T> GetRepository<T>() where T : BaseEntity;
 		Task<int> CompleteAsync();
+
+		Task ExecuteInTransactionAsync(Func<Task> operation);
 	}
 }

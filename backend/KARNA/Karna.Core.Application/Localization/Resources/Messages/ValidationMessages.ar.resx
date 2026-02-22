@@ -159,4 +159,7 @@
   <data name="EmailAlreadyInUse" xml:space="preserve">
     <value>هذا البريد الإلكتروني مستخدم بالفعل</value>
   </data>
+  <data name="UsernameAlreadyTaken" xml:space="preserve">
+    <value>اسم المستخدم هذا مأخوذ بالفعل</value>
+  </data>
 </root>

@@ -20,6 +20,21 @@ namespace Karna.Infrastructure.Persistence._Data.Repositories
 			return await dbContext.SaveChangesAsync();
 		}
 
+		public async Task ExecuteInTransactionAsync(Func<Task> operation)
+		{
+			await using var transaction = await dbContext.Database.BeginTransactionAsync();
+			try
+			{
+				await operation();
+				await transaction.CommitAsync();
+			}
+			catch
+			{
+				await transaction.RollbackAsync();
+				throw;
+			}
+		}
+
 		public async ValueTask DisposeAsync()
 		{
 			await dbContext.DisposeAsync();
