@@ -256,17 +256,9 @@ namespace Karna.Core.Application.Services
 
         }
 
-		public async Task<ApiResponseDto> ChangePassword(ChangePasswordDto dto)
+		public async Task<ApiResponseDto> ChangePasswordAsync(ChangePasswordDto dto)
 		{
 			var userId = _currentUserService.UserId;
-			if (userId == Guid.Empty)
-			{
-				return new ApiResponseDto
-				{
-					Success = false,
-					Message = _localizer.GetValidationMessage("Unauthorized")
-				};
-			}
 
 			var validationResult = await _changePasswordValidator.ValidateAsync(dto);
             if (!validationResult.IsValid)
@@ -292,7 +284,7 @@ namespace Karna.Core.Application.Services
             return new ApiResponseDto
             {
                 Success = true,
-                Message = _localizer.GetValidationMessage("PasswordChanged")
+                Message = _localizer.GetMessage("PasswordChanged")
             };
         }
     }

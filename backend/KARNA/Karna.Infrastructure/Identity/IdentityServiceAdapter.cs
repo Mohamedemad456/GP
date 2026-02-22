@@ -169,9 +169,9 @@ namespace Karna.Infrastructure.Identity
 
             var result = await _userManager.ChangePasswordAsync(user, oldPass, newPass);
 
-            return (
+			return (
 				result.Succeeded,
-				result.Errors.Select(e => e.Code)
+				result.Errors.Select(e => e.Description)
 			);
 		}
 	}

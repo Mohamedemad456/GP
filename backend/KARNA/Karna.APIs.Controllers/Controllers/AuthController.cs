@@ -71,9 +71,9 @@ namespace Karna.APIs.Controllers.Controllers
 
         [HttpPost("change-password")]
         [Authorize]
-        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
+        public async Task<IActionResult> ChangePasswordAsync([FromBody] ChangePasswordDto dto)
         {
-            var result = await _authService.ChangePassword(dto);
+            var result = await _authService.ChangePasswordAsync(dto);
 
             if (!result.Success)
                 return BadRequest(result);

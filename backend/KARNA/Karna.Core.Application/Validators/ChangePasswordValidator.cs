@@ -24,7 +24,7 @@ namespace Karna.Core.Application.Validators
                 .Matches(@"[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]").WithMessage(localizer.GetValidationMessage("PasswordRequiresSpecial"));
 
            RuleFor(x => x.ConfirmPassword)
-            .NotEmpty().WithMessage(localizer.GetValidationMessage("RequiresField"))
+            .NotEmpty().WithMessage(localizer.GetValidationMessage("RequiredField"))
             .Equal(x => x.NewPassword).WithMessage(localizer.GetValidationMessage("PasswordsDoNotMatch"));
         }
     }

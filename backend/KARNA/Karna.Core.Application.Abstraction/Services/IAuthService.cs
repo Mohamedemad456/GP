@@ -10,7 +10,7 @@ namespace Karna.Core.Application.Abstraction.Services
 		Task<ApiResponseDto> LogoutAsync(Guid userId);
 		Task<ApiResponseDto> LogoutFromAllDevicesAsync(Guid userId);
         Task<ApiResponse<TokenResponseDto>> RegisterAsync(RegisterDto registerDto, string? deviceInfo = null);
-		Task<ApiResponseDto> ChangePassword(ChangePasswordDto dto);
+		Task<ApiResponseDto> ChangePasswordAsync(ChangePasswordDto dto);
 
 
     }
