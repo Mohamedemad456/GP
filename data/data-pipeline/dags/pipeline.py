@@ -1,3 +1,6 @@
+from urllib.parse import quote_plus
+from sqlalchemy import create_engine
+from urllib.parse import quote_plus
 from airflow.sdk import dag, task
 import pandas as pd
 
@@ -80,6 +83,14 @@ def data_pipeline():
 
         df['fuel'] = (df['fuel'].str.strip().str.lower().replace(fuel_map))
         return df
+    
+    @task
+    def load_to_db(df):
+        password = quote_plus("!YA-gp*13579karna")
+        engine = create_engine(
+            f"postgresql://postgres.idcnjzlutvmnpmgyukrk:{password}@aws-1-eu-west-1.pooler.supabase.com:6543/postgres"
+        )
+        df.to_sql("used_cars", engine, if_exists="append", index=False)
 
     htla2eeData = extract_htla2ee()
     dubizzleData = extract_dubizzle()
@@ -87,6 +98,7 @@ def data_pipeline():
     cleaned_dubizzleData = clean_dubizzle(dubizzleData)
     unioned_data = union_datasets(cleaned_htla2eeData, cleaned_dubizzleData)
     final_data = edit_fuel(unioned_data)
+    load_to_db(final_data)
 
 data_pipeline()
 
