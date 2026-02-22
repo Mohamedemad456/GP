@@ -5,3 +5,9 @@
 
 # Ignore all files in the data directory
 data/*
+
+# python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
