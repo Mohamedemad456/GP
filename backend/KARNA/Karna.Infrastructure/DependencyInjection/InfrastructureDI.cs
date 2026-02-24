@@ -42,6 +42,18 @@ namespace Karna.Infrastructure.DependencyInjection
 						RoleClaimType = ClaimTypes.Role
 
 					};
+
+					options.Events = new JwtBearerEvents
+					{
+						OnMessageReceived = context =>
+						{
+							if (context.Request.Cookies.ContainsKey("AccessToken"))
+							{
+								context.Token = context.Request.Cookies["AccessToken"];
+							}
+							return Task.CompletedTask;
+						}
+					};
 				});
 
 			services.AddScoped<ITokenService, JwtTokenService>();

@@ -7,6 +7,7 @@ using Karna.Core.Application.Abstraction.Persistence;
 using Karna.Core.Application.Abstraction.Services;
 using Karna.Core.Application.Abstraction.Settings;
 using Karna.Core.Domain.Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
 namespace Karna.Core.Application.Services
@@ -20,7 +21,8 @@ namespace Karna.Core.Application.Services
 		IValidator<ChangePasswordDto> _changePasswordValidator,
         IOptions<JwtSettings> _jwtSettings,
 		ILocalizationService _localizer,
-        ICurrentUserService _currentUserService
+        ICurrentUserService _currentUserService,
+        IHttpContextAccessor _httpContextAccessor
     ) : IAuthService
 	{
 		public async Task<ApiResponse<TokenResponseDto>> LoginAsync(LoginDto loginDto, string? deviceInfo = null)
@@ -133,6 +135,8 @@ namespace Karna.Core.Application.Services
 				await _unitOfWork.CompleteAsync();
 			}
 
+			ClearTokenCookies();
+
 			return new ApiResponseDto
 			{
 				Success = true,
@@ -153,6 +157,8 @@ namespace Karna.Core.Application.Services
 			}
 
 			await _unitOfWork.CompleteAsync();
+
+			ClearTokenCookies();
 
 			return new ApiResponseDto
 			{
@@ -177,6 +183,8 @@ namespace Karna.Core.Application.Services
 			});
 
 			await _unitOfWork.CompleteAsync();
+
+			SetTokenCookies(accessToken, rawRefreshToken);
 
 			return new ApiResponse<TokenResponseDto>
 			{
@@ -287,5 +295,31 @@ namespace Karna.Core.Application.Services
                 Message = _localizer.GetMessage("PasswordChanged")
             };
         }
+
+		private void SetTokenCookies(string accessToken, string refreshToken)
+		{
+			var httpContext = _httpContextAccessor.HttpContext;
+			if (httpContext == null) return;
+
+			var cookieOptions = new CookieOptions
+			{
+				HttpOnly = true,
+				Secure = true,
+				SameSite = SameSiteMode.None,
+				Expires = DateTime.UtcNow.AddDays(_jwtSettings.Value.RefreshTokenExpirationDays) 
+			};
+
+			httpContext.Response.Cookies.Append("AccessToken", accessToken, cookieOptions);
+			httpContext.Response.Cookies.Append("RefreshToken", refreshToken, cookieOptions);
+		}
+
+		private void ClearTokenCookies()
+		{
+			var httpContext = _httpContextAccessor.HttpContext;
+			if (httpContext == null) return;
+
+			httpContext.Response.Cookies.Delete("AccessToken");
+			httpContext.Response.Cookies.Delete("RefreshToken");
+		}
     }
 }
