@@ -1,6 +1,14 @@
 import { memo, useCallback, useMemo } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { BarChart3, Car, LogOut, Languages, Plus, List } from "lucide-react";
+import {
+  BarChart3,
+  Car,
+  House,
+  LogOut,
+  Languages,
+  Plus,
+  List,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
   SidebarProvider,
@@ -61,6 +69,18 @@ const SellerLayout = memo(() => {
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    tooltip={t("navigation.home")}
+                    isActive={location.pathname === "/"}
+                  >
+                    <NavLink to="/" end>
+                      <House className="size-4" />
+                      <span>{t("navigation.home")}</span>
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton
                     asChild

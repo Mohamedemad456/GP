@@ -3,6 +3,7 @@ import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   Users,
   Car,
+  House,
   LayoutDashboard,
   BarChart3,
   LogOut,
@@ -64,6 +65,18 @@ const AdminLayout = memo(() => {
             <SidebarGroupLabel>{t("admin.sidebar.overview")}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    tooltip={t("navigation.home")}
+                    isActive={location.pathname === "/"}
+                  >
+                    <NavLink to="/" end>
+                      <House className="size-4" />
+                      <span>{t("navigation.home")}</span>
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton
                     asChild

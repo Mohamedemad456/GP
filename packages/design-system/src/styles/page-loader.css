@@ -29,6 +29,7 @@
   width: 12em;
   height: 7em;
   font-size: 16px;
+  direction: ltr;
 }
 
 /* ─── Car body ─────────────────────────────────────────────────────────── */
@@ -59,6 +60,7 @@
 .page-loader__car::before {
   content: "";
   position: absolute;
+  left: 0;
   width: 0;
   height: 0;
   top: -0.5em;
@@ -145,6 +147,7 @@
       var(--foreground) 51%
     );
   animation: page-loader-wheel-spin 0.5s linear infinite;
+  z-index: 4;
 }
 
 .page-loader__wheels::before {

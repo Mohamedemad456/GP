@@ -8,9 +8,15 @@
   "navigation": {
     "logo": "Sayarti",
     "home": "Home",
+    "feed": "Feed",
     "about": "About",
     "contact": "Contact",
-    "login": "Login"
+    "login": "Login",
+    "account": "Account",
+    "profile": "Profile",
+    "sellerDashboard": "Seller dashboard",
+    "adminDashboard": "Admin dashboard",
+    "logout": "Logout"
   },
   "buttons": {
     "submit": "Submit",
@@ -546,6 +552,69 @@
         "title": "Listing submitted!",
         "description": "Your listing has been submitted for review. You will be notified once it is approved."
       }
+    }
+  },
+  "buyer": {
+    "feed": {
+      "title": "Browse Cars",
+      "subtitle": "Find your next car from verified listings with detailed specs and pricing.",
+      "filtersTitle": "Filters & Sorting",
+      "filtersSubtitle": "Narrow down listings quickly",
+      "search": "Search",
+      "searchPlaceholder": "Make, model, keyword...",
+      "make": "Make",
+      "allMakes": "All makes",
+      "fuelType": "Fuel type",
+      "allFuelTypes": "All fuel types",
+      "condition": "Condition",
+      "allConditions": "All conditions",
+      "aRange": "A range",
+      "bRange": "B range",
+      "cRange": "C range",
+      "maxPrice": "Max price (SAR)",
+      "maxPricePlaceholder": "e.g. 120000",
+      "sortBy": "Sort by",
+      "sort": {
+        "newest": "Newest",
+        "popular": "Most viewed",
+        "priceAsc": "Price: Low to high",
+        "priceDesc": "Price: High to low",
+        "mileageAsc": "Mileage: Low to high"
+      },
+      "showing": "Showing",
+      "listings": "listings",
+      "totalFavorites": "Total favorites:",
+      "listingPrice": "Listing price",
+      "addWishlist": "Wishlist",
+      "removeWishlist": "Wishlisted",
+      "viewDetails": "View details"
+    },
+    "details": {
+      "notFoundTitle": "Listing not found",
+      "notFoundDescription": "The listing you are looking for does not exist or was removed.",
+      "backToFeed": "Back to feed",
+      "description": "Description",
+      "pricing": "Pricing",
+      "listingPrice": "Listing price",
+      "suggestedPrice": "Suggested price",
+      "basePrice": "Base price",
+      "deduction": "Deduction",
+      "vehicleDetails": "Vehicle details",
+      "makeId": "Make ID",
+      "modelId": "Model ID",
+      "year": "Year",
+      "mileage": "Mileage",
+      "fuelType": "Fuel Type",
+      "transmission": "Transmission",
+      "engineSize": "Engine Size",
+      "color": "Color",
+      "sellerId": "Seller ID",
+      "createdAt": "Created At",
+      "updatedAt": "Updated At",
+      "approvedAt": "Approved At",
+      "soldAt": "Sold At",
+      "rejectionReason": "Rejection Reason",
+      "approvedByAdminId": "Approved By Admin ID"
     }
   },
   "footer": {

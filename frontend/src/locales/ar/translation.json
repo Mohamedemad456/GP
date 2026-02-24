@@ -8,9 +8,15 @@
   "navigation": {
     "logo": "سيارتي",
     "home": "الرئيسية",
+    "feed": "التصفح",
     "about": "حول",
     "contact": "اتصل بنا",
-    "login": "تسجيل الدخول"
+    "login": "تسجيل الدخول",
+    "account": "الحساب",
+    "profile": "الملف الشخصي",
+    "sellerDashboard": "لوحة البائع",
+    "adminDashboard": "لوحة المشرف",
+    "logout": "تسجيل الخروج"
   },
   "buttons": {
     "submit": "إرسال",
@@ -546,6 +552,69 @@
         "title": "تم إرسال الإعلان!",
         "description": "تم إرسال إعلانك للمراجعة. سيتم إعلامك عند الموافقة عليه."
       }
+    }
+  },
+  "buyer": {
+    "feed": {
+      "title": "تصفح السيارات",
+      "subtitle": "اعثر على سيارتك القادمة من الإعلانات الموثقة مع التفاصيل الكاملة والسعر.",
+      "filtersTitle": "الفلاتر والترتيب",
+      "filtersSubtitle": "ضيّق النتائج بسرعة",
+      "search": "بحث",
+      "searchPlaceholder": "الماركة، الموديل، كلمة مفتاحية...",
+      "make": "الماركة",
+      "allMakes": "كل الماركات",
+      "fuelType": "نوع الوقود",
+      "allFuelTypes": "كل أنواع الوقود",
+      "condition": "الحالة",
+      "allConditions": "كل الحالات",
+      "aRange": "فئة A",
+      "bRange": "فئة B",
+      "cRange": "فئة C",
+      "maxPrice": "أقصى سعر (ريال)",
+      "maxPricePlaceholder": "مثال: 120000",
+      "sortBy": "ترتيب حسب",
+      "sort": {
+        "newest": "الأحدث",
+        "popular": "الأكثر مشاهدة",
+        "priceAsc": "السعر: الأقل إلى الأعلى",
+        "priceDesc": "السعر: الأعلى إلى الأقل",
+        "mileageAsc": "المسافة: الأقل إلى الأعلى"
+      },
+      "showing": "عرض",
+      "listings": "إعلانات",
+      "totalFavorites": "إجمالي المفضلة:",
+      "listingPrice": "سعر الإعلان",
+      "addWishlist": "أضف للمفضلة",
+      "removeWishlist": "في المفضلة",
+      "viewDetails": "عرض التفاصيل"
+    },
+    "details": {
+      "notFoundTitle": "الإعلان غير موجود",
+      "notFoundDescription": "الإعلان الذي تبحث عنه غير موجود أو تمت إزالته.",
+      "backToFeed": "العودة للتصفح",
+      "description": "الوصف",
+      "pricing": "التسعير",
+      "listingPrice": "سعر الإعلان",
+      "suggestedPrice": "السعر المقترح",
+      "basePrice": "السعر الأساسي",
+      "deduction": "الخصم",
+      "vehicleDetails": "تفاصيل السيارة",
+      "makeId": "معرف الماركة",
+      "modelId": "معرف الموديل",
+      "year": "السنة",
+      "mileage": "المسافة المقطوعة",
+      "fuelType": "نوع الوقود",
+      "transmission": "ناقل الحركة",
+      "engineSize": "حجم المحرك",
+      "color": "اللون",
+      "sellerId": "معرف البائع",
+      "createdAt": "تاريخ الإنشاء",
+      "updatedAt": "تاريخ التحديث",
+      "approvedAt": "تاريخ الموافقة",
+      "soldAt": "تاريخ البيع",
+      "rejectionReason": "سبب الرفض",
+      "approvedByAdminId": "تمت الموافقة بواسطة"
     }
   },
   "footer": {

@@ -1,13 +1,15 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button, Input } from "@gp/design-system";
 import { useToast } from "@/hooks/use-toast";
 import { Car, ArrowLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "@/components";
+import { setAuthSession } from "@/lib/auth";
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const { t } = useTranslation();
   const [formData, setFormData] = useState({
@@ -17,10 +19,21 @@ const Login = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    setAuthSession({
+      email: formData.email,
+      role: "user",
+      createdAt: new Date().toISOString(),
+    });
+
+    const redirectPath =
+      (location.state as { from?: { pathname?: string } } | null)?.from
+        ?.pathname ?? "/feed";
+
     toast(t("auth.toastTitle"), {
       description: t("auth.toastDescription"),
     });
-    navigate("/");
+    navigate(redirectPath, { replace: true });
     setFormData({
       email: "",
       password: "",
