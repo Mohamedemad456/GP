@@ -1,26 +1,66 @@
-import { memo, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Car } from "lucide-react";
-import { Button } from "@/lib";
+import { memo, useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import {
+  Menu,
+  X,
+  Car,
+  ChevronDown,
+  UserCircle2,
+  LayoutDashboard,
+  ShieldCheck,
+  LogOut,
+} from "lucide-react";
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@gp/design-system";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "./LanguageSwitcher";
+import { clearAuthSession, getAuthSession } from "@/lib/auth";
 
 const Navbar = memo(() => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { t, i18n } = useTranslation();
+  const [session, setSession] = useState(() => getAuthSession());
 
   // Detect RTL language
   const isRTL = i18n.language?.startsWith("ar") ?? false;
+  const isLoggedIn = !!session;
+  const isAdmin = session?.role === "admin";
+
+  useEffect(() => {
+    setSession(getAuthSession());
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const onStorage = () => setSession(getAuthSession());
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
 
   const navLinks = [
     { name: t("navigation.home"), path: "/" },
+    { name: t("navigation.feed"), path: "/feed" },
     { name: t("navigation.about"), path: "/about" },
     { name: t("navigation.contact"), path: "/contact" },
   ];
 
   const isActive = (path: string) => location.pathname === path;
+
+  const handleLogout = () => {
+    clearAuthSession();
+    setSession(null);
+    setIsOpen(false);
+    navigate("/login", { replace: true });
+  };
 
   return (
     <motion.nav
@@ -99,48 +139,68 @@ const Navbar = memo(() => {
             ))}
           </motion.div>
 
-          {/* Auth Buttons */}
+          {/* Auth / Account */}
           <div
             className={`hidden md:flex items-center gap-3 ${
               isRTL ? "flex-row-reverse mr-auto" : "ml-auto"
             }`}
           >
-            {!isRTL ? (
-              <>
-                <LanguageSwitcher />
-                <Link to="/login">
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+            <LanguageSwitcher />
+            {isLoggedIn ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2 border-primary/25 bg-background/70 hover:bg-primary/10 hover:border-primary/40"
                   >
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="transition-smooth hover:bg-primary hover:text-primary-foreground hover:border-primary font-sans"
-                    >
-                      {t("navigation.login")}
-                    </Button>
-                  </motion.div>
-                </Link>
-                <Link to="/signup">
-                  <motion.div
-                    whileHover={{
-                      scale: 1.05,
-                      boxShadow: "0 0 20px hsl(var(--primary) / 0.4)",
-                    }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Button
-                      size="sm"
-                      className="bg-primary text-primary-foreground hover:glow-primary transition-smooth font-sans"
-                    >
-                      {t("auth.signUp")}
-                    </Button>
-                  </motion.div>
-                </Link>
-              </>
+                    <UserCircle2 className="size-4 text-primary" />
+                    <span className="max-w-36 truncate">{session?.email}</span>
+                    <ChevronDown className="size-4 text-muted-foreground" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align={isRTL ? "start" : "end"} className="w-64">
+                  <DropdownMenuLabel className="space-y-0.5">
+                    <p className="text-xs font-medium text-muted-foreground">
+                      {t("navigation.account")}
+                    </p>
+                    <p className="truncate text-sm font-semibold">{session?.email}</p>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate("/profile")}>
+                    <UserCircle2 className="size-4" />
+                    {t("navigation.profile")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/seller")}>
+                    <LayoutDashboard className="size-4" />
+                    {t("navigation.sellerDashboard")}
+                  </DropdownMenuItem>
+                  {isAdmin && (
+                    <DropdownMenuItem onClick={() => navigate("/admin")}>
+                      <ShieldCheck className="size-4" />
+                      {t("navigation.adminDashboard")}
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem variant="destructive" onClick={handleLogout}>
+                    <LogOut className="size-4" />
+                    {t("navigation.logout")}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <>
+                <Link to="/login">
+                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="transition-smooth hover:bg-primary hover:text-primary-foreground hover:border-primary font-sans"
+                    >
+                      {t("navigation.login")}
+                    </Button>
+                  </motion.div>
+                </Link>
                 <Link to="/signup">
                   <motion.div
                     whileHover={{
@@ -157,21 +217,6 @@ const Navbar = memo(() => {
                     </Button>
                   </motion.div>
                 </Link>
-                <Link to="/login">
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="transition-smooth hover:bg-primary hover:text-primary-foreground hover:border-primary font-sans"
-                    >
-                      {t("navigation.login")}
-                    </Button>
-                  </motion.div>
-                </Link>
-                <LanguageSwitcher />
               </>
             )}
           </div>
@@ -255,24 +300,74 @@ const Navbar = memo(() => {
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.3 }}
               >
-                <Link
-                  to="/login"
-                  onClick={() => setIsOpen(false)}
-                  className="block"
-                >
-                  <Button variant="outline" className="w-full">
-                    {t("navigation.login")}
-                  </Button>
-                </Link>
-                <Link
-                  to="/signup"
-                  onClick={() => setIsOpen(false)}
-                  className="block"
-                >
-                  <Button className="w-full bg-primary text-primary-foreground">
-                    {t("auth.signUp")}
-                  </Button>
-                </Link>
+                {isLoggedIn ? (
+                  <>
+                    <Link
+                      to="/profile"
+                      onClick={() => setIsOpen(false)}
+                      className="block"
+                    >
+                      <Button variant="outline" className="w-full justify-start gap-2">
+                        <UserCircle2 className="size-4" />
+                        {t("navigation.profile")}
+                      </Button>
+                    </Link>
+                    <Link
+                      to="/seller"
+                      onClick={() => setIsOpen(false)}
+                      className="block"
+                    >
+                      <Button variant="outline" className="w-full justify-start gap-2">
+                        <LayoutDashboard className="size-4" />
+                        {t("navigation.sellerDashboard")}
+                      </Button>
+                    </Link>
+                    {isAdmin && (
+                      <Link
+                        to="/admin"
+                        onClick={() => setIsOpen(false)}
+                        className="block"
+                      >
+                        <Button
+                          variant="outline"
+                          className="w-full justify-start gap-2"
+                        >
+                          <ShieldCheck className="size-4" />
+                          {t("navigation.adminDashboard")}
+                        </Button>
+                      </Link>
+                    )}
+                    <Button
+                      variant="destructive"
+                      className="w-full justify-start gap-2"
+                      onClick={handleLogout}
+                    >
+                      <LogOut className="size-4" />
+                      {t("navigation.logout")}
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      to="/login"
+                      onClick={() => setIsOpen(false)}
+                      className="block"
+                    >
+                      <Button variant="outline" className="w-full">
+                        {t("navigation.login")}
+                      </Button>
+                    </Link>
+                    <Link
+                      to="/signup"
+                      onClick={() => setIsOpen(false)}
+                      className="block"
+                    >
+                      <Button className="w-full bg-primary text-primary-foreground">
+                        {t("auth.signUp")}
+                      </Button>
+                    </Link>
+                  </>
+                )}
               </motion.div>
             </motion.div>
           </motion.div>

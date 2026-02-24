@@ -15,6 +15,7 @@ import {
   CheckCircle,
   Fuel,
   Gauge,
+  Heart,
   Search,
   Shield,
   SlidersHorizontal,
@@ -24,108 +25,57 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import heroCarImage from "@/assets/hero-car.jpg";
-import type { CarListing } from "@/types";
+import { MOCK_LISTINGS } from "@/data/mocks/listings";
 
-const DEMO_CARS: CarListing[] = [
-  {
-    id: "1",
-    make: "Toyota",
-    model: "Camry",
-    year: 2023,
-    price: 28900,
-    mileageKm: 12000,
-    fuel: "Gasoline",
-    transmission: "Automatic",
-    bodyType: "Sedan",
-    location: "Dubai",
-    featured: true,
-  },
-  {
-    id: "2",
-    make: "BMW",
-    model: "X5",
-    year: 2022,
-    price: 55900,
-    mileageKm: 28000,
-    fuel: "Hybrid",
-    transmission: "Automatic",
-    bodyType: "SUV",
-    location: "Abu Dhabi",
-    featured: true,
-  },
-  {
-    id: "3",
-    make: "Tesla",
-    model: "Model 3",
-    year: 2024,
-    price: 41900,
-    mileageKm: 6000,
-    fuel: "Electric",
-    transmission: "Automatic",
-    bodyType: "Sedan",
-    location: "Riyadh",
-  },
-  {
-    id: "4",
-    make: "Mercedes",
-    model: "C-Class",
-    year: 2021,
-    price: 37900,
-    mileageKm: 39000,
-    fuel: "Gasoline",
-    transmission: "Automatic",
-    bodyType: "Sedan",
-    location: "Jeddah",
-  },
-  {
-    id: "5",
-    make: "Nissan",
-    model: "Patrol",
-    year: 2020,
-    price: 46900,
-    mileageKm: 62000,
-    fuel: "Gasoline",
-    transmission: "Automatic",
-    bodyType: "SUV",
-    location: "Doha",
-  },
-  {
-    id: "6",
-    make: "Ford",
-    model: "Ranger",
-    year: 2022,
-    price: 30900,
-    mileageKm: 25000,
-    fuel: "Gasoline",
-    transmission: "Automatic",
-    bodyType: "Pickup",
-    location: "Kuwait City",
-  },
-  {
-    id: "7",
-    make: "Honda",
-    model: "Civic",
-    year: 2021,
-    price: 21900,
-    mileageKm: 34000,
-    fuel: "Gasoline",
-    transmission: "Automatic",
-    bodyType: "Sedan",
-    location: "Manama",
-  },
-  {
-    id: "8",
-    make: "Audi",
-    model: "A5",
-    year: 2022,
-    price: 44900,
-    mileageKm: 18000,
-    fuel: "Gasoline",
-    transmission: "Automatic",
-    bodyType: "Coupe",
-    location: "Sharjah",
-  },
+type HomeCarCard = {
+  id: number;
+  make: string;
+  model: string;
+  year: number;
+  price: number;
+  mileageKm: number;
+  fuel: string;
+  transmission: string;
+  bodyType: string;
+  location: string;
+  image: string;
+  featured?: boolean;
+};
+
+const FALLBACK_LOCATIONS = [
+  "Dubai",
+  "Abu Dhabi",
+  "Riyadh",
+  "Jeddah",
+  "Doha",
+  "Kuwait City",
+  "Manama",
+  "Sharjah",
 ];
+
+const BODY_TYPE_BY_MAKE: Record<string, string> = {
+  Toyota: "Sedan",
+  Honda: "Sedan",
+  BMW: "Sedan",
+  "Mercedes-Benz": "Sedan",
+  Nissan: "SUV",
+  Hyundai: "Sedan",
+};
+
+const DEMO_CARS: HomeCarCard[] = MOCK_LISTINGS.map((listing, index) => ({
+  id: listing.id,
+  make: listing.make,
+  model: listing.model,
+  year: listing.year,
+  price: listing.listingPrice,
+  mileageKm: listing.mileage,
+  fuel: listing.fuelType,
+  transmission: listing.transmission,
+  bodyType: BODY_TYPE_BY_MAKE[listing.make] ?? "Sedan",
+  location: FALLBACK_LOCATIONS[index % FALLBACK_LOCATIONS.length],
+  image: listing.images[0],
+  featured: index < 2,
+}));
 
 const Home = () => {
   const { t, i18n } = useTranslation();
@@ -142,6 +92,7 @@ const Home = () => {
   const [sort, setSort] = useState<
     "featured" | "priceAsc" | "priceDesc" | "yearDesc"
   >("featured");
+  const [savedCarIds, setSavedCarIds] = useState<Set<number>>(new Set());
 
   const makeOptions = useMemo(() => {
     const set = new Set(DEMO_CARS.map((c) => c.make));
@@ -164,7 +115,7 @@ const Home = () => {
       return true;
     };
 
-    const matches = (car: CarListing) => {
+    const matches = (car: HomeCarCard) => {
       if (make !== "all" && car.make !== make) return false;
       if (bodyType !== "all" && car.bodyType !== bodyType) return false;
       if (!withinPrice(car.price)) return false;
@@ -178,7 +129,7 @@ const Home = () => {
 
     const sorters: Record<
       typeof sort,
-      (a: CarListing, b: CarListing) => number
+      (a: HomeCarCard, b: HomeCarCard) => number
     > = {
       featured: (a, b) => {
         const af = a.featured ? 1 : 0;
@@ -193,6 +144,18 @@ const Home = () => {
 
     return list.sort(sorters[sort]);
   }, [query, make, bodyType, minPrice, maxPrice, sort]);
+
+  const toggleSaved = (carId: number) => {
+    setSavedCarIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(carId)) {
+        next.delete(carId);
+      } else {
+        next.add(carId);
+      }
+      return next;
+    });
+  };
 
   const currency = useMemo(
     () =>
@@ -481,8 +444,14 @@ const Home = () => {
                     transition={{ delay: Math.min(idx, 6) * 0.04 }}
                   >
                     <Card className="group h-full overflow-hidden border-border/60 hover:shadow-lg transition-smooth flex flex-col min-w-0">
-                      <div className="relative aspect-16/10 bg-linear-to-br from-muted/40 to-muted/10 min-w-0">
-                        <div className="absolute inset-0 bg-linear-to-t from-background/70 via-transparent to-transparent" />
+                      <div className="relative aspect-16/10 min-w-0 overflow-hidden">
+                        <img
+                          src={car.image}
+                          alt={`${car.make} ${car.model}`}
+                          className="h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
+                          loading="lazy"
+                        />
+                        <div className="absolute inset-0 bg-linear-to-t from-black/45 via-transparent to-transparent" />
                         <div className="absolute left-2 top-2 sm:left-4 sm:top-4 flex gap-1 sm:gap-2 flex-wrap">
                           {car.featured ? (
                             <Badge className="bg-primary text-primary-foreground px-2 py-0.5 sm:px-3 sm:py-1 text-xs">
@@ -498,30 +467,31 @@ const Home = () => {
                             <span className="truncate">{car.bodyType}</span>
                           </Badge>
                         </div>
-                        <div className="absolute bottom-2 left-2 right-2 sm:bottom-4 sm:left-4 sm:right-4 flex items-end justify-between gap-2 min-w-0">
-                          <div className="min-w-0 flex-1">
-                            <div className="text-xs sm:text-sm text-muted-foreground truncate">
-                              {car.location}
-                            </div>
-                            <div className="text-base sm:text-xl font-bold font-heading truncate">
-                              {car.make} {car.model}
-                            </div>
-                            <div className="text-xs sm:text-sm text-muted-foreground">
-                              {car.year}
-                            </div>
-                          </div>
-                          <div className="text-right shrink-0">
-                            <div className="text-xs text-muted-foreground">
-                              {t("home.browse.priceFrom")}
-                            </div>
-                            <div className="text-sm sm:text-lg font-semibold text-primary whitespace-nowrap">
-                              {currency.format(car.price)}
-                            </div>
-                          </div>
-                        </div>
                       </div>
 
                       <CardContent className="p-3 sm:p-4 flex flex-col h-full min-w-0">
+                        <div className="mb-3 flex items-start justify-between gap-3 min-w-0">
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs sm:text-sm text-muted-foreground truncate">
+                              {car.location}
+                            </p>
+                            <h3 className="text-base sm:text-lg font-bold font-heading truncate text-foreground">
+                              {car.make} {car.model}
+                            </h3>
+                            <p className="text-xs sm:text-sm text-muted-foreground">
+                              {car.year}
+                            </p>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <p className="text-xs text-muted-foreground">
+                              {t("home.browse.priceFrom")}
+                            </p>
+                            <p className="text-sm sm:text-lg font-semibold text-primary whitespace-nowrap">
+                              {currency.format(car.price)}
+                            </p>
+                          </div>
+                        </div>
+
                         <div className="grid grid-cols-3 gap-2 sm:gap-3 text-xs text-muted-foreground min-w-0">
                           <div className="flex items-center gap-1 sm:gap-2 min-w-0">
                             <Gauge className="h-3 w-3 sm:h-4 sm:w-4 text-foreground/70 shrink-0" />
@@ -541,16 +511,33 @@ const Home = () => {
                           </div>
                         </div>
 
-                        <div className="mt-auto pt-3 sm:pt-4 flex gap-2 min-w-0">
-                          <Button
-                            variant="outline"
-                            className="flex-1 transition-smooth min-w-0"
+                        <div className="mt-auto pt-3 sm:pt-4 flex flex-col gap-2 min-w-0">
+                          <Link
+                            to={`/cars/${car.id}`}
+                            className="w-full min-w-0"
                           >
-                            <span className="truncate text-xs sm:text-sm">
-                              {t("home.browse.viewDetails")}
-                            </span>
-                          </Button>
-                          <Button className="flex-1 bg-primary text-primary-foreground hover:glow-primary min-w-0">
+                            <Button
+                              variant="outline"
+                              className="w-full transition-smooth min-w-0"
+                            >
+                              <span className="truncate text-xs sm:text-sm">
+                                {t("home.browse.viewDetails")}
+                              </span>
+                            </Button>
+                          </Link>
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            onClick={() => toggleSaved(car.id)}
+                            className="w-full min-w-0 gap-2"
+                          >
+                            <Heart
+                              className={`h-4 w-4 shrink-0 ${
+                                savedCarIds.has(car.id)
+                                  ? "fill-current text-destructive"
+                                  : "text-muted-foreground"
+                              }`}
+                            />
                             <span className="truncate text-xs sm:text-sm">
                               {t("home.browse.save")}
                             </span>

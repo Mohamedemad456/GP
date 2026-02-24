@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 
 import { Toaster } from "@/lib";
 import { PageLoader } from "@gp/design-system";
+import PrivateRoute from "./components/PrivateRoute";
 import Layout from "./components/Layout";
 
 // Lazy load route components for code splitting
@@ -20,6 +21,9 @@ const SellerLayout = lazy(() => import("@/pages/(seller)/SellerLayout"));
 const SellerAnalytics = lazy(() => import("@/pages/(seller)/analytics"));
 const SellerListings = lazy(() => import("@/pages/(seller)/listings"));
 const AddListing = lazy(() => import("@/pages/(seller)/add-listing"));
+const FeedPage = lazy(() => import("@/pages/(buyer)/feed"));
+const CarDetailsPage = lazy(() => import("@/pages/(buyer)/car-details"));
+const ProfilePage = lazy(() => import("@/pages/(buyer)/profile"));
 
 function App() {
   const storedLanguage =
@@ -46,19 +50,28 @@ function App() {
             <Route index element={<Home />} />
             <Route path="about" element={<About />} />
             <Route path="contact" element={<Contact />} />
+            <Route element={<PrivateRoute />}>
+              <Route path="profile" element={<ProfilePage />} />
+              <Route path="feed" element={<FeedPage />} />
+              <Route path="cars/:id" element={<CarDetailsPage />} />
+            </Route>
           </Route>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/onboarding" element={<Onboarding />} />
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<Analytics />} />
-            <Route path="users-pending" element={<UsersPending />} />
-            <Route path="cars-pending" element={<CarsPending />} />
+          <Route element={<PrivateRoute allowedRoles={["admin"]} />}>
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<Analytics />} />
+              <Route path="users-pending" element={<UsersPending />} />
+              <Route path="cars-pending" element={<CarsPending />} />
+            </Route>
           </Route>
-          <Route path="/seller" element={<SellerLayout />}>
-            <Route index element={<SellerAnalytics />} />
-            <Route path="listings" element={<SellerListings />} />
-            <Route path="add-listing" element={<AddListing />} />
+          <Route element={<PrivateRoute allowedRoles={["user"]} />}>
+            <Route path="/seller" element={<SellerLayout />}>
+              <Route index element={<SellerAnalytics />} />
+              <Route path="listings" element={<SellerListings />} />
+              <Route path="add-listing" element={<AddListing />} />
+            </Route>
           </Route>
         </Routes>
       </Suspense>
