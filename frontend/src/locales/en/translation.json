@@ -24,6 +24,22 @@
     "save": "Save",
     "delete": "Delete"
   },
+  "chatbot": {
+    "openLabel": "Open AI assistant",
+    "title": "AI Assistant",
+    "subtitle": "Your smart car advisor",
+    "online": "Online",
+    "greeting": "Hi! I'm Karna AI. How can I help you find your perfect car today?",
+    "typing": "Thinking...",
+    "placeholder": "Ask me anything...",
+    "send": "Send",
+    "mock": {
+      "user1": "What’s the best way to find a reliable used car?",
+      "assistant1": "Start by setting a budget and checking vehicle history reports. I can help you filter by make, year, and condition from our listings.",
+      "user2": "Can you show me SUVs under 50k?",
+      "assistant2": "Sure! Use the Feed filters: set body type to SUV and max price to 50,000. I can open the feed for you if you’d like."
+    }
+  },
   "auth": {
     "backToHome": "Back to Home",
     "heading": "Welcome Back",
@@ -277,6 +293,9 @@
     "header": {
       "dashboard": "Dashboard"
     },
+    "common": {
+      "rowsPerPage": "Rows per page"
+    },
     "analytics": {
       "title": "Analytics Overview",
       "subtitle": "Platform performance metrics and insights at a glance.",
@@ -332,7 +351,7 @@
     "carsPending": {
       "title": "Cars posts pending",
       "subtitle": "Review and approve or reject car listing submissions.",
-      "listingsAwaiting": "{{count}} listings awaiting review.",
+      "listingsAwaiting": "listings awaiting review.",
       "caption": "Click on a row to view full listing details.",
       "vehicle": "Vehicle",
       "year": "Year",

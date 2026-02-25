@@ -3,6 +3,11 @@
 @source "../../packages/design-system/src";
 @import "@gp/design-system/styles.css";
 
+/* Reserve space for scrollbar to prevent layout shift when overlays lock scroll */
+html {
+  scrollbar-gutter: stable;
+}
+
 @layer utilities {
   /* Clean, professional page background */
   .hero-gradient {

@@ -2,6 +2,7 @@ import { memo } from "react";
 import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import ChatbotSheet from "./ChatbotSheet";
 
 const Layout = memo(() => {
   return (
@@ -11,6 +12,7 @@ const Layout = memo(() => {
         <Outlet />
       </main>
       <Footer />
+      <ChatbotSheet />
     </div>
   );
 });

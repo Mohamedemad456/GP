@@ -1,4 +1,4 @@
-import { memo, useCallback, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Card,
@@ -18,6 +18,11 @@ import {
   SelectTrigger,
   SelectValue,
   Separator,
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationEllipsis,
 } from "@gp/design-system";
 import {
   Search,
@@ -511,6 +516,38 @@ const SellerListings = () => {
     return result;
   }, [search, statusFilter, fuelFilter, transmissionFilter, conditionFilter, sortBy]);
 
+  // Pagination for card grid
+  const [page, setPage] = useState(1);
+  const pageSize = 6;
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [search, statusFilter, fuelFilter, transmissionFilter, conditionFilter, sortBy]);
+
+  const totalItems = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  const from = totalItems === 0 ? 0 : (page - 1) * pageSize + 1;
+  const to = Math.min(totalItems, page * pageSize);
+
+  const pageListings = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return filtered.slice(start, start + pageSize);
+  }, [filtered, page, pageSize]);
+
+  const visiblePages = useMemo(() => {
+    if (totalPages <= 3) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+
+    const pages = new Set<number>();
+    pages.add(1);
+    pages.add(totalPages);
+    pages.add(page);
+
+    return Array.from(pages).sort((a, b) => a - b);
+  }, [page, totalPages]);
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -631,7 +668,7 @@ const SellerListings = () => {
       </Card>
 
       {/* Listings Grid */}
-      {filtered.length === 0 ? (
+      {totalItems === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
             <Car className="size-12 text-muted-foreground/40" />
@@ -640,11 +677,96 @@ const SellerListings = () => {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {filtered.map((listing) => (
-            <ListingCard key={listing.id} listing={listing} onClick={() => handleOpenDetail(listing)} t={t} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {pageListings.map((listing) => (
+              <ListingCard key={listing.id} listing={listing} onClick={() => handleOpenDetail(listing)} t={t} />
+            ))}
+          </div>
+
+          {/* Global pagination */}
+          {totalPages > 1 && (
+            <div className="mt-6 flex flex-col items-center gap-3 text-xs text-muted-foreground">
+              <div className="text-[11px] text-muted-foreground/90">
+                {t(
+                  "seller.listings.paginationSummary",
+                  "Showing {{from}}–{{to}} of {{total}} listings",
+                  { from, to, total: totalItems },
+                )}
+              </div>
+              <Pagination className="mx-0 w-auto justify-center" dir="ltr">
+                <PaginationContent className="gap-1 rounded-xl bg-card/80 px-2 py-1.5 shadow-sm border border-border/70 sm:gap-1.5 sm:rounded-full sm:px-2.5">
+                  <PaginationItem>
+                    <PaginationLink
+                      href="#"
+                      size="icon"
+                      aria-label={t("seller.listings.prevPage", "Previous page")}
+                      className={`size-8 sm:size-9 sm:h-9 sm:w-auto sm:gap-1.5 sm:px-2.5 ${page === 1 ? "pointer-events-none opacity-40" : ""}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setPage((p) => Math.max(1, p - 1));
+                      }}
+                    >
+                      <ChevronLeft className="size-4" />
+                      <span className="hidden sm:inline">
+                        {t("seller.listings.prev", "Previous")}
+                      </span>
+                    </PaginationLink>
+                  </PaginationItem>
+
+                  {visiblePages.map((pageNumber, index) => {
+                    const previousPage = visiblePages[index - 1];
+                    const items = [];
+
+                    if (index > 0 && previousPage !== undefined && pageNumber - previousPage > 1) {
+                      items.push(
+                        <PaginationItem key={`ellipsis-${previousPage}-${pageNumber}`}>
+                          <PaginationEllipsis className="size-8 sm:size-9" />
+                        </PaginationItem>,
+                      );
+                    }
+
+                    items.push(
+                      <PaginationItem key={pageNumber}>
+                        <PaginationLink
+                          href="#"
+                          isActive={pageNumber === page}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setPage(pageNumber);
+                          }}
+                          className="size-8 sm:size-9"
+                        >
+                          {pageNumber}
+                        </PaginationLink>
+                      </PaginationItem>,
+                    );
+
+                    return items;
+                  })}
+
+                  <PaginationItem>
+                    <PaginationLink
+                      href="#"
+                      size="icon"
+                      aria-label={t("seller.listings.nextPage", "Next page")}
+                      className={`size-8 sm:size-9 sm:h-9 sm:w-auto sm:gap-1.5 sm:px-2.5 ${page === totalPages ? "pointer-events-none opacity-40" : ""}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setPage((p) => Math.min(totalPages, p + 1));
+                      }}
+                    >
+                      <span className="hidden sm:inline">
+                        {t("seller.listings.next", "Next")}
+                      </span>
+                      <ChevronRight className="size-4" />
+                    </PaginationLink>
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
+        </>
       )}
 
       {/* Detail Dialog */}
