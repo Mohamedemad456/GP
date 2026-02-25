@@ -318,8 +318,15 @@ namespace Karna.Core.Application.Services
 			var httpContext = _httpContextAccessor.HttpContext;
 			if (httpContext == null) return;
 
-			httpContext.Response.Cookies.Delete("AccessToken");
-			httpContext.Response.Cookies.Delete("RefreshToken");
+			var cookieOptions = new CookieOptions
+			{
+				HttpOnly = true,
+				Secure = true,
+				SameSite = SameSiteMode.None
+			};
+
+			httpContext.Response.Cookies.Delete("AccessToken", cookieOptions);
+			httpContext.Response.Cookies.Delete("RefreshToken", cookieOptions);
 		}
     }
 }
