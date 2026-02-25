@@ -147,7 +147,7 @@ const Navbar = memo(() => {
           >
             <LanguageSwitcher />
             {isLoggedIn ? (
-              <DropdownMenu>
+              <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="outline"
