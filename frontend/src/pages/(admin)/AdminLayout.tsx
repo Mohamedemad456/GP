@@ -157,7 +157,7 @@ const AdminLayout = memo(() => {
               variant="ghost"
               size="sm"
               onClick={toggleLanguage}
-              className="gap-1.5 text-muted-foreground hover:text-foreground"
+              className="gap-1.5 text-muted-foreground hover:text-white"
               aria-label="Toggle language"
             >
               <Languages className="size-4" />

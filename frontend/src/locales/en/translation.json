@@ -293,6 +293,9 @@
     "header": {
       "dashboard": "Dashboard"
     },
+    "common": {
+      "rowsPerPage": "Rows per page"
+    },
     "analytics": {
       "title": "Analytics Overview",
       "subtitle": "Platform performance metrics and insights at a glance.",
@@ -348,7 +351,7 @@
     "carsPending": {
       "title": "Cars posts pending",
       "subtitle": "Review and approve or reject car listing submissions.",
-      "listingsAwaiting": "{{count}} listings awaiting review.",
+      "listingsAwaiting": "listings awaiting review.",
       "caption": "Click on a row to view full listing details.",
       "vehicle": "Vehicle",
       "year": "Year",
