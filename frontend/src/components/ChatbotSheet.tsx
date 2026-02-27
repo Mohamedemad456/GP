@@ -17,6 +17,8 @@ import {
   AvatarBadge,
 } from "@gp/design-system";
 import { cn } from "@/lib/utils";
+import { formatMarkdown } from "@/lib/formatMarkdown";
+import { chatWithAI } from "@/actions/action";
 
 type Message = { role: "user" | "assistant"; text: string };
 
@@ -42,21 +44,14 @@ function TypingIndicator() {
 
 function MessageBubble({
   msg,
-  isRTL,
   index,
 }: {
   msg: Message;
-  isRTL: boolean;
   index: number;
 }) {
   const isUser = msg.role === "user";
-  const align = isUser
-    ? isRTL
-      ? "justify-start"
-      : "justify-end"
-    : isRTL
-      ? "justify-end"
-      : "justify-start";
+  // User always right, AI always left (consistent in both LTR and RTL)
+  const align = isUser ? "justify-end" : "justify-start";
 
   return (
     <motion.div
@@ -78,13 +73,14 @@ function MessageBubble({
       )}
       <div
         className={cn(
-          "max-w-[80%] px-4 py-3 text-sm leading-relaxed",
+          "max-w-[80%] px-4 py-3 text-sm leading-relaxed [&_ul]:list-disc [&_ol]:list-decimal",
           isUser
             ? "rounded-t-3xl rounded-bl-3xl rounded-br-lg bg-primary text-primary-foreground shadow-md shadow-primary/15"
-            : "rounded-t-3xl rounded-br-3xl rounded-bl-lg border border-border/60 bg-card text-card-foreground shadow-sm"
+            : "rounded-t-3xl rounded-br-3xl rounded-bl-lg border border-border/60 bg-card text-card-foreground shadow-sm",
         )}
+        dir="auto"
       >
-        {msg.text}
+        {isUser ? msg.text : formatMarkdown(msg.text)}
       </div>
       {isUser && (
         <Avatar size="default" className="mt-1 ring-0">
@@ -101,20 +97,52 @@ export default function ChatbotSheet() {
   const { t, i18n } = useTranslation();
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
+  const [messages, setMessages] = useState<Message[]>(() => [
+    { role: "assistant", text: t("chatbot.greeting") },
+  ]);
+  const [isLoading, setIsLoading] = useState(false);
   const isRTL = i18n.language?.startsWith("ar") ?? false;
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  const mockMessages: Message[] = [
-    { role: "assistant", text: t("chatbot.greeting") },
-    { role: "user", text: t("chatbot.mock.user1") },
-    { role: "assistant", text: t("chatbot.mock.assistant1") },
-    { role: "user", text: t("chatbot.mock.user2") },
-    { role: "assistant", text: t("chatbot.mock.assistant2") },
-  ];
+  const handleMessageSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = inputValue.trim();
+    if (!trimmed || isLoading) return;
+
+    setMessages((prev) => [...prev, { role: "user", text: trimmed }]);
+    setInputValue("");
+    setIsLoading(true);
+
+    try {
+      const data = await chatWithAI(trimmed);
+      const assistantText =
+        (data as { response?: string })?.response ?? "Sorry, I couldn't process that.";
+      setMessages((prev) => [...prev, { role: "assistant", text: assistantText }]);
+    } catch (error) {
+      console.error(error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          text: t("chatbot.error", "Something went wrong. Please try again."),
+        },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (open) bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [open]);
+  }, [open, messages, isLoading]);
+
+  // Update greeting when language changes (initial state only runs once at mount)
+  useEffect(() => {
+    setMessages((prev) => {
+      if (prev.length === 0 || prev[0].role !== "assistant") return prev;
+      return [{ ...prev[0], text: t("chatbot.greeting") }, ...prev.slice(1)];
+    });
+  }, [i18n.language, t]);
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -127,8 +155,7 @@ export default function ChatbotSheet() {
             "bg-primary text-primary-foreground",
             "shadow-[0_4px_24px_-4px_hsl(var(--primary)/0.45)]",
             "outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-            isRTL ? "left-5" : "right-5",
-            "bottom-5"
+            "right-5 bottom-5",
           )}
           whileHover={{ scale: 1.08 }}
           whileTap={{ scale: 0.95 }}
@@ -165,12 +192,11 @@ export default function ChatbotSheet() {
       </SheetTrigger>
 
       <SheetContent
-        side={isRTL ? "left" : "right"}
+        side="right"
         className={cn(
           "flex h-full w-[92vw] max-w-[420px] flex-col gap-0 overflow-hidden border-0 p-0 sm:w-[420px]",
           "bg-background",
-          "shadow-[-4px_0_24px_-6px_rgba(0,0,0,0.1)]",
-          isRTL ? "rounded-r-2xl" : "rounded-l-2xl"
+          "shadow-[-4px_0_24px_-6px_rgba(0,0,0,0.1)] rounded-l-2xl",
         )}
         showCloseButton={false}
       >
@@ -224,33 +250,32 @@ export default function ChatbotSheet() {
 
         {/* Messages */}
         <ScrollArea className="flex-1 border-0 bg-transparent">
-          <div
-            className="flex flex-col gap-4 px-4 py-5"
-            style={{ direction: isRTL ? "rtl" : "ltr" }}
-          >
-            {mockMessages.map((msg, i) => (
-              <MessageBubble key={i} msg={msg} isRTL={isRTL} index={i} />
+          <div className="flex flex-col gap-4 px-4 py-5" style={{ direction: "ltr" }}>
+            {messages.map((msg, i) => (
+              <MessageBubble key={i} msg={msg} index={i} />
             ))}
 
             {/* Typing indicator */}
-            <motion.div
-              className={cn(
-                "flex items-center gap-2.5",
-                isRTL ? "justify-end" : "justify-start"
+            <AnimatePresence>
+              {isLoading && (
+                <motion.div
+                className="flex items-center gap-2.5 justify-start"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ delay: 0.1 }}
+                >
+                <Avatar size="default" className="ring-0">
+                  <AvatarFallback className="bg-primary/15 text-primary">
+                    <Bot strokeWidth={2.2} />
+                  </AvatarFallback>
+                </Avatar>
+                <div className="rounded-2xl border border-border/60 bg-card px-4 py-3 shadow-sm">
+                  <TypingIndicator />
+                </div>
+              </motion.div>
               )}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: mockMessages.length * 0.08 + 0.2 }}
-            >
-              <Avatar size="default" className="ring-0">
-                <AvatarFallback className="bg-primary/15 text-primary">
-                  <Bot strokeWidth={2.2} />
-                </AvatarFallback>
-              </Avatar>
-              <div className="rounded-2xl border border-border/60 bg-card px-4 py-3 shadow-sm">
-                <TypingIndicator />
-              </div>
-            </motion.div>
+            </AnimatePresence>
 
             <div ref={bottomRef} />
           </div>
@@ -260,7 +285,7 @@ export default function ChatbotSheet() {
         <div className="shrink-0 border-t border-border/50 bg-background px-4 py-3.5">
           <form
             className="flex items-center gap-2"
-            onSubmit={(e) => e.preventDefault()}
+            onSubmit={handleMessageSubmit}
             style={{ direction: isRTL ? "rtl" : "ltr" }}
           >
             <Input
@@ -279,14 +304,14 @@ export default function ChatbotSheet() {
                 "size-10 shrink-0 rounded-full transition-all",
                 inputValue.trim()
                   ? "bg-primary text-primary-foreground shadow-md hover:bg-primary/90 hover:shadow-lg"
-                  : "bg-secondary text-muted-foreground"
+                  : "bg-secondary text-muted-foreground",
               )}
               aria-label={t("chatbot.send")}
             >
               <Send
                 className={cn(
                   "size-4 transition-transform",
-                  isRTL ? "rotate-180" : ""
+                  isRTL ? "rotate-180" : "",
                 )}
                 strokeWidth={2.2}
               />
