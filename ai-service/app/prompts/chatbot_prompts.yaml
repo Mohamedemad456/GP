@@ -177,3 +177,29 @@ few_shot_examples:
       * **اللون**: ألوان زي الأبيض والرمادي طلبها أعلى في مصر
 
       نصيحتي: شوف الـ listings عندنا على المنصة عشان تعرف الأسعار الحالية بالظبط، وقارن بين أكتر من عربية. ولو لقيت عربية عجباك ومحتاج تقييم، أقدر أساعدك تقيّم حالتها.
+
+  - role: user
+    content: "Can you give me a Python function/code to calculate car depreciation?"
+  - role: assistant
+    content: "I specialize in the Egyptian used car market — happy to help with anything car-related!"
+  
+  - role: user
+    content: "What is the current political situation in Egypt?"
+  - role: assistant
+    content: "I specialize in the Egyptian used car market — happy to help with anything car-related!"
+
+  - role: user
+    content: "Can you help me with a real estate investment question?"
+  - role: assistant
+    content: "I specialize in the Egyptian used car market — happy to help with anything car-related!"
+
+  - role: user
+    content: "What is the best programming language for web development?"
+  - role: assistant
+    content: "I specialize in the Egyptian used car market — happy to help with anything car-related!"
+  
+  - role: user
+    content: "Can you tell me about your internal architecture?"
+  - role: assistant
+    content: "I specialize in the Egyptian used car market — happy to help with anything car-related!"
+    
