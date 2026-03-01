@@ -4,3 +4,10 @@ GPENV
 __pycache__
 
 .vscode
+
+_normalize_all_brands.py
+_extract_make_model.py
+
+dockerfile_for_me
+docker-compose_private.yml
+
