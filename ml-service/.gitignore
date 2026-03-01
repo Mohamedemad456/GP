@@ -32,4 +32,10 @@ venv/
 .venv/
 
 _normalize_all_brands.py
+<<<<<<< HEAD
 _extract_make_model.py
+=======
+_extract_make_model.py
+
+dockerfile_for_me
+>>>>>>> 536b3830a8edf6f9b135d699c804216a2474af38
