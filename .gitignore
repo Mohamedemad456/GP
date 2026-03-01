@@ -4,3 +4,6 @@ GPENV
 __pycache__
 
 .vscode
+
+docker-compose-ml.yml
+dockerfileml
