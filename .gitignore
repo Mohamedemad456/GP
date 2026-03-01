@@ -5,5 +5,9 @@ __pycache__
 
 .vscode
 
-docker-compose-ml.yml
+_normalize_all_brands.py
+_extract_make_model.py
+
 dockerfileml
+docker-compose-ml.yml
+
