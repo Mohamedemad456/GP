@@ -30,3 +30,6 @@ Thumbs.db
 # Virtual environment
 venv/
 .venv/
+
+_normalize_all_brands.py
+_extract_make_model.py
