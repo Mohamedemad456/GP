@@ -1,0 +1,41 @@
+# Environment
+.env
+.env.example
+# Data
+data/raw/*.parquet
+data/raw/*.csv
+data/cleaned/*.parquet
+data/processed/*.parquet
+
+# Models
+models/v*/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Virtual environment
+venv/
+.venv/
+
+_normalize_all_brands.py
+<<<<<<< HEAD
+_extract_make_model.py
+=======
+_extract_make_model.py
+
+dockerfile_for_me
+>>>>>>> 536b3830a8edf6f9b135d699c804216a2474af38
