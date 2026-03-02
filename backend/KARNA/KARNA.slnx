@@ -1,7 +1,8 @@
 <Solution>
   <Folder Name="/docs/">
-    <File Path="../../../Karna_GP_ERD.pdf" />
     <File Path="../../../ref_structure.txt" />
+    <File Path="../../Docs/Karna_Fuctional_Requirements.docx" />
+    <File Path="../../Docs/Karna_GP_ERD.pdf" />
   </Folder>
   <Folder Name="/src/" />
   <Folder Name="/src/APIs/">
