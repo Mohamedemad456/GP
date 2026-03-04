@@ -20,6 +20,11 @@ namespace Karna.Infrastructure.Persistence._Data.Repositories
 			return await _dbSet.FirstOrDefaultAsync(predicate);
 		}
 
+		public async Task<T?> GetWithSpecAsync(ISpecification<T> spec)
+		{
+			return await ApplySpecification(spec).FirstOrDefaultAsync();
+		}
+
 		public async Task<IEnumerable<T>> GetAllAsync(bool withTracking = false)
 		{
 			return withTracking
@@ -27,11 +32,21 @@ namespace Karna.Infrastructure.Persistence._Data.Repositories
 				: await _dbSet.AsNoTracking().ToListAsync();
 		}
 
+		public async Task<IEnumerable<T>> GetAllWithSpecAsync(ISpecification<T> spec)
+		{
+			return await ApplySpecification(spec).ToListAsync();
+		}
+
 		public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate, bool withTracking = false)
 		{
 			var query = _dbSet.Where(predicate);
 			if (!withTracking) query = query.AsNoTracking();
 			return await query.ToListAsync();
+		}
+
+		public async Task<int> GetCountAsync(ISpecification<T> spec)
+		{
+			return await ApplySpecification(spec).CountAsync();
 		}
 
 		public async Task AddAsync(T entity)
@@ -55,6 +70,11 @@ namespace Karna.Infrastructure.Persistence._Data.Repositories
 			{
 				_dbSet.Remove(entity);
 			}
+		}
+
+		private IQueryable<T> ApplySpecification(ISpecification<T> spec)
+		{
+			return SpecificationEvaluator<T>.GetQuery(_dbSet, spec);
 		}
 	}
 }
