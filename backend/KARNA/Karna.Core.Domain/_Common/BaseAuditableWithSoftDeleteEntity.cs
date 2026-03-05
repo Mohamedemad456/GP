@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Karna.Core.Domain._Common
 {
-	public abstract class SoftDeleteEntity : BaseAuditableEntity
+	public abstract class BaseAuditableWithSoftDeleteEntity : BaseAuditableEntity, ISoftDelete
 	{
 		public bool IsDeleted { get; set; }
 	}

@@ -162,4 +162,7 @@
   <data name="UsernameAlreadyTaken" xml:space="preserve">
     <value>اسم المستخدم هذا مأخوذ بالفعل</value>
   </data>
+  <data name="MakeNameAlreadyExists" xml:space="preserve">
+    <value>يوجد شركة مصنعة بهذا الاسم بالفعل.</value>
+  </data>
 </root>

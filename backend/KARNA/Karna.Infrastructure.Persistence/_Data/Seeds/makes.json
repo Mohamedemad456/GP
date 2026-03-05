@@ -1,0 +1,237 @@
+[
+  {
+    "Name": "Alfa Romeo",
+    "LogoUrl": "icons/Makes/alfa-romeo.png",
+    "Country": "Italy"
+  },
+  {
+    "Name": "Audi",
+    "LogoUrl": "icons/Makes/audi.png",
+    "Country": "Germany"
+  },
+  {
+    "Name": "Bentley",
+    "LogoUrl": "icons/Makes/bentley.png",
+    "Country": "United Kingdom"
+  },
+  {
+    "Name": "BMW",
+    "LogoUrl": "icons/Makes/bmw.png",
+    "Country": "Germany"
+  },
+  {
+    "Name": "Brilliance",
+    "LogoUrl": "icons/Makes/brilliance.png",
+    "Country": "China"
+  },
+  {
+    "Name": "BYD",
+    "LogoUrl": "icons/Makes/byd.png",
+    "Country": "China"
+  },
+  {
+    "Name": "Cadillac",
+    "LogoUrl": "icons/Makes/cadillac.png",
+    "Country": "USA"
+  },
+  {
+    "Name": "Chery",
+    "LogoUrl": "icons/Makes/chery.png",
+    "Country": "China"
+  },
+  {
+    "Name": "Chevrolet",
+    "LogoUrl": "icons/Makes/chevrolet.png",
+    "Country": "USA"
+  },
+  {
+    "Name": "Citroen",
+    "LogoUrl": "icons/Makes/citroen.png",
+    "Country": "France"
+  },
+  {
+    "Name": "Cupra",
+    "LogoUrl": "icons/Makes/cupra.png",
+    "Country": "Spain"
+  },
+  {
+    "Name": "Daewoo",
+    "LogoUrl": "icons/Makes/daewoo.png",
+    "Country": "South Korea"
+  },
+  {
+    "Name": "DS",
+    "LogoUrl": "icons/Makes/ds.png",
+    "Country": "France"
+  },
+  {
+    "Name": "Ferrari",
+    "LogoUrl": "icons/Makes/ferrari.png",
+    "Country": "Italy"
+  },
+  {
+    "Name": "Fiat",
+    "LogoUrl": "icons/Makes/fiat.png",
+    "Country": "Italy"
+  },
+  {
+    "Name": "Ford Mustang",
+    "LogoUrl": "icons/Makes/ford-mustang.png",
+    "Country": "USA"
+  },
+  {
+    "Name": "Ford",
+    "LogoUrl": "icons/Makes/ford.png",
+    "Country": "USA"
+  },
+  {
+    "Name": "Geely",
+    "LogoUrl": "icons/Makes/geely.png",
+    "Country": "China"
+  },
+  {
+    "Name": "GMC",
+    "LogoUrl": "icons/Makes/gmc.png",
+    "Country": "USA"
+  },
+  {
+    "Name": "Haval",
+    "LogoUrl": "icons/Makes/haval.png",
+    "Country": "China"
+  },
+  {
+    "Name": "Hispano Suiza",
+    "LogoUrl": "icons/Makes/hispano-suiza.png",
+    "Country": "Spain"
+  },
+  {
+    "Name": "Honda",
+    "LogoUrl": "icons/Makes/honda.png",
+    "Country": "Japan"
+  },
+  {
+    "Name": "Hyundai",
+    "LogoUrl": "icons/Makes/hyundai.png",
+    "Country": "South Korea"
+  },
+  {
+    "Name": "Isuzu",
+    "LogoUrl": "icons/Makes/isuzu.png",
+    "Country": "Japan"
+  },
+  {
+    "Name": "JAC",
+    "LogoUrl": "icons/Makes/jac.png",
+    "Country": "China"
+  },
+  {
+    "Name": "Jaguar",
+    "LogoUrl": "icons/Makes/jaguar.png",
+    "Country": "United Kingdom"
+  },
+  {
+    "Name": "Jeep",
+    "LogoUrl": "icons/Makes/jeep.png",
+    "Country": "USA"
+  },
+  {
+    "Name": "JMC",
+    "LogoUrl": "icons/Makes/jmc.png",
+    "Country": "China"
+  },
+  {
+    "Name": "Kia",
+    "LogoUrl": "icons/Makes/kia.png",
+    "Country": "South Korea"
+  },
+  {
+    "Name": "Lamborghini",
+    "LogoUrl": "icons/Makes/lamborghini.png",
+    "Country": "Italy"
+  },
+  {
+    "Name": "Land Rover",
+    "LogoUrl": "icons/Makes/land-rover.png",
+    "Country": "United Kingdom"
+  },
+  {
+    "Name": "Lexus",
+    "LogoUrl": "icons/Makes/lexus.png",
+    "Country": "Japan"
+  },
+  {
+    "Name": "Lotus",
+    "LogoUrl": "icons/Makes/lotus.png",
+    "Country": "United Kingdom"
+  },
+  {
+    "Name": "Maserati",
+    "LogoUrl": "icons/Makes/maserati.png",
+    "Country": "Italy"
+  },
+  {
+    "Name": "Mazda",
+    "LogoUrl": "icons/Makes/mazda.png",
+    "Country": "Japan"
+  },
+  {
+    "Name": "Mercedes",
+    "LogoUrl": "icons/Makes/mercedes.png",
+    "Country": "Germany"
+  },
+  {
+    "Name": "MG",
+    "LogoUrl": "icons/Makes/mg.png",
+    "Country": "United Kingdom"
+  },
+  {
+    "Name": "Mini",
+    "LogoUrl": "icons/Makes/mini.png",
+    "Country": "United Kingdom"
+  },
+  {
+    "Name": "Mitsubishi",
+    "LogoUrl": "icons/Makes/mitsubishi.png",
+    "Country": "Japan"
+  },
+  {
+    "Name": "Opel",
+    "LogoUrl": "icons/Makes/opel.png",
+    "Country": "Germany"
+  },
+  {
+    "Name": "Peugeot",
+    "LogoUrl": "icons/Makes/peugeot.png",
+    "Country": "France"
+  },
+  {
+    "Name": "Porsche",
+    "LogoUrl": "icons/Makes/porsche.png",
+    "Country": "Germany"
+  },
+  {
+    "Name": "Renault",
+    "LogoUrl": "icons/Makes/renault.png",
+    "Country": "France"
+  },
+  {
+    "Name": "Skoda",
+    "LogoUrl": "icons/Makes/skoda.png",
+    "Country": "Czech Republic"
+  },
+  {
+    "Name": "Subaru",
+    "LogoUrl": "icons/Makes/subaru.png",
+    "Country": "Japan"
+  },
+  {
+    "Name": "Toyota",
+    "LogoUrl": "icons/Makes/toyota.png",
+    "Country": "Japan"
+  },
+  {
+    "Name": "Volkswagen",
+    "LogoUrl": "icons/Makes/volkswagen.png",
+    "Country": "Germany"
+  }
+]

@@ -124,6 +124,33 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Make created successfully..
+        /// </summary>
+        public static string MakeCreated {
+            get {
+                return ResourceManager.GetString("MakeCreated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Make deleted successfully..
+        /// </summary>
+        public static string MakeDeleted {
+            get {
+                return ResourceManager.GetString("MakeDeleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Make updated successfully..
+        /// </summary>
+        public static string MakeUpdated {
+            get {
+                return ResourceManager.GetString("MakeUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Operation completed successfully..
         /// </summary>
         public static string OperationSuccess {

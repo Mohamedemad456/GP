@@ -40,4 +40,13 @@
   <data name="ProfileUpdated" xml:space="preserve">
     <value>تم تحديث الملف الشخصي بنجاح</value>
   </data>
+  <data name="MakeCreated" xml:space="preserve">
+    <value>تم إنشاء الشركة المصنعة بنجاح.</value>
+  </data>
+  <data name="MakeUpdated" xml:space="preserve">
+    <value>تم تحديث الشركة المصنعة بنجاح.</value>
+  </data>
+  <data name="MakeDeleted" xml:space="preserve">
+    <value>تم حذف الشركة المصنعة بنجاح.</value>
+  </data>
 </root>

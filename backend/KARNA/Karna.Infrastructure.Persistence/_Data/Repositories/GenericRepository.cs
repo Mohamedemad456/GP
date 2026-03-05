@@ -61,7 +61,7 @@ namespace Karna.Infrastructure.Persistence._Data.Repositories
 
 		public void Delete(T entity)
 		{
-			if (entity is SoftDeleteEntity softDelete)
+			if (entity is ISoftDelete softDelete)
 			{
 				softDelete.IsDeleted = true;
 				_dbSet.Update(entity);

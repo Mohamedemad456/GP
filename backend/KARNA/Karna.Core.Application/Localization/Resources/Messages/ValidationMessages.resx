@@ -162,4 +162,7 @@
   <data name="UsernameAlreadyTaken" xml:space="preserve">
     <value>This username is already taken.</value>
   </data>
+  <data name="MakeNameAlreadyExists" xml:space="preserve">
+    <value>A make with this name already exists.</value>
+  </data>
 </root>
