@@ -13,6 +13,7 @@ namespace Karna.Infrastructure.Persistence._Data
 
 		public DbSet<User> Users { get; set; } = null!;
 		public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
+		public DbSet<Make> Makes { get; set; } = null!;
 
 		public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
 		{
@@ -25,10 +26,10 @@ namespace Karna.Infrastructure.Persistence._Data
 			// Global query filter for soft-deleted entities
 			foreach (var entityType in modelBuilder.Model.GetEntityTypes())
 			{
-				if (typeof(SoftDeleteEntity).IsAssignableFrom(entityType.ClrType))
+				if (typeof(ISoftDelete).IsAssignableFrom(entityType.ClrType))
 				{
 					var parameter = Expression.Parameter(entityType.ClrType, "e");
-					var property = Expression.Property(parameter, nameof(SoftDeleteEntity.IsDeleted));
+					var property = Expression.Property(parameter, nameof(ISoftDelete.IsDeleted));
 					var filter = Expression.Lambda(
 						Expression.Equal(property, Expression.Constant(false)),
 						parameter);

@@ -124,11 +124,29 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Make not found..
+        /// </summary>
+        internal static string MakeNotFound {
+            get {
+                return ResourceManager.GetString("MakeNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The requested resource was not found..
         /// </summary>
         internal static string NotFound {
             get {
                 return ResourceManager.GetString("NotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Registration failed. Please try again..
+        /// </summary>
+        internal static string RegistrationFailed {
+            get {
+                return ResourceManager.GetString("RegistrationFailed", resourceCulture);
             }
         }
         
@@ -156,15 +174,6 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         internal static string UserNotFound {
             get {
                 return ResourceManager.GetString("UserNotFound", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Registration failed. Please try again..
-        /// </summary>
-        internal static string RegistrationFailed {
-            get {
-                return ResourceManager.GetString("RegistrationFailed", resourceCulture);
             }
         }
     }

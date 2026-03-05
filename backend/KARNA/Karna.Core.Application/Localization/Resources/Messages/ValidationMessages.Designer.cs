@@ -19,7 +19,7 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class ValidationMessages {
@@ -106,6 +106,15 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A make with this name already exists..
+        /// </summary>
+        internal static string MakeNameAlreadyExists {
+            get {
+                return ResourceManager.GetString("MakeNameAlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Maximum length of {0} characters exceeded..
         /// </summary>
         internal static string MaxLengthExceeded {
@@ -183,6 +192,15 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         internal static string RequiredField {
             get {
                 return ResourceManager.GetString("RequiredField", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This username is already taken..
+        /// </summary>
+        internal static string UsernameAlreadyTaken {
+            get {
+                return ResourceManager.GetString("UsernameAlreadyTaken", resourceCulture);
             }
         }
     }

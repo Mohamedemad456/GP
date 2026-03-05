@@ -28,7 +28,6 @@ services:
       - CHOKIDAR_USEPOLLING=true
       - WATCHPACK_POLLING=true
 
-      
   # =======================
   # AI Service (FastAPI)
   # =======================
@@ -59,6 +58,7 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_HTTP_PORTS: 8080
       ConnectionStrings__DefaultConnection: Server=db;Database=KarnaDb;User=sa;Password=Karna@Pass123;TrustServerCertificate=True
+      Urls__ApiBaseUrl: http://localhost:9090
     depends_on:
       - db
 
@@ -78,4 +78,3 @@ services:
 
 volumes:
   karna_db_data:
-
