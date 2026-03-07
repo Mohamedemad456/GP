@@ -63,7 +63,7 @@ namespace Karna.Core.Application.Services
 
 			var repo = _unitOfWork.GetRepository<Make>();
 
-			var existing = await repo.GetAsync(m => m.Name == dto.Name);
+			var existing = await repo.GetAsync(m => m.Name == dto.Name || m.NameAr == dto.NameAr);
 			if (existing is not null)
 				return new ApiResponse<MakeDto>
 				{
@@ -107,7 +107,8 @@ namespace Karna.Core.Application.Services
 					Message = _localizer.GetErrorMessage("MakeNotFound")
 				};
 
-			var duplicate = await repo.GetAsync(m => m.Name == dto.Name && m.Id != id);
+			var duplicate = await repo.GetAsync(m =>
+				(m.Name == dto.Name || m.NameAr == dto.NameAr) && m.Id != id);
 			if (duplicate is not null)
 				return new ApiResponse<MakeDto>
 				{

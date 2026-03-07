@@ -10,6 +10,8 @@ namespace Karna.Core.Application.Mapping
 		public MappingProfile()
 		{
 			CreateMap<Make, MakeDto>()
+				.ForMember(dest => dest.Name, opt => opt.MapFrom<LocalizedMakeNameResolver>())
+				.ForMember(dest => dest.Country, opt => opt.MapFrom<LocalizedMakeCountryResolver>())
 				.ForMember(dest => dest.LogoUrl, opt => opt.MapFrom<MakesLogoUrlResolver>());
 
 			CreateMap<CreateMakeDto, Make>()
@@ -21,6 +23,7 @@ namespace Karna.Core.Application.Mapping
 
 			CreateMap<UpdateMakeDto, Make>()
 				.ForMember(dest => dest.Id, opt => opt.Ignore())
+				.ForMember(dest => dest.LogoUrl, opt => opt.Ignore())
 				.ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
 				.ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
 				.ForMember(dest => dest.IsDeleted, opt => opt.Ignore());

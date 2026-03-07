@@ -12,21 +12,40 @@ namespace Karna.APIs.Extensions
 			var appDbContextInitializer = services.GetRequiredService<IAppDbInitializer>();
 
 			var loggerFactory = services.GetRequiredService<ILoggerFactory>();
+			var logger = loggerFactory.CreateLogger<Program>();
 
-			try
+			const int maxRetries = 10;
+			const int delaySeconds = 5;
+
+			for (int i = 1; i <= maxRetries; i++)
 			{
-				await appIdentityDbContextInitializer.InitializeDbAsync();
-				await appDbContextInitializer.InitializeDbAsync();
+				try
+				{
+					await appIdentityDbContextInitializer.InitializeDbAsync();
+					await appDbContextInitializer.InitializeDbAsync();
 
-				await appIdentityDbContextInitializer.SeedDbAsync();
-				await appDbContextInitializer.SeedDbAsync();
-			}
-			catch (Exception ex)
-			{
+					await appIdentityDbContextInitializer.SeedDbAsync();
+					await appDbContextInitializer.SeedDbAsync();
 
-				var logger = loggerFactory.CreateLogger<Program>();
-				logger.LogError(ex, "An error has been occured during applying the migrations");
+					logger.LogInformation("Database initialized and seeded successfully.");
+					break;
+				}
+				catch (Exception ex)
+				{
+					logger.LogWarning(ex,
+						"Database initialization attempt {Attempt}/{MaxRetries} failed. Retrying in {Delay}s...",
+						i, maxRetries, delaySeconds);
+
+					if (i == maxRetries)
+					{
+						logger.LogError(ex, "Database initialization failed after {MaxRetries} attempts.", maxRetries);
+						throw;
+					}
+
+					await Task.Delay(TimeSpan.FromSeconds(delaySeconds));
+				}
 			}
+
 			return app;
 		}
 	}
