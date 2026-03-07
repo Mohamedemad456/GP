@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Karna.Infrastructure.Persistence._Data.Migrations
 {
     /// <inheritdoc />
-    public partial class AddMakeEntity : Migration
+    public partial class initialMakes : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,8 +17,10 @@ namespace Karna.Infrastructure.Persistence._Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    NameAr = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     LogoUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     Country = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
+                    CountryAr = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
@@ -32,7 +34,15 @@ namespace Karna.Infrastructure.Persistence._Data.Migrations
                 name: "IX_Makes_Name",
                 table: "Makes",
                 column: "Name",
-                unique: true);
+                unique: true,
+                filter: "[IsDeleted] = 0");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Makes_NameAr",
+                table: "Makes",
+                column: "NameAr",
+                unique: true,
+                filter: "[IsDeleted] = 0");
         }
 
         /// <inheritdoc />

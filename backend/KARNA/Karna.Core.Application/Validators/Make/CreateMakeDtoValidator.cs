@@ -12,9 +12,17 @@ namespace Karna.Core.Application.Validators.Make
 				.NotEmpty().WithMessage(localizer.GetValidationMessage("RequiredField"))
 				.MaximumLength(100).WithMessage(localizer.GetValidationMessage("MaxLengthExceeded", 100));
 
+			RuleFor(x => x.NameAr)
+				.NotEmpty().WithMessage(localizer.GetValidationMessage("RequiredField"))
+				.MaximumLength(100).WithMessage(localizer.GetValidationMessage("MaxLengthExceeded", 100));
+
 			RuleFor(x => x.Country)
 				.MaximumLength(100).WithMessage(localizer.GetValidationMessage("MaxLengthExceeded", 100))
 				.When(x => x.Country is not null);
+
+			RuleFor(x => x.CountryAr)
+				.MaximumLength(100).WithMessage(localizer.GetValidationMessage("MaxLengthExceeded", 100))
+				.When(x => x.CountryAr is not null);
 		}
 	}
 }

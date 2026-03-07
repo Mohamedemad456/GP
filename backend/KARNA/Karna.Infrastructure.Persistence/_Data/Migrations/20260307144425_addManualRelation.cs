@@ -5,7 +5,7 @@
 namespace Karna.Infrastructure.Persistence._Data.Migrations
 {
     /// <inheritdoc />
-    public partial class AddManualRelations : Migration
+    public partial class addManualRelation : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

@@ -16,26 +16,24 @@ namespace Karna.Infrastructure.Persistence._Initializers
 
 		private async Task SeedMakesAsync()
 		{
-			if (!await _dbContext.Makes.AnyAsync())
+			if (await _dbContext.Makes.AnyAsync())
+				return;
+
+			var seedData = await SeedLoader.LoadAsync<MakeSeedDto>("makes.json");
+			if (seedData.Count == 0)
+				return;
+
+			var makes = seedData.Select(s => new Make
 			{
+				Name = s.Name,
+				NameAr = s.NameAr,
+				LogoUrl = s.LogoUrl,
+				Country = s.Country,
+				CountryAr = s.CountryAr
+			});
 
-				var makesData = await SeedLoader.LoadAsync<MakeSeedDto>("makes.json");
-
-				if (makesData?.Count > 0)
-				{
-
-					var makes = makesData.Select(s => new Make
-					{
-						Name = s.Name,
-						LogoUrl = s.LogoUrl,
-						Country = s.Country
-					});
-
-					await _dbContext.Makes.AddRangeAsync(makes);
-					await _dbContext.SaveChangesAsync();
-				}
-			}
-
+			await _dbContext.Makes.AddRangeAsync(makes);
+			await _dbContext.SaveChangesAsync();
 		}
 	}
 }
