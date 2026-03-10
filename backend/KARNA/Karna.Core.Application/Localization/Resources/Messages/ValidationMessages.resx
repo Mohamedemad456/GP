@@ -165,4 +165,7 @@
   <data name="MakeNameAlreadyExists" xml:space="preserve">
     <value>A make with this name already exists.</value>
   </data>
+  <data name="ModelNameAlreadyExists" xml:space="preserve">
+    <value>Model name already exists for this make.</value>
+  </data>
 </root>

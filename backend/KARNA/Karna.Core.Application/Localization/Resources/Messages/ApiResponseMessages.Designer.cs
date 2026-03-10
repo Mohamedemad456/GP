@@ -151,6 +151,33 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Model created successfully.
+        /// </summary>
+        public static string ModelCreated {
+            get {
+                return ResourceManager.GetString("ModelCreated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Model deleted successfully.
+        /// </summary>
+        public static string ModelDeleted {
+            get {
+                return ResourceManager.GetString("ModelDeleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Model updated successfully.
+        /// </summary>
+        public static string ModelUpdated {
+            get {
+                return ResourceManager.GetString("ModelUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Operation completed successfully..
         /// </summary>
         public static string OperationSuccess {

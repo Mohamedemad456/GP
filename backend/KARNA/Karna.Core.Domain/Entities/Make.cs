@@ -9,5 +9,7 @@ namespace Karna.Core.Domain.Entities
 		public string? LogoUrl { get; set; }
 		public string? Country { get; set; }
 		public string? CountryAr { get; set; }
-	}
+
+        public ICollection<Model> Models { get; set; } = new List<Model>();
+    }
 }

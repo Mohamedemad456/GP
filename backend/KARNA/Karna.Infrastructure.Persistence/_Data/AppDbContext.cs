@@ -14,6 +14,7 @@ namespace Karna.Infrastructure.Persistence._Data
 		public DbSet<User> Users { get; set; } = null!;
 		public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
 		public DbSet<Make> Makes { get; set; } = null!;
+		public DbSet<Model> Models {  get; set; } = null!;
 
 		public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
 		{

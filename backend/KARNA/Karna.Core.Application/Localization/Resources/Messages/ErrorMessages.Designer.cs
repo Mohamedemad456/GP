@@ -133,6 +133,15 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Model not found.
+        /// </summary>
+        internal static string ModelNotFound {
+            get {
+                return ResourceManager.GetString("ModelNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The requested resource was not found..
         /// </summary>
         internal static string NotFound {
