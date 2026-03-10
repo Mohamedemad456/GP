@@ -2,50 +2,64 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button, Input } from "@gp/design-system";
 import { useToast } from "@/hooks/use-toast";
-import { Car, ArrowLeft } from "lucide-react";
+import { Car, ArrowLeft, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "@/components";
-import { setAuthSession } from "@/lib/auth";
+import { useAuth } from "@/context/AuthContext";
+import { loginUser, getProfile } from "@/lib/authApi";
+import type { UserRole } from "@/lib/auth";
+import axios from "axios";
 
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { toast } = useToast();
+  const { toast, error: toastError } = useToast();
   const { t } = useTranslation();
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const { setUser } = useAuth();
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
 
-    setAuthSession({
-      email: formData.email,
-      role: "user",
-      createdAt: new Date().toISOString(),
-    });
+    try {
+      const tokenRes = await loginUser(formData);
 
-    const redirectPath =
-      (location.state as { from?: { pathname?: string } } | null)?.from
-        ?.pathname ?? "/feed";
+      if (!tokenRes.success) {
+        toastError(t("auth.loginFailedTitle"), { description: tokenRes.message });
+        return;
+      }
 
-    toast(t("auth.toastTitle"), {
-      description: t("auth.toastDescription"),
-    });
-    navigate(redirectPath, { replace: true });
-    setFormData({
-      email: "",
-      password: "",
-    });
+      // Fetch profile — backend cookie is now set, so this works immediately
+      const profileRes = await getProfile();
+      if (profileRes.success) {
+        const u = profileRes.data;
+        const role = (
+          u.roles.map((r) => r.toLowerCase()).includes("admin") ? "admin" : "user"
+        ) as UserRole;
+        setUser({ userId: u.userId, name: u.name, email: u.email, role });
+      }
+
+      const redirectPath =
+        (location.state as { from?: { pathname?: string } } | null)?.from
+          ?.pathname ?? "/feed";
+
+      toast(t("auth.toastTitle"), { description: t("auth.toastDescription") });
+      setFormData({ email: "", password: "" });
+      navigate(redirectPath, { replace: true });
+    } catch (err) {
+      const message = axios.isAxiosError(err)
+        ? (err.response?.data?.message ?? err.message)
+        : t("auth.loginFailedDescription");
+      toastError(t("auth.loginFailedTitle"), { description: message });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 hero-gradient py-12">
@@ -62,7 +76,6 @@ const Login = () => {
 
       <div className="w-full max-w-md">
         <div className="bg-card/95 p-8 rounded-2xl border border-border/60 shadow-xl animate-scale-in">
-          {/* Logo */}
           <div className="flex justify-center mb-8">
             <div className="bg-primary p-3 rounded-2xl shadow-sm">
               <Car className="h-8 w-8 text-primary-foreground" />
@@ -86,6 +99,7 @@ const Login = () => {
                 required
                 value={formData.email}
                 onChange={handleChange}
+                disabled={isLoading}
                 className="w-full bg-background border-border/70 focus:border-primary transition-smooth"
                 placeholder={t("auth.emailPlaceholder")}
               />
@@ -102,6 +116,7 @@ const Login = () => {
                 required
                 value={formData.password}
                 onChange={handleChange}
+                disabled={isLoading}
                 className="w-full bg-background border-border/70 focus:border-primary transition-smooth"
                 placeholder={t("auth.passwordPlaceholder")}
               />
@@ -110,9 +125,10 @@ const Login = () => {
             <Button
               type="submit"
               size="lg"
+              disabled={isLoading}
               className="w-full bg-primary text-primary-foreground hover:glow-primary transition-smooth"
             >
-              {t("auth.signIn")}
+              {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : t("auth.signIn")}
             </Button>
           </form>
 

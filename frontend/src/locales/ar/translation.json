@@ -18,6 +18,25 @@
     "adminDashboard": "لوحة المشرف",
     "logout": "تسجيل الخروج"
   },
+  "profile": {
+    "title": "ملفي الشخصي",
+    "subtitle": "عرض وإدارة تفاصيل حسابك",
+    "active": "نشط",
+    "fields": {
+      "fullName": "الاسم الكامل",
+      "username": "اسم المستخدم",
+      "email": "البريد الإلكتروني",
+      "phone": "الهاتف",
+      "whatsapp": "واتساب",
+      "roles": "الأدوار",
+      "memberSince": "عضو منذ"
+    },
+    "actions": {
+      "goToFeed": "تصفح السيارات",
+      "sellerDashboard": "لوحة البائع",
+      "adminDashboard": "لوحة المشرف"
+    }
+  },
   "buttons": {
     "submit": "إرسال",
     "cancel": "إلغاء",
@@ -62,7 +81,13 @@
     "signupToastTitle": "تم إنشاء الحساب!",
     "signupToastDescription": "مرحباً بك في AutoElite",
     "passwordMismatchTitle": "كلمات المرور غير متطابقة",
-    "passwordMismatchDescription": "يرجى التأكد من تطابق كلمتي المرور"
+    "passwordMismatchDescription": "يرجى التأكد من تطابق كلمتي المرور",
+    "phoneLabel": "رقم الهاتف",
+    "phonePlaceholder": "+966 5X XXX XXXX",
+    "loginFailedTitle": "فشل تسجيل الدخول",
+    "loginFailedDescription": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+    "signupFailedTitle": "فشل إنشاء الحساب",
+    "signupFailedDescription": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
   },
   "onboarding": {
     "role": {

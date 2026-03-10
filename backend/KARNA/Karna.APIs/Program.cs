@@ -21,6 +21,21 @@ namespace Karna.APIs
 			webApplicationBuilder.Services.AddEndpointsApiExplorer();
 			webApplicationBuilder.Services.AddSwaggerGen();
 
+			var allowedOrigins = webApplicationBuilder.Configuration
+				.GetSection("Cors:AllowedOrigins")
+				.Get<string[]>() ?? [];
+
+			webApplicationBuilder.Services.AddCors(options =>
+			{
+				options.AddPolicy("FrontendPolicy", policy =>
+				{
+					policy.WithOrigins(allowedOrigins)
+						  .AllowAnyHeader()
+						  .AllowAnyMethod()
+						  .AllowCredentials();
+				});
+			});
+
 			webApplicationBuilder.Services.AddHttpContextAccessor().AddScoped<ICurrentUserService, CurrentUserService>();
 			webApplicationBuilder.Services.AddScoped<IFileService, FileService>();
 
@@ -40,6 +55,8 @@ namespace Karna.APIs
 				app.UseSwagger();
 				app.UseSwaggerUI();
 			}
+
+			app.UseCors("FrontendPolicy");
 
 			app.UseHttpsRedirection();
 

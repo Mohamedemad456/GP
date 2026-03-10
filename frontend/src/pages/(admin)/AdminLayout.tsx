@@ -1,5 +1,7 @@
 import { memo, useCallback, useMemo } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
+import { logoutUser } from "@/lib/authApi";
 import {
   Users,
   Car,
@@ -32,6 +34,7 @@ const AdminLayout = memo(() => {
   const location = useLocation();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
+  const { clearUser } = useAuth();
 
   const currentLang = useMemo(
     () => (i18n.language?.startsWith("ar") ? "ar" : "en"),
@@ -132,9 +135,10 @@ const AdminLayout = memo(() => {
             <SidebarMenuItem>
               <SidebarMenuButton
                 tooltip={t("admin.sidebar.logout")}
-                onClick={() => {
-                  // TODO: Implement actual logout logic
-                  navigate("/login");
+                onClick={async () => {
+                  try { await logoutUser(); } catch { /* proceed regardless */ }
+                  clearUser();
+                  navigate("/login", { replace: true });
                 }}
                 className="text-destructive hover:text-destructive hover:bg-destructive/10"
               >
