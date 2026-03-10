@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button, Input } from "@gp/design-system";
 import { useToast } from "@/hooks/use-toast";
-import { Car, ArrowLeft, Loader2 } from "lucide-react";
+import { Car, ArrowLeft, Loader2, Mail, Lock } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "@/components";
 import { useAuth } from "@/context/AuthContext";
@@ -31,7 +31,6 @@ const Login = () => {
         return;
       }
 
-      // Fetch profile — backend cookie is now set, so this works immediately
       const profileRes = await getProfile();
       if (profileRes.success) {
         const u = profileRes.data;
@@ -75,65 +74,78 @@ const Login = () => {
       </Link>
 
       <div className="w-full max-w-md">
-        <div className="bg-card/95 p-8 rounded-2xl border border-border/60 shadow-xl animate-scale-in">
-          <div className="flex justify-center mb-8">
-            <div className="bg-primary p-3 rounded-2xl shadow-sm">
-              <Car className="h-8 w-8 text-primary-foreground" />
+        <div className="bg-card/95 rounded-2xl border border-border/60 shadow-xl animate-scale-in overflow-hidden">
+
+          {/* Branded header band */}
+          <div className="bg-primary/10 border-b border-primary/15 px-8 py-6 flex items-center gap-4">
+            <div className="bg-primary p-2.5 rounded-xl shadow-sm shrink-0">
+              <Car className="h-6 w-6 text-primary-foreground" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold font-heading text-foreground leading-tight">
+                {t("auth.heading")}
+              </h1>
+              <p className="text-sm text-muted-foreground">{t("auth.subheading")}</p>
             </div>
           </div>
 
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold mb-2 font-heading">{t("auth.heading")}</h1>
-            <p className="text-muted-foreground">{t("auth.subheading")}</p>
-          </div>
+          <div className="px-8 py-7">
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="space-y-1.5">
+                <label
+                  htmlFor="email"
+                  className="flex items-center gap-1.5 text-sm font-medium text-foreground"
+                >
+                  <Mail className="h-4 w-4 text-muted-foreground" />
+                  {t("auth.emailLabel")}
+                </label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={handleChange}
+                  disabled={isLoading}
+                  className="w-full bg-background border-border/70 focus:border-primary transition-smooth"
+                  placeholder={t("auth.emailPlaceholder")}
+                />
+              </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium mb-2">
-                {t("auth.emailLabel")}
-              </label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                required
-                value={formData.email}
-                onChange={handleChange}
+              <div className="space-y-1.5">
+                <label
+                  htmlFor="password"
+                  className="flex items-center gap-1.5 text-sm font-medium text-foreground"
+                >
+                  <Lock className="h-4 w-4 text-muted-foreground" />
+                  {t("auth.passwordLabel")}
+                </label>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  value={formData.password}
+                  onChange={handleChange}
+                  disabled={isLoading}
+                  className="w-full bg-background border-border/70 focus:border-primary transition-smooth"
+                  placeholder={t("auth.passwordPlaceholder")}
+                />
+              </div>
+
+              <Button
+                type="submit"
+                size="lg"
                 disabled={isLoading}
-                className="w-full bg-background border-border/70 focus:border-primary transition-smooth"
-                placeholder={t("auth.emailPlaceholder")}
-              />
-            </div>
+                className="w-full bg-primary text-primary-foreground hover:glow-primary transition-smooth mt-1"
+              >
+                {isLoading
+                  ? <Loader2 className="h-4 w-4 animate-spin" />
+                  : t("auth.signIn")}
+              </Button>
+            </form>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium mb-2">
-                {t("auth.passwordLabel")}
-              </label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                required
-                value={formData.password}
-                onChange={handleChange}
-                disabled={isLoading}
-                className="w-full bg-background border-border/70 focus:border-primary transition-smooth"
-                placeholder={t("auth.passwordPlaceholder")}
-              />
-            </div>
-
-            <Button
-              type="submit"
-              size="lg"
-              disabled={isLoading}
-              className="w-full bg-primary text-primary-foreground hover:glow-primary transition-smooth"
-            >
-              {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : t("auth.signIn")}
-            </Button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-sm text-muted-foreground">
+            <p className="mt-5 text-center text-sm text-muted-foreground">
               {t("auth.noAccount")}{" "}
               <Link to="/signup" className="text-primary hover:underline font-medium">
                 {t("auth.signUp")}

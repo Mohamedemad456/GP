@@ -139,7 +139,6 @@ export default function ProfilePage() {
                 icon={<Calendar className="h-4 w-4" />}
                 label={t("profile.fields.memberSince")}
                 value={createdAt}
-                className="sm:col-span-2"
               />
             </dl>
           )}
