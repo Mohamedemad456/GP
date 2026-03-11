@@ -168,4 +168,10 @@
   <data name="ModelDeleted" xml:space="preserve">
     <value>تم حذف الموديل بنجاح</value>
   </data>
+  <data name="MakeActivated" xml:space="preserve">
+    <value>تم تفعيل الشركة المصنعة بنجاح.</value>
+  </data>
+  <data name="MakeDeactivated" xml:space="preserve">
+    <value>تم تعطيل الشركة المصنعة بنجاح.</value>
+  </data>
 </root>
