@@ -5,6 +5,7 @@ using Karna.Core.Application.Abstraction.DTOs.Make;
 using Karna.Core.Application.Abstraction.External;
 using Karna.Core.Application.Abstraction.Persistence;
 using Karna.Core.Application.Abstraction.Services;
+using Karna.Core.Application.Specifications.Makes;
 using Karna.Core.Domain.Entities;
 
 namespace Karna.Core.Application.Services
@@ -39,6 +40,7 @@ namespace Karna.Core.Application.Services
 			};
 		}
 
+		// Admin - makes (active + inactive)
 		public async Task<ApiResponse<IEnumerable<MakeDto>>> GetAllAsync()
 		{
 			var repo = _unitOfWork.GetRepository<Make>();
@@ -48,6 +50,20 @@ namespace Karna.Core.Application.Services
 			{
 				Success = true,
 				Data = _mapper.Map<IEnumerable<MakeDto>>(makes)
+			};
+		}
+
+		// Public — active (CreatedAt desc)
+		public async Task<ApiResponse<IEnumerable<MakeDto>>> GetAllActiveAsync()
+		{
+			var repo = _unitOfWork.GetRepository<Make>();
+			var spec = new ActiveMakesSpec();
+			var activeMakes = await repo.GetAllWithSpecAsync(spec);
+
+			return new ApiResponse<IEnumerable<MakeDto>>
+			{
+				Success = true,
+				Data = _mapper.Map<IEnumerable<MakeDto>>(activeMakes)
 			};
 		}
 
@@ -134,6 +150,31 @@ namespace Karna.Core.Application.Services
 				Success = true,
 				Message = _localizer.GetMessage("MakeUpdated"),
 				Data = _mapper.Map<MakeDto>(make)
+			};
+		}
+
+		public async Task<ApiResponseDto> ToggleActiveAsync(Guid id)
+		{
+			var repo = _unitOfWork.GetRepository<Make>();
+			var make = await repo.GetAsync(id);
+
+			if (make is null)
+				return new ApiResponseDto
+				{
+					Success = false,
+					Message = _localizer.GetErrorMessage("MakeNotFound")
+				};
+
+			make.IsActive = !make.IsActive;
+			repo.Update(make);
+			await _unitOfWork.CompleteAsync();
+
+			var messageKey = make.IsActive ? "MakeActivated" : "MakeDeactivated";
+
+			return new ApiResponseDto
+			{
+				Success = true,
+				Message = _localizer.GetMessage(messageKey)
 			};
 		}
 

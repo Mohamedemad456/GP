@@ -17,16 +17,16 @@ namespace Karna.Core.Application.Mapping
 			CreateMap<CreateMakeDto, Make>()
 				.ForMember(dest => dest.Id, opt => opt.Ignore())
 				.ForMember(dest => dest.LogoUrl, opt => opt.Ignore())
+				.ForMember(dest => dest.IsActive, opt => opt.Ignore())
 				.ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
-				.ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
-				.ForMember(dest => dest.IsDeleted, opt => opt.Ignore());
+				.ForMember(dest => dest.UpdatedAt, opt => opt.Ignore());
 
 			CreateMap<UpdateMakeDto, Make>()
 				.ForMember(dest => dest.Id, opt => opt.Ignore())
 				.ForMember(dest => dest.LogoUrl, opt => opt.Ignore())
+				.ForMember(dest => dest.IsActive, opt => opt.Ignore())
 				.ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
-				.ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
-				.ForMember(dest => dest.IsDeleted, opt => opt.Ignore());
+				.ForMember(dest => dest.UpdatedAt, opt => opt.Ignore());
 		}
 	}
 }
