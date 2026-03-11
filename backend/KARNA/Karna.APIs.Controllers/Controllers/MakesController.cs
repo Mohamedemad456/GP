@@ -9,7 +9,7 @@ namespace Karna.APIs.Controllers.Controllers
 	[Authorize(Roles = "Admin")]
 	public class MakesController(IMakeService _makeService) : ApiControllerBase
 	{
-		// Public — active makes بس
+		// Public — active makes
 		[AllowAnonymous]
 		[HttpGet("Active")]
 		public async Task<IActionResult> GetAllActive()
@@ -18,7 +18,7 @@ namespace Karna.APIs.Controllers.Controllers
 			return Ok(result);
 		}
 
-		// Admin — كل الـ makes (active + inactive)
+		// Admin — makes (active + inactive)
 		[HttpGet("All")]
 		public async Task<IActionResult> GetAll()
 		{
