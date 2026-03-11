@@ -4,6 +4,8 @@ import { Route, Routes } from "react-router-dom";
 import { Toaster } from "@/lib";
 import { PageLoader } from "@gp/design-system";
 import PrivateRoute from "./components/PrivateRoute";
+import GuestRoute from "./components/GuestRoute";
+import { AuthProvider } from "./context/AuthContext";
 import Layout from "./components/Layout";
 
 // Lazy load route components for code splitting
@@ -43,7 +45,7 @@ function App() {
   );
 
   return (
-    <>
+    <AuthProvider>
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/" element={<Layout />}>
@@ -56,8 +58,10 @@ function App() {
               <Route path="cars/:id" element={<CarDetailsPage />} />
             </Route>
           </Route>
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
+          <Route element={<GuestRoute />}>
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+          </Route>
           <Route path="/onboarding" element={<Onboarding />} />
           <Route element={<PrivateRoute allowedRoles={["admin"]} />}>
             <Route path="/admin" element={<AdminLayout />}>
@@ -76,7 +80,7 @@ function App() {
         </Routes>
       </Suspense>
       <Toaster position={toasterPosition} richColors />
-    </>
+    </AuthProvider>
   );
 }
 
