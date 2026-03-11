@@ -3,17 +3,23 @@ using Karna.Core.Application.Abstraction.DTOs.Make;
 using Karna.Core.Application.Abstraction.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Karna.APIs.Controllers.Controllers
 {
 	[Authorize(Roles = "Admin")]
 	public class MakesController(IMakeService _makeService) : ApiControllerBase
 	{
+		// Public — active makes بس
 		[AllowAnonymous]
-		[HttpGet("AllMakes")]
+		[HttpGet("Active")]
+		public async Task<IActionResult> GetAllActive()
+		{
+			var result = await _makeService.GetAllActiveAsync();
+			return Ok(result);
+		}
+
+		// Admin — كل الـ makes (active + inactive)
+		[HttpGet("All")]
 		public async Task<IActionResult> GetAll()
 		{
 			var result = await _makeService.GetAllAsync();
@@ -43,6 +49,15 @@ namespace Karna.APIs.Controllers.Controllers
 		public async Task<IActionResult> Update(Guid id, [FromForm] UpdateMakeDto dto)
 		{
 			var result = await _makeService.UpdateAsync(id, dto);
+			if (!result.Success)
+				return BadRequest(result);
+			return Ok(result);
+		}
+
+		[HttpPatch("ToggleActive/{id:guid}")]
+		public async Task<IActionResult> ToggleActive(Guid id)
+		{
+			var result = await _makeService.ToggleActiveAsync(id);
 			if (!result.Success)
 				return BadRequest(result);
 			return Ok(result);

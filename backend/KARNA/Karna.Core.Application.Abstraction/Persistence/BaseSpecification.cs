@@ -18,9 +18,16 @@ namespace Karna.Core.Application.Abstraction.Persistence
 		{
 		}
 
+
+
 		protected BaseSpecification(Expression<Func<TEntity, bool>> criteria)
 		{
 			Criteria = criteria;
+		}
+
+		private protected virtual void AddIncludes()
+		{
+
 		}
 
 		protected void AddInclude(Expression<Func<TEntity, object>> includeExpression)

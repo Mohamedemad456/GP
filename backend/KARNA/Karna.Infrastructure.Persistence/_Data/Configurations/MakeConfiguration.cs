@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Karna.Infrastructure.Persistence._Data.Configurations
 {
-	internal class MakeConfiguration : SoftDeleteEntityConfiguration<Make>
+	internal class MakeConfiguration : BaseAuditableEntityConfiguration<Make>
 	{
 		public override void Configure(EntityTypeBuilder<Make> builder)
 		{
@@ -16,16 +16,14 @@ namespace Karna.Infrastructure.Persistence._Data.Configurations
 				.HasMaxLength(100);
 
 			builder.HasIndex(m => m.Name)
-				.IsUnique()
-				.HasFilter("[IsDeleted] = 0");
+				.IsUnique();
 
 			builder.Property(m => m.NameAr)
 				.IsRequired()
 				.HasMaxLength(100);
 
 			builder.HasIndex(m => m.NameAr)
-				.IsUnique()
-				.HasFilter("[IsDeleted] = 0");
+				.IsUnique();
 
 			builder.Property(m => m.LogoUrl)
 				.HasMaxLength(500);
@@ -35,6 +33,10 @@ namespace Karna.Infrastructure.Persistence._Data.Configurations
 
 			builder.Property(m => m.CountryAr)
 				.HasMaxLength(100);
+
+			builder.Property(m => m.IsActive)
+				.IsRequired()
+				.HasDefaultValue(true);
 		}
 	}
 }

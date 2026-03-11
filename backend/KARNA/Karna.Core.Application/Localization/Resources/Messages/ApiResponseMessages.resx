@@ -100,4 +100,10 @@
  <data name="MakeDeleted" xml:space="preserve">
    <value>Make deleted successfully.</value>
  </data>
+ <data name="MakeActivated" xml:space="preserve">
+  <value>Make activated successfully.</value>
+</data>
+<data name="MakeDeactivated" xml:space="preserve">
+  <value>Make deactivated successfully.</value>
+</data>
 </root>
