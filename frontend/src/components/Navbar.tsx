@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from "react";
+import { memo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Menu,
@@ -22,29 +22,20 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "./LanguageSwitcher";
-import { clearAuthSession, getAuthSession } from "@/lib/auth";
+import { useAuth } from "@/context/AuthContext";
+import { logoutUser } from "@/lib/authApi";
 
 const Navbar = memo(() => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
-  const [session, setSession] = useState(() => getAuthSession());
+  const { user, clearUser } = useAuth();
 
   // Detect RTL language
   const isRTL = i18n.language?.startsWith("ar") ?? false;
-  const isLoggedIn = !!session;
-  const isAdmin = session?.role === "admin";
-
-  useEffect(() => {
-    setSession(getAuthSession());
-  }, [location.pathname]);
-
-  useEffect(() => {
-    const onStorage = () => setSession(getAuthSession());
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
-  }, []);
+  const isLoggedIn = !!user;
+  const isAdmin = user?.role === "admin";
 
   const navLinks = [
     { name: t("navigation.home"), path: "/" },
@@ -55,11 +46,16 @@ const Navbar = memo(() => {
 
   const isActive = (path: string) => location.pathname === path;
 
-  const handleLogout = () => {
-    clearAuthSession();
-    setSession(null);
-    setIsOpen(false);
-    navigate("/login", { replace: true });
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+    } catch {
+      // proceed regardless
+    } finally {
+      clearUser();
+      setIsOpen(false);
+      navigate("/login", { replace: true });
+    }
   };
 
   return (
@@ -155,7 +151,7 @@ const Navbar = memo(() => {
                     className="gap-2 border-primary/25 bg-background/70 hover:bg-primary/10 hover:border-primary/40"
                   >
                     <UserCircle2 className="size-4 text-primary" />
-                    <span className="max-w-36 truncate">{session?.email}</span>
+                    <span className="max-w-36 truncate">{user?.email}</span>
                     <ChevronDown className="size-4 text-muted-foreground" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -164,7 +160,7 @@ const Navbar = memo(() => {
                     <p className="text-xs font-medium text-muted-foreground">
                       {t("navigation.account")}
                     </p>
-                    <p className="truncate text-sm font-semibold">{session?.email}</p>
+                    <p className="truncate text-sm font-semibold">{user?.email}</p>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => navigate("/profile")}>
