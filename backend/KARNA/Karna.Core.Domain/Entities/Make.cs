@@ -11,7 +11,7 @@ namespace Karna.Core.Domain.Entities
 		public string? CountryAr { get; set; }
 
 		public bool IsActive { get; set; } = true;
-        public ICollection<Model> Models { get; set; } = new List<Model>();
+        public virtual ICollection<Model> Models { get; set; } = new List<Model>();
     }
 	
 }

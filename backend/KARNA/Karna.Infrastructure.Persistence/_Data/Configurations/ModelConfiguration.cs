@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Karna.Infrastructure.Persistence._Data.Configurations
 {
-    internal class ModelConfiguration : SoftDeleteEntityConfiguration<Model>
+    internal class ModelConfiguration : BaseAuditableEntityConfiguration<Model>
     {
         public override void Configure(EntityTypeBuilder<Model> builder)
         {
@@ -27,12 +27,10 @@ namespace Karna.Infrastructure.Persistence._Data.Configurations
                 .HasDefaultValue(true);
 
             builder.HasIndex(x => new { x.MakeId, x.Name })
-                .IsUnique()
-                .HasFilter("[IsDeleted] = 0");
+                .IsUnique();
 
             builder.HasIndex(x => new { x.MakeId, x.NameAr })
-                .IsUnique()
-                .HasFilter("[IsDeleted] = 0");
+                .IsUnique();
 
             builder.HasOne(x => x.Make)
                 .WithMany(x => x.Models)

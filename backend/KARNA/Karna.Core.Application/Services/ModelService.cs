@@ -4,10 +4,12 @@ using System.Text;
 using AutoMapper;
 using FluentValidation;
 using Karna.Core.Application.Abstraction.DTOs._Common;
+using Karna.Core.Application.Abstraction.DTOs.Make;
 using Karna.Core.Application.Abstraction.DTOs.Model;
 using Karna.Core.Application.Abstraction.External;
 using Karna.Core.Application.Abstraction.Persistence;
 using Karna.Core.Application.Abstraction.Services;
+using Karna.Core.Application.Specifications.Models;
 using Karna.Core.Domain.Entities;
 
 namespace Karna.Core.Application.Services
@@ -42,7 +44,7 @@ namespace Karna.Core.Application.Services
                 };
 
             var existing = await modelRepo.GetAsync(m =>
-                (m.Name == dto.Name || m.NameAr == dto.NameAr) && m.MakeId == dto.MakeId && !m.IsDeleted);
+                (m.Name == dto.Name || m.NameAr == dto.NameAr) && m.MakeId == dto.MakeId);
 
             if (existing is not null)
                 return new ApiResponse<ModelDto>
@@ -70,8 +72,7 @@ namespace Karna.Core.Application.Services
         public async Task<ApiResponseDto> DeleteAsync(Guid id)
         {
             var modelRepo = _unitOfWork.GetRepository<Model>();
-            var spec = new ModelWithMakeSpecification(id);
-            var model = await modelRepo.GetWithSpecAsync(spec);
+            var model = await modelRepo.GetAsync(id);
 
             if (model is null)
                 return new ApiResponseDto
@@ -89,7 +90,18 @@ namespace Karna.Core.Application.Services
                 Message = _localizer.GetMessage("ModelDeleted")
             };
         }
-        
+
+        public async Task<ApiResponse<IEnumerable<ModelDto>>> GetAllActiveAsync()
+        {
+            var repo = _unitOfWork.GetRepository<Model>();
+            var spec = new ActiveModelsWithMakeSpec();
+            var models = await repo.GetAllWithSpecAsync(spec);
+            return new ApiResponse<IEnumerable<ModelDto>>
+            {
+                Success = true,
+                Data = _mapper.Map<IEnumerable<ModelDto>>(models)
+            };
+        }
 
         public async Task<ApiResponse<IEnumerable<ModelDto>>> GetAllAsync()
         {
@@ -121,6 +133,33 @@ namespace Karna.Core.Application.Services
             {
                 Success = true,
                 Data = _mapper.Map<ModelDto>(model)
+            };
+        }
+
+        public async Task<ApiResponseDto> ToggleActiveAsync(Guid id)
+        {
+            
+            var repo = _unitOfWork.GetRepository<Model>();
+            var model = await repo.GetAsync(id);
+
+            if (model is null)
+                return new ApiResponseDto
+                {
+                    Success = false,
+                    Message = _localizer.GetErrorMessage("ModelNotFound")
+                };
+
+            model.IsActive = !model.IsActive;
+
+            repo.Update(model);
+            await _unitOfWork.CompleteAsync();
+
+            var messageKey = model.IsActive ? "ModelActivated" : "ModelDeactivated";
+
+            return new ApiResponseDto
+            {
+                Success = true,
+                Message = _localizer.GetMessage(messageKey)
             };
         }
 
@@ -157,8 +196,7 @@ namespace Karna.Core.Application.Services
             var duplicate = await modelRepo.GetAsync(m =>
                 (m.Name == dto.Name || m.NameAr == dto.NameAr) &&
                 m.MakeId == dto.MakeId &&
-                m.Id != id &&
-                !m.IsDeleted);
+                m.Id != id );
 
             if (duplicate is not null)
                 return new ApiResponse<ModelDto>

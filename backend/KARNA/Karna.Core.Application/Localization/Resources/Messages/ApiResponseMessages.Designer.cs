@@ -169,11 +169,29 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Model activated successfully..
+        /// </summary>
+        public static string ModelActivated {
+            get {
+                return ResourceManager.GetString("ModelActivated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Model created successfully.
         /// </summary>
         public static string ModelCreated {
             get {
                 return ResourceManager.GetString("ModelCreated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Model deactivated successfully..
+        /// </summary>
+        public static string ModelDeactivated {
+            get {
+                return ResourceManager.GetString("ModelDeactivated", resourceCulture);
             }
         }
         

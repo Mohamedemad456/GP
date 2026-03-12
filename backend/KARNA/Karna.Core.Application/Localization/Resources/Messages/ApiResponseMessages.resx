@@ -168,10 +168,16 @@
   <data name="ModelDeleted" xml:space="preserve">
     <value>Model deleted successfully</value>
   </data>
- <data name="MakeActivated" xml:space="preserve">
-  <value>Make activated successfully.</value>
-</data>
-<data name="MakeDeactivated" xml:space="preserve">
-  <value>Make deactivated successfully.</value>
-</data>
+  <data name="MakeActivated" xml:space="preserve">
+    <value>Make activated successfully.</value>
+  </data>
+  <data name="MakeDeactivated" xml:space="preserve">
+    <value>Make deactivated successfully.</value>
+  </data>
+  <data name="ModelActivated" xml:space="preserve">
+    <value>Model activated successfully.</value>
+  </data>
+  <data name="ModelDeactivated" xml:space="preserve">
+    <value>Model deactivated successfully.</value>
+  </data>
 </root>

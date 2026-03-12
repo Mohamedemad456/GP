@@ -37,7 +37,6 @@ namespace Karna.Core.Application.Mapping
 				.ForMember(des => des.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
-                .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
                 .ForMember(dest => dest.Make, opt => opt.Ignore());
 
 
@@ -45,7 +44,6 @@ namespace Karna.Core.Application.Mapping
                 .ForMember(des => des.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
-                .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
 			    .ForMember(dest => dest.Make, opt => opt.Ignore());
 
 

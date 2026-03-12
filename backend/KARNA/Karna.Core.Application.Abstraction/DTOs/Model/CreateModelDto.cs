@@ -8,7 +8,6 @@ namespace Karna.Core.Application.Abstraction.DTOs.Model
     {
         public string Name { get; set; } = null!;
         public string NameAr { get; set; } = null!;
-        public bool IsActive { get; set; } = true;
         public Guid MakeId { get; set; }
     }
 }
