@@ -133,6 +133,15 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Model name already exists for this make..
+        /// </summary>
+        internal static string ModelNameAlreadyExists {
+            get {
+                return ResourceManager.GetString("ModelNameAlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Password must contain at least one digit..
         /// </summary>
         internal static string PasswordRequiresDigit {

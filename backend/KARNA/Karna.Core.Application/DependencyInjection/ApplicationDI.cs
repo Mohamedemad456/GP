@@ -22,8 +22,10 @@ namespace Karna.Core.Application.DependencyInjection
 			services.AddScoped<IAuthService, AuthService>();
 			services.AddScoped<IUserService, UserService>();
 			services.AddScoped<IMakeService, MakeService>();
+            services.AddScoped<IModelService, ModelService>();
 
-			return services;
+
+            return services;
 		}
 	}
 }

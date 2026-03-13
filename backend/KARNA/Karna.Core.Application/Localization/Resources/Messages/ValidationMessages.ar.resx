@@ -165,4 +165,7 @@
   <data name="MakeNameAlreadyExists" xml:space="preserve">
     <value>يوجد شركة مصنعة بهذا الاسم بالفعل.</value>
   </data>
+  <data name="ModelNameAlreadyExists" xml:space="preserve">
+    <value>اسم الموديل موجود بالفعل لهذه الشركة المصنعة</value>
+  </data>
 </root>
