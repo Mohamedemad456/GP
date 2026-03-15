@@ -1,4 +1,5 @@
 using AutoMapper;
+using Karna.Core.Application.Abstraction.DTOs.ConditionChecklistCategory;
 using Karna.Core.Application.Abstraction.DTOs.Make;
 using Karna.Core.Application.Abstraction.DTOs.Model;
 using Karna.Core.Application.Mapping.Resolvers;
@@ -46,8 +47,22 @@ namespace Karna.Core.Application.Mapping
                 .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
 			    .ForMember(dest => dest.Make, opt => opt.Ignore());
 
+			CreateMap<ConditionChecklistCategory, ConditionChecklistCategoryDto>()
+				.ForMember(dest => dest.Name, opt => opt.MapFrom<LocalizedConditionChecklistCategoryNameResolver>());
 
-        }
-    }
+			CreateMap<CreateConditionChecklistCategoryDto, ConditionChecklistCategory>()
+				.ForMember(dest => dest.Id, opt => opt.Ignore())
+				.ForMember(dest => dest.IsActive, opt => opt.Ignore())
+				.ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+				.ForMember(dest => dest.UpdatedAt, opt => opt.Ignore());
+
+			CreateMap<UpdateConditionChecklistCategoryDto, ConditionChecklistCategory>()
+				.ForMember(dest => dest.Id, opt => opt.Ignore())
+				.ForMember(dest => dest.IsActive, opt => opt.Ignore())
+				.ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+				.ForMember(dest => dest.UpdatedAt, opt => opt.Ignore());
+
+		}
+	}
 			
 }

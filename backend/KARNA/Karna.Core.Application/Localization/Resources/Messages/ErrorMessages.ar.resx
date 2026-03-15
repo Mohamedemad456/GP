@@ -159,4 +159,7 @@
   <data name="ModelNotFound" xml:space="preserve">
     <value>الموديل غير موجود</value>
   </data>
+  <data name="ConditionChecklistCategoryNotFound" xml:space="preserve">
+    <value>فئة فحص الحالة غير موجودة.</value>
+  </data>
 </root>

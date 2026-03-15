@@ -180,4 +180,19 @@
   <data name="ModelDeactivated" xml:space="preserve">
     <value>تم تعطيل الموديل بنجاح.</value>
   </data>
+  <data name="ConditionChecklistCategoryCreated" xml:space="preserve">
+    <value>تم إنشاء فئة فحص الحالة بنجاح.</value>
+  </data>
+  <data name="ConditionChecklistCategoryUpdated" xml:space="preserve">
+    <value>تم تحديث فئة فحص الحالة بنجاح.</value>
+  </data>
+  <data name="ConditionChecklistCategoryDeleted" xml:space="preserve">
+    <value>تم حذف فئة فحص الحالة بنجاح.</value>
+  </data>
+  <data name="ConditionChecklistCategoryActivated" xml:space="preserve">
+    <value>تم تفعيل فئة فحص الحالة بنجاح.</value>
+  </data>
+  <data name="ConditionChecklistCategoryDeactivated" xml:space="preserve">
+    <value>تم تعطيل فئة فحص الحالة بنجاح.</value>
+  </data>
 </root>

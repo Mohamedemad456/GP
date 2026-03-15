@@ -61,6 +61,15 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A condition checklist category with this name already exists..
+        /// </summary>
+        internal static string ConditionChecklistCategoryNameAlreadyExists {
+            get {
+                return ResourceManager.GetString("ConditionChecklistCategoryNameAlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This email is already in use..
         /// </summary>
         internal static string EmailAlreadyInUse {

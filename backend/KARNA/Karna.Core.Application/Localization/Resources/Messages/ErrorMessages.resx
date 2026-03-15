@@ -159,4 +159,7 @@
   <data name="ModelNotFound" xml:space="preserve">
     <value>Model not found</value>
   </data>
+  <data name="ConditionChecklistCategoryNotFound" xml:space="preserve">
+    <value>Condition checklist category not found.</value>
+  </data>
 </root>

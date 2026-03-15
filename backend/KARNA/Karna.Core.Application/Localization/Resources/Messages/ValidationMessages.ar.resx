@@ -168,4 +168,7 @@
   <data name="ModelNameAlreadyExists" xml:space="preserve">
     <value>اسم الموديل موجود بالفعل لهذه الشركة المصنعة</value>
   </data>
+  <data name="ConditionChecklistCategoryNameAlreadyExists" xml:space="preserve">
+    <value>توجد فئة فحص حالة بهذا الاسم بالفعل.</value>
+  </data>
 </root>
