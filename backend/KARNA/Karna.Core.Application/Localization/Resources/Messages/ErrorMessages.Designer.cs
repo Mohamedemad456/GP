@@ -79,6 +79,15 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Condition checklist category not found..
+        /// </summary>
+        internal static string ConditionChecklistCategoryNotFound {
+            get {
+                return ResourceManager.GetString("ConditionChecklistCategoryNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This email address is already in use..
         /// </summary>
         internal static string EmailAlreadyInUse {

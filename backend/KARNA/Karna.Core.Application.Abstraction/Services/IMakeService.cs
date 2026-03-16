@@ -10,7 +10,8 @@ namespace Karna.Core.Application.Abstraction.Services
 		Task<ApiResponse<IEnumerable<MakeDto>>> GetAllActiveAsync();
 		Task<ApiResponse<MakeDto>> CreateAsync(CreateMakeDto dto);
 		Task<ApiResponse<MakeDto>> UpdateAsync(Guid id, UpdateMakeDto dto);
-		Task<ApiResponseDto> ToggleActiveAsync(Guid id);
+		Task<ApiResponseDto> ActivateAsync(Guid id);
+		Task<ApiResponseDto> DeactivateAsync(Guid id);
 		Task<ApiResponseDto> DeleteAsync(Guid id);
 	}
 }

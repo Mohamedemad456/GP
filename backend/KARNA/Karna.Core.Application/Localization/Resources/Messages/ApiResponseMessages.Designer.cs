@@ -61,6 +61,51 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Condition checklist category activated successfully..
+        /// </summary>
+        public static string ConditionChecklistCategoryActivated {
+            get {
+                return ResourceManager.GetString("ConditionChecklistCategoryActivated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Condition checklist category created successfully..
+        /// </summary>
+        public static string ConditionChecklistCategoryCreated {
+            get {
+                return ResourceManager.GetString("ConditionChecklistCategoryCreated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Condition checklist category deactivated successfully..
+        /// </summary>
+        public static string ConditionChecklistCategoryDeactivated {
+            get {
+                return ResourceManager.GetString("ConditionChecklistCategoryDeactivated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Condition checklist category deleted successfully..
+        /// </summary>
+        public static string ConditionChecklistCategoryDeleted {
+            get {
+                return ResourceManager.GetString("ConditionChecklistCategoryDeleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Condition checklist category updated successfully..
+        /// </summary>
+        public static string ConditionChecklistCategoryUpdated {
+            get {
+                return ResourceManager.GetString("ConditionChecklistCategoryUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Added to favorites..
         /// </summary>
         public static string FavoriteAdded {

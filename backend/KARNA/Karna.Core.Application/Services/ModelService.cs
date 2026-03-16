@@ -4,7 +4,6 @@ using System.Text;
 using AutoMapper;
 using FluentValidation;
 using Karna.Core.Application.Abstraction.DTOs._Common;
-using Karna.Core.Application.Abstraction.DTOs.Make;
 using Karna.Core.Application.Abstraction.DTOs.Model;
 using Karna.Core.Application.Abstraction.External;
 using Karna.Core.Application.Abstraction.Persistence;
@@ -14,208 +13,234 @@ using Karna.Core.Domain.Entities;
 
 namespace Karna.Core.Application.Services
 {
-    public class ModelService(
-        IUnitOfWork _unitOfWork,
-        IMapper _mapper,
-        ILocalizationService _localizer,
-        IValidator<CreateModelDto> _createValidator,
-        IValidator<UpdateModelDto> _updateValidator
-        ) : IModelService
-    {
-        public async Task<ApiResponse<ModelDto>> CreateAsync(CreateModelDto dto)
-        {
-            var validationResult = await _createValidator.ValidateAsync(dto);
-            if (!validationResult.IsValid)
-                return new ApiResponse<ModelDto>
-                {
-                    Success = false,
-                    Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage))
-                };
+	public class ModelService(
+		IUnitOfWork _unitOfWork,
+		IMapper _mapper,
+		ILocalizationService _localizer,
+		IValidator<CreateModelDto> _createValidator,
+		IValidator<UpdateModelDto> _updateValidator
+		) : IModelService
+	{
+		public async Task<ApiResponse<ModelDto>> CreateAsync(CreateModelDto dto)
+		{
+			var validationResult = await _createValidator.ValidateAsync(dto);
+			if (!validationResult.IsValid)
+				return new ApiResponse<ModelDto>
+				{
+					Success = false,
+					Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage))
+				};
 
-            var modelRepo = _unitOfWork.GetRepository<Model>();
-            var makeRepo = _unitOfWork.GetRepository<Make>();
+			var modelRepo = _unitOfWork.GetRepository<Model>();
+			var makeRepo = _unitOfWork.GetRepository<Make>();
 
-            var make = await makeRepo.GetAsync(dto.MakeId);
-            if (make is null)
-                return new ApiResponse<ModelDto>
-                {
-                    Success = false,
-                    Message = _localizer.GetErrorMessage("MakeNotFound")
-                };
+			var make = await makeRepo.GetAsync(dto.MakeId);
+			if (make is null)
+				return new ApiResponse<ModelDto>
+				{
+					Success = false,
+					Message = _localizer.GetErrorMessage("MakeNotFound")
+				};
 
-            var existing = await modelRepo.GetAsync(m =>
-                (m.Name == dto.Name || m.NameAr == dto.NameAr) && m.MakeId == dto.MakeId);
+			var existing = await modelRepo.GetAsync(m =>
+				(m.Name == dto.Name || m.NameAr == dto.NameAr) && m.MakeId == dto.MakeId);
 
-            if (existing is not null)
-                return new ApiResponse<ModelDto>
-                {
-                    Success = false,
-                    Message = _localizer.GetValidationMessage("ModelNameAlreadyExists")
-                };
+			if (existing is not null)
+				return new ApiResponse<ModelDto>
+				{
+					Success = false,
+					Message = _localizer.GetValidationMessage("ModelNameAlreadyExists")
+				};
 
-            var model = _mapper.Map<Model>(dto);
+			var model = _mapper.Map<Model>(dto);
 
-            await modelRepo.AddAsync(model);
-            await _unitOfWork.CompleteAsync();
+			await modelRepo.AddAsync(model);
+			await _unitOfWork.CompleteAsync();
 
-            var spec = new ModelWithMakeSpecification(model.Id);
-            var createdModel = await modelRepo.GetWithSpecAsync(spec);
+			var spec = new ModelWithMakeSpecification(model.Id);
+			var createdModel = await modelRepo.GetWithSpecAsync(spec);
 
-            return new ApiResponse<ModelDto>
-            {
-                Success = true,
-                Message = _localizer.GetMessage("ModelCreated"),
-                Data = _mapper.Map<ModelDto>(createdModel)
-            };
-        }
+			return new ApiResponse<ModelDto>
+			{
+				Success = true,
+				Message = _localizer.GetMessage("ModelCreated"),
+				Data = _mapper.Map<ModelDto>(createdModel)
+			};
+		}
 
-        public async Task<ApiResponseDto> DeleteAsync(Guid id)
-        {
-            var modelRepo = _unitOfWork.GetRepository<Model>();
-            var model = await modelRepo.GetAsync(id);
+		public async Task<ApiResponseDto> DeleteAsync(Guid id)
+		{
+			var modelRepo = _unitOfWork.GetRepository<Model>();
+			var model = await modelRepo.GetAsync(id);
 
-            if (model is null)
-                return new ApiResponseDto
-                {
-                    Success = false,
-                    Message = _localizer.GetErrorMessage("ModelNotFound")
-                };
+			if (model is null)
+				return new ApiResponseDto
+				{
+					Success = false,
+					Message = _localizer.GetErrorMessage("ModelNotFound")
+				};
 
-            modelRepo.Delete(model);
-            await _unitOfWork.CompleteAsync();
+			modelRepo.Delete(model);
+			await _unitOfWork.CompleteAsync();
 
-            return new ApiResponseDto
-            {
-                Success = true,
-                Message = _localizer.GetMessage("ModelDeleted")
-            };
-        }
+			return new ApiResponseDto
+			{
+				Success = true,
+				Message = _localizer.GetMessage("ModelDeleted")
+			};
+		}
 
-        public async Task<ApiResponse<IEnumerable<ModelDto>>> GetAllActiveAsync()
-        {
-            var repo = _unitOfWork.GetRepository<Model>();
-            var spec = new ActiveModelsWithMakeSpec();
-            var models = await repo.GetAllWithSpecAsync(spec);
-            return new ApiResponse<IEnumerable<ModelDto>>
-            {
-                Success = true,
-                Data = _mapper.Map<IEnumerable<ModelDto>>(models)
-            };
-        }
+		public async Task<ApiResponse<IEnumerable<ModelDto>>> GetAllActiveAsync()
+		{
+			var repo = _unitOfWork.GetRepository<Model>();
+			var spec = new ActiveModelsWithMakeSpec();
+			var models = await repo.GetAllWithSpecAsync(spec);
 
-        public async Task<ApiResponse<IEnumerable<ModelDto>>> GetAllAsync()
-        {
-            var repo = _unitOfWork.GetRepository<Model>();
-            var spec = new ModelWithMakeSpecification();
-            var models = await repo.GetAllWithSpecAsync(spec);
+			return new ApiResponse<IEnumerable<ModelDto>>
+			{
+				Success = true,
+				Data = _mapper.Map<IEnumerable<ModelDto>>(models)
+			};
+		}
 
-            return new ApiResponse<IEnumerable<ModelDto>>
-            {
-                Success = true,
-                Data = _mapper.Map<IEnumerable<ModelDto>>(models)
-            };
-        }
+		public async Task<ApiResponse<IEnumerable<ModelDto>>> GetAllAsync()
+		{
+			var repo = _unitOfWork.GetRepository<Model>();
+			var spec = new ModelWithMakeSpecification();
+			var models = await repo.GetAllWithSpecAsync(spec);
 
-        public async Task<ApiResponse<ModelDto>> GetByIdAsync(Guid id)
-        {
-            var repo = _unitOfWork.GetRepository<Model>();
-            var spec = new ModelWithMakeSpecification(id);
-            var model = await repo.GetWithSpecAsync(spec);
+			return new ApiResponse<IEnumerable<ModelDto>>
+			{
+				Success = true,
+				Data = _mapper.Map<IEnumerable<ModelDto>>(models)
+			};
+		}
 
-            if (model is null)
-                return new ApiResponse<ModelDto>
-                {
-                    Success = false,
-                    Message = _localizer.GetErrorMessage("ModelNotFound")
-                };
+		public async Task<ApiResponse<ModelDto>> GetByIdAsync(Guid id)
+		{
+			var repo = _unitOfWork.GetRepository<Model>();
+			var spec = new ModelWithMakeSpecification(id);
+			var model = await repo.GetWithSpecAsync(spec);
 
-            return new ApiResponse<ModelDto>
-            {
-                Success = true,
-                Data = _mapper.Map<ModelDto>(model)
-            };
-        }
+			if (model is null)
+				return new ApiResponse<ModelDto>
+				{
+					Success = false,
+					Message = _localizer.GetErrorMessage("ModelNotFound")
+				};
 
-        public async Task<ApiResponseDto> ToggleActiveAsync(Guid id)
-        {
-            
-            var repo = _unitOfWork.GetRepository<Model>();
-            var model = await repo.GetAsync(id);
+			return new ApiResponse<ModelDto>
+			{
+				Success = true,
+				Data = _mapper.Map<ModelDto>(model)
+			};
+		}
 
-            if (model is null)
-                return new ApiResponseDto
-                {
-                    Success = false,
-                    Message = _localizer.GetErrorMessage("ModelNotFound")
-                };
+		public async Task<ApiResponseDto> ActivateAsync(Guid id)
+		{
+			var repo = _unitOfWork.GetRepository<Model>();
+			var model = await repo.GetAsync(id);
 
-            model.IsActive = !model.IsActive;
+			if (model is null)
+				return new ApiResponseDto
+				{
+					Success = false,
+					Message = _localizer.GetErrorMessage("ModelNotFound")
+				};
 
-            repo.Update(model);
-            await _unitOfWork.CompleteAsync();
+			if (!model.IsActive)
+			{
+				model.IsActive = true;
+				repo.Update(model);
+				await _unitOfWork.CompleteAsync();
+			}
 
-            var messageKey = model.IsActive ? "ModelActivated" : "ModelDeactivated";
+			return new ApiResponseDto
+			{
+				Success = true,
+				Message = _localizer.GetMessage("ModelActivated")
+			};
+		}
 
-            return new ApiResponseDto
-            {
-                Success = true,
-                Message = _localizer.GetMessage(messageKey)
-            };
-        }
+		public async Task<ApiResponseDto> DeactivateAsync(Guid id)
+		{
+			var repo = _unitOfWork.GetRepository<Model>();
+			var model = await repo.GetAsync(id);
 
-        public async Task<ApiResponse<ModelDto>> UpdateAsync(Guid id, UpdateModelDto dto)
-        {
-            var validationResult = await _updateValidator.ValidateAsync(dto);
-            if (!validationResult.IsValid)
-                return new ApiResponse<ModelDto>
-                {
-                    Success = false,
-                    Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage))
-                };
+			if (model is null)
+				return new ApiResponseDto
+				{
+					Success = false,
+					Message = _localizer.GetErrorMessage("ModelNotFound")
+				};
 
-            var modelRepo = _unitOfWork.GetRepository<Model>();
-            var makeRepo = _unitOfWork.GetRepository<Make>();
+			if (model.IsActive)
+			{
+				model.IsActive = false;
+				repo.Update(model);
+				await _unitOfWork.CompleteAsync();
+			}
 
-            var spec = new ModelWithMakeSpecification(id);
-            var model = await modelRepo.GetWithSpecAsync(spec);
-            if (model is null)
-                return new ApiResponse<ModelDto>
-                {
-                    Success = false,
-                    Message = _localizer.GetErrorMessage("ModelNotFound")
-                };
+			return new ApiResponseDto
+			{
+				Success = true,
+				Message = _localizer.GetMessage("ModelDeactivated")
+			};
+		}
 
-            var make = await makeRepo.GetAsync(dto.MakeId);
-            if (make is null)
-                return new ApiResponse<ModelDto>
-                {
-                    Success = false,
-                    Message = _localizer.GetErrorMessage("MakeNotFound")
-                };
+		public async Task<ApiResponse<ModelDto>> UpdateAsync(Guid id, UpdateModelDto dto)
+		{
+			var validationResult = await _updateValidator.ValidateAsync(dto);
+			if (!validationResult.IsValid)
+				return new ApiResponse<ModelDto>
+				{
+					Success = false,
+					Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage))
+				};
 
-            var duplicate = await modelRepo.GetAsync(m =>
-                (m.Name == dto.Name || m.NameAr == dto.NameAr) &&
-                m.MakeId == dto.MakeId &&
-                m.Id != id );
+			var modelRepo = _unitOfWork.GetRepository<Model>();
+			var makeRepo = _unitOfWork.GetRepository<Make>();
 
-            if (duplicate is not null)
-                return new ApiResponse<ModelDto>
-                {
-                    Success = false,
-                    Message = _localizer.GetValidationMessage("ModelNameAlreadyExists")
-                };
+			var spec = new ModelWithMakeSpecification(id);
+			var model = await modelRepo.GetWithSpecAsync(spec);
+			if (model is null)
+				return new ApiResponse<ModelDto>
+				{
+					Success = false,
+					Message = _localizer.GetErrorMessage("ModelNotFound")
+				};
 
-            _mapper.Map(dto, model);
+			var make = await makeRepo.GetAsync(dto.MakeId);
+			if (make is null)
+				return new ApiResponse<ModelDto>
+				{
+					Success = false,
+					Message = _localizer.GetErrorMessage("MakeNotFound")
+				};
 
-            modelRepo.Update(model);
-            await _unitOfWork.CompleteAsync();
+			var duplicate = await modelRepo.GetAsync(m =>
+				(m.Name == dto.Name || m.NameAr == dto.NameAr) &&
+				m.MakeId == dto.MakeId &&
+				m.Id != id);
 
-            return new ApiResponse<ModelDto>
-            {
-                Success = true,
-                Message = _localizer.GetMessage("ModelUpdated"),
-                Data = _mapper.Map<ModelDto>(model)
-            };
-        }
-    }
+			if (duplicate is not null)
+				return new ApiResponse<ModelDto>
+				{
+					Success = false,
+					Message = _localizer.GetValidationMessage("ModelNameAlreadyExists")
+				};
+
+			_mapper.Map(dto, model);
+
+			modelRepo.Update(model);
+			await _unitOfWork.CompleteAsync();
+
+			return new ApiResponse<ModelDto>
+			{
+				Success = true,
+				Message = _localizer.GetMessage("ModelUpdated"),
+				Data = _mapper.Map<ModelDto>(model)
+			};
+		}
+	}
 }

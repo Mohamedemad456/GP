@@ -9,7 +9,6 @@ namespace Karna.APIs.Controllers.Controllers
 	[Authorize(Roles = "Admin")]
 	public class MakesController(IMakeService _makeService) : ApiControllerBase
 	{
-		// Public — active makes
 		[AllowAnonymous]
 		[HttpGet("Active")]
 		public async Task<IActionResult> GetAllActive()
@@ -18,7 +17,6 @@ namespace Karna.APIs.Controllers.Controllers
 			return Ok(result);
 		}
 
-		// Admin — makes (active + inactive)
 		[HttpGet("All")]
 		public async Task<IActionResult> GetAll()
 		{
@@ -54,10 +52,19 @@ namespace Karna.APIs.Controllers.Controllers
 			return Ok(result);
 		}
 
-		[HttpPatch("ToggleActive/{id:guid}")]
-		public async Task<IActionResult> ToggleActive(Guid id)
+		[HttpPatch("Activate/{id:guid}")]
+		public async Task<IActionResult> Activate(Guid id)
 		{
-			var result = await _makeService.ToggleActiveAsync(id);
+			var result = await _makeService.ActivateAsync(id);
+			if (!result.Success)
+				return BadRequest(result);
+			return Ok(result);
+		}
+
+		[HttpPatch("Deactivate/{id:guid}")]
+		public async Task<IActionResult> Deactivate(Guid id)
+		{
+			var result = await _makeService.DeactivateAsync(id);
 			if (!result.Success)
 				return BadRequest(result);
 			return Ok(result);

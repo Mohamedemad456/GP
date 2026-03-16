@@ -180,4 +180,19 @@
   <data name="ModelDeactivated" xml:space="preserve">
     <value>Model deactivated successfully.</value>
   </data>
+  <data name="ConditionChecklistCategoryCreated" xml:space="preserve">
+    <value>Condition checklist category created successfully.</value>
+  </data>
+  <data name="ConditionChecklistCategoryUpdated" xml:space="preserve">
+    <value>Condition checklist category updated successfully.</value>
+  </data>
+  <data name="ConditionChecklistCategoryDeleted" xml:space="preserve">
+    <value>Condition checklist category deleted successfully.</value>
+  </data>
+  <data name="ConditionChecklistCategoryActivated" xml:space="preserve">
+    <value>Condition checklist category activated successfully.</value>
+  </data>
+  <data name="ConditionChecklistCategoryDeactivated" xml:space="preserve">
+    <value>Condition checklist category deactivated successfully.</value>
+  </data>
 </root>
