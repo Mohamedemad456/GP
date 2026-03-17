@@ -1,20 +1,21 @@
-﻿using AutoMapper;
-using FluentValidation;
+﻿using FluentValidation;
 using Karna.Core.Application.Abstraction.DTOs._Common;
 using Karna.Core.Application.Abstraction.DTOs.Make;
 using Karna.Core.Application.Abstraction.External;
 using Karna.Core.Application.Abstraction.Persistence;
 using Karna.Core.Application.Abstraction.Services;
+using Karna.Core.Application.Mapping;
 using Karna.Core.Application.Specifications.Makes;
 using Karna.Core.Domain.Entities;
+using Microsoft.Extensions.Configuration;
 
 namespace Karna.Core.Application.Services
 {
 	internal class MakeService(
 		IUnitOfWork _unitOfWork,
-		IMapper _mapper,
 		ILocalizationService _localizer,
 		IFileService _fileService,
+		IConfiguration _configuration,
 		IValidator<CreateMakeDto> _createValidator,
 		IValidator<UpdateMakeDto> _updateValidator
 		) : IMakeService
@@ -27,17 +28,9 @@ namespace Karna.Core.Application.Services
 			var make = await repo.GetAsync(id);
 
 			if (make is null)
-				return new ApiResponse<MakeDto>
-				{
-					Success = false,
-					Message = _localizer.GetErrorMessage("MakeNotFound")
-				};
+				return new ApiResponse<MakeDto> { Success = false, Message = _localizer.GetErrorMessage("MakeNotFound") };
 
-			return new ApiResponse<MakeDto>
-			{
-				Success = true,
-				Data = _mapper.Map<MakeDto>(make)
-			};
+			return new ApiResponse<MakeDto> { Success = true, Data = make.ToDto(_configuration) };
 		}
 
 		public async Task<ApiResponse<IEnumerable<MakeDto>>> GetAllAsync()
@@ -45,47 +38,30 @@ namespace Karna.Core.Application.Services
 			var repo = _unitOfWork.GetRepository<Make>();
 			var makes = await repo.GetAllAsync();
 
-			return new ApiResponse<IEnumerable<MakeDto>>
-			{
-				Success = true,
-				Data = _mapper.Map<IEnumerable<MakeDto>>(makes)
-			};
+			return new ApiResponse<IEnumerable<MakeDto>> { Success = true, Data = makes.ToDto(_configuration) };
 		}
 
 		public async Task<ApiResponse<IEnumerable<MakeDto>>> GetAllActiveAsync()
 		{
 			var repo = _unitOfWork.GetRepository<Make>();
-			var spec = new ActiveMakesSpec();
-			var activeMakes = await repo.GetAllWithSpecAsync(spec);
+			var activeMakes = await repo.GetAllWithSpecAsync(new ActiveMakesSpec());
 
-			return new ApiResponse<IEnumerable<MakeDto>>
-			{
-				Success = true,
-				Data = _mapper.Map<IEnumerable<MakeDto>>(activeMakes)
-			};
+			return new ApiResponse<IEnumerable<MakeDto>> { Success = true, Data = activeMakes.ToDto(_configuration) };
 		}
 
 		public async Task<ApiResponse<MakeDto>> CreateAsync(CreateMakeDto dto)
 		{
 			var validationResult = await _createValidator.ValidateAsync(dto);
 			if (!validationResult.IsValid)
-				return new ApiResponse<MakeDto>
-				{
-					Success = false,
-					Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage))
-				};
+				return new ApiResponse<MakeDto> { Success = false, Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage)) };
 
 			var repo = _unitOfWork.GetRepository<Make>();
 
 			var existing = await repo.GetAsync(m => m.Name == dto.Name || m.NameAr == dto.NameAr);
 			if (existing is not null)
-				return new ApiResponse<MakeDto>
-				{
-					Success = false,
-					Message = _localizer.GetValidationMessage("MakeNameAlreadyExists")
-				};
+				return new ApiResponse<MakeDto> { Success = false, Message = _localizer.GetValidationMessage("MakeNameAlreadyExists") };
 
-			var make = _mapper.Map<Make>(dto);
+			var make = dto.ToEntity();
 
 			if (dto.Icon is not null)
 				make.LogoUrl = await _fileService.SaveFileAsync(dto.Icon, IconsFolder);
@@ -97,7 +73,7 @@ namespace Karna.Core.Application.Services
 			{
 				Success = true,
 				Message = _localizer.GetMessage("MakeCreated"),
-				Data = _mapper.Map<MakeDto>(make)
+				Data = make.ToDto(_configuration)
 			};
 		}
 
@@ -105,30 +81,17 @@ namespace Karna.Core.Application.Services
 		{
 			var validationResult = await _updateValidator.ValidateAsync(dto);
 			if (!validationResult.IsValid)
-				return new ApiResponse<MakeDto>
-				{
-					Success = false,
-					Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage))
-				};
+				return new ApiResponse<MakeDto> { Success = false, Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage)) };
 
 			var repo = _unitOfWork.GetRepository<Make>();
 			var make = await repo.GetAsync(id);
 
 			if (make is null)
-				return new ApiResponse<MakeDto>
-				{
-					Success = false,
-					Message = _localizer.GetErrorMessage("MakeNotFound")
-				};
+				return new ApiResponse<MakeDto> { Success = false, Message = _localizer.GetErrorMessage("MakeNotFound") };
 
-			var duplicate = await repo.GetAsync(m =>
-				(m.Name == dto.Name || m.NameAr == dto.NameAr) && m.Id != id);
+			var duplicate = await repo.GetAsync(m => (m.Name == dto.Name || m.NameAr == dto.NameAr) && m.Id != id);
 			if (duplicate is not null)
-				return new ApiResponse<MakeDto>
-				{
-					Success = false,
-					Message = _localizer.GetValidationMessage("MakeNameAlreadyExists")
-				};
+				return new ApiResponse<MakeDto> { Success = false, Message = _localizer.GetValidationMessage("MakeNameAlreadyExists") };
 
 			if (dto.Icon is not null)
 			{
@@ -138,7 +101,7 @@ namespace Karna.Core.Application.Services
 				make.LogoUrl = await _fileService.SaveFileAsync(dto.Icon, IconsFolder);
 			}
 
-			_mapper.Map(dto, make);
+			dto.ApplyTo(make);
 
 			repo.Update(make);
 			await _unitOfWork.CompleteAsync();
@@ -147,7 +110,7 @@ namespace Karna.Core.Application.Services
 			{
 				Success = true,
 				Message = _localizer.GetMessage("MakeUpdated"),
-				Data = _mapper.Map<MakeDto>(make)
+				Data = make.ToDto(_configuration)
 			};
 		}
 
@@ -157,11 +120,7 @@ namespace Karna.Core.Application.Services
 			var make = await repo.GetAsync(id);
 
 			if (make is null)
-				return new ApiResponseDto
-				{
-					Success = false,
-					Message = _localizer.GetErrorMessage("MakeNotFound")
-				};
+				return new ApiResponseDto { Success = false, Message = _localizer.GetErrorMessage("MakeNotFound") };
 
 			if (!make.IsActive)
 			{
@@ -170,11 +129,7 @@ namespace Karna.Core.Application.Services
 				await _unitOfWork.CompleteAsync();
 			}
 
-			return new ApiResponseDto
-			{
-				Success = true,
-				Message = _localizer.GetMessage("MakeActivated")
-			};
+			return new ApiResponseDto { Success = true, Message = _localizer.GetMessage("MakeActivated") };
 		}
 
 		public async Task<ApiResponseDto> DeactivateAsync(Guid id)
@@ -183,11 +138,7 @@ namespace Karna.Core.Application.Services
 			var make = await repo.GetAsync(id);
 
 			if (make is null)
-				return new ApiResponseDto
-				{
-					Success = false,
-					Message = _localizer.GetErrorMessage("MakeNotFound")
-				};
+				return new ApiResponseDto { Success = false, Message = _localizer.GetErrorMessage("MakeNotFound") };
 
 			if (make.IsActive)
 			{
@@ -196,11 +147,7 @@ namespace Karna.Core.Application.Services
 				await _unitOfWork.CompleteAsync();
 			}
 
-			return new ApiResponseDto
-			{
-				Success = true,
-				Message = _localizer.GetMessage("MakeDeactivated")
-			};
+			return new ApiResponseDto { Success = true, Message = _localizer.GetMessage("MakeDeactivated") };
 		}
 
 		public async Task<ApiResponseDto> DeleteAsync(Guid id)
@@ -209,11 +156,7 @@ namespace Karna.Core.Application.Services
 			var make = await repo.GetAsync(id);
 
 			if (make is null)
-				return new ApiResponseDto
-				{
-					Success = false,
-					Message = _localizer.GetErrorMessage("MakeNotFound")
-				};
+				return new ApiResponseDto { Success = false, Message = _localizer.GetErrorMessage("MakeNotFound") };
 
 			if (!string.IsNullOrEmpty(make.LogoUrl))
 				_fileService.DeleteFile(make.LogoUrl);
@@ -221,11 +164,7 @@ namespace Karna.Core.Application.Services
 			repo.Delete(make);
 			await _unitOfWork.CompleteAsync();
 
-			return new ApiResponseDto
-			{
-				Success = true,
-				Message = _localizer.GetMessage("MakeDeleted")
-			};
+			return new ApiResponseDto { Success = true, Message = _localizer.GetMessage("MakeDeleted") };
 		}
 	}
 }

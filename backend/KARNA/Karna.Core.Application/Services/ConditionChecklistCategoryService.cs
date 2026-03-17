@@ -1,10 +1,10 @@
-using AutoMapper;
 using FluentValidation;
 using Karna.Core.Application.Abstraction.DTOs._Common;
 using Karna.Core.Application.Abstraction.DTOs.ConditionChecklistCategory;
 using Karna.Core.Application.Abstraction.External;
 using Karna.Core.Application.Abstraction.Persistence;
 using Karna.Core.Application.Abstraction.Services;
+using Karna.Core.Application.Mapping;
 using Karna.Core.Application.Specifications.ConditionChecklistCategories;
 using Karna.Core.Domain.Entities;
 
@@ -12,7 +12,6 @@ namespace Karna.Core.Application.Services
 {
 	internal class ConditionChecklistCategoryService(
 		IUnitOfWork _unitOfWork,
-		IMapper _mapper,
 		ILocalizationService _localizer,
 		IValidator<CreateConditionChecklistCategoryDto> _createValidator,
 		IValidator<UpdateConditionChecklistCategoryDto> _updateValidator
@@ -24,17 +23,9 @@ namespace Karna.Core.Application.Services
 			var category = await repo.GetAsync(id);
 
 			if (category is null)
-				return new ApiResponse<ConditionChecklistCategoryDto>
-				{
-					Success = false,
-					Message = _localizer.GetErrorMessage("ConditionChecklistCategoryNotFound")
-				};
+				return new ApiResponse<ConditionChecklistCategoryDto> { Success = false, Message = _localizer.GetErrorMessage("ConditionChecklistCategoryNotFound") };
 
-			return new ApiResponse<ConditionChecklistCategoryDto>
-			{
-				Success = true,
-				Data = _mapper.Map<ConditionChecklistCategoryDto>(category)
-			};
+			return new ApiResponse<ConditionChecklistCategoryDto> { Success = true, Data = category.ToDto() };
 		}
 
 		public async Task<ApiResponse<IEnumerable<ConditionChecklistCategoryDto>>> GetAllAsync()
@@ -42,47 +33,30 @@ namespace Karna.Core.Application.Services
 			var repo = _unitOfWork.GetRepository<ConditionChecklistCategory>();
 			var categories = await repo.GetAllAsync();
 
-			return new ApiResponse<IEnumerable<ConditionChecklistCategoryDto>>
-			{
-				Success = true,
-				Data = _mapper.Map<IEnumerable<ConditionChecklistCategoryDto>>(categories)
-			};
+			return new ApiResponse<IEnumerable<ConditionChecklistCategoryDto>> { Success = true, Data = categories.ToDto() };
 		}
 
 		public async Task<ApiResponse<IEnumerable<ConditionChecklistCategoryDto>>> GetAllActiveAsync()
 		{
 			var repo = _unitOfWork.GetRepository<ConditionChecklistCategory>();
-			var spec = new ActiveConditionChecklistCategoriesSpecification();
-			var categories = await repo.GetAllWithSpecAsync(spec);
+			var categories = await repo.GetAllWithSpecAsync(new ActiveConditionChecklistCategoriesSpecification());
 
-			return new ApiResponse<IEnumerable<ConditionChecklistCategoryDto>>
-			{
-				Success = true,
-				Data = _mapper.Map<IEnumerable<ConditionChecklistCategoryDto>>(categories)
-			};
+			return new ApiResponse<IEnumerable<ConditionChecklistCategoryDto>> { Success = true, Data = categories.ToDto() };
 		}
 
 		public async Task<ApiResponse<ConditionChecklistCategoryDto>> CreateAsync(CreateConditionChecklistCategoryDto dto)
 		{
 			var validationResult = await _createValidator.ValidateAsync(dto);
 			if (!validationResult.IsValid)
-				return new ApiResponse<ConditionChecklistCategoryDto>
-				{
-					Success = false,
-					Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage))
-				};
+				return new ApiResponse<ConditionChecklistCategoryDto> { Success = false, Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage)) };
 
 			var repo = _unitOfWork.GetRepository<ConditionChecklistCategory>();
 
 			var existing = await repo.GetAsync(c => c.Name == dto.Name || c.NameAr == dto.NameAr);
 			if (existing is not null)
-				return new ApiResponse<ConditionChecklistCategoryDto>
-				{
-					Success = false,
-					Message = _localizer.GetValidationMessage("ConditionChecklistCategoryNameAlreadyExists")
-				};
+				return new ApiResponse<ConditionChecklistCategoryDto> { Success = false, Message = _localizer.GetValidationMessage("ConditionChecklistCategoryNameAlreadyExists") };
 
-			var category = _mapper.Map<ConditionChecklistCategory>(dto);
+			var category = dto.ToEntity();
 
 			await repo.AddAsync(category);
 			await _unitOfWork.CompleteAsync();
@@ -91,7 +65,7 @@ namespace Karna.Core.Application.Services
 			{
 				Success = true,
 				Message = _localizer.GetMessage("ConditionChecklistCategoryCreated"),
-				Data = _mapper.Map<ConditionChecklistCategoryDto>(category)
+				Data = category.ToDto()
 			};
 		}
 
@@ -99,33 +73,19 @@ namespace Karna.Core.Application.Services
 		{
 			var validationResult = await _updateValidator.ValidateAsync(dto);
 			if (!validationResult.IsValid)
-				return new ApiResponse<ConditionChecklistCategoryDto>
-				{
-					Success = false,
-					Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage))
-				};
+				return new ApiResponse<ConditionChecklistCategoryDto> { Success = false, Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage)) };
 
 			var repo = _unitOfWork.GetRepository<ConditionChecklistCategory>();
 			var category = await repo.GetAsync(id);
 
 			if (category is null)
-				return new ApiResponse<ConditionChecklistCategoryDto>
-				{
-					Success = false,
-					Message = _localizer.GetErrorMessage("ConditionChecklistCategoryNotFound")
-				};
+				return new ApiResponse<ConditionChecklistCategoryDto> { Success = false, Message = _localizer.GetErrorMessage("ConditionChecklistCategoryNotFound") };
 
-			var duplicate = await repo.GetAsync(c =>
-				(c.Name == dto.Name || c.NameAr == dto.NameAr) && c.Id != id);
-
+			var duplicate = await repo.GetAsync(c => (c.Name == dto.Name || c.NameAr == dto.NameAr) && c.Id != id);
 			if (duplicate is not null)
-				return new ApiResponse<ConditionChecklistCategoryDto>
-				{
-					Success = false,
-					Message = _localizer.GetValidationMessage("ConditionChecklistCategoryNameAlreadyExists")
-				};
+				return new ApiResponse<ConditionChecklistCategoryDto> { Success = false, Message = _localizer.GetValidationMessage("ConditionChecklistCategoryNameAlreadyExists") };
 
-			_mapper.Map(dto, category);
+			dto.ApplyTo(category);
 
 			repo.Update(category);
 			await _unitOfWork.CompleteAsync();
@@ -134,7 +94,7 @@ namespace Karna.Core.Application.Services
 			{
 				Success = true,
 				Message = _localizer.GetMessage("ConditionChecklistCategoryUpdated"),
-				Data = _mapper.Map<ConditionChecklistCategoryDto>(category)
+				Data = category.ToDto()
 			};
 		}
 
@@ -144,20 +104,12 @@ namespace Karna.Core.Application.Services
 			var category = await repo.GetAsync(id);
 
 			if (category is null)
-				return new ApiResponseDto
-				{
-					Success = false,
-					Message = _localizer.GetErrorMessage("ConditionChecklistCategoryNotFound")
-				};
+				return new ApiResponseDto { Success = false, Message = _localizer.GetErrorMessage("ConditionChecklistCategoryNotFound") };
 
 			repo.Delete(category);
 			await _unitOfWork.CompleteAsync();
 
-			return new ApiResponseDto
-			{
-				Success = true,
-				Message = _localizer.GetMessage("ConditionChecklistCategoryDeleted")
-			};
+			return new ApiResponseDto { Success = true, Message = _localizer.GetMessage("ConditionChecklistCategoryDeleted") };
 		}
 
 		public async Task<ApiResponseDto> ActivateAsync(Guid id)
@@ -166,11 +118,7 @@ namespace Karna.Core.Application.Services
 			var category = await repo.GetAsync(id);
 
 			if (category is null)
-				return new ApiResponseDto
-				{
-					Success = false,
-					Message = _localizer.GetErrorMessage("ConditionChecklistCategoryNotFound")
-				};
+				return new ApiResponseDto { Success = false, Message = _localizer.GetErrorMessage("ConditionChecklistCategoryNotFound") };
 
 			if (!category.IsActive)
 			{
@@ -179,11 +127,7 @@ namespace Karna.Core.Application.Services
 				await _unitOfWork.CompleteAsync();
 			}
 
-			return new ApiResponseDto
-			{
-				Success = true,
-				Message = _localizer.GetMessage("ConditionChecklistCategoryActivated")
-			};
+			return new ApiResponseDto { Success = true, Message = _localizer.GetMessage("ConditionChecklistCategoryActivated") };
 		}
 
 		public async Task<ApiResponseDto> DeactivateAsync(Guid id)
@@ -192,11 +136,7 @@ namespace Karna.Core.Application.Services
 			var category = await repo.GetAsync(id);
 
 			if (category is null)
-				return new ApiResponseDto
-				{
-					Success = false,
-					Message = _localizer.GetErrorMessage("ConditionChecklistCategoryNotFound")
-				};
+				return new ApiResponseDto { Success = false, Message = _localizer.GetErrorMessage("ConditionChecklistCategoryNotFound") };
 
 			if (category.IsActive)
 			{
@@ -205,11 +145,7 @@ namespace Karna.Core.Application.Services
 				await _unitOfWork.CompleteAsync();
 			}
 
-			return new ApiResponseDto
-			{
-				Success = true,
-				Message = _localizer.GetMessage("ConditionChecklistCategoryDeactivated")
-			};
+			return new ApiResponseDto { Success = true, Message = _localizer.GetMessage("ConditionChecklistCategoryDeactivated") };
 		}
 	}
 }

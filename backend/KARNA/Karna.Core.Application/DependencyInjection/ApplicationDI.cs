@@ -1,7 +1,5 @@
-﻿using AutoMapper;
-using FluentValidation;
+﻿using FluentValidation;
 using Karna.Core.Application.Abstraction.Services;
-using Karna.Core.Application.Mapping;
 using Karna.Core.Application.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,7 +12,6 @@ namespace Karna.Core.Application.DependencyInjection
 		public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
 		{
 			services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-			services.AddAutoMapper(cfg => cfg.AddProfile<MappingProfile>(), typeof(MappingProfile));
 
 			services.AddScoped<IAuthService, AuthService>();
 			services.AddScoped<IUserService, UserService>();

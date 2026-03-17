@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using AutoMapper;
 using FluentValidation;
 using Karna.Core.Application.Abstraction.DTOs._Common;
 using Karna.Core.Application.Abstraction.DTOs.Model;
 using Karna.Core.Application.Abstraction.External;
 using Karna.Core.Application.Abstraction.Persistence;
 using Karna.Core.Application.Abstraction.Services;
+using Karna.Core.Application.Mapping;
 using Karna.Core.Application.Specifications.Models;
 using Karna.Core.Domain.Entities;
 
@@ -15,7 +15,6 @@ namespace Karna.Core.Application.Services
 {
 	public class ModelService(
 		IUnitOfWork _unitOfWork,
-		IMapper _mapper,
 		ILocalizationService _localizer,
 		IValidator<CreateModelDto> _createValidator,
 		IValidator<UpdateModelDto> _updateValidator
@@ -25,46 +24,36 @@ namespace Karna.Core.Application.Services
 		{
 			var validationResult = await _createValidator.ValidateAsync(dto);
 			if (!validationResult.IsValid)
-				return new ApiResponse<ModelDto>
-				{
-					Success = false,
-					Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage))
-				};
+				return new ApiResponse<ModelDto> { Success = false, Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage)) };
 
 			var modelRepo = _unitOfWork.GetRepository<Model>();
 			var makeRepo = _unitOfWork.GetRepository<Make>();
 
 			var make = await makeRepo.GetAsync(dto.MakeId);
 			if (make is null)
-				return new ApiResponse<ModelDto>
-				{
-					Success = false,
-					Message = _localizer.GetErrorMessage("MakeNotFound")
-				};
+				return new ApiResponse<ModelDto> { Success = false, Message = _localizer.GetErrorMessage("MakeNotFound") };
 
-			var existing = await modelRepo.GetAsync(m =>
-				(m.Name == dto.Name || m.NameAr == dto.NameAr) && m.MakeId == dto.MakeId);
-
+			var existing = await modelRepo.GetAsync(m => (m.Name == dto.Name || m.NameAr == dto.NameAr) && m.MakeId == dto.MakeId);
 			if (existing is not null)
-				return new ApiResponse<ModelDto>
-				{
-					Success = false,
-					Message = _localizer.GetValidationMessage("ModelNameAlreadyExists")
-				};
+				return new ApiResponse<ModelDto> { Success = false, Message = _localizer.GetValidationMessage("ModelNameAlreadyExists") };
 
-			var model = _mapper.Map<Model>(dto);
+			var model = dto.ToEntity();
 
 			await modelRepo.AddAsync(model);
 			await _unitOfWork.CompleteAsync();
 
-			var spec = new ModelWithMakeSpecification(model.Id);
-			var createdModel = await modelRepo.GetWithSpecAsync(spec);
+			var createdModel = await modelRepo.GetWithSpecAsync(new ModelWithMakeSpecification(model.Id));
+			if (createdModel is null)
+			{
+				model.Make = make;
+				createdModel = model;
+			}
 
 			return new ApiResponse<ModelDto>
 			{
 				Success = true,
 				Message = _localizer.GetMessage("ModelCreated"),
-				Data = _mapper.Map<ModelDto>(createdModel)
+				Data = createdModel.ToDto()
 			};
 		}
 
@@ -74,66 +63,39 @@ namespace Karna.Core.Application.Services
 			var model = await modelRepo.GetAsync(id);
 
 			if (model is null)
-				return new ApiResponseDto
-				{
-					Success = false,
-					Message = _localizer.GetErrorMessage("ModelNotFound")
-				};
+				return new ApiResponseDto { Success = false, Message = _localizer.GetErrorMessage("ModelNotFound") };
 
 			modelRepo.Delete(model);
 			await _unitOfWork.CompleteAsync();
 
-			return new ApiResponseDto
-			{
-				Success = true,
-				Message = _localizer.GetMessage("ModelDeleted")
-			};
+			return new ApiResponseDto { Success = true, Message = _localizer.GetMessage("ModelDeleted") };
 		}
 
 		public async Task<ApiResponse<IEnumerable<ModelDto>>> GetAllActiveAsync()
 		{
 			var repo = _unitOfWork.GetRepository<Model>();
-			var spec = new ActiveModelsWithMakeSpec();
-			var models = await repo.GetAllWithSpecAsync(spec);
+			var models = await repo.GetAllWithSpecAsync(new ActiveModelsWithMakeSpec());
 
-			return new ApiResponse<IEnumerable<ModelDto>>
-			{
-				Success = true,
-				Data = _mapper.Map<IEnumerable<ModelDto>>(models)
-			};
+			return new ApiResponse<IEnumerable<ModelDto>> { Success = true, Data = models.ToDto() };
 		}
 
 		public async Task<ApiResponse<IEnumerable<ModelDto>>> GetAllAsync()
 		{
 			var repo = _unitOfWork.GetRepository<Model>();
-			var spec = new ModelWithMakeSpecification();
-			var models = await repo.GetAllWithSpecAsync(spec);
+			var models = await repo.GetAllWithSpecAsync(new ModelWithMakeSpecification());
 
-			return new ApiResponse<IEnumerable<ModelDto>>
-			{
-				Success = true,
-				Data = _mapper.Map<IEnumerable<ModelDto>>(models)
-			};
+			return new ApiResponse<IEnumerable<ModelDto>> { Success = true, Data = models.ToDto() };
 		}
 
 		public async Task<ApiResponse<ModelDto>> GetByIdAsync(Guid id)
 		{
 			var repo = _unitOfWork.GetRepository<Model>();
-			var spec = new ModelWithMakeSpecification(id);
-			var model = await repo.GetWithSpecAsync(spec);
+			var model = await repo.GetWithSpecAsync(new ModelWithMakeSpecification(id));
 
 			if (model is null)
-				return new ApiResponse<ModelDto>
-				{
-					Success = false,
-					Message = _localizer.GetErrorMessage("ModelNotFound")
-				};
+				return new ApiResponse<ModelDto> { Success = false, Message = _localizer.GetErrorMessage("ModelNotFound") };
 
-			return new ApiResponse<ModelDto>
-			{
-				Success = true,
-				Data = _mapper.Map<ModelDto>(model)
-			};
+			return new ApiResponse<ModelDto> { Success = true, Data = model.ToDto() };
 		}
 
 		public async Task<ApiResponseDto> ActivateAsync(Guid id)
@@ -142,11 +104,7 @@ namespace Karna.Core.Application.Services
 			var model = await repo.GetAsync(id);
 
 			if (model is null)
-				return new ApiResponseDto
-				{
-					Success = false,
-					Message = _localizer.GetErrorMessage("ModelNotFound")
-				};
+				return new ApiResponseDto { Success = false, Message = _localizer.GetErrorMessage("ModelNotFound") };
 
 			if (!model.IsActive)
 			{
@@ -155,11 +113,7 @@ namespace Karna.Core.Application.Services
 				await _unitOfWork.CompleteAsync();
 			}
 
-			return new ApiResponseDto
-			{
-				Success = true,
-				Message = _localizer.GetMessage("ModelActivated")
-			};
+			return new ApiResponseDto { Success = true, Message = _localizer.GetMessage("ModelActivated") };
 		}
 
 		public async Task<ApiResponseDto> DeactivateAsync(Guid id)
@@ -168,11 +122,7 @@ namespace Karna.Core.Application.Services
 			var model = await repo.GetAsync(id);
 
 			if (model is null)
-				return new ApiResponseDto
-				{
-					Success = false,
-					Message = _localizer.GetErrorMessage("ModelNotFound")
-				};
+				return new ApiResponseDto { Success = false, Message = _localizer.GetErrorMessage("ModelNotFound") };
 
 			if (model.IsActive)
 			{
@@ -181,42 +131,25 @@ namespace Karna.Core.Application.Services
 				await _unitOfWork.CompleteAsync();
 			}
 
-			return new ApiResponseDto
-			{
-				Success = true,
-				Message = _localizer.GetMessage("ModelDeactivated")
-			};
+			return new ApiResponseDto { Success = true, Message = _localizer.GetMessage("ModelDeactivated") };
 		}
 
 		public async Task<ApiResponse<ModelDto>> UpdateAsync(Guid id, UpdateModelDto dto)
 		{
 			var validationResult = await _updateValidator.ValidateAsync(dto);
 			if (!validationResult.IsValid)
-				return new ApiResponse<ModelDto>
-				{
-					Success = false,
-					Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage))
-				};
+				return new ApiResponse<ModelDto> { Success = false, Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage)) };
 
 			var modelRepo = _unitOfWork.GetRepository<Model>();
 			var makeRepo = _unitOfWork.GetRepository<Make>();
 
-			var spec = new ModelWithMakeSpecification(id);
-			var model = await modelRepo.GetWithSpecAsync(spec);
+			var model = await modelRepo.GetWithSpecAsync(new ModelWithMakeSpecification(id));
 			if (model is null)
-				return new ApiResponse<ModelDto>
-				{
-					Success = false,
-					Message = _localizer.GetErrorMessage("ModelNotFound")
-				};
+				return new ApiResponse<ModelDto> { Success = false, Message = _localizer.GetErrorMessage("ModelNotFound") };
 
 			var make = await makeRepo.GetAsync(dto.MakeId);
 			if (make is null)
-				return new ApiResponse<ModelDto>
-				{
-					Success = false,
-					Message = _localizer.GetErrorMessage("MakeNotFound")
-				};
+				return new ApiResponse<ModelDto> { Success = false, Message = _localizer.GetErrorMessage("MakeNotFound") };
 
 			var duplicate = await modelRepo.GetAsync(m =>
 				(m.Name == dto.Name || m.NameAr == dto.NameAr) &&
@@ -224,13 +157,10 @@ namespace Karna.Core.Application.Services
 				m.Id != id);
 
 			if (duplicate is not null)
-				return new ApiResponse<ModelDto>
-				{
-					Success = false,
-					Message = _localizer.GetValidationMessage("ModelNameAlreadyExists")
-				};
+				return new ApiResponse<ModelDto> { Success = false, Message = _localizer.GetValidationMessage("ModelNameAlreadyExists") };
 
-			_mapper.Map(dto, model);
+			dto.ApplyTo(model);
+			model.Make = make;
 
 			modelRepo.Update(model);
 			await _unitOfWork.CompleteAsync();
@@ -239,7 +169,7 @@ namespace Karna.Core.Application.Services
 			{
 				Success = true,
 				Message = _localizer.GetMessage("ModelUpdated"),
-				Data = _mapper.Map<ModelDto>(model)
+				Data = model.ToDto()
 			};
 		}
 	}
