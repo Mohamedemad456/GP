@@ -61,13 +61,18 @@ const Signup = () => {
         return;
       }
 
-      const profileRes = await getProfile();
-      if (profileRes.success) {
-        const u = profileRes.data;
-        const role = (
-          u.roles.map((r) => r.toLowerCase()).includes("admin") ? "admin" : "user"
-        ) as UserRole;
-        setUser({ userId: u.userId, name: u.name, email: u.email, role });
+      // Attempt to load the user profile; a failure here should not block the signup.
+      try {
+        const profileRes = await getProfile();
+        if (profileRes.success) {
+          const u = profileRes.data;
+          const role = (
+            u.roles.map((r) => r.toLowerCase()).includes("admin") ? "admin" : "user"
+          ) as UserRole;
+          setUser({ userId: u.userId, name: u.name, email: u.email, role });
+        }
+      } catch {
+        // AuthContext will retry on the next render via its own useEffect.
       }
 
       success(t("auth.signupToastTitle"), {
@@ -186,7 +191,6 @@ const Signup = () => {
                     id="whatsAppNumber"
                     name="whatsAppNumber"
                     type="tel"
-                    required
                     value={formData.whatsAppNumber}
                     onChange={handleChange}
                     disabled={isLoading}

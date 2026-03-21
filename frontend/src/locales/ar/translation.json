@@ -21,6 +21,9 @@
   "profile": {
     "title": "ملفي الشخصي",
     "subtitle": "عرض وإدارة تفاصيل حسابك",
+    "loadError": "فشل تحميل الملف الشخصي",
+    "loadErrorDescription": "تعذّر جلب بيانات ملفك الشخصي. يرجى التحقق من اتصالك والمحاولة مجددًا.",
+    "retry": "إعادة المحاولة",
     "active": "نشط",
     "fields": {
       "fullName": "الاسم الكامل",
@@ -35,6 +38,38 @@
       "goToFeed": "تصفح السيارات",
       "sellerDashboard": "لوحة البائع",
       "adminDashboard": "لوحة المشرف"
+    },
+    "edit": {
+      "button": "تعديل الملف",
+      "title": "تعديل الملف الشخصي",
+      "subtitle": "تحديث معلوماتك الشخصية",
+      "namePlaceholder": "اسمك الكامل",
+      "usernamePlaceholder": "اسم المستخدم",
+      "phonePlaceholder": "+966 5X XXX XXXX",
+      "whatsappPlaceholder": "+966 5X XXX XXXX",
+      "save": "حفظ التغييرات",
+      "cancel": "إلغاء",
+      "saving": "جارٍ الحفظ...",
+      "successTitle": "تم تحديث الملف",
+      "successDescription": "تم حفظ ملفك الشخصي بنجاح.",
+      "errorTitle": "فشل التحديث"
+    },
+    "password": {
+      "title": "تغيير كلمة المرور",
+      "subtitle": "اختر كلمة مرور قوية للحفاظ على أمان حسابك",
+      "oldPassword": "كلمة المرور الحالية",
+      "newPassword": "كلمة المرور الجديدة",
+      "confirmPassword": "تأكيد كلمة المرور الجديدة",
+      "oldPlaceholder": "••••••••",
+      "newPlaceholder": "••••••••",
+      "confirmPlaceholder": "••••••••",
+      "save": "تحديث كلمة المرور",
+      "saving": "جارٍ التحديث...",
+      "mismatchTitle": "كلمات المرور غير متطابقة",
+      "mismatchDescription": "كلمة المرور الجديدة وتأكيدها يجب أن يكونا متطابقَين.",
+      "successTitle": "تم تغيير كلمة المرور",
+      "successDescription": "تم تحديث كلمة مرورك بنجاح.",
+      "errorTitle": "فشل التغيير"
     }
   },
   "buttons": {
@@ -633,7 +668,10 @@
       "listingPrice": "سعر الإعلان",
       "addWishlist": "أضف للمفضلة",
       "removeWishlist": "في المفضلة",
-      "viewDetails": "عرض التفاصيل"
+      "viewDetails": "عرض التفاصيل",
+      "noResults": "لا توجد إعلانات",
+      "noResultsDescription": "حاول تعديل الفلاتر للعثور على نتائج أكثر.",
+      "clearFilters": "مسح الفلاتر"
     },
     "details": {
       "notFoundTitle": "الإعلان غير موجود",
