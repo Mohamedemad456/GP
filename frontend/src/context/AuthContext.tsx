@@ -6,6 +6,7 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
+import axios from "axios";
 import type { AuthUser, UserRole } from "@/lib/auth";
 import { registerAuthFailureHandler } from "@/lib/authSignal";
 import { getProfile } from "@/lib/authApi";
@@ -50,8 +51,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           });
         }
       })
-      .catch(() => {
-        // 401 → not logged in, user stays null
+      .catch((err) => {
+        // 401 means the user is simply not authenticated — expected, no action needed.
+        // Any other status (network failure, 500, etc.) is unexpected; log it for diagnostics.
+        if (!axios.isAxiosError(err) || (err.response?.status ?? 0) !== 401) {
+          console.error("[AuthContext] Failed to rehydrate session:", err);
+        }
       })
       .finally(() => setIsLoading(false));
   }, []);

@@ -21,6 +21,9 @@
   "profile": {
     "title": "My Profile",
     "subtitle": "View and manage your account details",
+    "loadError": "Failed to load profile",
+    "loadErrorDescription": "Could not fetch your profile data. Please check your connection and try again.",
+    "retry": "Try again",
     "active": "Active",
     "fields": {
       "fullName": "Full name",
@@ -35,6 +38,38 @@
       "goToFeed": "Go to feed",
       "sellerDashboard": "Seller dashboard",
       "adminDashboard": "Admin dashboard"
+    },
+    "edit": {
+      "button": "Edit profile",
+      "title": "Edit Profile",
+      "subtitle": "Update your personal information",
+      "namePlaceholder": "Your full name",
+      "usernamePlaceholder": "Your username",
+      "phonePlaceholder": "+966 5X XXX XXXX",
+      "whatsappPlaceholder": "+966 5X XXX XXXX",
+      "save": "Save changes",
+      "cancel": "Cancel",
+      "saving": "Saving...",
+      "successTitle": "Profile updated",
+      "successDescription": "Your profile has been saved successfully.",
+      "errorTitle": "Update failed"
+    },
+    "password": {
+      "title": "Change Password",
+      "subtitle": "Choose a strong password to keep your account secure",
+      "oldPassword": "Current password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm new password",
+      "oldPlaceholder": "••••••••",
+      "newPlaceholder": "••••••••",
+      "confirmPlaceholder": "••••••••",
+      "save": "Update password",
+      "saving": "Updating...",
+      "mismatchTitle": "Passwords don't match",
+      "mismatchDescription": "New password and confirmation must be the same.",
+      "successTitle": "Password changed",
+      "successDescription": "Your password has been updated successfully.",
+      "errorTitle": "Change failed"
     }
   },
   "buttons": {
@@ -633,7 +668,10 @@
       "listingPrice": "Listing price",
       "addWishlist": "Wishlist",
       "removeWishlist": "Wishlisted",
-      "viewDetails": "View details"
+      "viewDetails": "View details",
+      "noResults": "No listings found",
+      "noResultsDescription": "Try adjusting your filters to find more results.",
+      "clearFilters": "Clear filters"
     },
     "details": {
       "notFoundTitle": "Listing not found",

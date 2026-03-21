@@ -6,6 +6,7 @@ import { PageLoader } from "@gp/design-system";
 import PrivateRoute from "./components/PrivateRoute";
 import GuestRoute from "./components/GuestRoute";
 import { AuthProvider } from "./context/AuthContext";
+import ErrorBoundary from "./components/ErrorBoundary";
 import Layout from "./components/Layout";
 
 // Lazy load route components for code splitting
@@ -45,9 +46,10 @@ function App() {
   );
 
   return (
-    <AuthProvider>
-      <Suspense fallback={<PageLoader />}>
-        <Routes>
+    <ErrorBoundary>
+      <AuthProvider>
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="about" element={<About />} />
@@ -77,10 +79,11 @@ function App() {
               <Route path="add-listing" element={<AddListing />} />
             </Route>
           </Route>
-        </Routes>
-      </Suspense>
-      <Toaster position={toasterPosition} richColors />
-    </AuthProvider>
+          </Routes>
+        </Suspense>
+        <Toaster position={toasterPosition} richColors />
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 

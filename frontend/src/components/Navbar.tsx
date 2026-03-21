@@ -9,6 +9,7 @@ import {
   LayoutDashboard,
   ShieldCheck,
   LogOut,
+  Loader2,
 } from "lucide-react";
 import {
   Button,
@@ -27,6 +28,7 @@ import { logoutUser } from "@/lib/authApi";
 
 const Navbar = memo(() => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
@@ -39,7 +41,7 @@ const Navbar = memo(() => {
 
   const navLinks = [
     { name: t("navigation.home"), path: "/" },
-    { name: t("navigation.feed"), path: "/feed" },
+    ...(isLoggedIn ? [{ name: t("navigation.feed"), path: "/feed" }] : []),
     { name: t("navigation.about"), path: "/about" },
     { name: t("navigation.contact"), path: "/contact" },
   ];
@@ -47,13 +49,16 @@ const Navbar = memo(() => {
   const isActive = (path: string) => location.pathname === path;
 
   const handleLogout = async () => {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
     try {
       await logoutUser();
     } catch {
-      // proceed regardless
+      // Always sign out client-side even if the server call fails.
     } finally {
       clearUser();
       setIsOpen(false);
+      setIsLoggingOut(false);
       navigate("/login", { replace: true });
     }
   };
@@ -178,8 +183,14 @@ const Navbar = memo(() => {
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem variant="destructive" onClick={handleLogout}>
-                    <LogOut className="size-4" />
+                  <DropdownMenuItem
+                    variant="destructive"
+                    onClick={handleLogout}
+                    disabled={isLoggingOut}
+                  >
+                    {isLoggingOut
+                      ? <Loader2 className="size-4 animate-spin" />
+                      : <LogOut className="size-4" />}
                     {t("navigation.logout")}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -337,8 +348,11 @@ const Navbar = memo(() => {
                       variant="destructive"
                       className="w-full justify-start gap-2"
                       onClick={handleLogout}
+                      disabled={isLoggingOut}
                     >
-                      <LogOut className="size-4" />
+                      {isLoggingOut
+                        ? <Loader2 className="size-4 animate-spin" />
+                        : <LogOut className="size-4" />}
                       {t("navigation.logout")}
                     </Button>
                   </>

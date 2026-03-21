@@ -33,10 +33,11 @@ namespace Karna.APIs.Controllers.Controllers
 			return Ok(result);
 		}
 
-		[HttpPost("refresh")]
-		public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequestDto dto)
+		[AllowAnonymous]
+		[HttpPost("refresh-cookie")]
+		public async Task<IActionResult> RefreshFromCookie()
 		{
-			var result = await _authService.RefreshTokenAsync(dto);
+			var result = await _authService.RefreshFromCookieAsync();
 
 			if (!result.Success)
 				return Unauthorized(result);

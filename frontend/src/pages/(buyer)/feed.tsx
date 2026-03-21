@@ -17,7 +17,7 @@ import {
   SelectValue,
   Separator,
 } from "@gp/design-system";
-import { Eye, Heart, Search, SlidersHorizontal } from "lucide-react";
+import { Eye, Heart, Search, SlidersHorizontal, Car } from "lucide-react";
 import { MOCK_LISTINGS } from "@/data/mocks/listings";
 
 export default function FeedPage() {
@@ -223,20 +223,51 @@ export default function FeedPage() {
             </span>
           </div>
 
+          {listings.length === 0 ? (
+            <div className="flex flex-col items-center justify-center gap-4 rounded-lg border border-dashed border-border bg-card py-16 text-center">
+              <div className="rounded-full bg-muted p-4">
+                <Car className="h-8 w-8 text-muted-foreground" />
+              </div>
+              <div className="space-y-1">
+                <p className="font-semibold text-foreground">{t("buyer.feed.noResults")}</p>
+                <p className="text-sm text-muted-foreground">{t("buyer.feed.noResultsDescription")}</p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setQuery("");
+                  setMake("all");
+                  setFuelType("all");
+                  setCondition("all");
+                  setMaxPrice("");
+                }}
+              >
+                {t("buyer.feed.clearFilters")}
+              </Button>
+            </div>
+          ) : (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {listings.map((listing) => {
               const isWishlisted = wishlistedIds.has(listing.id);
               const favoriteCount = listing.favoriteCount + (isWishlisted ? 1 : 0);
+              const imageUrl = listing.images[0];
 
               return (
               <Card key={listing.id} className="group overflow-hidden">
                 <div className="overflow-hidden">
+                  {imageUrl ? (
                   <img
-                    src={listing.images[0]}
+                    src={imageUrl}
                     alt={`${listing.make} ${listing.model}`}
                     className="aspect-video w-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
                     loading="lazy"
                   />
+                  ) : (
+                  <div className="flex aspect-video w-full items-center justify-center bg-muted">
+                    <Car className="h-12 w-12 text-muted-foreground/40" />
+                  </div>
+                  )}
                 </div>
                 <CardHeader className="space-y-2">
                   <div className="flex items-start justify-between gap-2">
@@ -294,6 +325,7 @@ export default function FeedPage() {
               </Card>
             )})}
           </div>
+          )}
         </section>
       </div>
     </div>
