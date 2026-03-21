@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using Karna.Core.Application.Abstraction.DTOs._Common;
 using Karna.Core.Application.Abstraction.DTOs.Auth;
 using Karna.Core.Application.Abstraction.DTOs.Identity;
@@ -70,7 +70,7 @@ namespace Karna.Core.Application.Services
 			return await GenerateAndSaveTokensAsync(user, deviceInfo);
 		}
 
-		public async Task<ApiResponse<TokenResponseDto>> RefreshTokenAsync(RefreshTokenRequestDto dto)
+		private async Task<ApiResponse<TokenResponseDto>> RefreshTokenAsync(RefreshTokenRequestDto dto)
 		{
 			var principal = _tokenService.GetPrincipalFromExpiredToken(dto.AccessToken);
 			var userId = principal?.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -93,8 +93,21 @@ namespace Karna.Core.Application.Services
 				rt.TokenHashed == incomingHash &&
 				!rt.IsRevoked);
 
-			if (storedToken is null || storedToken.ExpiresAt <= DateTime.UtcNow)
+			if (storedToken is null)
 			{
+				return new ApiResponse<TokenResponseDto>
+				{
+					Success = false,
+					Message = _localizer.GetErrorMessage("InvalidCredentials")
+				};
+			}
+
+			if (storedToken.ExpiresAt <= DateTime.UtcNow)
+			{
+				storedToken.IsRevoked = true;
+				repo.Update(storedToken);
+				await _unitOfWork.CompleteAsync();
+
 				return new ApiResponse<TokenResponseDto>
 				{
 					Success = false,
@@ -116,6 +129,29 @@ namespace Karna.Core.Application.Services
 			}
 
 			return await GenerateAndSaveTokensAsync(user, storedToken.DeviceInfo);
+		}
+
+		public async Task<ApiResponse<TokenResponseDto>> RefreshFromCookieAsync()
+		{
+			var httpContext = _httpContextAccessor.HttpContext;
+
+			var accessToken = httpContext?.Request.Cookies["AccessToken"];
+			var refreshToken = httpContext?.Request.Cookies["RefreshToken"];
+
+			if (string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(refreshToken))
+			{
+				return new ApiResponse<TokenResponseDto>
+				{
+					Success = false,
+					Message = _localizer.GetErrorMessage("InvalidCredentials")
+				};
+			}
+
+			return await RefreshTokenAsync(new RefreshTokenRequestDto
+			{
+				AccessToken = accessToken,
+				RefreshToken = refreshToken
+			});
 		}
 
 		public async Task<ApiResponseDto> LogoutAsync(Guid userId)

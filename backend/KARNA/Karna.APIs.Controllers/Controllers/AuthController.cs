@@ -33,30 +33,11 @@ namespace Karna.APIs.Controllers.Controllers
 			return Ok(result);
 		}
 
-
-
-		/// <summary>
-		/// Cookie-based silent refresh.
-		/// Reads AccessToken + RefreshToken directly from HttpOnly cookies so the
-		/// browser can call this without JS ever touching the raw token values.
-		/// </summary>
 		[AllowAnonymous]
 		[HttpPost("refresh-cookie")]
 		public async Task<IActionResult> RefreshFromCookie()
 		{
-			var accessToken = Request.Cookies["AccessToken"];
-			var refreshToken = Request.Cookies["RefreshToken"];
-
-			if (string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(refreshToken))
-				return Unauthorized();
-
-			var dto = new RefreshTokenRequestDto
-			{
-				AccessToken = accessToken,
-				RefreshToken = refreshToken
-			};
-
-			var result = await _authService.RefreshTokenAsync(dto);
+			var result = await _authService.RefreshFromCookieAsync();
 
 			if (!result.Success)
 				return Unauthorized(result);
