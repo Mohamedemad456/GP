@@ -138,9 +138,12 @@
     "skip": "Skip for now",
     "favorites": {
       "title": "Pick your top 3 favorites",
-      "subtitle": "Select up to {{count}} car models you're interested in",
+      "subtitle": "Select up to {{count}} car brands you're interested in",
       "selected": "{{count}} of {{max}} selected",
-      "continue": "Continue"
+      "continue": "Continue",
+      "searchPlaceholder": "Search brands...",
+      "noResults": "No brands found for your search.",
+      "loadMore": "Load {{remaining}} more"
     }
   },
   "hero": {
@@ -347,9 +350,11 @@
       "title": "Admin",
       "overview": "Overview",
       "moderation": "Moderation",
+      "dataManagement": "Data Management",
       "analytics": "Analytics",
       "usersPending": "Users pending",
       "carsPostsPending": "Cars posts pending",
+      "makes": "Car Makes",
       "logout": "Logout"
     },
     "header": {
@@ -409,6 +414,46 @@
       "approve": "Approve",
       "reject": "Reject",
       "pending": "pending"
+    },
+    "makes": {
+      "title": "Car Makes",
+      "subtitle": "Manage car manufacturers — add, edit, activate, or remove makes.",
+      "addMake": "Add Make",
+      "caption": "{{count}} makes in total",
+      "logo": "Logo",
+      "name": "Name",
+      "nameAr": "Name (AR)",
+      "country": "Country",
+      "countryAr": "Country (AR)",
+      "status": "Status",
+      "actions": "Actions",
+      "active": "Active",
+      "inactive": "Inactive",
+      "empty": "No makes found. Add one to get started.",
+      "edit": "Edit",
+      "delete": "Delete",
+      "activateBtn": "Activate",
+      "deactivateBtn": "Deactivate",
+      "uploadLogo": "Upload Logo",
+      "createTitle": "Add Car Make",
+      "createDescription": "Fill in the details to add a new car manufacturer.",
+      "editTitle": "Edit Car Make",
+      "editDescription": "Update the details for this car manufacturer.",
+      "deleteTitle": "Delete Make",
+      "deleteDescription": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
+      "saving": "Saving...",
+      "deleting": "Deleting...",
+      "nameRequired": "Name (EN) and Name (AR) are required.",
+      "loadError": "Failed to load makes.",
+      "createSuccess": "Make created successfully.",
+      "createError": "Failed to create make.",
+      "updateSuccess": "Make updated successfully.",
+      "updateError": "Failed to update make.",
+      "deleteSuccess": "Make deleted successfully.",
+      "deleteError": "Failed to delete make.",
+      "activated": "Make activated.",
+      "deactivated": "Make deactivated.",
+      "toggleError": "Failed to update make status."
     },
     "carsPending": {
       "title": "Cars posts pending",

@@ -127,6 +127,12 @@ export {
 } from "./popover";
 export { ScrollArea, ScrollBar } from "./scroll-area";
 export {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+  TooltipProvider,
+} from "./tooltip";
+export {
   Avatar,
   AvatarImage,
   AvatarFallback,

@@ -20,6 +20,7 @@ const AdminLayout = lazy(() => import("@/pages/(admin)/AdminLayout"));
 const Analytics = lazy(() => import("@/pages/(admin)/analytics"));
 const UsersPending = lazy(() => import("@/pages/(admin)/users-pending"));
 const CarsPending = lazy(() => import("@/pages/(admin)/cars-pending"));
+const AdminMakes = lazy(() => import("@/pages/(admin)/makes"));
 const SellerLayout = lazy(() => import("@/pages/(seller)/SellerLayout"));
 const SellerAnalytics = lazy(() => import("@/pages/(seller)/analytics"));
 const SellerListings = lazy(() => import("@/pages/(seller)/listings"));
@@ -70,6 +71,7 @@ function App() {
               <Route index element={<Analytics />} />
               <Route path="users-pending" element={<UsersPending />} />
               <Route path="cars-pending" element={<CarsPending />} />
+              <Route path="makes" element={<AdminMakes />} />
             </Route>
           </Route>
           <Route element={<PrivateRoute allowedRoles={["user"]} />}>

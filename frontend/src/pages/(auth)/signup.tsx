@@ -14,16 +14,13 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import { useAuth } from "@/context/AuthContext";
-import { registerUser, getProfile } from "@/lib/authApi";
-import type { UserRole } from "@/lib/auth";
+import { registerUser } from "@/lib/authApi";
 import axios from "axios";
 
 const Signup = () => {
   const navigate = useNavigate();
   const { error, success } = useToast();
   const { t } = useTranslation();
-  const { setUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -61,24 +58,14 @@ const Signup = () => {
         return;
       }
 
-      // Attempt to load the user profile; a failure here should not block the signup.
-      try {
-        const profileRes = await getProfile();
-        if (profileRes.success) {
-          const u = profileRes.data;
-          const role = (
-            u.roles.map((r) => r.toLowerCase()).includes("admin") ? "admin" : "user"
-          ) as UserRole;
-          setUser({ userId: u.userId, name: u.name, email: u.email, role });
-        }
-      } catch {
-        // AuthContext will retry on the next render via its own useEffect.
-      }
-
       success(t("auth.signupToastTitle"), {
         description: t("auth.signupToastDescription"),
       });
-      setTimeout(() => navigate("/onboarding"), 1000);
+      // Navigate BEFORE setting auth state so GuestRoute never sees an
+      // authenticated user while still on /signup (which would cause it to
+      // redirect to /feed and swallow the onboarding navigation).
+      // The onboarding page fetches the profile itself to establish the session.
+      navigate("/onboarding", { replace: true });
     } catch (err) {
       const message = axios.isAxiosError(err)
         ? (err.response?.data?.message ?? err.message)

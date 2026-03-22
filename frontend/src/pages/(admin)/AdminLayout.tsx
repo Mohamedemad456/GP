@@ -10,6 +10,7 @@ import {
   BarChart3,
   LogOut,
   Languages,
+  Database,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
@@ -126,6 +127,27 @@ const AdminLayout = memo(() => {
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+          <SidebarGroup>
+            <SidebarGroupLabel>
+              {t("admin.sidebar.dataManagement")}
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    tooltip={t("admin.sidebar.makes")}
+                    isActive={location.pathname === "/admin/makes"}
+                  >
+                    <NavLink to="/admin/makes">
+                      <Database className="size-4" />
+                      <span>{t("admin.sidebar.makes")}</span>
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
