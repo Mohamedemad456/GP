@@ -1,4 +1,5 @@
 import axios, { type InternalAxiosRequestConfig } from "axios";
+import i18n from "@/lib/i18n/config";
 import { triggerAuthFailure } from "./authSignal";
 
 // Local dev  → http://localhost:5082  (dotnet run / launchSettings.json)
@@ -10,6 +11,12 @@ export const api = axios.create({
   baseURL: BASE_URL,
   withCredentials: true, // sends HttpOnly cookies on every request automatically
   headers: { "Content-Type": "application/json" },
+});
+
+// Forward the active UI language so the backend returns localised names.
+api.interceptors.request.use((config) => {
+  config.headers["Accept-Language"] = i18n.language ?? "en";
+  return config;
 });
 
 /**

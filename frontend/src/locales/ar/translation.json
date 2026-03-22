@@ -138,9 +138,12 @@
     "skip": "تخطي الآن",
     "favorites": {
       "title": "اختر أفضل 3 ماركات لديك",
-      "subtitle": "اختر حتى {{count}} موديلات سيارات تهتم بها",
+      "subtitle": "اختر حتى {{count}} ماركات سيارات تهتم بها",
       "selected": "{{count}} من {{max}} محددة",
-      "continue": "متابعة"
+      "continue": "متابعة",
+      "searchPlaceholder": "ابحث عن ماركة...",
+      "noResults": "لا توجد ماركات تطابق بحثك.",
+      "loadMore": "تحميل {{remaining}} أكثر"
     }
   },
   "hero": {
@@ -347,9 +350,11 @@
       "title": "المشرف",
       "overview": "نظرة عامة",
       "moderation": "الإشراف",
+      "dataManagement": "إدارة البيانات",
       "analytics": "التحليلات",
       "usersPending": "المستخدمون المعلقون",
       "carsPostsPending": "إعلانات السيارات المعلقة",
+      "makes": "ماركات السيارات",
       "logout": "تسجيل الخروج"
     },
     "header": {
@@ -409,6 +414,46 @@
       "approve": "موافقة",
       "reject": "رفض",
       "pending": "معلق"
+    },
+    "makes": {
+      "title": "ماركات السيارات",
+      "subtitle": "إدارة الشركات المصنّعة للسيارات — إضافة وتعديل وتفعيل أو حذف الماركات.",
+      "addMake": "إضافة ماركة",
+      "caption": "إجمالي {{count}} ماركة",
+      "logo": "الشعار",
+      "name": "الاسم",
+      "nameAr": "الاسم (عربي)",
+      "country": "الدولة",
+      "countryAr": "الدولة (عربي)",
+      "status": "الحالة",
+      "actions": "الإجراءات",
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "empty": "لا توجد ماركات. أضف ماركة للبدء.",
+      "edit": "تعديل",
+      "delete": "حذف",
+      "activateBtn": "تفعيل",
+      "deactivateBtn": "تعطيل",
+      "uploadLogo": "رفع الشعار",
+      "createTitle": "إضافة ماركة سيارة",
+      "createDescription": "أدخل التفاصيل لإضافة شركة مصنّعة جديدة.",
+      "editTitle": "تعديل ماركة سيارة",
+      "editDescription": "حدّث تفاصيل هذه الشركة المصنّعة.",
+      "deleteTitle": "حذف الماركة",
+      "deleteDescription": "هل أنت متأكد من حذف \"{{name}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+      "saving": "جارٍ الحفظ...",
+      "deleting": "جارٍ الحذف...",
+      "nameRequired": "الاسم (إنجليزي) والاسم (عربي) مطلوبان.",
+      "loadError": "فشل تحميل الماركات.",
+      "createSuccess": "تم إنشاء الماركة بنجاح.",
+      "createError": "فشل إنشاء الماركة.",
+      "updateSuccess": "تم تحديث الماركة بنجاح.",
+      "updateError": "فشل تحديث الماركة.",
+      "deleteSuccess": "تم حذف الماركة بنجاح.",
+      "deleteError": "فشل حذف الماركة.",
+      "activated": "تم تفعيل الماركة.",
+      "deactivated": "تم تعطيل الماركة.",
+      "toggleError": "فشل تحديث حالة الماركة."
     },
     "carsPending": {
       "title": "إعلانات السيارات المعلقة",
