@@ -12,6 +12,7 @@ namespace Karna.Infrastructure.Persistence._Initializers
 		public override async Task SeedDbAsync()
 		{
 			await SeedMakesAsync();
+			await SeedModelsAsync();
 		}
 
 		private async Task SeedMakesAsync()
@@ -33,6 +34,32 @@ namespace Karna.Infrastructure.Persistence._Initializers
 			});
 
 			await _dbContext.Makes.AddRangeAsync(makes);
+			await _dbContext.SaveChangesAsync();
+		}
+
+		private async Task SeedModelsAsync()
+		{
+			if (await _dbContext.Models.AnyAsync())
+				return;
+
+			var seedData = await SeedLoader.LoadAsync<ModelSeedDto>("models.json");
+			if (seedData.Count == 0)
+				return;
+
+			var makeLookup = await _dbContext.Makes
+				.AsNoTracking()
+				.ToDictionaryAsync(m => m.Name, m => m.Id);
+
+			var models = seedData
+				.Where(s => makeLookup.ContainsKey(s.MakeName))
+				.Select(s => new Model
+				{
+					Name = s.Name,
+					NameAr = s.NameAr,
+					MakeId = makeLookup[s.MakeName]
+				});
+
+			await _dbContext.Models.AddRangeAsync(models);
 			await _dbContext.SaveChangesAsync();
 		}
 	}
