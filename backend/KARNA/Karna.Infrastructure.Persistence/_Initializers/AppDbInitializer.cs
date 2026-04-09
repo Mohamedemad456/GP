@@ -13,6 +13,7 @@ namespace Karna.Infrastructure.Persistence._Initializers
 		{
 			await SeedMakesAsync();
 			await SeedModelsAsync();
+			await SeedConditionChecklistCategoriesAsync();
 		}
 
 		private async Task SeedMakesAsync()
@@ -62,5 +63,26 @@ namespace Karna.Infrastructure.Persistence._Initializers
 			await _dbContext.Models.AddRangeAsync(models);
 			await _dbContext.SaveChangesAsync();
 		}
+
+		private async Task SeedConditionChecklistCategoriesAsync()
+		{
+			if (await _dbContext.ConditionChecklistCategories.AnyAsync())
+				return;
+
+			var seedData = await SeedLoader.LoadAsync<ConditionChecklistCategorySeedDto>("condition-checklist-categories.json");
+			if (seedData.Count == 0)
+				return;
+
+			var categories = seedData.Select(s => new ConditionChecklistCategory
+			{
+				Name = s.Name,
+				NameAr = s.NameAr,
+				Description = s.Description
+			});
+
+			await _dbContext.ConditionChecklistCategories.AddRangeAsync(categories);
+			await _dbContext.SaveChangesAsync();
+		}
 	}
 }
+

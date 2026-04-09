@@ -12,6 +12,6 @@ namespace Karna.Core.Domain.Entities
         public bool IsActive { get; set; } = true;
 
         public Guid MakeId { get; set; }
-        public virtual Make Make {  get; set; } = null!;
+        public Make Make {  get; set; } = null!;
     }
 }

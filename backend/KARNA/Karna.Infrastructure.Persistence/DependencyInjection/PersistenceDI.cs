@@ -1,4 +1,4 @@
-﻿using Karna.Core.Application.Abstraction.Initializers;
+using Karna.Core.Application.Abstraction.Initializers;
 using Karna.Core.Application.Abstraction.Persistence;
 using Karna.Infrastructure.Persistence._Data;
 using Karna.Infrastructure.Persistence._Data.Interceptors;
@@ -21,7 +21,6 @@ namespace Karna.Infrastructure.Persistence.DependencyInjection
 			services.AddDbContext<AppDbContext>((serviceprovider, optionsBuilder) =>
 			{
 				optionsBuilder
-				.UseLazyLoadingProxies()
 				.UseSqlServer(configuration.GetConnectionString("DefaultConnection"))
 				.AddInterceptors(serviceprovider.GetRequiredService<AuditableEntityInterceptor>());
 			});
@@ -34,7 +33,6 @@ namespace Karna.Infrastructure.Persistence.DependencyInjection
 			services.AddDbContext<AppIdentityDbContext>((serviceprovider, optionsBuilder) =>
 			{
 				optionsBuilder
-				.UseLazyLoadingProxies()
 				.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
 			});
 

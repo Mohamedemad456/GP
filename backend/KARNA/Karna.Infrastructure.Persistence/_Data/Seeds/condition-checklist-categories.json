@@ -1,0 +1,77 @@
+[
+  {
+    "Name": "Engine",
+    "NameAr": "المحرك",
+    "Description": "Checks related to the engine condition, performance, and components"
+  },
+  {
+    "Name": "Transmission",
+    "NameAr": "ناقل الحركة",
+    "Description": "Checks related to the gearbox and transmission system"
+  },
+  {
+    "Name": "Brakes",
+    "NameAr": "الفرامل",
+    "Description": "Checks related to the braking system and components"
+  },
+  {
+    "Name": "Suspension",
+    "NameAr": "نظام التعليق",
+    "Description": "Checks related to the suspension system and steering"
+  },
+  {
+    "Name": "Exterior Body",
+    "NameAr": "الهيكل الخارجي",
+    "Description": "Checks related to the car body, paint, panels, and frame"
+  },
+  {
+    "Name": "Interior",
+    "NameAr": "المقصورة الداخلية",
+    "Description": "Checks related to the interior cabin, seats, dashboard, and trim"
+  },
+  {
+    "Name": "Electrical System",
+    "NameAr": "النظام الكهربائي",
+    "Description": "Checks related to the electrical wiring, battery, and electronic modules"
+  },
+  {
+    "Name": "Lights",
+    "NameAr": "الإضاءة",
+    "Description": "Checks related to headlights, taillights, indicators, and interior lights"
+  },
+  {
+    "Name": "Tires & Wheels",
+    "NameAr": "الإطارات والجنوط",
+    "Description": "Checks related to tire condition, tread depth, and wheel alignment"
+  },
+  {
+    "Name": "Air Conditioning",
+    "NameAr": "التكييف",
+    "Description": "Checks related to the AC system, heating, and ventilation"
+  },
+  {
+    "Name": "Exhaust System",
+    "NameAr": "نظام العادم",
+    "Description": "Checks related to the exhaust, catalytic converter, and emissions"
+  },
+  {
+    "Name": "Fluids & Leaks",
+    "NameAr": "السوائل والتسريبات",
+    "Description": "Checks related to oil, coolant, brake fluid, and any visible leaks"
+  },
+  {
+    "Name": "Safety Features",
+    "NameAr": "أنظمة الأمان",
+    "Description": "Checks related to airbags, seatbelts, ABS, and other safety systems"
+  },
+  {
+    "Name": "Glass & Mirrors",
+    "NameAr": "الزجاج والمرايا",
+    "Description": "Checks related to windshield, windows, and mirrors condition"
+  },
+  {
+    "Name": "Underbody",
+    "NameAr": "أسفل السيارة",
+    "Description": "Checks related to the chassis, rust, and underbody components"
+  }
+]

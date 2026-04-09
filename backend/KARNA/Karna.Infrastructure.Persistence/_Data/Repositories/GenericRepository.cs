@@ -34,7 +34,7 @@ namespace Karna.Infrastructure.Persistence._Data.Repositories
 
 		public async Task<IEnumerable<T>> GetAllWithSpecAsync(ISpecification<T> spec)
 		{
-			return await ApplySpecification(spec).ToListAsync();
+			return await ApplySpecification(spec).AsNoTracking().ToListAsync();
 		}
 
 		public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate, bool withTracking = false)
