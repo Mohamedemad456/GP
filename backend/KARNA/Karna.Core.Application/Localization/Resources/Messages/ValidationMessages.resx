@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -170,5 +170,8 @@
   </data>
   <data name="ConditionChecklistCategoryNameAlreadyExists" xml:space="preserve">
     <value>A condition checklist category with this name already exists.</value>
+  </data>
+  <data name="ConditionDefectNameAlreadyExists" xml:space="preserve">
+    <value>A condition defect with this name already exists for this category.</value>
   </data>
 </root>

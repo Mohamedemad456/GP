@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -194,5 +194,20 @@
   </data>
   <data name="ConditionChecklistCategoryDeactivated" xml:space="preserve">
     <value>Condition checklist category deactivated successfully.</value>
+  </data>
+  <data name="ConditionDefectCreated" xml:space="preserve">
+    <value>Condition defect created successfully.</value>
+  </data>
+  <data name="ConditionDefectUpdated" xml:space="preserve">
+    <value>Condition defect updated successfully.</value>
+  </data>
+  <data name="ConditionDefectDeleted" xml:space="preserve">
+    <value>Condition defect deleted successfully.</value>
+  </data>
+  <data name="ConditionDefectActivated" xml:space="preserve">
+    <value>Condition defect activated successfully.</value>
+  </data>
+  <data name="ConditionDefectDeactivated" xml:space="preserve">
+    <value>Condition defect deactivated successfully.</value>
   </data>
 </root>

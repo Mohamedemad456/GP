@@ -26,9 +26,6 @@ namespace Karna.Infrastructure.Persistence._Data.Configurations
 			builder.HasIndex(c => c.NameAr)
 				.IsUnique();
 
-			builder.Property(c => c.Description)
-					.HasMaxLength(500);
-
 			builder.Property(c => c.IsActive)
 				.IsRequired()
 				.HasDefaultValue(true);

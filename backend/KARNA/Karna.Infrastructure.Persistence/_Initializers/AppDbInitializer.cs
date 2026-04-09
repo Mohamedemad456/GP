@@ -76,8 +76,7 @@ namespace Karna.Infrastructure.Persistence._Initializers
 			var categories = seedData.Select(s => new ConditionChecklistCategory
 			{
 				Name = s.Name,
-				NameAr = s.NameAr,
-				Description = s.Description
+				NameAr = s.NameAr
 			});
 
 			await _dbContext.ConditionChecklistCategories.AddRangeAsync(categories);
