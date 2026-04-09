@@ -43,6 +43,8 @@ RUN groupadd --gid 1000 appuser && \
 # ── Application code ────────────────────────────────────────────
 COPY ./app ./app
 
+RUN mkdir -p /app/logs
+
 RUN chown -R appuser:appuser /app
 USER appuser
 
