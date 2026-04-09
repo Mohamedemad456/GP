@@ -1,4 +1,4 @@
-﻿using Karna.Core.Domain._Common;
+using Karna.Core.Domain._Common;
 using Karna.Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
@@ -12,6 +12,7 @@ namespace Karna.Infrastructure.Persistence._Data
 		public DbSet<Make> Makes { get; set; } = null!;
 		public DbSet<Model> Models { get; set; } = null!;
 		public DbSet<ConditionChecklistCategory> ConditionChecklistCategories { get; set; } = null!;
+		public DbSet<ConditionDefect> ConditionDefects { get; set; } = null!;
 
 		public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
 		{

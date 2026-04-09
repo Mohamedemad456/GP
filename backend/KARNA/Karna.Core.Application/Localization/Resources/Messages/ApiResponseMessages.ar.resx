@@ -195,4 +195,19 @@
   <data name="ConditionChecklistCategoryDeactivated" xml:space="preserve">
     <value>تم تعطيل فئة فحص الحالة بنجاح.</value>
   </data>
+  <data name="ConditionDefectCreated" xml:space="preserve">
+    <value>تم إنشاء عيب الحالة بنجاح.</value>
+  </data>
+  <data name="ConditionDefectUpdated" xml:space="preserve">
+    <value>تم تحديث عيب الحالة بنجاح.</value>
+  </data>
+  <data name="ConditionDefectDeleted" xml:space="preserve">
+    <value>تم حذف عيب الحالة بنجاح.</value>
+  </data>
+  <data name="ConditionDefectActivated" xml:space="preserve">
+    <value>تم تفعيل عيب الحالة بنجاح.</value>
+  </data>
+  <data name="ConditionDefectDeactivated" xml:space="preserve">
+    <value>تم تعطيل عيب الحالة بنجاح.</value>
+  </data>
 </root>

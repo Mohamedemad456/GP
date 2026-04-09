@@ -14,7 +14,6 @@ namespace Karna.Core.Application.Mapping
 			{
 				Id = source.Id,
 				Name = isArabic ? source.NameAr : source.Name,
-				Description = source.Description,
 				IsActive = source.IsActive,
 				CreatedAt = source.CreatedAt,
 				UpdatedAt = source.UpdatedAt
@@ -27,15 +26,13 @@ namespace Karna.Core.Application.Mapping
 		public static ConditionChecklistCategory ToEntity(this CreateConditionChecklistCategoryDto dto) => new()
 		{
 			Name = dto.Name,
-			NameAr = dto.NameAr,
-			Description = dto.Description
+			NameAr = dto.NameAr
 		};
 
 		public static void ApplyTo(this UpdateConditionChecklistCategoryDto dto, ConditionChecklistCategory entity)
 		{
 			entity.Name = dto.Name;
 			entity.NameAr = dto.NameAr;
-			entity.Description = dto.Description;
 		}
 	}
 }

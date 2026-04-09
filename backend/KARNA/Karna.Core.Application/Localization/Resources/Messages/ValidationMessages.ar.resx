@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -170,5 +170,8 @@
   </data>
   <data name="ConditionChecklistCategoryNameAlreadyExists" xml:space="preserve">
     <value>توجد فئة فحص حالة بهذا الاسم بالفعل.</value>
+  </data>
+  <data name="ConditionDefectNameAlreadyExists" xml:space="preserve">
+    <value>يوجد عيب حالة بهذا الاسم بالفعل لهذه الفئة.</value>
   </data>
 </root>

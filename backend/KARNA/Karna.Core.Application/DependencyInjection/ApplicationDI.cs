@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using Karna.Core.Application.Abstraction.Services;
 using Karna.Core.Application.Services;
 using Microsoft.Extensions.Configuration;
@@ -18,6 +18,7 @@ namespace Karna.Core.Application.DependencyInjection
 			services.AddScoped<IMakeService, MakeService>();
 			services.AddScoped<IModelService, ModelService>();
 			services.AddScoped<IConditionChecklistCategoryService, ConditionChecklistCategoryService>();
+			services.AddScoped<IConditionDefectService, ConditionDefectService>();
 
 			return services;
 		}

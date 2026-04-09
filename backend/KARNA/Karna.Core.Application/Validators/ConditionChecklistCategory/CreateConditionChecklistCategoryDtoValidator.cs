@@ -15,10 +15,6 @@ namespace Karna.Core.Application.Validators.ConditionChecklistCategory
 			RuleFor(x => x.NameAr)
 				.NotEmpty().WithMessage(localizer.GetValidationMessage("RequiredField"))
 				.MaximumLength(100).WithMessage(localizer.GetValidationMessage("MaxLengthExceeded", 100));
-
-			RuleFor(x => x.Description)
-				.MaximumLength(500).WithMessage(localizer.GetValidationMessage("MaxLengthExceeded", 500))
-				.When(x => x.Description is not null);
 		}
 	}
 }
