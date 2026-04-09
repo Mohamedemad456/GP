@@ -39,6 +39,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
+    volumes:
+      - ./ai-service/logs:/app/logs:Z
     env_file:
       - .env
     environment:

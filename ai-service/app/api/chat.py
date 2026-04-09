@@ -19,6 +19,11 @@ class ChatRequest(BaseModel):
         description="User's message in English or Arabic",
         examples=["What should I look for when buying a used car?"]
     )
+    model: str | None = Field(
+        default=None,
+        description="Optional provider selector for testing: auto, Llama_groq, Llama_samba, or gemini",
+        examples=["auto", "Llama_groq", "Llama_samba", "gemini"],
+    )
 
 
 class ChatResponse(BaseModel):
@@ -44,8 +49,20 @@ async def chat_endpoint(request: ChatRequest) -> ChatResponse:
         HTTPException: 500 if LLM service fails
     """
     try:
-        response_text = await llm_service.generate_response(request.message)
+        logger.info(
+            "Chat request received model=%s message_length=%s",
+            request.model or "auto",
+            len(request.message),
+        )
+        response_text = await llm_service.generate_response(request.message, request.model)
         return ChatResponse(response=response_text)
+
+    except ValueError as e:
+        logger.warning("Invalid chat request model: %s", e)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
         
     except Exception as e:
         logger.exception("Chat endpoint failed")
