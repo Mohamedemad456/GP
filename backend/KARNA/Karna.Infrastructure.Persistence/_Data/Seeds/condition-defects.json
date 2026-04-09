@@ -1,0 +1,352 @@
+[
+  {
+    "ItemName": "Oil Leak",
+    "ItemNameAr": "تسريب زيت",
+    "Description": "Visible oil leaking from the engine area",
+    "DescriptionAr": "تسريب زيت مرئي من منطقة المحرك",
+    "CategoryName": "Engine"
+  },
+  {
+    "ItemName": "Overheating",
+    "ItemNameAr": "ارتفاع حرارة المحرك",
+    "Description": "Engine temperature exceeds normal range",
+    "DescriptionAr": "حرارة المحرك تتجاوز المعدل الطبيعي",
+    "CategoryName": "Engine"
+  },
+  {
+    "ItemName": "Unusual Engine Noise",
+    "ItemNameAr": "صوت غير طبيعي بالمحرك",
+    "Description": "Knocking, ticking, or rattling sounds from the engine",
+    "DescriptionAr": "أصوات طرق أو طقطقة أو خشخشة من المحرك",
+    "CategoryName": "Engine"
+  },
+  {
+    "ItemName": "Check Engine Light On",
+    "ItemNameAr": "لمبة فحص المحرك مضاءة",
+    "Description": "Check engine warning light is illuminated",
+    "DescriptionAr": "لمبة تحذير فحص المحرك مضاءة",
+    "CategoryName": "Engine"
+  },
+  {
+    "ItemName": "Excessive Exhaust Smoke",
+    "ItemNameAr": "دخان عادم كثيف",
+    "Description": "Thick or colored smoke coming from exhaust while engine is running",
+    "DescriptionAr": "دخان كثيف أو ملون من العادم أثناء تشغيل المحرك",
+    "CategoryName": "Engine"
+  },
+  {
+    "ItemName": "Hard Shifting",
+    "ItemNameAr": "صعوبة في تغيير السرعات",
+    "Description": "Difficulty or roughness when changing gears",
+    "DescriptionAr": "صعوبة أو خشونة عند تغيير السرعات",
+    "CategoryName": "Transmission"
+  },
+  {
+    "ItemName": "Transmission Slipping",
+    "ItemNameAr": "انزلاق ناقل الحركة",
+    "Description": "Transmission slips out of gear or delays engagement",
+    "DescriptionAr": "ناقل الحركة ينزلق من السرعة أو يتأخر في الاستجابة",
+    "CategoryName": "Transmission"
+  },
+  {
+    "ItemName": "Transmission Fluid Leak",
+    "ItemNameAr": "تسريب زيت ناقل الحركة",
+    "Description": "Visible transmission fluid leak under the vehicle",
+    "DescriptionAr": "تسريب مرئي لزيت ناقل الحركة أسفل السيارة",
+    "CategoryName": "Transmission"
+  },
+  {
+    "ItemName": "Unusual Transmission Noise",
+    "ItemNameAr": "صوت غير طبيعي من ناقل الحركة",
+    "Description": "Whining, humming or clunking sounds from the transmission",
+    "DescriptionAr": "أصوات أنين أو طنين أو طقطقة من ناقل الحركة",
+    "CategoryName": "Transmission"
+  },
+  {
+    "ItemName": "Worn Brake Pads",
+    "ItemNameAr": "تآكل تيل الفرامل",
+    "Description": "Brake pads are worn beyond safe limits",
+    "DescriptionAr": "تيل الفرامل متآكل بما يتجاوز حدود الأمان",
+    "CategoryName": "Brakes"
+  },
+  {
+    "ItemName": "Brake Squealing",
+    "ItemNameAr": "صرير الفرامل",
+    "Description": "High-pitched noise when applying brakes",
+    "DescriptionAr": "صوت صرير عالي عند الضغط على الفرامل",
+    "CategoryName": "Brakes"
+  },
+  {
+    "ItemName": "Brake Fluid Leak",
+    "ItemNameAr": "تسريب زيت الفرامل",
+    "Description": "Visible brake fluid leak near wheels or master cylinder",
+    "DescriptionAr": "تسريب مرئي لزيت الفرامل بالقرب من العجلات أو الأسطوانة الرئيسية",
+    "CategoryName": "Brakes"
+  },
+  {
+    "ItemName": "Soft Brake Pedal",
+    "ItemNameAr": "دواسة فرامل رخوة",
+    "Description": "Brake pedal feels spongy or goes too far down",
+    "DescriptionAr": "دواسة الفرامل تبدو لينة أو تنخفض أكثر من اللازم",
+    "CategoryName": "Brakes"
+  },
+  {
+    "ItemName": "Shock Absorber Damage",
+    "ItemNameAr": "تلف المساعدين",
+    "Description": "Worn or leaking shock absorbers",
+    "DescriptionAr": "مساعدين متآكلة أو بها تسريب",
+    "CategoryName": "Suspension"
+  },
+  {
+    "ItemName": "Suspension Noise",
+    "ItemNameAr": "صوت من نظام التعليق",
+    "Description": "Clunking or creaking noise when going over bumps",
+    "DescriptionAr": "صوت طقطقة أو صرير عند المرور فوق المطبات",
+    "CategoryName": "Suspension"
+  },
+  {
+    "ItemName": "Uneven Ride Height",
+    "ItemNameAr": "عدم استواء ارتفاع السيارة",
+    "Description": "Vehicle sits unevenly or leans to one side",
+    "DescriptionAr": "السيارة غير مستوية أو تميل لجانب واحد",
+    "CategoryName": "Suspension"
+  },
+  {
+    "ItemName": "Dents",
+    "ItemNameAr": "خدوش وصدمات",
+    "Description": "Visible dents on body panels",
+    "DescriptionAr": "صدمات مرئية على ألواح الهيكل",
+    "CategoryName": "Exterior Body"
+  },
+  {
+    "ItemName": "Rust or Corrosion",
+    "ItemNameAr": "صدأ أو تآكل",
+    "Description": "Visible rust spots or corrosion on the body",
+    "DescriptionAr": "بقع صدأ أو تآكل مرئية على الهيكل",
+    "CategoryName": "Exterior Body"
+  },
+  {
+    "ItemName": "Paint Damage",
+    "ItemNameAr": "تلف الطلاء",
+    "Description": "Scratches, peeling, or fading paint",
+    "DescriptionAr": "خدوش أو تقشير أو بهتان في الطلاء",
+    "CategoryName": "Exterior Body"
+  },
+  {
+    "ItemName": "Misaligned Body Panel",
+    "ItemNameAr": "عدم محاذاة ألواح الهيكل",
+    "Description": "Body panels are not properly aligned, indicating previous accident",
+    "DescriptionAr": "ألواح الهيكل غير متحاذية، مما يشير إلى حادث سابق",
+    "CategoryName": "Exterior Body"
+  },
+  {
+    "ItemName": "Seat Damage",
+    "ItemNameAr": "تلف المقاعد",
+    "Description": "Torn, stained, or worn seats",
+    "DescriptionAr": "مقاعد ممزقة أو ملطخة أو متآكلة",
+    "CategoryName": "Interior"
+  },
+  {
+    "ItemName": "Dashboard Warning Lights",
+    "ItemNameAr": "لمبات تحذير التابلوه",
+    "Description": "One or more warning lights are illuminated on dashboard",
+    "DescriptionAr": "واحدة أو أكثر من لمبات التحذير مضاءة على التابلوه",
+    "CategoryName": "Interior"
+  },
+  {
+    "ItemName": "Odor Inside Cabin",
+    "ItemNameAr": "رائحة داخل المقصورة",
+    "Description": "Unpleasant or unusual smell inside the vehicle",
+    "DescriptionAr": "رائحة كريهة أو غير عادية داخل السيارة",
+    "CategoryName": "Interior"
+  },
+  {
+    "ItemName": "Steering Wheel Wear",
+    "ItemNameAr": "تآكل عجلة القيادة",
+    "Description": "Worn or damaged steering wheel surface",
+    "DescriptionAr": "سطح عجلة القيادة متآكل أو تالف",
+    "CategoryName": "Interior"
+  },
+  {
+    "ItemName": "Battery Issue",
+    "ItemNameAr": "مشكلة في البطارية",
+    "Description": "Weak or dead battery, corrosion on terminals",
+    "DescriptionAr": "بطارية ضعيفة أو فارغة أو تآكل في الأقطاب",
+    "CategoryName": "Electrical System"
+  },
+  {
+    "ItemName": "Wiring Problem",
+    "ItemNameAr": "مشكلة في الأسلاك",
+    "Description": "Exposed, frayed, or damaged wiring",
+    "DescriptionAr": "أسلاك مكشوفة أو متآكلة أو تالفة",
+    "CategoryName": "Electrical System"
+  },
+  {
+    "ItemName": "Power Window Malfunction",
+    "ItemNameAr": "عطل في النوافذ الكهربائية",
+    "Description": "One or more power windows not functioning properly",
+    "DescriptionAr": "واحدة أو أكثر من النوافذ الكهربائية لا تعمل بشكل صحيح",
+    "CategoryName": "Electrical System"
+  },
+  {
+    "ItemName": "Headlight Issue",
+    "ItemNameAr": "مشكلة في المصابيح الأمامية",
+    "Description": "Dim, broken, or non-functioning headlights",
+    "DescriptionAr": "مصابيح أمامية خافتة أو مكسورة أو لا تعمل",
+    "CategoryName": "Lights"
+  },
+  {
+    "ItemName": "Taillight Issue",
+    "ItemNameAr": "مشكلة في المصابيح الخلفية",
+    "Description": "Broken or non-functioning taillights",
+    "DescriptionAr": "مصابيح خلفية مكسورة أو لا تعمل",
+    "CategoryName": "Lights"
+  },
+  {
+    "ItemName": "Turn Signal Malfunction",
+    "ItemNameAr": "عطل في الإشارات",
+    "Description": "Turn signals not working or flashing irregularly",
+    "DescriptionAr": "إشارات الانعطاف لا تعمل أو تومض بشكل غير منتظم",
+    "CategoryName": "Lights"
+  },
+  {
+    "ItemName": "Uneven Tire Wear",
+    "ItemNameAr": "تآكل غير متساوٍ للإطارات",
+    "Description": "Tires show uneven wear patterns",
+    "DescriptionAr": "الإطارات تظهر أنماط تآكل غير متساوية",
+    "CategoryName": "Tires & Wheels"
+  },
+  {
+    "ItemName": "Low Tire Tread",
+    "ItemNameAr": "نقش إطار منخفض",
+    "Description": "Tire tread depth below safe limit",
+    "DescriptionAr": "عمق نقش الإطار أقل من الحد الآمن",
+    "CategoryName": "Tires & Wheels"
+  },
+  {
+    "ItemName": "Wheel Damage",
+    "ItemNameAr": "تلف الجنط",
+    "Description": "Cracked, bent, or curbed wheels",
+    "DescriptionAr": "جنوط مشروخة أو معوجة أو متضررة",
+    "CategoryName": "Tires & Wheels"
+  },
+  {
+    "ItemName": "Weak Cooling",
+    "ItemNameAr": "ضعف التبريد",
+    "Description": "AC not cooling effectively",
+    "DescriptionAr": "المكيف لا يبرد بشكل فعال",
+    "CategoryName": "Air Conditioning"
+  },
+  {
+    "ItemName": "AC Unusual Smell",
+    "ItemNameAr": "رائحة غير عادية من المكيف",
+    "Description": "Musty or unpleasant odor when AC is turned on",
+    "DescriptionAr": "رائحة عفن أو كريهة عند تشغيل المكيف",
+    "CategoryName": "Air Conditioning"
+  },
+  {
+    "ItemName": "AC Noise",
+    "ItemNameAr": "صوت من المكيف",
+    "Description": "Unusual noise when AC compressor is engaged",
+    "DescriptionAr": "صوت غير طبيعي عند تشغيل ضاغط المكيف",
+    "CategoryName": "Air Conditioning"
+  },
+  {
+    "ItemName": "Exhaust Leak",
+    "ItemNameAr": "تسريب في العادم",
+    "Description": "Audible exhaust leak or visible damage to exhaust pipe",
+    "DescriptionAr": "تسريب مسموع في العادم أو تلف مرئي في أنبوب العادم",
+    "CategoryName": "Exhaust System"
+  },
+  {
+    "ItemName": "Catalytic Converter Issue",
+    "ItemNameAr": "مشكلة في دبة التلوث",
+    "Description": "Clogged or damaged catalytic converter",
+    "DescriptionAr": "دبة تلوث مسدودة أو تالفة",
+    "CategoryName": "Exhaust System"
+  },
+  {
+    "ItemName": "Coolant Leak",
+    "ItemNameAr": "تسريب سائل التبريد",
+    "Description": "Visible coolant leak under the vehicle",
+    "DescriptionAr": "تسريب مرئي لسائل التبريد أسفل السيارة",
+    "CategoryName": "Fluids & Leaks"
+  },
+  {
+    "ItemName": "Power Steering Fluid Leak",
+    "ItemNameAr": "تسريب زيت الباور",
+    "Description": "Power steering fluid leak detected",
+    "DescriptionAr": "تم اكتشاف تسريب زيت الباور ستيرينج",
+    "CategoryName": "Fluids & Leaks"
+  },
+  {
+    "ItemName": "Low Fluid Levels",
+    "ItemNameAr": "مستويات سوائل منخفضة",
+    "Description": "One or more fluid levels are below minimum",
+    "DescriptionAr": "واحد أو أكثر من مستويات السوائل أقل من الحد الأدنى",
+    "CategoryName": "Fluids & Leaks"
+  },
+  {
+    "ItemName": "Airbag Warning Light",
+    "ItemNameAr": "لمبة تحذير الوسادة الهوائية",
+    "Description": "Airbag warning indicator is on",
+    "DescriptionAr": "مؤشر تحذير الوسادة الهوائية مضاء",
+    "CategoryName": "Safety Features"
+  },
+  {
+    "ItemName": "Seatbelt Issue",
+    "ItemNameAr": "مشكلة في حزام الأمان",
+    "Description": "Seatbelt does not latch, retract, or function properly",
+    "DescriptionAr": "حزام الأمان لا يقفل أو يرتد أو يعمل بشكل صحيح",
+    "CategoryName": "Safety Features"
+  },
+  {
+    "ItemName": "ABS Malfunction",
+    "ItemNameAr": "عطل في نظام ABS",
+    "Description": "Anti-lock braking system warning light is on",
+    "DescriptionAr": "لمبة تحذير نظام الفرامل المانعة للانزلاق مضاءة",
+    "CategoryName": "Safety Features"
+  },
+  {
+    "ItemName": "Windshield Crack",
+    "ItemNameAr": "شرخ في الزجاج الأمامي",
+    "Description": "Crack or chip in the windshield",
+    "DescriptionAr": "شرخ أو كسر في الزجاج الأمامي",
+    "CategoryName": "Glass & Mirrors"
+  },
+  {
+    "ItemName": "Side Mirror Damage",
+    "ItemNameAr": "تلف المرآة الجانبية",
+    "Description": "Broken or missing side mirror",
+    "DescriptionAr": "مرآة جانبية مكسورة أو مفقودة",
+    "CategoryName": "Glass & Mirrors"
+  },
+  {
+    "ItemName": "Rear Window Defogger Issue",
+    "ItemNameAr": "عطل في مزيل ضباب الزجاج الخلفي",
+    "Description": "Rear window defogger not working",
+    "DescriptionAr": "مزيل ضباب الزجاج الخلفي لا يعمل",
+    "CategoryName": "Glass & Mirrors"
+  },
+  {
+    "ItemName": "Undercarriage Rust",
+    "ItemNameAr": "صدأ أسفل السيارة",
+    "Description": "Significant rust or corrosion on underbody components",
+    "DescriptionAr": "صدأ أو تآكل كبير في مكونات أسفل السيارة",
+    "CategoryName": "Underbody"
+  },
+  {
+    "ItemName": "Damaged Underbody Shield",
+    "ItemNameAr": "تلف غطاء أسفل السيارة",
+    "Description": "Underbody plastic shield is damaged, loose, or missing",
+    "DescriptionAr": "غطاء بلاستيك أسفل السيارة تالف أو مفكوك أو مفقود",
+    "CategoryName": "Underbody"
+  },
+  {
+    "ItemName": "Frame Damage",
+    "ItemNameAr": "تلف في الشاسيه",
+    "Description": "Visible damage or bending in the vehicle frame",
+    "DescriptionAr": "تلف أو انحناء مرئي في شاسيه السيارة",
+    "CategoryName": "Underbody"
+  }
+]

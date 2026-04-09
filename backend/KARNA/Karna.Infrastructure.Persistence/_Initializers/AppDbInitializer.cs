@@ -14,6 +14,7 @@ namespace Karna.Infrastructure.Persistence._Initializers
 			await SeedMakesAsync();
 			await SeedModelsAsync();
 			await SeedConditionChecklistCategoriesAsync();
+			await SeedConditionDefectsAsync();
 		}
 
 		private async Task SeedMakesAsync()
@@ -80,6 +81,34 @@ namespace Karna.Infrastructure.Persistence._Initializers
 			});
 
 			await _dbContext.ConditionChecklistCategories.AddRangeAsync(categories);
+			await _dbContext.SaveChangesAsync();
+		}
+
+		private async Task SeedConditionDefectsAsync()
+		{
+			if (await _dbContext.ConditionDefects.AnyAsync())
+				return;
+
+			var seedData = await SeedLoader.LoadAsync<ConditionDefectSeedDto>("condition-defects.json");
+			if (seedData.Count == 0)
+				return;
+
+			var categoryLookup = await _dbContext.ConditionChecklistCategories
+				.AsNoTracking()
+				.ToDictionaryAsync(c => c.Name, c => c.Id);
+
+			var defects = seedData
+				.Where(s => categoryLookup.ContainsKey(s.CategoryName))
+				.Select(s => new ConditionDefect
+				{
+					ItemName = s.ItemName,
+					ItemNameAr = s.ItemNameAr,
+					Description = s.Description,
+					DescriptionAr = s.DescriptionAr,
+					CategoryId = categoryLookup[s.CategoryName]
+				});
+
+			await _dbContext.ConditionDefects.AddRangeAsync(defects);
 			await _dbContext.SaveChangesAsync();
 		}
 	}
