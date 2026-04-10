@@ -30,7 +30,7 @@ Expected: LightGBM should beat baselines by 30-50% on MAPE. If it doesn't, somet
 
 ### Data Split
 
-- **70% train / 15% validation / 15% test**
+- **80% train / 10% validation / 10% test**
 - Stratified on price decile bins to ensure even distribution across price ranges
 - Use validation set for early stopping during training
 - Use test set for final evaluation only (never during tuning)
@@ -159,7 +159,7 @@ Each model version `models/vX.X.X/` contains:
 | model_lower.joblib | 10th percentile model |
 | model_upper.joblib | 90th percentile model |
 | preprocessor.joblib | Feature transformations (ensures train-serve consistency) |
-| metadata.json | Metrics, hyperparameters, feature list, training date, sample count |
+| metadata.json | Metrics, hyperparameters, feature list, training date, sample count using tensor board or any possible way |
 | shap_summary.png | Global feature importance plot |
 
 The `model_registry.json` at the root of `models/` points to the active version.

@@ -4,176 +4,205 @@
 
 The ML pricing engine is a standalone microservice that predicts used car prices with negotiation ranges. It is decoupled from both the chatbot service and the .NET backend.
 
+The key architectural decision in this version is how we handle dynamic pricing across multiple scraping runs. The service is designed to work with a single snapshot today, but it already carries the structure needed to move to multi-snapshot training later.
+
 ## Architecture Diagram
 
-```
-                        SUPABASE (Raw Data)
+```text
+                        SUPABASE (raw scraped listings)
                                 ↓
-                                ↓ Connection string (training only)
+                                ↓ training-only connection string
                                 ↓
-                        ---------------------------------------------------------------------------------------
-                        ML SERVICE
-                        Data & Training Pipeline (src/)
+        ──────────────────────────────────────────────────────────────────
+        ML SERVICE - Data and Training Pipeline (src/)
 
-                                data_loader.py        → Pull raw data from Supabase
-                                data_cleaner.py       → Clean & validate data
-                                feature_engineering.py→ Build all features
-                                train.py              → Train quantile models
-                                evaluate.py           → Metrics & reports
-                                retrain.py            → Orchestrate retraining
+                data_loader.py         → pull raw data from Supabase
+                data_cleaner.py        → clean and validate data
+                feature_engineering.py → build all features
+                train.py               → train quantile models
+                evaluate.py            → metrics and reports
+                retrain.py             → orchestrate monthly retraining
 
-                        ---------------------------------------------------------------------------------------
-                        ARTIFACTS
+        ──────────────────────────────────────────────────────────────────
+        ARTIFACTS
 
-                                data/
-                                ├── lookups/
-                                │   ├── car_specs_lookup.csv ← Lookup features
-                                │   └── title_parsed.csv    ← Claude-parsed titles
-                                ├── raw/                    ← Raw snapshots
-                                ├── cleaned/                ← Cleaned data
-                                └── processed/              ← Training-ready data
+                data/
+                ├── lookups/
+                │   ├── car_specs_lookup.csv   ← static specs per make+model+year
+                │   └── title_parsed.csv       ← Claude-parsed titles cache
+                ├── raw/                       ← timestamped raw snapshots
+                ├── cleaned/                   ← cleaned per-snapshot data
+                └── processed/                 ← training-ready merged data
 
-                                models/
-                                ├── model_registry.json    ← Active version ptr
-                                └── v1.0.0/
-                                ├── model_median.joblib
-                                ├── model_lower.joblib
-                                ├── model_upper.joblib
-                                ├── preprocessor.joblib
-                                ├── metadata.json
-                                └── shap_summary.png
+                models/
+                ├── model_registry.json        ← active version pointer
+                └── v1.0.0/
+                    ├── model_median.joblib
+                    ├── model_lower.joblib
+                    ├── model_upper.joblib
+                    ├── preprocessor.joblib
+                    ├── metadata.json
+                    └── shap_summary.png
 
-                        ---------------------------------------------------------------------------------------
-                        ONLINE: FastAPI Prediction Service (app/)
+        ──────────────────────────────────────────────────────────────────
+        ONLINE: FastAPI Prediction Service (app/)
 
-                                POST /api/v1/predict   → Price + range + factors
-                                GET  /health           → Status + model version
-                                GET  /model-info       → Metrics & metadata
+                POST /api/v1/predict    → price + range + factors
+                GET  /health            → status + model version
+                GET  /model-info        → metrics + metadata
 
-                                On startup: loads active model + lookup CSV
-                                At inference: joins input with lookup → predict
+                On startup: load active model + lookup CSV into memory
+                At inference: join input with lookup, build features, predict
 
-                        ---------------------------------------------------------------------------------------
-                        .NET BACKEND (not my scope)
-                                ↑
-                                ↑ HTTP JSON
+        ──────────────────────────────────────────────────────────────────
+        .NET BACKEND (not my scope)
+                ↑
+                ↑ HTTP JSON
 ```
----
 
 ## Key Design Decisions
 
-### 1. Static Lookup CSV Instead of Runtime LLM
+### 1. Dynamic Pricing Strategy
 
-Car specs (engine_cc, horsepower, body_type, new_car_price) are deterministic properties of a model+year, not of an individual car. They are generated once via Claude, validated manually, stored as CSV, and used identically at training time and inference time.
+The supervisor concern is valid: prices change over time, so a one-time model can go stale. The right answer depends on how much data you have.
 
-**Why not LLM at runtime:**
-- Non-deterministic — same input can produce different outputs across calls
-- Adds 1-3s latency per prediction
-- Creates train-serve skew — training data enriched differently than inference data
-- Costs money per prediction
-- External API downtime takes our service down
+**Current recommendation: Approach A - independent snapshots.**
 
-### 2. Offline/Online Separation
+Treat each monthly scrape as its own dataset and train on the latest snapshot only. The previous snapshot stays archived, but it is not merged into the current training set.
 
-- `src/` — Training code. Runs in notebooks or CLI. Never deployed to production.
-- `app/` — Serving code. Runs in Docker. Loads pre-trained models only.
-- Shared logic (feature building) lives in `app/services/feature_builder.py` and is imported by `src/` during training to guarantee identical preprocessing.
+```text
+Feb scrape → clean → train v1.0.0 (baseline)
+Mar scrape → clean → train v1.1.0 (current market)
+Apr scrape → clean → train v1.2.0 (refreshed market)
+```
 
-### 3. Three Quantile Models
+Why this is the correct starting point:
+- It is simple to explain and defend in a GP presentation.
+- It avoids stale historical prices contaminating current predictions.
+- It does not require stable listing IDs across runs.
+- It matches the current state of the project if you only have one snapshot.
 
-Instead of one regression model, three LightGBM models are trained:
-- **Lower (α=0.1):** 10th percentile → negotiation floor
-- **Median (α=0.5):** 50th percentile → fair price estimate
-- **Upper (α=0.9):** 90th percentile → negotiation ceiling
+**Upgrade path: Approach B - cumulative dataset.**
 
-This gives an 80% prediction interval without distributional assumptions.
+When you have several months of data, merge snapshots and keep `scraped_at` only for splitting and auditing, not as a model feature. That gives the model more history and better trend coverage.
 
-### 4. Model Registry Pattern
+**Approach C - listing-level trend tracking** is possible later if stable listing IDs exist, but it is unnecessary for the current scope.
 
-A simple `model_registry.json` points to the active model version. Rollback = change the pointer and restart. No MLflow, DVC, or external tooling.
+### 2. Static Lookup CSV Instead of Runtime LLM
 
-### 5. Title Parsing via Claude (Not Regex)
+Car specs such as `engine_cc`, `horsepower`, `body_type`, and `new_car_price_egp` are deterministic properties of a model-year combination. They should be generated once, validated, and reused at both training and inference time.
 
-Unique titles are sent to Claude Opus 4.6 in batch to extract brand, model, and trim. Results are saved as `data/title_parsed.csv`. This is a one-time operation repeated only when new unique titles appear after scraping.
+Why not call an LLM at prediction time:
+- Non-deterministic output.
+- Adds seconds of latency.
+- Creates train-serve skew.
+- Adds per-request cost.
+- Makes the service dependent on an external API.
 
-**Why Claude over regex:** Handles multi-word models, Arabic transliterations, trim levels, and inconsistent formats far more reliably.
+### 3. Offline / Online Separation
 
----
+- `src/` contains training code only. It runs in notebooks or CLI and is never deployed.
+- `app/` contains serving code only. It runs in Docker and loads pre-trained artifacts.
+- Shared feature logic lives in `app/services/feature_builder.py` and is imported by `src/` during training so preprocessing stays identical.
+
+This is the main safeguard against preprocessing skew.
+
+### 4. Three Quantile Models
+
+Instead of one regression model, the service trains three independent LightGBM models:
+
+- Lower (`alpha = 0.1`) → negotiation floor.
+- Median (`alpha = 0.5`) → fair price estimate.
+- Upper (`alpha = 0.9`) → negotiation ceiling.
+
+Together they produce an 80% prediction interval without distributional assumptions.
+
+### 5. Model Registry Pattern
+
+`model_registry.json` is the only pointer needed for promotion and rollback. Update the pointer, restart the service, and the active version changes. That keeps versioning simple and explainable.
+
+### 6. Title Parsing via Claude
+
+Unique titles are parsed in batch to extract brand, model, and trim, then cached in `data/title_parsed.csv`.
+
+Why this is better than regex:
+- Handles multi-word models and trims.
+- Handles Arabic transliterations and inconsistent formatting.
+- Is easier to validate manually than a large ruleset.
 
 ## Technology Stack
 
 | Component | Choice | Rationale |
 |-----------|--------|-----------|
-| ML Framework | LightGBM | Fast, native categoricals, built-in quantile loss |
+| ML framework | LightGBM | Fast, native categoricals, quantile loss |
 | Tuning | Optuna | Efficient TPE sampler |
-| Explainability | SHAP (TreeSHAP) | Fast for tree models, industry standard |
+| Explainability | SHAP (TreeSHAP) | Fast and industry standard for trees |
 | API | FastAPI | Async, auto-docs, Pydantic validation |
-| Serialization | joblib | Optimized for numpy-heavy objects |
-| Container | Docker | Reproducibility |
-| Lookups | CSV | Human-editable, Git-friendly, easy to inspect |
-| Datasets | Parquet | Compressed, typed, fast for large data |
-| Deployment | Railway.app / Render | Free tier, Docker support |
+| Serialization | joblib | Efficient for numpy-heavy artifacts |
+| Container | Docker | Reproducibility and simple deployment |
+| Lookups | CSV | Human-editable and Git-friendly |
+| Datasets | Parquet | Compact and typed |
+| Deployment | Railway.app / Render | Simple Docker hosting |
 
 ### Skip List
 
 | Tool | Why |
 |------|-----|
-| MLflow / DVC | JSON registry is sufficient at this scope |
-| Kubernetes | Enterprise-scale, unnecessary |
-| Airflow | Monthly retraining = a Python script, not a DAG |
-| Feature Store | <30K rows, no real-time features |
-
----
+| MLflow / DVC | JSON registry is enough at this scope |
+| Kubernetes | Too heavy for the project |
+| Airflow | Monthly retraining does not need a DAG |
+| Feature store | Too much overhead for this dataset size |
 
 ## Data Flow
 
-```
-Step 1: DE team scrapes Hatla2ee/Dubizzel → raw data lands in Supabase
+```text
+Step 1: DE team scrapes Hatla2ee / Dubizzle and lands raw data in Supabase.
 
 Step 2: data_loader.py
-        Pull raw data from Supabase → basic validation (dtypes, nulls)
-        → save raw snapshot as Parquet (no cleaning)
+        Pull raw data from Supabase, validate dtypes and nulls, save a raw Parquet snapshot.
 
-Step 3: data_cleaner.py
-        Load raw Parquet → remove duplicates → filter invalid prices
+Step 3: title_parser.py
+        Parse unique titles with Claude or any agent in batch, then save the dagta to the raw dir.
+
+Step 4: data_cleaner.py
+        Load raw Parquet → remove duplicates → filter invalid prices and mileage, standardize fields
         → handle mileage=0 & transmission="0" → standardize locations
-        → IQR outlier removal per brand+model → log cleaning funnel
+        impute missing values using training statistics only, save processed Parquet.
+        Join the data that have the titles parsed with car_specs_lookup.csv, build derived features,
+        apply group-level outlier removal, log the cleaning funnel, save cleaned Parquet.
         → save cleaned Parquet to data/cleaned/
 
-Step 4: title_parser.py (first run or when new titles appear)
-        Extract unique titles → send to Claude in batch
-        → receive brand, model, trim → save as title_parsed.csv
 
-Step 5: feature_engineering.py
-        Load cleaned Parquet from data/cleaned/
-        + Join with title_parsed.csv     → adds brand, model columns
-        + Join with car_specs_lookup.csv  → adds engine_cc, hp, body_type, new_car_price, etc.
-        + Engineer derived features       → car_age, mileage_per_year, depreciation, etc.
-        + Impute remaining missing values
-        → Save training-ready Parquet to data/processed/
+Step 5: train.py
+        Split data, tune with Optuna, train 3 quantile models, evaluate, save artifacts.
+        evaluate, generate SHAP plots and save it, save the model with it's version
 
-Step 6: train.py
-        Load processed data → split (70/15/15)
-        → tune hyperparameters (Optuna) → train 3 quantile models
-        → evaluate → generate SHAP plots → save all artifacts to models/vX.X.X/
+Step 7: FastAPI app
+        Load the active version on startup.
+        build features, predict, and optionally compute SHAP explanations.
 
-Step 7: FastAPI (app/)
-        On startup: load active model version + car_specs_lookup.csv
-        On request: receive car details → join with lookup → build features → predict
-        → return price + negotiation range + factors
-
-Step 8: retrain.py (monthly)
-        Orchestrates steps 2-6 → compares new model vs active
-        → promotes if better, keeps old if worse
+Step 8: retrain.py
+        Repeat the pipeline monthly, compare against the active version, and promote only if better.
 ```
-
----
 
 ## API Contract
 
 ### POST /api/v1/predict
 
-**Request:** brand, model, year, mileage_km, transmission, fuel, location (optional), include_factors (optional)
+**Request body example:**
+
+```json
+{
+  "brand": "Toyota",
+  "model": "Corolla",
+  "year": 2018,
+  "mileage_km": 85000,
+  "transmission": "Automatic",
+  "fuel": "petrol",
+  "location": "Cairo",
+  "include_factors": true
+}
+```
 
 **Response:**
 - `fair_price` — Point estimate, rounded to nearest 1K EGP
@@ -183,25 +212,39 @@ Step 8: retrain.py (monthly)
 - `model_version` — Active version string
 - `predicted_at` — UTC timestamp
 
+
+```json
+{
+  "fair_price": 485000,
+  "negotiation_range": { "min_price": 420000, "max_price": 560000 },
+  "confidence": "high",
+  "price_factors": [
+    { "factor": "mileage_km", "direction": "negative", "description": "High mileage decreases price" }
+  ],
+  "model_version": "v1.0.0",
+  "predicted_at": "2026-04-10T14:30:00Z"
+}
+```
+
 ### GET /health
 
-Returns: service status, active model version, training date, uptime.
-
----
+Returns service status, active model version, training date, and uptime.
 
 ## Lookup Feature Enrichment
 
-The `car_specs_lookup.csv` adds these features at both training and inference time:
+`car_specs_lookup.csv` enriches both training and inference with deterministic features.
 
 | Feature | Description | Source |
 |---------|-------------|--------|
-| engine_cc | Engine displacement in cc | Claude batch → validated |
-| body_type | Sedan, SUV, Hatchback, etc. | Claude batch → validated |
-| horsepower | Engine power | Claude batch → validated |
-| drivetrain | FWD, RWD, AWD | Claude batch → validated |
-| new_car_price_egp | MSRP in Egyptian market | Claude batch → cross-checked with Hatla2ee |
-| seating_capacity | Number of seats | Claude batch → validated |
+| engine_cc | Engine displacement in cc | Claude batch, then validated |
+| body_type | Sedan, SUV, hatchback, and similar body classes | Claude batch, then validated |
+| horsepower | Engine power | Claude batch, then validated |
+| drivetrain | FWD, RWD, AWD | Claude batch, then validated |
+| new_car_price_egp | MSRP in the Egyptian market | Claude batch, cross-checked manually |
+| seating_capacity | Number of seats | Claude batch, then validated |
 
-**Join key:** (brand, model, year) — the same key is used during training and during inference to guarantee no train-serve skew.
+**Join key:** `(brand, model, year)`.
 
-**Validation:** Top 10 brands (covering ~80% of data) are manually cross-checked against official specs and Egyptian pricing sites.
+If there is no exact year match, fall back to `(brand, model)` using the nearest available year and mark the prediction confidence as low.
+
+**Validation priority:** cross-check the top 10 brands, which cover most of the dataset, against official specs and Egyptian pricing sources.
