@@ -6,8 +6,8 @@
 
 | Feature | Source | Why |
 |---------|--------|-----|
-| brand | Parsed from title (Claude) | Strongest categorical predictor — Toyota vs BMW = completely different price |
-| model | Parsed from title (Claude) | Huge variance within brand — Corolla vs Land Cruiser |
+| brand | Parsed from title  | Strongest categorical predictor — Toyota vs BMW = completely different price |
+| model | Parsed from title  | Huge variance within brand — Corolla vs Land Cruiser |
 | year | Raw data | Direct depreciation proxy |
 | mileage_km | Raw data | Wear indicator. Keep continuous, do NOT bin. |
 | new_car_price_egp | Specs lookup CSV | Most powerful enrichment feature. Anchors prediction in the right price universe. |
