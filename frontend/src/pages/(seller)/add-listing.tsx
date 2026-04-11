@@ -1,7 +1,9 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { getActiveMakes, type MakeDto } from "@/lib/makesApi";
+import { getActiveModels, type ModelDto } from "@/lib/modelsApi";
 import {
   Card,
   CardContent,
@@ -18,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
   Separator,
+  Combobox,
 } from "@gp/design-system";
 import {
   Upload,
@@ -28,28 +31,6 @@ import {
 } from "lucide-react";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
-
-const MAKES = [
-  { id: 1, name: "Toyota" },
-  { id: 2, name: "Honda" },
-  { id: 3, name: "BMW" },
-  { id: 4, name: "Mercedes-Benz" },
-  { id: 5, name: "Nissan" },
-  { id: 6, name: "Hyundai" },
-  { id: 7, name: "Kia" },
-  { id: 8, name: "Ford" },
-];
-
-const MODELS: Record<number, { id: number; name: string }[]> = {
-  1: [{ id: 1, name: "Camry" }, { id: 2, name: "Corolla" }, { id: 3, name: "Land Cruiser" }, { id: 4, name: "RAV4" }],
-  2: [{ id: 5, name: "Civic" }, { id: 6, name: "Accord" }, { id: 7, name: "CR-V" }],
-  3: [{ id: 8, name: "3 Series" }, { id: 9, name: "5 Series" }, { id: 10, name: "X5" }],
-  4: [{ id: 11, name: "C-Class" }, { id: 12, name: "E-Class" }, { id: 13, name: "GLC" }],
-  5: [{ id: 14, name: "Patrol" }, { id: 15, name: "Altima" }, { id: 16, name: "X-Trail" }],
-  6: [{ id: 17, name: "Tucson" }, { id: 18, name: "Elantra" }, { id: 19, name: "Santa Fe" }],
-  7: [{ id: 20, name: "Sportage" }, { id: 21, name: "K5" }, { id: 22, name: "Sorento" }],
-  8: [{ id: 23, name: "Mustang" }, { id: 24, name: "Explorer" }, { id: 25, name: "F-150" }],
-};
 
 const FUEL_TYPES = ["Gasoline", "Diesel", "Hybrid", "Electric", "Other"];
 const TRANSMISSIONS = ["Automatic", "Manual"];
@@ -105,11 +86,29 @@ const AddListing = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
 
-  // Available models based on selected make
-  const availableModels = useMemo(() => {
-    const makeId = Number(form.makeId);
-    return makeId ? MODELS[makeId] ?? [] : [];
-  }, [form.makeId]);
+  // Makes & models from API
+  const [makes, setMakes] = useState<MakeDto[]>([]);
+  const [allModels, setAllModels] = useState<ModelDto[]>([]);
+  const [isLoadingMakes, setIsLoadingMakes] = useState(true);
+  const [isLoadingModels, setIsLoadingModels] = useState(true);
+
+  useEffect(() => {
+    getActiveMakes()
+      .then((res) => { if (res.success) setMakes(res.data ?? []); })
+      .catch(() => toast.error(t("seller.addListing.errors.loadMakesFailed")))
+      .finally(() => setIsLoadingMakes(false));
+
+    getActiveModels()
+      .then((res) => { if (res.success) setAllModels(res.data ?? []); })
+      .catch(() => toast.error(t("seller.addListing.errors.loadModelsFailed")))
+      .finally(() => setIsLoadingModels(false));
+  }, [t]);
+
+  // Filter models by selected make
+  const availableModels = useMemo(
+    () => (form.makeId ? allModels.filter((m) => m.makeId === form.makeId) : []),
+    [allModels, form.makeId]
+  );
 
   // ── Handlers ─────────────────────────────────────────────────────────────
 
@@ -368,38 +367,40 @@ const AddListing = () => {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {/* Make */}
             <FormField label={t("seller.addListing.fields.make")} error={errors.makeId} required>
-              <Select value={form.makeId} onValueChange={(v) => updateField("makeId", v)}>
-                <SelectTrigger aria-invalid={!!errors.makeId}>
-                  <SelectValue placeholder={t("seller.addListing.placeholders.make")} />
-                </SelectTrigger>
-                <SelectContent>
-                  {MAKES.map((make) => (
-                    <SelectItem key={make.id} value={make.id.toString()}>
-                      {make.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Combobox
+                value={form.makeId}
+                onValueChange={(v) => updateField("makeId", v)}
+                options={makes.map((m) => ({ value: m.id, label: m.name }))}
+                placeholder={
+                  isLoadingMakes
+                    ? t("seller.addListing.placeholders.loading")
+                    : t("seller.addListing.placeholders.make")
+                }
+                searchPlaceholder={t("seller.addListing.placeholders.searchMake")}
+                emptyText={t("seller.addListing.placeholders.noMakeFound")}
+                disabled={isLoadingMakes}
+                aria-invalid={!!errors.makeId}
+              />
             </FormField>
 
             {/* Model */}
             <FormField label={t("seller.addListing.fields.model")} error={errors.modelId} required>
-              <Select
+              <Combobox
                 value={form.modelId}
                 onValueChange={(v) => updateField("modelId", v)}
-                disabled={!form.makeId}
-              >
-                <SelectTrigger aria-invalid={!!errors.modelId}>
-                  <SelectValue placeholder={t("seller.addListing.placeholders.model")} />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableModels.map((model) => (
-                    <SelectItem key={model.id} value={model.id.toString()}>
-                      {model.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                options={availableModels.map((m) => ({ value: m.id, label: m.name }))}
+                placeholder={
+                  isLoadingModels
+                    ? t("seller.addListing.placeholders.loading")
+                    : !form.makeId
+                    ? t("seller.addListing.placeholders.selectMakeFirst")
+                    : t("seller.addListing.placeholders.model")
+                }
+                searchPlaceholder={t("seller.addListing.placeholders.searchModel")}
+                emptyText={t("seller.addListing.placeholders.noModelFound")}
+                disabled={!form.makeId || isLoadingModels}
+                aria-invalid={!!errors.modelId}
+              />
             </FormField>
 
             {/* Year */}

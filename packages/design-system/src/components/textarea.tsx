@@ -14,6 +14,13 @@ function Textarea({
         "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
         "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
         "resize-none",
+        // Custom scrollbar — hidden until hover/focus, visible only when overflowing
+        "[scrollbar-width:thin] [scrollbar-color:var(--border)_transparent]",
+        "[&::-webkit-scrollbar]:w-1.5",
+        "[&::-webkit-scrollbar-track]:bg-transparent",
+        "[&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-transparent",
+        "[&:hover::-webkit-scrollbar-thumb]:bg-border [&:focus::-webkit-scrollbar-thumb]:bg-border",
+        "[&::-webkit-scrollbar-thumb:hover]:bg-muted-foreground/40",
         className
       )}
       {...props}
