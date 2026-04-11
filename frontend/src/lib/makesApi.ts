@@ -14,8 +14,10 @@ export type BaseApiResponse = {
 export type MakeDto = {
   id: string;
   name: string;
+  nameAr: string;
   logoUrl: string | null;
   country: string | null;
+  countryAr: string | null;
   isActive: boolean;
   createdAt: string;
   updatedAt: string | null;
@@ -71,27 +73,19 @@ export const createMake = (data: CreateMakeRequest) =>
 // PUT /api/Makes/Update/{id}  — Admin
 export const updateMake = (id: string, data: UpdateMakeRequest) =>
   api
-    .put<ApiResponse<MakeDto>>(
-      `/api/Makes/Update/${id}`,
-      buildMakeFormData(data),
-      { headers: { "Content-Type": "multipart/form-data" } },
-    )
+    .put<
+      ApiResponse<MakeDto>
+    >(`/api/Makes/Update/${id}`, buildMakeFormData(data), { headers: { "Content-Type": "multipart/form-data" } })
     .then((r) => r.data);
 
 // PATCH /api/Makes/Activate/{id}  — Admin  (returns ApiResponseDto, no data)
 export const activateMake = (id: string) =>
-  api
-    .patch<BaseApiResponse>(`/api/Makes/Activate/${id}`)
-    .then((r) => r.data);
+  api.patch<BaseApiResponse>(`/api/Makes/Activate/${id}`).then((r) => r.data);
 
 // PATCH /api/Makes/Deactivate/{id}  — Admin  (returns ApiResponseDto, no data)
 export const deactivateMake = (id: string) =>
-  api
-    .patch<BaseApiResponse>(`/api/Makes/Deactivate/${id}`)
-    .then((r) => r.data);
+  api.patch<BaseApiResponse>(`/api/Makes/Deactivate/${id}`).then((r) => r.data);
 
 // DELETE /api/Makes/Delete/{id}  — Admin  (returns ApiResponseDto, no data)
 export const deleteMake = (id: string) =>
-  api
-    .delete<BaseApiResponse>(`/api/Makes/Delete/${id}`)
-    .then((r) => r.data);
+  api.delete<BaseApiResponse>(`/api/Makes/Delete/${id}`).then((r) => r.data);
