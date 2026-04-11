@@ -84,7 +84,7 @@ Why this is the correct starting point:
 
 **Upgrade path: Approach B - cumulative dataset.**
 
-When you have several months of data, merge snapshots and keep `scraped_at` only for splitting and auditing, not as a model feature. That gives the model more history and better trend coverage.
+When you have several months of data, merge snapshots and keep `scraped_at` only for splitting and auditing latter not now, not as a model feature. That gives the model more history and better trend coverage.
 
 **Approach C - listing-level trend tracking** is possible later if stable listing IDs exist, but it is unnecessary for the current scope.
 
@@ -174,7 +174,7 @@ Step 4: data_cleaner.py
 
 
 Step 5: train.py
-        Split data, tune with Optuna, train 3 quantile models, evaluate, save artifacts.
+        Split data(StratifiedShuffleSplit), tune with Optuna, train 3 quantile models, evaluate, save artifacts.
         evaluate, generate SHAP plots and save it, save the model with it's version
 
 Step 7: FastAPI app

@@ -31,7 +31,8 @@ Expected: LightGBM should beat baselines by 30-50% on MAPE. If it doesn't, somet
 ### Data Split
 
 - **80% train / 10% validation / 10% test**
-- Stratified on price decile bins to ensure even distribution across price ranges
+- StratifiedShuffleSplit based on the make and maybe model and year too.
+<!-- - Stratified on price decile bins to ensure even distribution across price ranges -->
 - Use validation set for early stopping during training
 - Use test set for final evaluation only (never during tuning)
 

@@ -144,7 +144,7 @@ Before training, verify NONE of these are in features:
 | price_egp (target) | Obviously |
 | Any ratio involving price_egp | Contains target |
 | page (pagination) | Scraping artifact |
-| scraped_at | Temporal leakage risk — but use it for time-based split if enough data |
+| scraped_at | Temporal leakage risk — but use it for time-based split if enough data(later not now) |
 | Aggregates computed from other rows' prices | Information from test set |
 
 **Golden rule:** Can you compute this feature from only the dealer's input + the static lookup? If yes, it's safe. If no, it's a leak.
