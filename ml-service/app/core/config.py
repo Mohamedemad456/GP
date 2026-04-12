@@ -63,6 +63,7 @@ class Settings(BaseSettings):
     raw_snapshot_file_stem: str = Field(default="cars_raw")
     model_registry_file: str = Field(default="model_registry.json")
     lookup_file_name: str = Field(default="car_specs_lookup.csv")
+    main_info_file_name: str = Field(default="car_main_info")
 
     def model_post_init(self, __context: Any) -> None:
         """Resolves directory paths to absolute paths after model instantiation."""
@@ -125,6 +126,10 @@ class Settings(BaseSettings):
         return self.lookup_dir / self.lookup_file_name
 
     @property
+    def main_info_data_path(self) -> Path:
+        return self.lookup_dir / f"{self.main_info_file_name}.json"
+
+    @property
     def model_registry_path(self) -> Path:
         return self.models_dir / self.model_registry_file
 
@@ -133,6 +138,13 @@ class Settings(BaseSettings):
         return (
             self.lookup_data_path,
             self.data_dir / self.lookup_file_name,
+        )
+
+    @property
+    def main_info_candidates(self) -> tuple[Path, ...]:
+        return (
+            self.main_info_data_path,
+            self.main_info_data_path.with_suffix(".csv"),
         )
 
     # --- Database Helpers ---
@@ -173,6 +185,16 @@ class Settings(BaseSettings):
 
         if normalized in parquet_paths:
             return pd.read_parquet(parquet_paths[normalized])
+
+        if normalized == "main_info":
+            for candidate in self.main_info_candidates:
+                if candidate.exists():
+                    if candidate.suffix == ".json":
+                        return pd.read_json(candidate)
+                    return pd.read_csv(candidate)
+            raise FileNotFoundError(
+                f"No car main info file found. Looked in: {', '.join(str(path) for path in self.main_info_candidates)}"
+            )
             
         if normalized == "lookup":
             for candidate in self.lookup_candidates:
@@ -182,7 +204,7 @@ class Settings(BaseSettings):
                 f"No lookup file found. Looked in: {', '.join(str(path) for path in self.lookup_candidates)}"
             )
 
-        raise ValueError("data_type must be one of: raw, cleaned, processed, lookup")
+        raise ValueError("data_type must be one of: raw, cleaned, processed, lookup, main_info")
     
     def save_data(self, data: pd.DataFrame, data_type: str, format: str = "parquet") -> None:
         """
@@ -190,8 +212,8 @@ class Settings(BaseSettings):
         
         Args:
             data: DataFrame to save
-            data_type: Type of data (raw, cleaned, processed, lookup)
-            format: File format - "parquet", "csv", or "all" (default: "parquet")
+            data_type: Type of data (raw, cleaned, processed, lookup, main_info)
+            format: File format - "parquet", "csv", "json", or "all" (default: "parquet")
         """
         normalized_type = data_type.strip().lower()
         normalized_format = format.strip().lower()
@@ -201,23 +223,41 @@ class Settings(BaseSettings):
             "cleaned": self.cleaned_data_path,
             "processed": self.processed_data_path,
             "lookup": self.lookup_data_path,
+            "main_info": self.main_info_data_path,
         }
         
         if normalized_type not in path_map:
-            raise ValueError("data_type must be one of: raw, cleaned, processed, lookup")
+            raise ValueError("data_type must be one of: raw, cleaned, processed, lookup, main_info")
         
-        if normalized_format not in ("parquet", "csv", "all"):
-            raise ValueError("format must be one of: parquet, csv, all")
+        if normalized_format not in ("parquet", "csv", "json", "all"):
+            raise ValueError("format must be one of: parquet, csv, json, all")
         
         base_path = path_map[normalized_type]
         base_path.parent.mkdir(parents=True, exist_ok=True)
+
+        if normalized_type == "main_info":
+            if normalized_format == "parquet":
+                raise ValueError("format must be one of: csv, json, all for main_info")
+
+            if normalized_format in ("json", "all"):
+                data.to_json(base_path, orient="records", force_ascii=False, indent=2)
+
+            if normalized_format in ("csv", "all"):
+                csv_path = base_path.with_suffix(".csv")
+                data.to_csv(csv_path, index=False)
+
+            return
         
-        if normalized_format in ("parquet", "all"):
+        if normalized_format in ("parquet"):
             data.to_parquet(base_path)
         
         if normalized_format in ("csv", "all"):
             csv_path = base_path.with_suffix(".csv")
             data.to_csv(csv_path, index=False)
+
+        if normalized_format == "json":
+            json_path = base_path.with_suffix(".json")
+            data.to_json(json_path, orient="records", force_ascii=False, indent=2)
 
 
 @lru_cache(maxsize=1)
