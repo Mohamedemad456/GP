@@ -17,6 +17,8 @@ namespace Karna.Core.Application.DependencyInjection
 			services.AddScoped<IUserService, UserService>();
 			services.AddScoped<IMakeService, MakeService>();
 			services.AddScoped<IModelService, ModelService>();
+			services.AddScoped<IListingService, ListingService>();
+			services.AddScoped<ILookupService, LookupService>();
 			services.AddScoped<IConditionChecklistCategoryService, ConditionChecklistCategoryService>();
 			services.AddScoped<IConditionDefectService, ConditionDefectService>();
 
