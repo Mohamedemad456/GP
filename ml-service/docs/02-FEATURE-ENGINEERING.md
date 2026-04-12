@@ -20,7 +20,7 @@
 | engine_cc | Specs lookup | Correlates with tier, running costs, tax |
 | body_type | Specs lookup | SUV/Crossover premium is real |
 | fuel | Raw data | Diesel trucks vs gas sedans vs hybrid luxury |
-| location_tier | Engineered | Cairo premium is significant (15-20%) |
+| brand_origin | Specs lookup | Japanese brands hold value best in Egypt |
 | horsepower | Specs lookup | Performance tier indicator |
 
 ### Tier 3 — Nice to Have
@@ -28,7 +28,9 @@
 | Feature | Source | Why |
 |---------|--------|-----|
 | drivetrain | Specs lookup | 4WD premium exists but collinear with body_type |
-| seating_capacity | Specs lookup | Mostly captured by body_type already |
+| seating_capacity | Specs lookup | Optional; mostly captured by body_type already |
+| car_segment | Specs lookup | Optional coarse class like family / sport / trip / city |
+| brand_market_share | Specs lookup | Optional popularity proxy from the ground-truth seed set |
 
 ### Skip These
 
@@ -49,12 +51,6 @@
 | car_age | 2026 - year | Depreciation proxy |
 | mileage_per_year | mileage_km / max(car_age, 1) | Usage intensity — more meaningful than raw mileage |
 | expected_depreciated_value | new_car_price × 0.85^(min(age,1)) × 0.90^(max(age-1,0)) | Theoretical value based on standard depreciation curve. The model learns how much actual price deviates from this. This is the most powerful derived feature. |
-| mileage_deviation | (mileage_km - car_age × 15000) / (car_age × 15000) | How much mileage deviates from Egyptian average (~15K km/year). Positive = high mileage (price decrease). |
-| location_tier | Map governorate → premium/high/medium/standard | Cairo/Giza = premium, Alexandria = high, others = medium/standard |
-| brand_origin | Map brand → japanese/korean/european/american/chinese/other | Japanese brands hold value best in Egypt |
-| brand_market_share | Brand frequency in dataset (normalized) | Popularity proxy — common brands have cheaper parts |
-| mileage_is_missing | Flag when original mileage was 0 or null | Missing mileage is itself informative (sellers may hide high mileage) |
-| transmission_is_missing | Flag when original transmission was "0" | Same principle — missingness carries signal |
 
 ---
 
@@ -83,11 +79,11 @@
 
 **Format:** CSV (flat, easy to inspect/edit in Excel, Git-friendly)
 
-**Columns:** brand, model, year, engine_cc, body_type, horsepower, drivetrain, new_car_price_egp, seating_capacity
+**Columns:** brand, model, year, engine_cc, body_type, horsepower, drivetrain, new_car_price_egp, seating_capacity, brand_origin, car_segment, brand_market_share
 
 **Generation:**
-1. Get unique (brand, model, year) combos from parsed titles (expect 200-500)
-2. Send to Claude in batch with strict schema
+1. Get unique (brand, model, year, transmission, fuel) combos from the ground-truth seed file
+2. Enrich each row with the lookup-backed columns listed above
 3. Save as `data/car_specs_lookup.csv`
 4. Validate top 10 brands manually against official specs and Egyptian pricing sites
 5. Commit to Git
@@ -102,7 +98,7 @@
 
 **Use LightGBM's native categorical support.** Do not one-hot encode.
 
-- Convert brand, model, transmission, fuel, body_type, drivetrain, location_tier, brand_origin to pandas `category` dtype
+- Convert brand, model, transmission, fuel, body_type, drivetrain, brand_origin, car_segment to pandas `category` dtype
 - Pass them as `categorical_feature` parameter to LightGBM
 - LightGBM uses optimal partitioning internally, which is better than one-hot for high-cardinality features
 
@@ -117,10 +113,9 @@ For rare models (<10 samples), group into "Other_{brand}" to prevent noise.
 | mileage_km | Value is 0 or null | Flag with mileage_is_missing = True, then impute with brand+model median |
 | transmission | Value is "0" | Flag with transmission_is_missing = True, then impute with brand+model mode |
 | fuel | Rarely missing | Assume "Gas" (most common in Egypt) |
-| location | Rarely missing | Set location_tier = "unknown" |
 | Lookup features | No match in CSV | Impute with brand+body_type group median. Mark confidence = "low". |
 
-**Key insight:** Create binary `_is_missing` flags before imputing. Tree models use these effectively — the fact that mileage is missing is itself predictive (sellers may hide high mileage).
+**Key insight:** Missing values should still be handled during cleaning, but the final feature list stays limited to the agreed core, lookup, and engineered columns.
 
 ---
 
@@ -151,14 +146,14 @@ Before training, verify NONE of these are in features:
 
 ---
 
-## Final Feature List (~20 features)
+## Final Feature List (~18 features)
+
+Lookup-backed features are the static enrichment columns stored in the lookup file.
 
 **Core (6):** brand, model, year, mileage_km, transmission, fuel
 
-**Lookup (5):** engine_cc, body_type, horsepower, new_car_price_egp, drivetrain
+**Lookup (9):** engine_cc, body_type, horsepower, new_car_price_egp, drivetrain, brand_origin, car_segment, brand_market_share, seating_capacity
 
-**Engineered (7):** car_age, mileage_per_year, expected_depreciated_value, mileage_deviation, location_tier, brand_origin, brand_market_share
+**Engineered (3):** car_age, mileage_per_year, expected_depreciated_value
 
-**Flags (2):** mileage_is_missing, transmission_is_missing
-
-This is the right size — enough signal without overfitting on 27K samples.
+This is the right size — enough signal without overfitting on 26K samples.

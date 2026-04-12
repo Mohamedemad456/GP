@@ -90,7 +90,7 @@ When you have several months of data, merge snapshots and keep `scraped_at` only
 
 ### 2. Static Lookup CSV Instead of Runtime LLM
 
-Car specs such as `engine_cc`, `horsepower`, `body_type`, and `new_car_price_egp` are deterministic properties of a model-year combination. They should be generated once, validated, and reused at both training and inference time.
+Car specs and lookup-backed enrichments such as `engine_cc`, `horsepower`, `body_type`, `drivetrain`, `new_car_price_egp`, `seating_capacity`, `brand_origin`, `car_segment`, and `brand_market_share` are deterministic or precomputed properties of a model-year combination. They should be generated once, validated, and reused at both training and inference time.
 
 Why not call an LLM at prediction time:
 - Non-deterministic output.
@@ -169,7 +169,7 @@ Step 4: data_cleaner.py
         → handle mileage=0 & transmission="0" → standardize locations
         impute missing values using training statistics only, save processed Parquet.
         Join the data that have the titles parsed with car_specs_lookup.csv, build derived features,
-        apply group-level outlier removal, log the cleaning funnel, save cleaned Parquet.
+        apply group-level outlier removal, save cleaned Parquet.
         → save cleaned Parquet to data/cleaned/
 
 
@@ -242,6 +242,9 @@ Returns service status, active model version, training date, and uptime.
 | drivetrain | FWD, RWD, AWD | Claude batch, then validated |
 | new_car_price_egp | MSRP in the Egyptian market | Claude batch, cross-checked manually |
 | seating_capacity | Number of seats | Claude batch, then validated |
+| brand_origin | Brand origin region | Rule-based mapping from canonical brand |
+| car_segment | family / sport / trip / city style segment | Rule-based mapping from body_type + seating + drivetrain |
+| brand_market_share | Normalized dataset frequency | Computed once from the ground-truth seed set and cached |
 
 **Join key:** `(brand, model, year)`.
 
