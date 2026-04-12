@@ -62,7 +62,7 @@ class Settings(BaseSettings):
     # --- File Names ---
     raw_snapshot_file_stem: str = Field(default="cars_raw")
     model_registry_file: str = Field(default="model_registry.json")
-    lookup_file_name: str = Field(default="car_specs_lookup.csv")
+    lookup_file_name: str = Field(default="car_specs_lookup_full_cleaned.csv")
     main_info_file_name: str = Field(default="car_main_info")
 
     def model_post_init(self, __context: Any) -> None:
