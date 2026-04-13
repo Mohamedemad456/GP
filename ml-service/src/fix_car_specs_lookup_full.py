@@ -131,6 +131,13 @@ def _only_brand_market_share_le(max_value: float) -> Callable[[dict[str, str]], 
     return _predicate
 
 
+def _only_col_equals(col: str, expected: str) -> Callable[[dict[str, str]], bool]:
+    def _predicate(row: dict[str, str]) -> bool:
+        return norm_text(row.get(col, "")) == norm_text(expected)
+
+    return _predicate
+
+
 # Targeted correction map based on the issues described in your review thread.
 # Notes:
 # - Keep rules tight to avoid unintended edits.
@@ -251,6 +258,40 @@ RULES: list[Rule] = [
         only_if=_only_brand_market_share_le(0.0010),
         updates={"brand_market_share": 0.0035},
     ),
+
+    # Segment mismatches (confirmed)
+    Rule(
+        id="segment_ds_ds7_luxury_suv",
+        make="DS",
+        model="DS7",
+        year_range=(1900, 2100),
+        only_if=_only_col_equals("car_segment", "executive"),
+        updates={"car_segment": "luxury_suv"},
+    ),
+    Rule(
+        id="segment_cupra_formentor_crossover",
+        make="Cupra",
+        model="Formentor",
+        year_range=(1900, 2100),
+        only_if=_only_col_equals("car_segment", "sport"),
+        updates={"car_segment": "crossover"},
+    ),
+    Rule(
+        id="segment_alfa_romeo_tonale_crossover",
+        make="Alfa Romeo",
+        model="Tonale",
+        year_range=(1900, 2100),
+        only_if=_only_col_equals("car_segment", "executive"),
+        updates={"car_segment": "crossover"},
+    ),
+    Rule(
+        id="segment_vw_beetle_sport",
+        make="Volkswagen",
+        model="Beetle",
+        year_range=(1900, 2100),
+        only_if=_only_col_equals("car_segment", "city"),
+        updates={"car_segment": "sport"},
+    ),
 ]
 
 
@@ -305,15 +346,16 @@ def atomic_replace(src: Path, dst: Path) -> None:
 def default_paths() -> tuple[Path, Path]:
     # This script lives in ml-service/src; derive the ml-service root reliably.
     ml_service_root = Path(__file__).resolve().parents[1]
-    input_path = ml_service_root / "data" / "lookups" / "car_specs_lookup_full.csv"
-    output_path = ml_service_root / "data" / "lookups" / "car_specs_lookup_full.fixed.csv"
+    # The canonical, production-ready lookup is the cleaned file.
+    input_path = ml_service_root / "data" / "lookups" / "car_specs_lookup_full_cleaned.csv"
+    output_path = ml_service_root / "data" / "lookups" / "car_specs_lookup_full_cleaned_fixed.csv"
     return input_path, output_path
 
 
 def main(argv: list[str]) -> int:
     default_in, default_out = default_paths()
 
-    parser = argparse.ArgumentParser(description="Apply deterministic corrections to car_specs_lookup_full.csv")
+    parser = argparse.ArgumentParser(description="Apply deterministic corrections to the car specs lookup CSV")
     parser.add_argument("--input", type=Path, default=default_in, help=f"Input CSV (default: {default_in})")
     parser.add_argument("--output", type=Path, default=default_out, help=f"Output CSV (default: {default_out})")
     parser.add_argument("--in-place", action="store_true", help="Overwrite the input file (creates a .bak backup)")

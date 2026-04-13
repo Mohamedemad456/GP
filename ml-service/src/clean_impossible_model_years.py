@@ -66,6 +66,11 @@ class ModelYearRule:
 MIN_MODEL_YEAR: list[ModelYearRule] = [
     ModelYearRule(make="Audi", model="Q4 E-Tron", min_year=2021),
     ModelYearRule(make="Tesla", model="Model Y", min_year=2020),
+    ModelYearRule(make="BMW", model="IX1", min_year=2022),
+    ModelYearRule(make="BYD", model="Destroyer 05", min_year=2022),
+    ModelYearRule(make="MG", model="Cyberster", min_year=2023),
+    ModelYearRule(make="Chery", model="Tiggo 8 Pro Max", min_year=2024),
+    ModelYearRule(make="Kia", model="Xceed", min_year=2020),
 ]
 
 

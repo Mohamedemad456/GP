@@ -1,6 +1,6 @@
 # 07 — Data Quality Fixes (Lookup + Raw Listings)
 
-**Date:** 2026-04-12
+**Date:** 2026-04-13
 
 This document summarizes the data-quality issues discovered in this workspace and the exact fixes applied to:
 
@@ -16,15 +16,22 @@ The goal is to keep your Egypt used-cars price model from learning wrong relatio
 ### 1.1 Lookup tables
 
 - Car specs lookup (enrichment features):
-  - [ml-service/data/lookups/car_specs_lookup_full.csv](../data/lookups/car_specs_lookup_full.csv)
+  - [ml-service/data/lookups/car_specs_lookup_full_cleaned.csv](../data/lookups/car_specs_lookup_full_cleaned.csv)
 - Main info lookup (basic listing metadata per make/model/year):
   - [ml-service/data/lookups/car_main_info.csv](../data/lookups/car_main_info.csv)
+
+Note: we intentionally consolidated the lookup folder so only the production-ready CSVs remain (no duplicate `*.cleaned.csv` artifacts and no stale JSON).
 
 ### 1.2 Raw marketplace dataset
 
 - Cleaned in place:
   - [ml-service/data/raw/cars_with_make_model.csv](../data/raw/cars_with_make_model.csv)
   - [ml-service/data/raw/cars_with_make_model.parquet](../data/raw/cars_with_make_model.parquet)
+
+### 1.3 Data cleaning notebook
+
+- Notebook pipeline:
+  - [ml-service/notebooks/02_data_cleaning.ipynb](../notebooks/02_data_cleaning.ipynb)
 
 ---
 
@@ -55,15 +62,15 @@ We found impossible combinations that cannot exist in reality:
 These “ghost” rows appear in:
 
 - raw listings: [ml-service/data/raw/cars_with_make_model.csv](../data/raw/cars_with_make_model.csv)
-- lookup tables: [ml-service/data/lookups/car_specs_lookup_full.csv](../data/lookups/car_specs_lookup_full.csv), [ml-service/data/lookups/car_main_info.csv](../data/lookups/car_main_info.csv)
+- lookup tables: [ml-service/data/lookups/car_specs_lookup_full_cleaned.csv](../data/lookups/car_specs_lookup_full_cleaned.csv), [ml-service/data/lookups/car_main_info.csv](../data/lookups/car_main_info.csv)
 
 This is a source-data reliability issue, not a lookup-fixer bug.
 
-### 2.4 Additional inconsistency to watch (not auto-fixed)
+### 2.4 EV fuel/transmission noise (fixed via explicit rules)
 
-In the lookup `car_main_info.csv`, some EV models appear with fuel like `petrol` in certain years (e.g., Tesla Model Y entries). This is a sign that `fuel`/`transmission` can also inherit source noise.
+In the lookup `car_main_info.csv`, some pure-EV models appeared with `fuel=petrol` (and/or non-automatic transmissions) in certain years (e.g., Tesla Model Y). This is a sign that `fuel`/`transmission` can inherit source noise.
 
-We did **not** mass-correct fuel/transmission yet because it needs explicit rules (and likely depends on trim/model year).
+We fixed this using an explicit allowlist of confirmed pure-EV models (see section 3.4).
 
 ---
 
@@ -78,10 +85,9 @@ Tooling:
 - Safety: rules are intentionally tight; some only apply if the existing values match a known-bad pattern.
 - Backup behavior: in-place edits create timestamped `.bak` backups.
 
-**Latest run summary (from the script output):**
+**Current production file summary:**
 
-- Rows in lookup: `4221`
-- Rule applications: `37`
+- Rows in lookup (after ghost-year drops): `4190`
 
 **Corrections applied (high level):**
 
@@ -103,10 +109,7 @@ Tooling:
   - Toyota Corolla Cross (2020+): force `body_type=Crossover`, `car_segment=crossover`
   - Toyota Urban Cruiser: force `body_type=Crossover`, `car_segment=crossover`
 
-**Backups created (car specs lookup):**
-
-- [ml-service/data/lookups/car_specs_lookup_full.csv.20260412_200231.bak](../data/lookups/car_specs_lookup_full.csv.20260412_200231.bak)
-- [ml-service/data/lookups/car_specs_lookup_full.csv.20260412_200828.bak](../data/lookups/car_specs_lookup_full.csv.20260412_200828.bak)
+During development, in-place runs created timestamped `.bak` files. These were later deleted when consolidating the lookup folder to “latest-only”.
 
 ### 3.2 Remove impossible model-year rows (“data ghosts”)
 
@@ -116,6 +119,11 @@ Tooling:
 - Rules implemented (minimal authoritative set):
   - Audi Q4 E-Tron: `min_year = 2021`
   - Tesla Model Y: `min_year = 2020`
+  - BMW IX1: `min_year = 2022`
+  - BYD Destroyer 05: `min_year = 2022`
+  - MG Cyberster: `min_year = 2023`
+  - Chery Tiggo 8 Pro Max: `min_year = 2024`
+  - Kia Xceed: `min_year = 2020`
 
 Supported actions:
 
@@ -128,12 +136,35 @@ Supported actions:
 - Raw dataset `cars_with_make_model.csv`: dropped `25` rows
   - Tesla Model Y: `18`
   - Audi Q4 E-Tron: `7`
-- Lookup `car_specs_lookup_full.csv`: dropped `12` rows in cleaned-output file
-- Lookup `car_main_info.csv`: dropped `13` rows in cleaned-output file
+
+After expanding the rule set (2026-04-13), additional ghost rows were removed:
+
+- Raw dataset `cars_with_make_model.csv`: dropped `68` rows
+  - Chery Tiggo 8 Pro Max: `28`
+  - MG Cyberster: `21`
+  - BYD Destroyer 05: `15`
+  - BMW IX1: `3`
+  - Kia Xceed: `1`
+
+- Lookup `car_specs_lookup_full_cleaned.csv`: dropped `31` rows
+  - Audi Q4 E-Tron: `6`
+  - Tesla Model Y: `6`
+  - Chery Tiggo 8 Pro Max: `6`
+  - BYD Destroyer 05: `5`
+  - MG Cyberster: `4`
+  - BMW IX1: `3`
+  - Kia Xceed: `1`
+
+- Lookup `car_main_info.csv`: dropped `27` rows
+  - BYD Destroyer 05: `11`
+  - Chery Tiggo 8 Pro Max: `8`
+  - MG Cyberster: `4`
+  - BMW IX1: `3`
+  - Kia Xceed: `1`
 
 **Raw dataset in-place backup created:**
 
-- [ml-service/data/raw/cars_with_make_model.csv.20260412_203832.bak](../data/raw/cars_with_make_model.csv.20260412_203832.bak)
+- [ml-service/data/raw/cars_with_make_model.csv.20260413_110741.bak](../data/raw/cars_with_make_model.csv.20260413_110741.bak)
 
 **Parquet regeneration:**
 
@@ -141,21 +172,43 @@ To keep formats consistent, we regenerated:
 
 - [ml-service/data/raw/cars_with_make_model.parquet](../data/raw/cars_with_make_model.parquet)
 
-with a backup:
+Non-destructive cleaned outputs may exist in `data/raw/` (e.g., `cars_with_make_model.csv.cleaned.csv`). Lookup-folder artifacts were intentionally removed during consolidation.
 
-- [ml-service/data/raw/cars_with_make_model.parquet.20260412_204057.bak](../data/raw/cars_with_make_model.parquet.20260412_204057.bak)
+---
 
-**Non-destructive cleaned outputs also produced:**
+## 3.3 Segment corrections (spec lookup)
 
-- [ml-service/data/raw/cars_with_make_model.csv.cleaned.csv](../data/raw/cars_with_make_model.csv.cleaned.csv)
-- [ml-service/data/lookups/car_specs_lookup_full.csv.cleaned.csv](../data/lookups/car_specs_lookup_full.csv.cleaned.csv)
-- [ml-service/data/lookups/car_main_info.csv.cleaned.csv](../data/lookups/car_main_info.csv.cleaned.csv)
+Confirmed segment mismatches were corrected in-place via [ml-service/src/fix_car_specs_lookup_full.py](../src/fix_car_specs_lookup_full.py):
+
+- DS DS7: `executive` → `luxury_suv`
+- Cupra Formentor: `sport` → `crossover`
+- Alfa Romeo Tonale: `executive` → `crossover`
+- Volkswagen Beetle: `city` → `sport`
+
+Note: any intermediate `.bak` files created during development were removed during lookup-folder consolidation.
+
+---
+
+## 3.4 EV fuel/transmission normalization (main info lookup)
+
+Some known pure-EV models appeared with `fuel=petrol` (and/or non-automatic transmissions) in [ml-service/data/lookups/car_main_info.csv](../data/lookups/car_main_info.csv).
+
+Tooling:
+
+- Script: [ml-service/src/fix_car_main_info_ev_fuel.py](../src/fix_car_main_info_ev_fuel.py)
+- Rule: for confirmed pure-EV models, enforce `fuel='electric'` and `transmission='Automatic'`.
+
+Observed changes (2026-04-13):
+
+- `32` rows updated in `car_main_info.csv`
+
+Note: any intermediate `.bak` files created during development were removed during lookup-folder consolidation.
 
 ---
 
 ## 4) Lookup Data Notes (Schema + Intended Use)
 
-### 4.1 `car_specs_lookup_full.csv`
+### 4.1 `car_specs_lookup_full_cleaned.csv`
 
 Header:
 
@@ -170,6 +223,33 @@ Header:
 - `make, model, year, transmission, fuel`
 
 Intended use: coarse normalization by year and basic drivetrain/energy type.
+
+### 4.3 Notebook-based preprocessing flow
+
+The main cleaning notebook performs the following steps before feature engineering and merge:
+
+- load `raw` listings and the lookup table through `settings.load_data(...)`
+- standardize key string columns (`make`, `model`, `transmission`, `fuel`, `location`, `title`)
+- drop duplicates using all columns except `id` and `location`
+- recover `year` from `title`, then fill remaining nulls with the modal year per `(make, model)`, then drop unresolved rows
+- apply hard filters for year, price, and mileage
+- remove unusually old listings with implausibly low mileage
+- fix only ultra-rare categorical inconsistencies using a very strict group-based rule
+- impute `fuel` and `transmission` via hierarchical mode rules
+- normalize `location` into the final Egyptian market categories
+- remove rare make+model pairs with fewer than 5 rows
+- engineer `price_egp_log`, `car_age`, and `mileage_per_year`
+- merge the cleaned listings with the lookup on `(make, model, year)`
+- drop `brand_market_share` from the lookup before the final merge output
+
+### 4.4 Final notebook outputs
+
+The notebook currently saves two production-facing outputs:
+
+- cleaned listings: [ml-service/data/cleaned/cleaned_data.parquet](../data/cleaned/cleaned_data.parquet)
+- feature-enriched dataset: [ml-service/data/processed/processed_data.csv](../data/processed/processed_data.csv)
+
+These outputs are the ones that should feed downstream model training, not the intermediate cleaned lookup artifacts that were deleted during consolidation.
 
 ---
 
@@ -192,11 +272,13 @@ Raw dataset (in-place):
   --action drop
 ```
 
-Lookups (non-destructive cleaned outputs):
+Lookups (recommended to run in-place on the production lookup):
 
 ```bash
 /home/mo-seif/Documents/GP/GPENV/bin/python ml-service/src/clean_impossible_model_years.py \
-  --input ml-service/data/lookups/car_specs_lookup_full.csv
+  --input ml-service/data/lookups/car_specs_lookup_full_cleaned.csv \
+  --in-place \
+  --action drop
 
 /home/mo-seif/Documents/GP/GPENV/bin/python ml-service/src/clean_impossible_model_years.py \
   --input ml-service/data/lookups/car_main_info.csv
@@ -231,4 +313,4 @@ and run:
 
 - **Trim-level ambiguity:** some issues (e.g., Renault Duster 4WD variants) cannot be corrected without a trim/variant signal. A single (make, model, year) row cannot represent multiple drivetrains reliably.
 - **Broader ghost-year audit:** the current cleaner only targets models you explicitly confirmed. If you want broader coverage, build a ruleset for the EV / newer-model universe (and/or detect outliers where a model appears decades before its median year).
-- **Fuel/transmission cleanup:** `car_main_info.csv` contains suspicious energy-type values for some EVs. If you want, we can add a second cleaner to enforce EV fuel types based on the spec lookup (engine_cc=0 + known EV models), but that should be done with explicit rules to avoid false positives.
+- **Fuel/transmission cleanup:** implemented for an explicit allowlist of confirmed pure-EV models. Extend the allowlist only after validating additional models, because this category is easy to over-correct.

@@ -5,9 +5,8 @@
 
 data/raw/*.*
 data/cleaned/*.*
-data/processed/*.
+data/processed/*.*
 data/lookups/*
-
 
 # Models
 models/v*/
