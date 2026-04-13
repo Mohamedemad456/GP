@@ -1,4 +1,5 @@
 ﻿using Karna.APIs.Controllers.Controllers._Base;
+using Karna.Core.Application.Abstraction.DTOs._Common;
 using Karna.Core.Application.Abstraction.DTOs.Make;
 using Karna.Core.Application.Abstraction.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -11,16 +12,16 @@ namespace Karna.APIs.Controllers.Controllers
 	{
 		[AllowAnonymous]
 		[HttpGet("Active")]
-		public async Task<IActionResult> GetAllActive()
+		public async Task<IActionResult> GetAllActive([FromQuery] PaginationSpecParams specParams)
 		{
-			var result = await _makeService.GetAllActiveAsync();
+			var result = await _makeService.GetAllActiveAsync(specParams);
 			return Ok(result);
 		}
 
 		[HttpGet("All")]
-		public async Task<IActionResult> GetAll()
+		public async Task<IActionResult> GetAll([FromQuery] MakeSpecParams specParams)
 		{
-			var result = await _makeService.GetAllAsync();
+			var result = await _makeService.GetAllAsync(specParams);
 			return Ok(result);
 		}
 
