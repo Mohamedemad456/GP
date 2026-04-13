@@ -56,7 +56,7 @@ You have 8-12 weeks, working solo, with no prior ML deployment experience. The f
 ### Risk #3: Specs Lookup Accuracy (MEDIUM)
 
 **The Problem:**
-LLM-generated specs (engine_cc, horsepower, new_car_price_egp) might be wrong. Especially `new_car_price_egp` which varies by trim, year, and Egyptian import taxes/currency fluctuations. A wrong new_car_price_egp anchor will throw off predictions.
+LLM-generated lookup-backed fields (engine_cc, horsepower, new_car_price_egp, brand_origin, car_segment, seating_capacity, brand_market_share) might be wrong. Especially `new_car_price_egp` which varies by trim, year, and Egyptian import taxes/currency fluctuations. A wrong lookup anchor will throw off predictions.
 
 **Impact:** Garbage-in-garbage-out for enriched features. Model learns wrong relationships.
 
