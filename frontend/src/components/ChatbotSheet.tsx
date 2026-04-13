@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Send, Sparkles, Bot, User } from "lucide-react";
+import { Send, Sparkles, Bot, User, MessageCircle, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Sheet,
@@ -11,7 +11,7 @@ import {
   SheetDescription,
   ScrollArea,
   Button,
-  Input,
+  Textarea,
   Avatar,
   AvatarFallback,
   AvatarBadge,
@@ -24,16 +24,16 @@ type Message = { role: "user" | "assistant"; text: string };
 
 function TypingIndicator() {
   return (
-    <div className="flex items-center gap-1.5 px-1">
+    <div className="flex items-center gap-1.5">
       {[0, 1, 2].map((i) => (
         <motion.span
           key={i}
-          className="block size-2 rounded-full bg-primary/60"
-          animate={{ y: [0, -6, 0] }}
+          className="block size-2 rounded-full bg-primary/70"
+          animate={{ y: [0, -5, 0], opacity: [0.5, 1, 0.5] }}
           transition={{
-            duration: 0.6,
+            duration: 0.7,
             repeat: Infinity,
-            delay: i * 0.15,
+            delay: i * 0.14,
             ease: "easeInOut",
           }}
         />
@@ -103,6 +103,30 @@ export default function ChatbotSheet() {
   const [isLoading, setIsLoading] = useState(false);
   const isRTL = i18n.language?.startsWith("ar") ?? false;
   const bottomRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+
+
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.overflowY = "hidden";  
+    el.style.height = "auto";
+    const maxH = 120;               
+    if (el.scrollHeight > maxH) {
+      el.style.height = `${maxH}px`;
+      el.style.overflowY = "auto"; 
+    } else {
+      el.style.height = `${el.scrollHeight}px`;
+    }
+  }, [inputValue]);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      formRef.current?.requestSubmit();
+    }
+  };
 
   const handleMessageSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -153,33 +177,33 @@ export default function ChatbotSheet() {
           className={cn(
             "fixed z-40 flex size-14 cursor-pointer items-center justify-center rounded-full",
             "bg-primary text-primary-foreground",
-            "shadow-[0_4px_24px_-4px_hsl(var(--primary)/0.45)]",
+            "shadow-[0_8px_32px_-4px_hsl(var(--primary)/0.5)]",
             "outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-            "right-5 bottom-5",
+            "end-5 bottom-5",
           )}
           whileHover={{ scale: 1.08 }}
-          whileTap={{ scale: 0.95 }}
+          whileTap={{ scale: 0.94 }}
         >
           <AnimatePresence mode="wait">
             {open ? (
               <motion.span
                 key="open"
-                initial={{ rotate: -90, opacity: 0 }}
-                animate={{ rotate: 0, opacity: 1 }}
-                exit={{ rotate: 90, opacity: 0 }}
-                transition={{ duration: 0.2 }}
+                initial={{ rotate: -90, opacity: 0, scale: 0.7 }}
+                animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                exit={{ rotate: 90, opacity: 0, scale: 0.7 }}
+                transition={{ duration: 0.18 }}
               >
-                <Sparkles className="size-6" strokeWidth={2.2} />
+                <X className="size-5" strokeWidth={2.5} />
               </motion.span>
             ) : (
               <motion.span
                 key="closed"
-                initial={{ rotate: 90, opacity: 0 }}
-                animate={{ rotate: 0, opacity: 1 }}
-                exit={{ rotate: -90, opacity: 0 }}
-                transition={{ duration: 0.2 }}
+                initial={{ rotate: 90, opacity: 0, scale: 0.7 }}
+                animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                exit={{ rotate: -90, opacity: 0, scale: 0.7 }}
+                transition={{ duration: 0.18 }}
               >
-                <Sparkles className="size-6" strokeWidth={2.2} />
+                <MessageCircle className="size-6" strokeWidth={2} />
               </motion.span>
             )}
           </AnimatePresence>
@@ -227,83 +251,85 @@ export default function ChatbotSheet() {
                 type="button"
                 onClick={() => setOpen(false)}
                 className="flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-                aria-label="Close"
+                aria-label={t("chatbot.close", "Close")}
               >
-                <svg
-                  width="15"
-                  height="15"
-                  viewBox="0 0 15 15"
-                  fill="none"
-                  className="size-4"
-                >
-                  <path
-                    d="M11.7816 4.03157C12.0062 3.80702 12.0062 3.44295 11.7816 3.2184C11.5571 2.99385 11.193 2.99385 10.9685 3.2184L7.50005 6.68682L4.03164 3.2184C3.80708 2.99385 3.44301 2.99385 3.21846 3.2184C2.99391 3.44295 2.99391 3.80702 3.21846 4.03157L6.68688 7.49999L3.21846 10.9684C2.99391 11.193 2.99391 11.557 3.21846 11.7816C3.44301 12.0061 3.80708 12.0061 4.03164 11.7816L7.50005 8.31316L10.9685 11.7816C11.193 12.0061 11.5571 12.0061 11.7816 11.7816C12.0062 11.557 12.0062 11.193 11.7816 10.9684L8.31322 7.49999L11.7816 4.03157Z"
-                    fill="currentColor"
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                  />
-                </svg>
+                <X className="size-4" strokeWidth={2.5} />
               </button>
             </div>
           </SheetHeader>
         </div>
 
         {/* Messages */}
-        <ScrollArea className="flex-1 border-0 bg-transparent">
-          <div className="flex flex-col gap-4 px-4 py-5" style={{ direction: "ltr" }}>
-            {messages.map((msg, i) => (
-              <MessageBubble key={i} msg={msg} index={i} />
-            ))}
+        <div className="relative flex-1 overflow-hidden">
+          {/* Top fade */}
+          <div
+            className="pointer-events-none absolute inset-x-0 top-0 z-10 h-6 bg-linear-to-b from-background to-transparent"
+            aria-hidden
+          />
+          <ScrollArea className="h-full border-0 bg-muted/20">
+            <div className="flex flex-col gap-4 px-4 py-5" style={{ direction: "ltr" }}>
+              {messages.map((msg, i) => (
+                <MessageBubble key={i} msg={msg} index={i} />
+              ))}
 
-            {/* Typing indicator */}
-            <AnimatePresence>
-              {isLoading && (
-                <motion.div
-                className="flex items-center gap-2.5 justify-start"
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ delay: 0.1 }}
-                >
-                <Avatar size="default" className="ring-0">
-                  <AvatarFallback className="bg-primary/15 text-primary">
-                    <Bot strokeWidth={2.2} />
-                  </AvatarFallback>
-                </Avatar>
-                <div className="rounded-2xl border border-border/60 bg-card px-4 py-3 shadow-sm">
-                  <TypingIndicator />
-                </div>
-              </motion.div>
-              )}
-            </AnimatePresence>
+              {/* Typing indicator */}
+              <AnimatePresence>
+                {isLoading && (
+                  <motion.div
+                    className="flex items-center justify-start gap-2.5"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ delay: 0.1 }}
+                  >
+                    <Avatar size="default" className="ring-0">
+                      <AvatarFallback className="bg-primary/15 text-primary">
+                        <Bot strokeWidth={2.2} />
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="rounded-2xl border border-border/60 bg-card px-4 py-3 shadow-sm">
+                      <TypingIndicator />
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
-            <div ref={bottomRef} />
-          </div>
-        </ScrollArea>
+              <div ref={bottomRef} />
+            </div>
+          </ScrollArea>
+        </div>
 
         {/* Input */}
-        <div className="shrink-0 border-t border-border/50 bg-background px-4 py-3.5">
+        <div className="shrink-0 border-t border-border/50 bg-background px-4 pb-4 pt-3">
           <form
-            className="flex items-center gap-2"
+            ref={formRef}
+            className="flex items-end gap-2"
             onSubmit={handleMessageSubmit}
             style={{ direction: isRTL ? "rtl" : "ltr" }}
           >
-            <Input
-              type="text"
+            <Textarea
+              ref={textareaRef}
+              rows={1}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={handleKeyDown}
               placeholder={t("chatbot.placeholder")}
-              className="min-w-0 flex-1 rounded-full border-border/70 bg-secondary/50 px-4 py-2 text-sm placeholder:text-muted-foreground/70"
               aria-label={t("chatbot.placeholder")}
+              style={{ minHeight: 0 }}
+              className={cn(
+                "min-w-0 flex-1 rounded-2xl border-border/70",
+                "bg-secondary/50 px-4 py-2 text-sm leading-relaxed",
+                "placeholder:text-muted-foreground/60 max-h-[120px]",
+              )}
             />
             <Button
               type="submit"
               size="icon"
-              disabled={!inputValue.trim()}
+              disabled={!inputValue.trim() || isLoading}
               className={cn(
-                "size-10 shrink-0 rounded-full transition-all",
-                inputValue.trim()
-                  ? "bg-primary text-primary-foreground shadow-md hover:bg-primary/90 hover:shadow-lg"
+                "size-10 shrink-0 rounded-full transition-all duration-200",
+                inputValue.trim() && !isLoading
+                  ? "bg-primary text-primary-foreground shadow-md shadow-primary/25 hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/30"
                   : "bg-secondary text-muted-foreground",
               )}
               aria-label={t("chatbot.send")}
@@ -317,6 +343,9 @@ export default function ChatbotSheet() {
               />
             </Button>
           </form>
+          <p className="mt-2 text-center text-[10px] text-muted-foreground/50">
+            {t("chatbot.poweredBy", "Powered by Sayarti AI")}
+          </p>
         </div>
       </SheetContent>
     </Sheet>

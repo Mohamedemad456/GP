@@ -14,7 +14,7 @@ const Footer = memo(() => {
 
   return (
     <footer
-      className="mt-10 border-t border-border bg-background/90 backdrop-blur-lg"
+      className="border-t border-border bg-background/90 backdrop-blur-lg"
       dir={isRTL ? "rtl" : "ltr"}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">

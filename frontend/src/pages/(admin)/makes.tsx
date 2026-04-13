@@ -10,6 +10,7 @@ import {
   Loader2,
   ChevronLeft,
   ChevronRight,
+  Info,
 } from "lucide-react";
 import {
   Table,
@@ -59,7 +60,8 @@ type FormState = {
 const EMPTY_FORM: FormState = { name: "", nameAr: "", country: "", countryAr: "" };
 
 const Makes = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isArabic = i18n.language === "ar";
   const { success, error } = useToast();
 
   const [makes, setMakes] = useState<MakeDto[]>([]);
@@ -139,9 +141,9 @@ const Makes = () => {
     setEditingMake(make);
     setFormData({
       name: make.name,
-      nameAr: "",
+      nameAr: make.nameAr,
       country: make.country ?? "",
-      countryAr: "",
+      countryAr: make.countryAr ?? "",
     });
     setIconFile(null);
     setIconPreview(getMakeLogoUrl(make.logoUrl));
@@ -464,7 +466,7 @@ const Makes = () => {
 
       {/* Create / Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className={editingMake ? "sm:max-w-md" : "sm:max-w-lg"}>
           <DialogHeader>
             <DialogTitle>
               {editingMake ? t("admin.makes.editTitle") : t("admin.makes.createTitle")}
@@ -511,49 +513,128 @@ const Makes = () => {
               </Button>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="make-name">
-                  {t("admin.makes.name")} (EN) <span className="text-destructive">*</span>
-                </Label>
-                <Input
-                  id="make-name"
-                  value={formData.name}
-                  onChange={handleFieldChange("name")}
-                  placeholder="Toyota"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="make-nameAr">
-                  {t("admin.makes.nameAr")} (AR) <span className="text-destructive">*</span>
-                </Label>
-                <Input
-                  id="make-nameAr"
-                  value={formData.nameAr}
-                  dir="rtl"
-                  onChange={handleFieldChange("nameAr")}
-                  placeholder="تويوتا"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="make-country">{t("admin.makes.country")} (EN)</Label>
-                <Input
-                  id="make-country"
-                  value={formData.country}
-                  onChange={handleFieldChange("country")}
-                  placeholder="Japan"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="make-countryAr">{t("admin.makes.countryAr")} (AR)</Label>
-                <Input
-                  id="make-countryAr"
-                  value={formData.countryAr}
-                  dir="rtl"
-                  onChange={handleFieldChange("countryAr")}
-                  placeholder="اليابان"
-                />
-              </div>
+            <div className="space-y-4">
+              {editingMake ? (
+                // Edit: show only the active language's fields
+                isArabic ? (
+                  <>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="make-nameAr">
+                        {t("admin.makes.nameAr")} (AR){" "}
+                        <span className="text-destructive">*</span>
+                      </Label>
+                      <Input
+                        id="make-nameAr"
+                        value={formData.nameAr}
+                        dir="rtl"
+                        onChange={handleFieldChange("nameAr")}
+                        placeholder="تويوتا"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="make-countryAr">
+                        {t("admin.makes.countryAr")} (AR){" "}
+                        <span className="text-xs text-muted-foreground">(مثال: اليابان)</span>
+                      </Label>
+                      <Input
+                        id="make-countryAr"
+                        value={formData.countryAr}
+                        dir="rtl"
+                        onChange={handleFieldChange("countryAr")}
+                        placeholder="اليابان"
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="make-name">
+                        {t("admin.makes.name")} (EN){" "}
+                        <span className="text-destructive">*</span>
+                      </Label>
+                      <Input
+                        id="make-name"
+                        value={formData.name}
+                        onChange={handleFieldChange("name")}
+                        placeholder="Toyota"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="make-country">
+                        {t("admin.makes.country")} (EN){" "}
+                        <span className="text-xs text-muted-foreground">(e.g. Japan)</span>
+                      </Label>
+                      <Input
+                        id="make-country"
+                        value={formData.country}
+                        onChange={handleFieldChange("country")}
+                        placeholder="Japan"
+                      />
+                    </div>
+                  </>
+                )
+              ) : (
+                // Create: show all 4 fields in a 2-column grid (EN | AR)
+                <div className="grid grid-cols-2 gap-x-4 gap-y-4">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="make-name">
+                      {t("admin.makes.name")} (EN){" "}
+                      <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      id="make-name"
+                      value={formData.name}
+                      onChange={handleFieldChange("name")}
+                      placeholder="Toyota"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="make-nameAr">
+                      {t("admin.makes.nameAr")} (AR){" "}
+                      <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      id="make-nameAr"
+                      value={formData.nameAr}
+                      dir="rtl"
+                      onChange={handleFieldChange("nameAr")}
+                      placeholder="تويوتا"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="make-country">
+                      {t("admin.makes.country")} (EN){" "}
+                      <span className="text-xs text-muted-foreground">(e.g. Japan)</span>
+                    </Label>
+                    <Input
+                      id="make-country"
+                      value={formData.country}
+                      onChange={handleFieldChange("country")}
+                      placeholder="Japan"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="make-countryAr">
+                      {t("admin.makes.countryAr")} (AR){" "}
+                      <span className="text-xs text-muted-foreground">(مثال: اليابان)</span>
+                    </Label>
+                    <Input
+                      id="make-countryAr"
+                      value={formData.countryAr}
+                      dir="rtl"
+                      onChange={handleFieldChange("countryAr")}
+                      placeholder="اليابان"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {editingMake && (
+                <div className="flex items-start gap-2 rounded-lg border border-border/60 bg-muted/50 px-3 py-2.5 text-xs text-muted-foreground">
+                  <Info className="mt-0.5 size-3.5 shrink-0 text-primary/70" />
+                  <span>{t("admin.makes.langHint")}</span>
+                </div>
+              )}
             </div>
           </div>
 

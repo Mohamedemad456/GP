@@ -13,7 +13,7 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Karna.APIs/Karna.APIs.csproj", "Karna.APIs/"]
-RUN dotnet restore "./Karna.APIs/Karna.APIs.csproj"
+RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages dotnet restore "./Karna.APIs/Karna.APIs.csproj"
 COPY . .
 WORKDIR "/src/Karna.APIs"
 RUN dotnet build "./Karna.APIs.csproj" -c $BUILD_CONFIGURATION -o /app/build

@@ -11,6 +11,7 @@ namespace Karna.Infrastructure.Persistence._Data
 		public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
 		public DbSet<Make> Makes { get; set; } = null!;
 		public DbSet<Model> Models { get; set; } = null!;
+		public DbSet<Listing> Listings { get; set; } = null!;
 		public DbSet<ConditionChecklistCategory> ConditionChecklistCategories { get; set; } = null!;
 		public DbSet<ConditionDefect> ConditionDefects { get; set; } = null!;
 
