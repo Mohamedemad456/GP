@@ -136,18 +136,29 @@ const AdminLayout = memo(() => {
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    tooltip={t("admin.sidebar.makes")}
-                    isActive={location.pathname === "/admin/makes"}
-                  >
-                    <NavLink to="/admin/makes">
-                      <Database className="size-4" />
-                      <span>{t("admin.sidebar.makes")}</span>
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                {[
+                  {
+                    label: t("admin.sidebar.makes"),
+                    to: "/admin/makes",
+                  },
+                  {
+                    label: t("admin.sidebar.models"),
+                    to: "/admin/models",
+                  },
+                ].map((item) => (
+                  <SidebarMenuItem key={item.to}>
+                    <SidebarMenuButton
+                      asChild
+                      tooltip={item.label}
+                      isActive={location.pathname === item.to}
+                    >
+                      <NavLink to={item.to}>
+                        <Database className="size-4" />
+                        <span>{item.label}</span>
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>

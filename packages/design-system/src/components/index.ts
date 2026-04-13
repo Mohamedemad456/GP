@@ -140,6 +140,7 @@ export {
   AvatarGroup,
   AvatarGroupCount,
 } from "./avatar";
+export { Combobox, type ComboboxOption, type ComboboxProps } from "./combobox";
 export {
   Sheet,
   SheetTrigger,

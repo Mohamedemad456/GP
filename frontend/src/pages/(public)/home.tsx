@@ -24,7 +24,7 @@ import {
   Users,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import heroCarImage from "@/assets/hero-car.jpg";
+import heroCarImage from "@/assets/hero-car4.jpg";
 import { MOCK_LISTINGS } from "@/data/mocks/listings";
 
 type HomeCarCard = {
@@ -169,11 +169,10 @@ const Home = () => {
 
   return (
     <div className="relative min-h-screen overflow-x-hidden">
-      {/* Hero Section with Parallax Background */}
+      {/* ── Hero ── */}
       <section className="relative h-screen overflow-hidden">
-        {/* Fixed Background Image with Parallax Effect */}
         <div
-          className="fixed inset-0 w-full h-[120%] -z-10"
+          className="fixed inset-0 w-full h-full -z-10"
           style={{
             backgroundImage: `url(${heroCarImage})`,
             backgroundSize: "cover",
@@ -182,62 +181,57 @@ const Home = () => {
             willChange: "transform",
           }}
         >
-          {/* Gradient Overlay for Fade Effect */}
-          <div className="absolute inset-0 bg-linear-to-b from-background/90 via-background/70 to-background/95" />
-          <div className="absolute top-0 left-0 right-0 h-32 bg-linear-to-b from-background to-transparent" />
+          {/* Dark tint at top for white text legibility → image breathes in middle → fades to page bg at bottom */}
+          <div className="absolute inset-0" />
         </div>
 
-        {/* Hero Content */}
-        <div className="relative z-10 h-full flex items-center justify-center px-4 sm:px-6 lg:px-8">
+        <div className="relative z-10 h-full flex items-center justify-center px-4 sm:px-6 lg:px-8 pb-16">
           <div className="max-w-5xl mx-auto text-center">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
             >
-              <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/40 px-3 py-2 sm:px-4 backdrop-blur-md shadow-sm max-w-full">
-                <span className="h-2 w-2 rounded-full bg-primary shrink-0" />
-                <span className="text-xs sm:text-sm text-muted-foreground wrap-break-word">
+              <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 backdrop-blur-md shadow-sm max-w-full">
+                <span className="h-1.5 w-1.5 rounded-full bg-primary shrink-0 animate-pulse" />
+                <span className="text-xs sm:text-sm text-white/80 font-medium">
                   {t("home.heroBadge", {
                     defaultValue: "Verified listings • Best deals",
                   })}
                 </span>
               </div>
 
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 text-foreground drop-shadow-lg font-heading px-2 wrap-break-word">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 text-white font-heading px-2">
                 {t("hero.title")}
               </h1>
-              <p className="text-base sm:text-xl lg:text-2xl text-muted-foreground mb-6 sm:mb-8 max-w-2xl mx-auto drop-shadow-md px-2 wrap-break-word">
+              <p className="text-base sm:text-xl lg:text-2xl text-white/75 mb-8 max-w-2xl mx-auto px-2">
                 {t("hero.subtitle")}
               </p>
+
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
               >
-                <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 px-2">
+                <div className="flex flex-wrap items-center justify-center gap-3 px-2">
                   <a href="#browse" className="w-full sm:w-auto">
                     <Button
                       size="lg"
-                      className="w-full sm:w-auto bg-primary text-primary-foreground hover:glow-primary transition-smooth font-sans text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6"
+                      className="w-full sm:w-auto bg-primary text-primary-foreground hover:glow-primary transition-smooth text-base sm:text-lg px-8 py-6"
                     >
-                      <span className="wrap-break-word">{t("hero.cta")}</span>
-                      <ArrowRight
-                        className={`ml-2 h-4 w-4 sm:h-5 sm:w-5 inline-block shrink-0 ${isRTL ? "rotate-180" : ""}`}
-                      />
+                      {t("hero.cta")}
+                      <ArrowRight className="ms-2 h-5 w-5 shrink-0 rtl:rotate-180" />
                     </Button>
                   </a>
                   <Link to="/about" className="w-full sm:w-auto">
                     <Button
                       size="lg"
                       variant="outline"
-                      className="w-full sm:w-auto bg-background/40 backdrop-blur-md text-sm sm:text-base px-6 sm:px-8 py-5 sm:py-6"
+                      className="w-full sm:w-auto bg-background/40 backdrop-blur-md px-8 py-6"
                     >
-                      <span className="wrap-break-word">
-                        {t("home.heroSecondaryCta", {
-                          defaultValue: "How it works",
-                        })}
-                      </span>
+                      {t("home.heroSecondaryCta", {
+                        defaultValue: "How it works",
+                      })}
                     </Button>
                   </Link>
                 </div>
@@ -246,7 +240,7 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Scroll Indicator */}
+        {/* Scroll indicator */}
         <motion.div
           className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
           initial={{ opacity: 0 }}
@@ -271,21 +265,21 @@ const Home = () => {
         </motion.div>
       </section>
 
-      {/* Browse Cars */}
-      <section id="browse" className="relative z-20 bg-background pt-20 pb-10">
+      {/* ── Browse Cars ── */}
+      <section id="browse" className="relative z-20 bg-background py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-10 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
+              <p className="text-xs uppercase tracking-widest text-primary font-semibold mb-2">
+                {t("home.browse.subtitle")}
+              </p>
               <h2 className="text-3xl sm:text-4xl font-bold font-heading">
                 {t("home.browse.title")}
               </h2>
-              <p className="text-lg text-muted-foreground mt-2 max-w-2xl">
-                {t("home.browse.subtitle")}
-              </p>
             </div>
 
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <SlidersHorizontal className="h-4 w-4" />
+            <div className="flex items-center gap-2 self-start sm:self-auto px-3 py-1.5 rounded-full bg-muted/60 border border-border/60 text-sm text-muted-foreground">
+              <SlidersHorizontal className="h-3.5 w-3.5 text-primary shrink-0" />
               <span>
                 {t("home.browse.results", {
                   count: filteredCars.length,
@@ -296,22 +290,21 @@ const Home = () => {
           </div>
 
           {/* Filters */}
-          <Card className="border-border/60 bg-background/60 backdrop-blur-md">
-            <CardContent className="p-4 sm:p-6">
-              <div className="grid gap-3 md:grid-cols-12">
-                <div className="sm:col-span-2 md:col-span-4">
+          <Card className="border-border/60 bg-background/60 backdrop-blur-md shadow-(--shadow-sm)">
+            <CardContent className="p-4 sm:p-5">
+              <div className="space-y-3">
+                {/* Row 1: Search · Make · Body type · Sort */}
+                <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr]">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Search className="absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
                     <Input
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
                       placeholder={t("home.browse.searchPlaceholder")}
-                      className="pl-9 w-full min-w-0"
+                      className="ps-9 w-full min-w-0"
                     />
                   </div>
-                </div>
 
-                <div className="md:col-span-2">
                   <select
                     value={make}
                     onChange={(e) => setMake(e.target.value)}
@@ -326,13 +319,11 @@ const Home = () => {
                       </option>
                     ))}
                   </select>
-                </div>
 
-                <div className="sm:col-span-1 md:col-span-2">
                   <select
                     value={bodyType}
                     onChange={(e) => setBodyType(e.target.value)}
-                    className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] min-w-0"
+                    className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
                   >
                     <option value="all">
                       {t("home.browse.filters.bodyAll")}
@@ -343,27 +334,7 @@ const Home = () => {
                       </option>
                     ))}
                   </select>
-                </div>
 
-                <div className="md:col-span-2">
-                  <Input
-                    inputMode="numeric"
-                    value={minPrice}
-                    onChange={(e) => setMinPrice(e.target.value)}
-                    placeholder={t("home.browse.filters.minPrice")}
-                  />
-                </div>
-
-                <div className="md:col-span-2">
-                  <Input
-                    inputMode="numeric"
-                    value={maxPrice}
-                    onChange={(e) => setMaxPrice(e.target.value)}
-                    placeholder={t("home.browse.filters.maxPrice")}
-                  />
-                </div>
-
-                <div className="md:col-span-3">
                   <select
                     value={sort}
                     onChange={(e) =>
@@ -392,10 +363,23 @@ const Home = () => {
                   </select>
                 </div>
 
-                <div className="sm:col-span-2 md:col-span-3 flex flex-col gap-2 sm:flex-row">
+                {/* Row 2: Price range · Actions */}
+                <div className="grid gap-3 grid-cols-2 sm:grid-cols-[1fr_1fr_auto_auto]">
+                  <Input
+                    inputMode="numeric"
+                    value={minPrice}
+                    onChange={(e) => setMinPrice(e.target.value)}
+                    placeholder={t("home.browse.filters.minPrice")}
+                  />
+                  <Input
+                    inputMode="numeric"
+                    value={maxPrice}
+                    onChange={(e) => setMaxPrice(e.target.value)}
+                    placeholder={t("home.browse.filters.maxPrice")}
+                  />
                   <Button
                     variant="outline"
-                    className="w-full sm:w-auto min-w-0"
+                    className="whitespace-nowrap"
                     onClick={() => {
                       setQuery("");
                       setMake("all");
@@ -405,11 +389,11 @@ const Home = () => {
                       setSort("featured");
                     }}
                   >
-                    <span className="truncate">{t("home.browse.clear")}</span>
+                    {t("home.browse.clear")}
                   </Button>
-                  <Link to="/contact" className="w-full sm:w-auto min-w-0">
-                    <Button className="w-full sm:w-auto bg-primary text-primary-foreground hover:glow-primary min-w-0">
-                      <span className="truncate">{t("home.browse.help")}</span>
+                  <Link to="/contact">
+                    <Button className="w-full bg-primary text-primary-foreground hover:glow-primary whitespace-nowrap">
+                      {t("home.browse.help")}
                     </Button>
                   </Link>
                 </div>
@@ -421,14 +405,14 @@ const Home = () => {
           <div className="mt-8">
             {filteredCars.length === 0 ? (
               <Card className="border-border/60 bg-muted/20">
-                <CardContent className="p-10 text-center">
-                  <div className="mx-auto mb-3 h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <CardContent className="p-12 text-center">
+                  <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
                     <Search className="h-5 w-5 text-primary" />
                   </div>
-                  <div className="text-lg font-semibold">
+                  <div className="text-base font-semibold">
                     {t("home.browse.empty.title")}
                   </div>
-                  <div className="text-muted-foreground mt-1">
+                  <div className="text-sm text-muted-foreground mt-1">
                     {t("home.browse.empty.subtitle")}
                   </div>
                 </CardContent>
@@ -442,106 +426,105 @@ const Home = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ delay: Math.min(idx, 6) * 0.04 }}
+                    className="min-w-0"
                   >
-                    <Card className="group h-full overflow-hidden border-border/60 hover:shadow-lg transition-smooth flex flex-col min-w-0">
-                      <div className="relative aspect-16/10 min-w-0 overflow-hidden">
+                    <Card className="group h-full overflow-hidden border-border/60 hover:shadow-(--shadow-md) hover:border-border transition-all duration-200 flex flex-col min-w-0">
+                      {/* Image */}
+                      <div className="relative aspect-16/10 overflow-hidden">
                         <img
                           src={car.image}
                           alt={`${car.make} ${car.model}`}
                           className="h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
                           loading="lazy"
                         />
-                        <div className="absolute inset-0 bg-linear-to-t from-black/45 via-transparent to-transparent" />
-                        <div className="absolute left-2 top-2 sm:left-4 sm:top-4 flex gap-1 sm:gap-2 flex-wrap">
-                          {car.featured ? (
-                            <Badge className="bg-primary text-primary-foreground px-2 py-0.5 sm:px-3 sm:py-1 text-xs">
-                              <span className="truncate">
-                                {t("home.browse.featured")}
-                              </span>
+                        <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent" />
+
+                        {/* Badges */}
+                        <div className="absolute start-3 top-3 flex gap-1.5 flex-wrap">
+                          {car.featured && (
+                            <Badge className="bg-primary text-primary-foreground text-xs px-2 py-0.5">
+                              {t("home.browse.featured")}
                             </Badge>
-                          ) : null}
+                          )}
                           <Badge
                             variant="secondary"
-                            className="px-2 py-0.5 sm:px-3 sm:py-1 text-xs"
+                            className="text-xs px-2 py-0.5"
                           >
-                            <span className="truncate">{car.bodyType}</span>
+                            {car.bodyType}
                           </Badge>
                         </div>
+
+                        {/* Save button — floats over the image */}
+                        <button
+                          type="button"
+                          onClick={() => toggleSaved(car.id)}
+                          className="absolute end-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-background/80 backdrop-blur-sm border border-border/60 hover:bg-background transition-colors"
+                          aria-label={t("home.browse.save")}
+                        >
+                          <Heart
+                            className={`h-4 w-4 transition-colors ${
+                              savedCarIds.has(car.id)
+                                ? "fill-destructive text-destructive"
+                                : "text-muted-foreground"
+                            }`}
+                          />
+                        </button>
                       </div>
 
-                      <CardContent className="p-3 sm:p-4 flex flex-col h-full min-w-0">
-                        <div className="mb-3 flex items-start justify-between gap-3 min-w-0">
-                          <div className="min-w-0 flex-1">
-                            <p className="text-xs sm:text-sm text-muted-foreground truncate">
+                      <CardContent className="p-4 flex flex-col flex-1 min-w-0">
+                        {/* Title + Price */}
+                        <div className="mb-3 flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <p className="text-xs text-muted-foreground truncate mb-0.5">
                               {car.location}
                             </p>
-                            <h3 className="text-base sm:text-lg font-bold font-heading truncate text-foreground">
+                            <h3 className="text-base font-bold font-heading truncate text-foreground leading-tight">
                               {car.make} {car.model}
                             </h3>
-                            <p className="text-xs sm:text-sm text-muted-foreground">
-                              {car.year}
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              <span dir="ltr">{car.year}</span>
                             </p>
                           </div>
-                          <div className="text-right shrink-0">
-                            <p className="text-xs text-muted-foreground">
+                          <div className="text-end shrink-0">
+                            <p className="text-[11px] text-muted-foreground">
                               {t("home.browse.priceFrom")}
                             </p>
-                            <p className="text-sm sm:text-lg font-semibold text-primary whitespace-nowrap">
-                              {currency.format(car.price)}
+                            <p className="text-base font-semibold text-primary whitespace-nowrap">
+                              <span dir="ltr">
+                                {currency.format(car.price)}
+                              </span>
                             </p>
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-3 gap-2 sm:gap-3 text-xs text-muted-foreground min-w-0">
-                          <div className="flex items-center gap-1 sm:gap-2 min-w-0">
-                            <Gauge className="h-3 w-3 sm:h-4 sm:w-4 text-foreground/70 shrink-0" />
-                            <span className="truncate">
+                        {/* Specs */}
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground border-t border-border/50 pt-3 flex-wrap">
+                          <span className="flex items-center gap-1">
+                            <Gauge className="h-3.5 w-3.5 opacity-60 shrink-0" />
+                            <span dir="ltr">
                               {car.mileageKm.toLocaleString()} km
                             </span>
-                          </div>
-                          <div className="flex items-center gap-1 sm:gap-2 min-w-0">
-                            <Fuel className="h-3 w-3 sm:h-4 sm:w-4 text-foreground/70 shrink-0" />
-                            <span className="truncate">{car.fuel}</span>
-                          </div>
-                          <div className="flex items-center gap-1 sm:gap-2 min-w-0">
-                            <span className="h-3 w-3 sm:h-4 sm:w-4 inline-flex items-center justify-center rounded bg-muted text-foreground/70 shrink-0 text-[10px] sm:text-xs">
-                              A
-                            </span>
-                            <span className="truncate">{car.transmission}</span>
-                          </div>
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Fuel className="h-3.5 w-3.5 opacity-60 shrink-0" />
+                            {car.fuel}
+                          </span>
+                          <span className="truncate">{car.transmission}</span>
                         </div>
 
-                        <div className="mt-auto pt-3 sm:pt-4 flex flex-col gap-2 min-w-0">
-                          <Link
-                            to={`/cars/${car.id}`}
-                            className="w-full min-w-0"
-                          >
+                        {/* CTA */}
+                        <div className="mt-auto pt-3">
+                          <Link to={`/cars/${car.id}`} className="block">
                             <Button
                               variant="outline"
-                              className="w-full transition-smooth min-w-0"
+                              className="w-full group-hover:border-primary/50 group-hover:text-primary transition-colors"
                             >
-                              <span className="truncate text-xs sm:text-sm">
+                              <span className="text-sm">
                                 {t("home.browse.viewDetails")}
                               </span>
+                              <ArrowRight className="ms-1.5 h-3.5 w-3.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity rtl:rotate-180" />
                             </Button>
                           </Link>
-                          <Button
-                            type="button"
-                            variant="secondary"
-                            onClick={() => toggleSaved(car.id)}
-                            className="w-full min-w-0 gap-2"
-                          >
-                            <Heart
-                              className={`h-4 w-4 shrink-0 ${
-                                savedCarIds.has(car.id)
-                                  ? "fill-current text-destructive"
-                                  : "text-muted-foreground"
-                              }`}
-                            />
-                            <span className="truncate text-xs sm:text-sm">
-                              {t("home.browse.save")}
-                            </span>
-                          </Button>
                         </div>
                       </CardContent>
                     </Card>
@@ -553,23 +536,24 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="relative z-20 bg-background pt-10 pb-12">
+      {/* ── Features ── */}
+      <section className="relative z-20 bg-muted/20 border-y border-border/40 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-12"
+            className="text-center mb-14"
           >
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4 font-heading">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4 font-heading text-white/90">
               {t("home.features.title")}
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base text-white/65 max-w-xl mx-auto">
               {t("home.features.subtitle")}
             </p>
           </motion.div>
+
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               {
@@ -602,17 +586,26 @@ const Home = () => {
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
                 >
-                  <Card className="h-full hover:shadow-lg transition-smooth">
-                    <CardHeader>
-                      <div className="bg-primary/10 p-3 rounded-lg inline-block mb-4">
-                        <Icon className="h-6 w-6 text-primary" />
+                  <Card className="h-full hover:shadow-(--shadow-md) transition-shadow relative overflow-hidden group border-border/60">
+                    {/* Ghost number */}
+                    <span
+                      className="absolute top-4 end-4 text-5xl font-bold text-primary/6 font-heading leading-none select-none pointer-events-none"
+                      aria-hidden
+                    >
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <CardHeader className="pb-2">
+                      <div className="h-11 w-11 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/15 transition-colors">
+                        <Icon className="h-5 w-5 text-primary" />
                       </div>
-                      <CardTitle className="text-xl mb-2">
+                      <CardTitle className="text-base font-semibold">
                         {feature.title}
                       </CardTitle>
                     </CardHeader>
-                    <CardContent>
-                      <CardDescription>{feature.description}</CardDescription>
+                    <CardContent className="pt-0">
+                      <CardDescription className="text-sm leading-relaxed">
+                        {feature.description}
+                      </CardDescription>
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -622,23 +615,24 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section className="relative z-20 bg-muted/30 py-20">
+      {/* ── Testimonials ── */}
+      <section className="relative z-20 bg-background py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-12"
+            className="text-center mb-14"
           >
             <h2 className="text-3xl sm:text-4xl font-bold mb-4 font-heading">
               {t("home.testimonials.title")}
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base text-muted-foreground dark:text-white/70 max-w-xl mx-auto">
               {t("home.testimonials.subtitle")}
             </p>
           </motion.div>
+
           <div className="grid md:grid-cols-3 gap-6">
             {[
               {
@@ -667,24 +661,43 @@ const Home = () => {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
               >
-                <Card className="h-full">
-                  <CardHeader>
-                    <div className="flex items-center gap-1 mb-2">
+                <Card className="h-full border-border/60 flex flex-col">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center gap-0.5 mb-3">
                       {[...Array(testimonial.rating)].map((_, i) => (
                         <Star
                           key={i}
-                          className="h-4 w-4 fill-primary text-primary"
+                          className="h-3.5 w-3.5 fill-primary text-primary"
                         />
                       ))}
                     </div>
-                    <CardDescription className="text-base">
-                      {testimonial.content}
-                    </CardDescription>
+                    <div className="relative">
+                      <span
+                        className="absolute -top-1 -start-0.5 text-5xl text-primary/10 font-heading leading-none select-none"
+                        aria-hidden
+                      >
+                        "
+                      </span>
+                      <CardDescription className="text-sm leading-relaxed pt-5">
+                        {testimonial.content}
+                      </CardDescription>
+                    </div>
                   </CardHeader>
-                  <CardContent>
-                    <div className="font-semibold">{testimonial.name}</div>
-                    <div className="text-sm text-muted-foreground">
-                      {testimonial.role}
+                  <CardContent className="mt-auto pt-4 border-t border-border/50">
+                    <div className="flex items-center gap-3">
+                      <div className="h-9 w-9 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
+                        <span className="text-sm font-semibold text-primary">
+                          {testimonial.name.charAt(0)}
+                        </span>
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold">
+                          {testimonial.name}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {testimonial.role}
+                        </div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -694,8 +707,8 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Why Choose Us Section */}
-      <section className="relative z-20 bg-background py-20">
+      {/* ── Why Choose Us ── */}
+      <section className="relative z-20 bg-muted/20 border-y border-border/40 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <motion.div
@@ -704,73 +717,91 @@ const Home = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
             >
-              <h2 className="text-3xl sm:text-4xl font-bold mb-6 font-heading">
-                {t("home.whyChoose.title")}
-              </h2>
-              <p className="text-lg text-muted-foreground mb-8">
-                {t("home.whyChoose.subtitle")}
-              </p>
-              <div className="space-y-4">
-                {[
-                  t("home.whyChoose.reason1"),
-                  t("home.whyChoose.reason2"),
-                  t("home.whyChoose.reason3"),
-                  t("home.whyChoose.reason4"),
-                ].map((reason, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
-                    className="flex items-start gap-3"
-                  >
-                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                    <span className="text-base">{reason}</span>
-                  </motion.div>
-                ))}
-              </div>
+              <Card className="border-border/60 overflow-hidden h-full">
+                <div className="h-1 bg-primary" />
+                <CardContent className="p-8">
+                  <h2 className="text-3xl sm:text-4xl font-bold mb-3 font-heading">
+                    {t("home.whyChoose.title")}
+                  </h2>
+                  <p className="text-base text-muted-foreground mb-8">
+                    {t("home.whyChoose.subtitle")}
+                  </p>
+                  <div className="space-y-4">
+                    {[
+                      t("home.whyChoose.reason1"),
+                      t("home.whyChoose.reason2"),
+                      t("home.whyChoose.reason3"),
+                      t("home.whyChoose.reason4"),
+                    ].map((reason, index) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: index * 0.1 }}
+                        className="flex items-start gap-3"
+                      >
+                        <CheckCircle className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                        <span className="text-sm leading-relaxed">{reason}</span>
+                      </motion.div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
             </motion.div>
+
             <motion.div
               initial={{ opacity: 0, x: isRTL ? -50 : 50 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              <Card className="p-8">
-                <div className="bg-primary/10 p-6 rounded-lg inline-block mb-6">
-                  <Shield className="h-12 w-12 text-primary" />
-                </div>
-                <CardTitle className="text-2xl mb-4">
-                  {t("home.whyChoose.cardTitle")}
-                </CardTitle>
-                <CardDescription className="text-base mb-6">
-                  {t("home.whyChoose.cardDescription")}
-                </CardDescription>
-                <Link to="/about">
-                  <Button variant="outline" className="w-full sm:w-auto">
-                    {t("home.whyChoose.learnMore")}
-                  </Button>
-                </Link>
+              <Card className="border-border/60 overflow-hidden">
+                {/* Primary accent line at top of card */}
+                <div className="h-1 bg-primary" />
+                <CardContent className="p-8">
+                  <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-6">
+                    <Shield className="h-8 w-8 text-primary" />
+                  </div>
+                  <CardTitle className="text-xl mb-3">
+                    {t("home.whyChoose.cardTitle")}
+                  </CardTitle>
+                  <CardDescription className="text-sm leading-relaxed mb-6">
+                    {t("home.whyChoose.cardDescription")}
+                  </CardDescription>
+                  <Link to="/about">
+                    <Button variant="outline" className="group">
+                      {t("home.whyChoose.learnMore")}
+                      <ArrowRight className="ms-2 h-4 w-4 rtl:rotate-180 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-all" />
+                    </Button>
+                  </Link>
+                </CardContent>
               </Card>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="relative z-20 bg-linear-to-r from-primary/10 via-primary/5 to-primary/10 py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      {/* ── CTA ── */}
+      <section className="relative z-20 py-24 bg-background overflow-hidden">
+        {/* Subtle bloom + hairline borders for section definition */}
+        <div className="absolute inset-0 pointer-events-none" aria-hidden>
+          <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-primary/40 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-px bg-linear-to-r from-transparent via-primary/40 to-transparent" />
+          <div className="absolute -top-32 left-1/2 -translate-x-1/2 h-64 w-[700px] rounded-full bg-primary/6 blur-3xl" />
+        </div>
+
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            <h2 className="text-3xl sm:text-4xl font-bold mb-6 font-heading">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4 font-heading">
               {t("home.cta.title")}
             </h2>
-            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+            <p className="text-base text-muted-foreground dark:text-white/70 mb-10 max-w-xl mx-auto">
               {t("home.cta.description")}
             </p>
             <div className="flex gap-3 sm:gap-4 justify-center flex-wrap px-2">
@@ -779,7 +810,7 @@ const Home = () => {
                   size="lg"
                   className="w-full sm:w-auto bg-primary text-primary-foreground hover:glow-primary"
                 >
-                  <span className="wrap-break-word">{t("home.cta.contact")}</span>
+                  {t("home.cta.contact")}
                 </Button>
               </Link>
               <Link to="/about" className="w-full sm:w-auto">
@@ -788,7 +819,7 @@ const Home = () => {
                   variant="outline"
                   className="w-full sm:w-auto"
                 >
-                  <span className="wrap-break-word">{t("home.cta.learnMore")}</span>
+                  {t("home.cta.learnMore")}
                 </Button>
               </Link>
             </div>

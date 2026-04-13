@@ -33,20 +33,54 @@ namespace Karna.Core.Application.Services
 			return new ApiResponse<MakeDto> { Success = true, Data = make.ToDto(_configuration) };
 		}
 
-		public async Task<ApiResponse<IEnumerable<MakeDto>>> GetAllAsync()
+		public async Task<ApiResponse<Pagination<MakeDto>>> GetAllAsync(MakeSpecParams specParams)
 		{
 			var repo = _unitOfWork.GetRepository<Make>();
-			var makes = await repo.GetAllAsync();
 
-			return new ApiResponse<IEnumerable<MakeDto>> { Success = true, Data = makes.ToDto(_configuration) };
+			var dataSpec = new MakeListSpecification(specParams, activeOnly: false, applyPaging: true);
+			var countSpec = new MakeListSpecification(specParams, activeOnly: false, applyPaging: false);
+
+			var makes = await repo.GetAllWithSpecAsync(dataSpec);
+			var count = await repo.GetCountAsync(countSpec);
+
+			return new ApiResponse<Pagination<MakeDto>>
+			{
+				Success = true,
+				Data = new Pagination<MakeDto>(specParams.PageIndex, specParams.PageSize, count)
+				{
+					Data = makes.ToDto(_configuration)
+				}
+			};
 		}
 
-		public async Task<ApiResponse<IEnumerable<MakeDto>>> GetAllActiveAsync()
+		public async Task<ApiResponse<Pagination<MakeDto>>> GetAllActiveAsync(PaginationSpecParams specParams)
 		{
 			var repo = _unitOfWork.GetRepository<Make>();
-			var activeMakes = await repo.GetAllWithSpecAsync(new ActiveMakesSpec());
 
-			return new ApiResponse<IEnumerable<MakeDto>> { Success = true, Data = activeMakes.ToDto(_configuration) };
+			var makeSpecParams = new MakeSpecParams
+			{
+				PageIndex = specParams.PageIndex,
+				PageSize = specParams.PageSize,
+				Search = specParams.Search,
+				Sort = specParams.Sort,
+				SortDirection = specParams.SortDirection,
+				IsActive = true
+			};
+
+			var dataSpec = new MakeListSpecification(makeSpecParams, activeOnly: true, applyPaging: true);
+			var countSpec = new MakeListSpecification(makeSpecParams, activeOnly: true, applyPaging: false);
+
+			var makes = await repo.GetAllWithSpecAsync(dataSpec);
+			var count = await repo.GetCountAsync(countSpec);
+
+			return new ApiResponse<Pagination<MakeDto>>
+			{
+				Success = true,
+				Data = new Pagination<MakeDto>(specParams.PageIndex, specParams.PageSize, count)
+				{
+					Data = makes.ToDto(_configuration)
+				}
+			};
 		}
 
 		public async Task<ApiResponse<MakeDto>> CreateAsync(CreateMakeDto dto)

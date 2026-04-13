@@ -174,4 +174,19 @@
   <data name="ConditionDefectNameAlreadyExists" xml:space="preserve">
     <value>يوجد عيب حالة بهذا الاسم بالفعل لهذه الفئة.</value>
   </data>
+  <data name="ModelDoesNotBelongToMake" xml:space="preserve">
+    <value>الموديل المحدد لا ينتمي إلى الشركة المصنعة المحددة.</value>
+  </data>
+  <data name="MileageMustBePositive" xml:space="preserve">
+    <value>يجب أن يكون عدد الكيلومترات رقمًا موجبًا.</value>
+  </data>
+  <data name="EngineSizeMustBePositive" xml:space="preserve">
+    <value>يجب أن يكون حجم المحرك رقمًا موجبًا.</value>
+  </data>
+  <data name="InvalidFuelType" xml:space="preserve">
+    <value>يرجى اختيار نوع وقود صالح.</value>
+  </data>
+  <data name="InvalidTransmission" xml:space="preserve">
+    <value>يرجى اختيار نوع ناقل حركة صالح.</value>
+  </data>
 </root>
