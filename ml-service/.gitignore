@@ -5,9 +5,9 @@
 
 data/raw/*.*
 data/cleaned/*.*
-data/processed/*.
+data/processed/*.*
+data/processed/*.parquet
 data/lookups/*
-
 
 # Models
 models/v*/
