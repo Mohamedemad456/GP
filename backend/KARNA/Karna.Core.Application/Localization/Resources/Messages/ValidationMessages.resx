@@ -174,4 +174,19 @@
   <data name="ConditionDefectNameAlreadyExists" xml:space="preserve">
     <value>A condition defect with this name already exists for this category.</value>
   </data>
+  <data name="ModelDoesNotBelongToMake" xml:space="preserve">
+    <value>The selected model does not belong to the selected make.</value>
+  </data>
+  <data name="MileageMustBePositive" xml:space="preserve">
+    <value>Mileage must be a positive number.</value>
+  </data>
+  <data name="EngineSizeMustBePositive" xml:space="preserve">
+    <value>Engine size must be a positive number.</value>
+  </data>
+  <data name="InvalidFuelType" xml:space="preserve">
+    <value>Please select a valid fuel type.</value>
+  </data>
+  <data name="InvalidTransmission" xml:space="preserve">
+    <value>Please select a valid transmission type.</value>
+  </data>
 </root>
