@@ -10,13 +10,8 @@ import {
   TableRow,
   Badge,
   Button,
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationEllipsis,
+  PaginationBar,
 } from "@gp/design-system";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const MOCK_USERS = [
   { id: "1", email: "user1@example.com", name: "John Doe", status: "pending", createdAt: "2025-02-01" },
@@ -34,26 +29,11 @@ const UsersPending = () => {
 
   const totalItems = MOCK_USERS.length;
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
-  const from = totalItems === 0 ? 0 : (page - 1) * pageSize + 1;
-  const to = Math.min(totalItems, page * pageSize);
 
   const pageUsers = useMemo(() => {
     const start = (page - 1) * pageSize;
     return MOCK_USERS.slice(start, start + pageSize);
   }, [page, pageSize]);
-
-  const visiblePages = useMemo(() => {
-    if (totalPages <= 3) {
-      return Array.from({ length: totalPages }, (_, i) => i + 1);
-    }
-
-    const pages = new Set<number>();
-    pages.add(1);
-    pages.add(totalPages);
-    pages.add(page);
-
-    return Array.from(pages).sort((a, b) => a - b);
-  }, [page, totalPages]);
 
   return (
     <div className="space-y-6">
@@ -131,99 +111,20 @@ const UsersPending = () => {
           </TableBody>
         </Table>
 
-        <div className="border-t border-border px-4 py-3">
-          <div className="flex flex-col gap-3 text-xs text-muted-foreground md:flex-row md:items-center md:justify-between">
-            <Pagination className="mx-auto w-auto justify-center md:mx-0 md:justify-start" dir="ltr">
-              <PaginationContent className="flex-wrap">
-                <PaginationItem>
-                  <PaginationLink
-                    href="#"
-                    size="default"
-                    aria-label="Previous page"
-                    className={page === 1 ? "pointer-events-none opacity-50" : ""}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setPage((p) => Math.max(1, p - 1));
-                    }}
-                  >
-                    <ChevronLeft className="size-4" />
-                  </PaginationLink>
-                </PaginationItem>
-
-                {visiblePages.map((pageNumber, index) => {
-                  const previousPage = visiblePages[index - 1];
-                  const items = [];
-
-                  if (index > 0 && previousPage !== undefined && pageNumber - previousPage > 1) {
-                    items.push(
-                      <PaginationItem key={`ellipsis-${previousPage}-${pageNumber}`}>
-                        <PaginationEllipsis />
-                      </PaginationItem>,
-                    );
-                  }
-
-                  items.push(
-                    <PaginationItem key={pageNumber}>
-                      <PaginationLink
-                        href="#"
-                        isActive={pageNumber === page}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setPage(pageNumber);
-                        }}
-                      >
-                        {pageNumber}
-                      </PaginationLink>
-                    </PaginationItem>,
-                  );
-
-                  return items;
-                })}
-
-                <PaginationItem>
-                  <PaginationLink
-                    href="#"
-                    size="default"
-                    aria-label="Next page"
-                    className={
-                      page === totalPages ? "pointer-events-none opacity-50" : ""
-                    }
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setPage((p) => Math.min(totalPages, p + 1));
-                    }}
-                  >
-                    <ChevronRight className="size-4" />
-                  </PaginationLink>
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
-
-            <div className="flex items-center gap-3">
-              <span className="text-[11px]">
-                {t("admin.common.rowsPerPage", "Rows per page")}
-              </span>
-              <select
-                value={pageSize}
-                onChange={(e) => {
-                  const value = Number(e.target.value);
-                  setPage(1);
-                  setPageSize(value);
-                }}
-                className="h-8 rounded-md border border-border bg-background px-2 text-xs text-foreground shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-              >
-                {[5, 10, 20, 50].map((size) => (
-                  <option key={size} value={size}>
-                    {size}
-                  </option>
-                ))}
-              </select>
-              <span className="text-[11px] text-muted-foreground/90">
-                {from}–{to} / {totalItems}
-              </span>
-            </div>
-          </div>
-        </div>
+        <PaginationBar
+          page={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+          pageSize={pageSize}
+          pageSizeOptions={[5, 10, 20, 50]}
+          onPageSizeChange={(size) => {
+            setPage(1);
+            setPageSize(size);
+          }}
+          totalItems={totalItems}
+          rowsPerPageLabel={t("admin.common.rowsPerPage", "Rows per page")}
+          dir="ltr"
+        />
       </div>
     </div>
   );

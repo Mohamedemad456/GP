@@ -92,17 +92,41 @@ const AddListing = () => {
   const [isLoadingMakes, setIsLoadingMakes] = useState(true);
   const [isLoadingModels, setIsLoadingModels] = useState(true);
 
+  const fetchAllActiveMakes = useCallback(async () => {
+    setIsLoadingMakes(true);
+    try {
+      const allMakes: MakeDto[] = [];
+      let pageIndex = 1;
+      let totalCount = 0;
+
+      while (true) {
+        const res = await getActiveMakes({ pageIndex, pageSize: 100 });
+        if (!res.success) throw new Error(res.message);
+
+        const pageData = res.data?.data ?? [];
+        totalCount = res.data?.count ?? pageData.length;
+        allMakes.push(...pageData);
+
+        if (pageData.length === 0 || allMakes.length >= totalCount) break;
+        pageIndex += 1;
+      }
+
+      setMakes(allMakes);
+    } catch {
+      toast.error(t("seller.addListing.errors.loadMakesFailed"));
+    } finally {
+      setIsLoadingMakes(false);
+    }
+  }, [t]);
+
   useEffect(() => {
-    getActiveMakes()
-      .then((res) => { if (res.success) setMakes(res.data ?? []); })
-      .catch(() => toast.error(t("seller.addListing.errors.loadMakesFailed")))
-      .finally(() => setIsLoadingMakes(false));
+    fetchAllActiveMakes();
 
     getActiveModels()
       .then((res) => { if (res.success) setAllModels(res.data ?? []); })
       .catch(() => toast.error(t("seller.addListing.errors.loadModelsFailed")))
       .finally(() => setIsLoadingModels(false));
-  }, [t]);
+  }, [fetchAllActiveMakes, t]);
 
   // Filter models by selected make
   const availableModels = useMemo(
