@@ -71,20 +71,54 @@ namespace Karna.Core.Application.Services
 			return new ApiResponseDto { Success = true, Message = _localizer.GetMessage("ModelDeleted") };
 		}
 
-		public async Task<ApiResponse<IEnumerable<ModelDto>>> GetAllActiveAsync()
+		public async Task<ApiResponse<Pagination<ModelDto>>> GetAllActiveAsync(PaginationSpecParams specParams)
 		{
 			var repo = _unitOfWork.GetRepository<Model>();
-			var models = await repo.GetAllWithSpecAsync(new ActiveModelsWithMakeSpec());
 
-			return new ApiResponse<IEnumerable<ModelDto>> { Success = true, Data = models.ToDto() };
+			var modelSpecParams = new ModelSpecParams
+			{
+				PageIndex = specParams.PageIndex,
+				PageSize = specParams.PageSize,
+				Search = specParams.Search,
+				Sort = specParams.Sort,
+				SortDirection = specParams.SortDirection,
+				IsActive = true
+			};
+
+			var dataSpec = new ModelListSpecification(modelSpecParams, activeOnly: true, applyPaging: true);
+			var countSpec = new ModelListSpecification(modelSpecParams, activeOnly: true, applyPaging: false);
+
+			var models = await repo.GetAllWithSpecAsync(dataSpec);
+			var count = await repo.GetCountAsync(countSpec);
+
+			return new ApiResponse<Pagination<ModelDto>>
+			{
+				Success = true,
+				Data = new Pagination<ModelDto>(specParams.PageIndex, specParams.PageSize, count)
+				{
+					Data = models.ToDto()
+				}
+			};
 		}
 
-		public async Task<ApiResponse<IEnumerable<ModelDto>>> GetAllAsync()
+		public async Task<ApiResponse<Pagination<ModelDto>>> GetAllAsync(ModelSpecParams specParams)
 		{
 			var repo = _unitOfWork.GetRepository<Model>();
-			var models = await repo.GetAllWithSpecAsync(new ModelWithMakeSpecification());
 
-			return new ApiResponse<IEnumerable<ModelDto>> { Success = true, Data = models.ToDto() };
+			var dataSpec = new ModelListSpecification(specParams, activeOnly: false, applyPaging: true);
+			var countSpec = new ModelListSpecification(specParams, activeOnly: false, applyPaging: false);
+
+			var models = await repo.GetAllWithSpecAsync(dataSpec);
+			var count = await repo.GetCountAsync(countSpec);
+
+			return new ApiResponse<Pagination<ModelDto>>
+			{
+				Success = true,
+				Data = new Pagination<ModelDto>(specParams.PageIndex, specParams.PageSize, count)
+				{
+					Data = models.ToDto()
+				}
+			};
 		}
 
 		public async Task<ApiResponse<ModelDto>> GetByIdAsync(Guid id)
