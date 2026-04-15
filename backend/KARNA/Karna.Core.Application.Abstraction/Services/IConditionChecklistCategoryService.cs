@@ -6,8 +6,8 @@ namespace Karna.Core.Application.Abstraction.Services
 	public interface IConditionChecklistCategoryService
 	{
 		Task<ApiResponse<ConditionChecklistCategoryDto>> GetByIdAsync(Guid id);
-		Task<ApiResponse<IEnumerable<ConditionChecklistCategoryDto>>> GetAllAsync();
-		Task<ApiResponse<IEnumerable<ConditionChecklistCategoryDto>>> GetAllActiveAsync();
+		Task<ApiResponse<Pagination<ConditionChecklistCategoryDto>>> GetAllAsync(ConditionChecklistCategorySpecParams specParams);
+		Task<ApiResponse<Pagination<ConditionChecklistCategoryDto>>> GetAllActiveAsync(PaginationSpecParams specParams);
 		Task<ApiResponse<ConditionChecklistCategoryDto>> CreateAsync(CreateConditionChecklistCategoryDto dto);
 		Task<ApiResponse<ConditionChecklistCategoryDto>> UpdateAsync(Guid id, UpdateConditionChecklistCategoryDto dto);
 		Task<ApiResponseDto> DeleteAsync(Guid id);
