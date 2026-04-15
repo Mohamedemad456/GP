@@ -93,7 +93,7 @@ class Settings(BaseSettings):
     # --- File Path Properties ---
     @property
     def raw_data_path(self) -> Path:
-        return self.raw_data_dir / "cars_with_make_model.parquet"
+        return self.raw_data_dir / "cars_with_make_model.csv"
 
     @property
     def raw_snapshot_base_path(self) -> Path:
@@ -110,7 +110,7 @@ class Settings(BaseSettings):
 
     @property
     def processed_data_path(self) -> Path:
-        return self.processed_data_dir / "processed_data.parquet"
+        return self.processed_data_dir / "processed_data.csv"
     
     @property
     def training_data_path(self) -> Path:
@@ -177,14 +177,14 @@ class Settings(BaseSettings):
         normalized = data_type.strip().lower()
         
         # Dispatch map for direct paths
-        parquet_paths = {
+        paths = {
             "raw": self.raw_data_path,
             "cleaned": self.cleaned_data_path,
             "processed": self.processed_data_path,
         }
 
-        if normalized in parquet_paths:
-            return pd.read_parquet(parquet_paths[normalized])
+        if normalized in paths:
+            return pd.read_csv(paths[normalized])
 
         if normalized == "main_info":
             for candidate in self.main_info_candidates:
