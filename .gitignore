@@ -1,13 +1,77 @@
+# =========================
 
-*.csv
+# Python
 
-.env
+# =========================
 
-# Ignore all files in the data directory
-data/*
-
-# python cache files
-__pycache__/
-*.pyc
+**pycache**/
+*.py[cod]
 *.pyo
 *.pyd
+*.so
+
+# Virtual environments
+
+venv/
+env/
+.venv/
+
+# =========================
+
+# Airflow
+
+# =========================
+
+data/data-pipeline/logs/
+data/data-pipeline/config/airflow.cfg
+data/data-pipeline/airflow.db
+data/data-pipeline/airflow-webserver.pid
+
+# =========================
+
+# Data files (DO NOT PUSH)
+
+# =========================
+
+data/data-pipeline/data/*.csv
+data/data-pipeline/data/*.xlsx
+data/data-pipeline/data/*.json
+
+# =========================
+
+# Docker
+
+# =========================
+
+*.log
+*.pid
+*.env
+.env
+
+# =========================
+
+# OS / Editor
+
+# =========================
+
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# =========================
+
+# Jupyter (if you use it later)
+
+# =========================
+
+.ipynb_checkpoints/
+
+# =========================
+
+# Misc
+
+# =========================
+
+*.swp
+*.swo
