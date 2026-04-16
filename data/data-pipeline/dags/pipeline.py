@@ -14,7 +14,7 @@ def data_pipeline():
 
     @task
     def extract_dubizzle():
-        dubizzleDF = pd.read_csv("data/dubizzle_cars_english.csv")
+        dubizzleDF = pd.read_csv("data/dubizzle_cars_translated.csv")
         return dubizzleDF
     
     @task
@@ -90,7 +90,7 @@ def data_pipeline():
         engine = create_engine(
             f"postgresql://postgres.idcnjzlutvmnpmgyukrk:{password}@aws-1-eu-west-1.pooler.supabase.com:6543/postgres"
         )
-        df.to_sql("used_cars", engine, if_exists="append", index=False)
+        df.to_sql("test", engine, if_exists="append", index=False)
 
     htla2eeData = extract_htla2ee()
     dubizzleData = extract_dubizzle()
