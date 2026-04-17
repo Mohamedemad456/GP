@@ -7,7 +7,7 @@ from datetime import datetime
 
 # --- CONFIGURATION ---
 BASE_URL = "https://eg.hatla2ee.com/en/car/page/"
-PAGES_TO_SCRAPE = 10 ######################################## 696
+PAGES_TO_SCRAPE = 5 ######################################## 696
 
 def clean_text(text):
     if not text: return None
@@ -144,7 +144,7 @@ df = pd.DataFrame(all_cars)
 if not df.empty:
     df = df.dropna(subset=['title'])
     df.drop_duplicates(subset=["title", "price_egp", "location"], inplace=True)
-    df.to_csv("data/hatla2ee_ultra_light.csv", index=False)
+    df.to_csv("/opt/airflow/data/hatla2ee_ultra_light.csv", index=False)
     print(f"DONE! Saved {len(df)} cars.")
 else:
     print("No data found.")

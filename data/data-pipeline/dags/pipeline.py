@@ -1,20 +1,44 @@
+from datetime import timedelta
 from urllib.parse import quote_plus
 from sqlalchemy import create_engine
 from urllib.parse import quote_plus
 from airflow.sdk import dag, task
+from airflow.operators.bash import BashOperator
 import pandas as pd
 
 
 @dag
 def data_pipeline():
+
+    scraping_htla2ee = BashOperator(
+        task_id='scrape_hatla2ee',
+        bash_command='python /opt/airflow/scripts/first_scraping.py',
+        execution_timeout=timedelta(hours=6),
+        retries=2,
+        retry_delay=timedelta(minutes=10)
+    )
+
+    scraping_dubizzle = BashOperator(
+        task_id='scrape_dubizzle',
+        bash_command='python /opt/airflow/scripts/used_cars_scraper_dubizzle.py',
+        execution_timeout=timedelta(hours=6),
+        retries=2,
+        retry_delay=timedelta(minutes=10)
+    )
+
+    translate_dubizzle = BashOperator(
+        task_id='translate_dubizzle',
+        bash_command='python /opt/airflow/scripts/translate.py'
+    )
+
     @task
     def extract_htla2ee():
-        hatla2eeDF = pd.read_csv("data/hatla2ee_ultra_light.csv")
+        hatla2eeDF = pd.read_csv("/opt/airflow/data/hatla2ee_ultra_light.csv")
         return hatla2eeDF
 
     @task
     def extract_dubizzle():
-        dubizzleDF = pd.read_csv("data/dubizzle_cars_translated.csv")
+        dubizzleDF = pd.read_csv("/opt/airflow/data/dubizzle_cars_translated.csv")
         return dubizzleDF
     
     @task
@@ -98,8 +122,8 @@ def data_pipeline():
         )
         df.to_sql("test", engine, if_exists="replace", index=False) # replace for testing, change to append for production
 
-    htla2eeData = extract_htla2ee()
-    dubizzleData = extract_dubizzle()
+    htla2eeData = scraping_htla2ee >> extract_htla2ee()
+    dubizzleData = scraping_dubizzle >> translate_dubizzle >> extract_dubizzle()
     cleaned_htla2eeData = clean_hatla2ee(htla2eeData)
     cleaned_dubizzleData = clean_dubizzle(dubizzleData)
     unioned_data = union_datasets(cleaned_htla2eeData, cleaned_dubizzleData)

@@ -245,8 +245,8 @@ if __name__ == "__main__":
     
     if unique_cars_list:
         keys = unique_cars_list[0].keys()
-        with open('data/dubizzle_cars.csv', 'w', newline='', encoding='utf-8') as f:
+        with open('/opt/airflow/data/dubizzle_cars.csv', 'w', newline='', encoding='utf-8') as f:
             writer = csv.DictWriter(f, fieldnames=keys)
             writer.writeheader()
             writer.writerows(unique_cars_list)
-        print("Saved to data/dubizzle_cars.csv")
+        print("Saved to /opt/airflow/data/dubizzle_cars.csv")
