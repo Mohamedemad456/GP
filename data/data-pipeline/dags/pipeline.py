@@ -19,12 +19,16 @@ def data_pipeline():
     
     @task
     def clean_hatla2ee(df):
+        df['title'] = df['title'].str.lower().str.replace('-', ' ')
         df['scraped_at'] = pd.to_datetime(df['scraped_at'])
         df.drop(columns=['page'], inplace=True)
         return df
 
     @task
     def clean_dubizzle(df):
+        df['title'] = df['title'].str.lower().str.replace('-', ' ')
+        df['english_title'] = df['english_title'].str.lower().str.replace('-', ' ')
+        df = df[df['english_title'] != df['title']] # To keep only translated rows (if any Arabic titles slipped through, we remove them)
         df.drop(columns=['url', 'page', 'title'], inplace=True)
         df['price_egp'] = df['price_egp'].map(lambda x: x.replace('EGP', '').replace(',', '')).astype('Int64')
         df['year'] = df['year'].astype('Int64')
@@ -36,6 +40,7 @@ def data_pipeline():
                                     errors='coerce'
                                 ).astype('Int64'))
         df['scraped_at'] = pd.to_datetime(df['scraped_at'])
+        df = df[~df['english_title'].str.contains(r'[\u0600-\u06FF]', na=False)] # To remove any remaining Arabic titles that were not translated (if any slipped through)
         return df
     
     @task
@@ -65,7 +70,7 @@ def data_pipeline():
         return final_df
         
     @task
-    def edit_fuel(df):
+    def final_clean(df):
 
         fuel_map = {
             "gas": "petrol",
@@ -82,6 +87,7 @@ def data_pipeline():
         }
 
         df['fuel'] = (df['fuel'].str.strip().str.lower().replace(fuel_map))
+        df = df.drop_duplicates()
         return df
     
     @task
@@ -90,14 +96,14 @@ def data_pipeline():
         engine = create_engine(
             f"postgresql://postgres.idcnjzlutvmnpmgyukrk:{password}@aws-1-eu-west-1.pooler.supabase.com:6543/postgres"
         )
-        df.to_sql("test", engine, if_exists="append", index=False)
+        df.to_sql("test", engine, if_exists="replace", index=False) # replace for testing, change to append for production
 
     htla2eeData = extract_htla2ee()
     dubizzleData = extract_dubizzle()
     cleaned_htla2eeData = clean_hatla2ee(htla2eeData)
     cleaned_dubizzleData = clean_dubizzle(dubizzleData)
     unioned_data = union_datasets(cleaned_htla2eeData, cleaned_dubizzleData)
-    final_data = edit_fuel(unioned_data)
+    final_data = final_clean(unioned_data)
     load_to_db(final_data)
 
 data_pipeline()

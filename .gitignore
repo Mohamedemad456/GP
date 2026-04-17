@@ -66,6 +66,7 @@ Thumbs.db
 # =========================
 
 .ipynb_checkpoints/
+*test.ipynb
 
 # =========================
 
