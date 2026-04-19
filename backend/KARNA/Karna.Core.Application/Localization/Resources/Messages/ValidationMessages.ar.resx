@@ -189,4 +189,34 @@
   <data name="InvalidTransmission" xml:space="preserve">
     <value>يرجى اختيار نوع ناقل حركة صالح.</value>
   </data>
+  <data name="InvalidPhotoType" xml:space="preserve">
+    <value>يسمح فقط بالصور</value>
+  </data>
+  <data name="ListingIdRequired" xml:space="preserve">
+    <value>معرف الإعلان مطلوب</value>
+  </data>
+  <data name="PhotosRequired" xml:space="preserve">
+    <value>الصور مطلوبة</value>
+  </data>
+  <data name="PhotosCountInvalid" xml:space="preserve">
+    <value>يجب رفع من 3 إلى 10 صور</value>
+  </data>
+  <data name="PhotoEmpty" xml:space="preserve">
+    <value>الصورة فارغة</value>
+  </data>
+  <data name="String1" xml:space="preserve">
+    <value>مسموح فقط بالصور</value>
+  </data>
+  <data name="PhotoSizeExceeded" xml:space="preserve">
+    <value>حجم الصورة يجب ألا يتجاوز 5 ميجا</value>
+  </data>
+  <data name="PhotosAlreadyExist" xml:space="preserve">
+    <value>تم رفع الصور لهذا الإعلان مسبقًا</value>
+  </data>
+  <data name="ListingNotEditable" xml:space="preserve">
+    <value>لا يمكن تعديل الإعلان في هذه المرحلة</value>
+  </data>
+  <data name="MaxPhotosExceeded" xml:space="preserve">
+    <value>يمكنك رفع 10 صور كحد أقصى</value>
+  </data>
 </root>
