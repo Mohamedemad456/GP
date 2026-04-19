@@ -4,7 +4,9 @@ from sqlalchemy import create_engine
 from urllib.parse import quote_plus
 from airflow.sdk import dag, task
 from airflow.operators.bash import BashOperator
+from dotenv import load_dotenv
 import pandas as pd
+import os
 
 
 @dag
@@ -111,16 +113,37 @@ def data_pipeline():
         }
 
         df['fuel'] = (df['fuel'].str.strip().str.lower().replace(fuel_map))
-        df = df.drop_duplicates()
+        df = df.drop_duplicates() # To remove any duplicates       
+        df = df.dropna(subset=["title"]) # remove rows with missing title        
+        df = df[df["title"].str.strip() != ""] # remove empty string titles
         return df
     
     @task
-    def load_to_db(df):
-        password = quote_plus("!YA-gp*13579karna")
+    def add_scraping_num(df):
+        load_dotenv()  # loads .env file
+        password = quote_plus(os.getenv("DB_PASSWORD"))
         engine = create_engine(
-            f"postgresql://postgres.idcnjzlutvmnpmgyukrk:{password}@aws-1-eu-west-1.pooler.supabase.com:6543/postgres"
+            f"postgresql://{os.getenv('DB_USER')}:{password}"
+            f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
         )
-        df.to_sql("test", engine, if_exists="replace", index=False) # replace for testing, change to append for production
+        query = "SELECT MAX(scraping_num) FROM used_cars"
+        x = pd.read_sql(query, engine)
+        max_scraping_num = x.iloc[0, 0]
+        next_scraping_num = (max_scraping_num + 1) if pd.notnull(max_scraping_num) else 1
+        df['scraping_num'] = next_scraping_num
+        return df
+
+    @task
+    def load_to_db(df):
+        load_dotenv()  # loads .env file
+        password = quote_plus(os.getenv("DB_PASSWORD"))
+        engine = create_engine(
+            f"postgresql://{os.getenv('DB_USER')}:{password}"
+            f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
+        )
+        df.to_sql("used_cars", engine, if_exists="append", index=False) # replace for testing, change to append for production
+        print("Data loaded to database successfully.")
+        print("Number of records loaded:", len(df))
 
     htla2eeData = scraping_htla2ee >> extract_htla2ee()
     dubizzleData = scraping_dubizzle >> translate_dubizzle >> extract_dubizzle()
@@ -128,7 +151,8 @@ def data_pipeline():
     cleaned_dubizzleData = clean_dubizzle(dubizzleData)
     unioned_data = union_datasets(cleaned_htla2eeData, cleaned_dubizzleData)
     final_data = final_clean(unioned_data)
-    load_to_db(final_data)
+    final_data_with_scraping_num = add_scraping_num(final_data)
+    load_to_db(final_data_with_scraping_num)
 
 data_pipeline()
 
