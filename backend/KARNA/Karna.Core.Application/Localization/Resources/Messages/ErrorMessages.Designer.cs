@@ -88,6 +88,15 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Condition defect not found..
+        /// </summary>
+        internal static string ConditionDefectNotFound {
+            get {
+                return ResourceManager.GetString("ConditionDefectNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This email address is already in use..
         /// </summary>
         internal static string EmailAlreadyInUse {
@@ -124,6 +133,15 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This listing does not belong to you.
+        /// </summary>
+        internal static string InvalidListingOwner {
+            get {
+                return ResourceManager.GetString("InvalidListingOwner", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Listing not found..
         /// </summary>
         internal static string ListingNotFound {
@@ -156,6 +174,15 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         internal static string NotFound {
             get {
                 return ResourceManager.GetString("NotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to upload photos.
+        /// </summary>
+        internal static string PhotoUploadFailed {
+            get {
+                return ResourceManager.GetString("PhotoUploadFailed", resourceCulture);
             }
         }
         

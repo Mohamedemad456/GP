@@ -165,4 +165,10 @@
   <data name="ConditionDefectNotFound" xml:space="preserve">
     <value>Condition defect not found.</value>
   </data>
+  <data name="PhotoUploadFailed" xml:space="preserve">
+    <value>Failed to upload photos</value>
+  </data>
+  <data name="InvalidListingOwner" xml:space="preserve">
+    <value>This listing does not belong to you</value>
+  </data>
 </root>

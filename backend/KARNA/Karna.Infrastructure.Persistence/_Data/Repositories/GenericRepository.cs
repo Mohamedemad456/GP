@@ -76,5 +76,10 @@ namespace Karna.Infrastructure.Persistence._Data.Repositories
 		{
 			return SpecificationEvaluator<T>.GetQuery(_dbSet, spec);
 		}
-	}
+
+        public async Task AddRangeAsync(IEnumerable<T> entities)
+        {
+            await _dbSet.AddRangeAsync(entities);
+        }
+    }
 }

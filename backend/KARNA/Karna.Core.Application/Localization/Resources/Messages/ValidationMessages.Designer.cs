@@ -70,11 +70,29 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A condition defect with this name already exists for this category..
+        /// </summary>
+        internal static string ConditionDefectNameAlreadyExists {
+            get {
+                return ResourceManager.GetString("ConditionDefectNameAlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This email is already in use..
         /// </summary>
         internal static string EmailAlreadyInUse {
             get {
                 return ResourceManager.GetString("EmailAlreadyInUse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Engine size must be a positive number..
+        /// </summary>
+        internal static string EngineSizeMustBePositive {
+            get {
+                return ResourceManager.GetString("EngineSizeMustBePositive", resourceCulture);
             }
         }
         
@@ -88,11 +106,29 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please select a valid fuel type..
+        /// </summary>
+        internal static string InvalidFuelType {
+            get {
+                return ResourceManager.GetString("InvalidFuelType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Please enter a valid phone number..
         /// </summary>
         internal static string InvalidPhoneNumber {
             get {
                 return ResourceManager.GetString("InvalidPhoneNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only image files are allowed.
+        /// </summary>
+        internal static string InvalidPhotoType {
+            get {
+                return ResourceManager.GetString("InvalidPhotoType", resourceCulture);
             }
         }
         
@@ -106,11 +142,38 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please select a valid transmission type..
+        /// </summary>
+        internal static string InvalidTransmission {
+            get {
+                return ResourceManager.GetString("InvalidTransmission", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Please enter a valid year..
         /// </summary>
         internal static string InvalidYear {
             get {
                 return ResourceManager.GetString("InvalidYear", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Listing Id is required.
+        /// </summary>
+        internal static string ListingIdRequired {
+            get {
+                return ResourceManager.GetString("ListingIdRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Listing cannot be modified at this stage.
+        /// </summary>
+        internal static string ListingNotEditable {
+            get {
+                return ResourceManager.GetString("ListingNotEditable", resourceCulture);
             }
         }
         
@@ -133,11 +196,38 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You can upload up to 10 photos only.
+        /// </summary>
+        internal static string MaxPhotosExceeded {
+            get {
+                return ResourceManager.GetString("MaxPhotosExceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Mileage must be a positive number..
+        /// </summary>
+        internal static string MileageMustBePositive {
+            get {
+                return ResourceManager.GetString("MileageMustBePositive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Minimum length is {0} characters..
         /// </summary>
         internal static string MinLengthExceeded {
             get {
                 return ResourceManager.GetString("MinLengthExceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The selected model does not belong to the selected make..
+        /// </summary>
+        internal static string ModelDoesNotBelongToMake {
+            get {
+                return ResourceManager.GetString("ModelDoesNotBelongToMake", resourceCulture);
             }
         }
         
@@ -205,11 +295,65 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Photo cannot be empty.
+        /// </summary>
+        internal static string PhotoEmpty {
+            get {
+                return ResourceManager.GetString("PhotoEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Photos already uploaded for this listing.
+        /// </summary>
+        internal static string PhotosAlreadyExist {
+            get {
+                return ResourceManager.GetString("PhotosAlreadyExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You must upload between 3 and 10 photos.
+        /// </summary>
+        internal static string PhotosCountInvalid {
+            get {
+                return ResourceManager.GetString("PhotosCountInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Photo size must not exceed 5 MB.
+        /// </summary>
+        internal static string PhotoSizeExceeded {
+            get {
+                return ResourceManager.GetString("PhotoSizeExceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Photos are required.
+        /// </summary>
+        internal static string PhotosRequired {
+            get {
+                return ResourceManager.GetString("PhotosRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This field is required..
         /// </summary>
         internal static string RequiredField {
             get {
                 return ResourceManager.GetString("RequiredField", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to InvalidPhotoType.
+        /// </summary>
+        internal static string String1 {
+            get {
+                return ResourceManager.GetString("String1", resourceCulture);
             }
         }
         

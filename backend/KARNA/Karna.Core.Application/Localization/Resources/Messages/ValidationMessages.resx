@@ -189,4 +189,34 @@
   <data name="InvalidTransmission" xml:space="preserve">
     <value>Please select a valid transmission type.</value>
   </data>
+  <data name="InvalidPhotoType" xml:space="preserve">
+    <value>Only image files are allowed</value>
+  </data>
+  <data name="ListingIdRequired" xml:space="preserve">
+    <value>Listing Id is required</value>
+  </data>
+  <data name="PhotosRequired" xml:space="preserve">
+    <value>Photos are required</value>
+  </data>
+  <data name="PhotosCountInvalid" xml:space="preserve">
+    <value>You must upload between 3 and 10 photos</value>
+  </data>
+  <data name="PhotoEmpty" xml:space="preserve">
+    <value>Photo cannot be empty</value>
+  </data>
+  <data name="String1" xml:space="preserve">
+    <value>InvalidPhotoType</value>
+  </data>
+  <data name="PhotoSizeExceeded" xml:space="preserve">
+    <value>Photo size must not exceed 5 MB</value>
+  </data>
+  <data name="PhotosAlreadyExist" xml:space="preserve">
+    <value>Photos already uploaded for this listing</value>
+  </data>
+  <data name="ListingNotEditable" xml:space="preserve">
+    <value>Listing cannot be modified at this stage</value>
+  </data>
+  <data name="MaxPhotosExceeded" xml:space="preserve">
+    <value>You can upload up to 10 photos only</value>
+  </data>
 </root>
