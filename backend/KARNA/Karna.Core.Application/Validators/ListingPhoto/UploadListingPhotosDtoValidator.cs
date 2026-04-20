@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using FluentValidation;
@@ -13,6 +13,8 @@ namespace Karna.Core.Application.Validators.ListingPhoto
         {
             RuleFor(x => x.Files)
             .NotNull()
+            .WithMessage(localizer.GetValidationMessage("PhotosRequired"))
+            .NotEmpty()
             .WithMessage(localizer.GetValidationMessage("PhotosRequired"))
             .Must(files => files.Count <= 10)
             .WithMessage(localizer.GetValidationMessage("MaxPhotosExceeded"));

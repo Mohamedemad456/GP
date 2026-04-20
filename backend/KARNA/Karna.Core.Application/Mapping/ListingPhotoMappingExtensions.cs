@@ -27,7 +27,8 @@ namespace Karna.Core.Application.Mapping
         public static ListingPhoto ToEntity(this IFormFile file,Guid listingId,
                                             string photoUrl, int displayOrder, bool isPrimary)
         {
-            return new ListingPhoto
+			ArgumentNullException.ThrowIfNull(file);
+			return new ListingPhoto
             {
                 ListingId = listingId,
                 PhotoUrl = photoUrl,

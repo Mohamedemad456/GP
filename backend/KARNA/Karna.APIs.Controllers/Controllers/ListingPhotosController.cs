@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Karna.APIs.Controllers.Controllers._Base;
@@ -9,7 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Karna.APIs.Controllers.Controllers
 {
-    [Authorize(Roles = "Seller")]
+    [Route("api/listings")]
+    [Authorize(Roles = "User")]
     public class ListingPhotosController(IListingPhotoService _service) : ApiControllerBase
     {
         [HttpPost("{id:guid}/photos")]
