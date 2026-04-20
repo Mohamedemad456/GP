@@ -14,6 +14,7 @@ namespace Karna.Infrastructure.Persistence._Data
 		public DbSet<Listing> Listings { get; set; } = null!;
 		public DbSet<ConditionChecklistCategory> ConditionChecklistCategories { get; set; } = null!;
 		public DbSet<ConditionDefect> ConditionDefects { get; set; } = null!;
+		public DbSet<ListingDefect> ListingDefects { get; set; } = null!;
 
 		public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
 		{

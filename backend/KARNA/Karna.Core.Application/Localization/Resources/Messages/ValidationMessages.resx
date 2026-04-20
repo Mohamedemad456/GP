@@ -189,4 +189,10 @@
   <data name="InvalidTransmission" xml:space="preserve">
     <value>Please select a valid transmission type.</value>
   </data>
+  <data name="ConditionDefectIdsRequired" xml:space="preserve">
+    <value>At least one condition item must be selected.</value>
+  </data>
+  <data name="DuplicateConditionDefectIds" xml:space="preserve">
+    <value>Duplicate condition items are not allowed.</value>
+  </data>
 </root>

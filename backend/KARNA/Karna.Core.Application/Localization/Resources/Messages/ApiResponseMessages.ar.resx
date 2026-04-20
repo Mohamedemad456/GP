@@ -210,4 +210,7 @@
   <data name="ConditionDefectDeactivated" xml:space="preserve">
     <value>تم تعطيل عيب الحالة بنجاح.</value>
   </data>
+  <data name="ChecklistUpdated" xml:space="preserve">
+    <value>تم تحديث قائمة فحص الحالة بنجاح.</value>
+  </data>
 </root>

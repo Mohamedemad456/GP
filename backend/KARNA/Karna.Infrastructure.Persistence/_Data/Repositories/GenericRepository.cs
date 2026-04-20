@@ -54,6 +54,11 @@ namespace Karna.Infrastructure.Persistence._Data.Repositories
 			await _dbSet.AddAsync(entity);
 		}
 
+		public async Task AddRangeAsync(IEnumerable<T> entities)
+		{
+			await _dbSet.AddRangeAsync(entities);
+		}
+
 		public void Update(T entity)
 		{
 			_dbSet.Update(entity);
@@ -70,6 +75,11 @@ namespace Karna.Infrastructure.Persistence._Data.Repositories
 			{
 				_dbSet.Remove(entity);
 			}
+		}
+
+		public void DeleteRange(IEnumerable<T> entities)
+		{
+			_dbSet.RemoveRange(entities);
 		}
 
 		private IQueryable<T> ApplySpecification(ISpecification<T> spec)

@@ -165,4 +165,16 @@
   <data name="ConditionDefectNotFound" xml:space="preserve">
     <value>عيب الحالة غير موجود.</value>
   </data>
+  <data name="ListingNotOwnedByUser" xml:space="preserve">
+    <value>غير مصرح لك بتعديل هذا الإعلان.</value>
+  </data>
+  <data name="ListingNotInDraftState" xml:space="preserve">
+    <value>يجب أن يكون الإعلان في حالة مسودة لتعديل قائمة الفحص.</value>
+  </data>
+  <data name="ConditionDefectInactive" xml:space="preserve">
+    <value>واحد أو أكثر من عناصر الحالة المحددة غير نشطة.</value>
+  </data>
+  <data name="ConditionDefectItemsNotFound" xml:space="preserve">
+    <value>واحد أو أكثر من عناصر الحالة المحددة غير موجودة.</value>
+  </data>
 </root>
