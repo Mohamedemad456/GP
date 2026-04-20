@@ -86,5 +86,6 @@ namespace Karna.Infrastructure.Persistence._Data.Repositories
 		{
 			return SpecificationEvaluator<T>.GetQuery(_dbSet, spec);
 		}
-	}
+
+    }
 }

@@ -106,6 +106,51 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Condition defect activated successfully..
+        /// </summary>
+        public static string ConditionDefectActivated {
+            get {
+                return ResourceManager.GetString("ConditionDefectActivated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Condition defect created successfully..
+        /// </summary>
+        public static string ConditionDefectCreated {
+            get {
+                return ResourceManager.GetString("ConditionDefectCreated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Condition defect deactivated successfully..
+        /// </summary>
+        public static string ConditionDefectDeactivated {
+            get {
+                return ResourceManager.GetString("ConditionDefectDeactivated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Condition defect deleted successfully..
+        /// </summary>
+        public static string ConditionDefectDeleted {
+            get {
+                return ResourceManager.GetString("ConditionDefectDeleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Condition defect updated successfully..
+        /// </summary>
+        public static string ConditionDefectUpdated {
+            get {
+                return ResourceManager.GetString("ConditionDefectUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Added to favorites..
         /// </summary>
         public static string FavoriteAdded {
@@ -273,6 +318,15 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         public static string PasswordChanged {
             get {
                 return ResourceManager.GetString("PasswordChanged", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Photos uploaded successfully.
+        /// </summary>
+        public static string PhotosUploaded {
+            get {
+                return ResourceManager.GetString("PhotosUploaded", resourceCulture);
             }
         }
         

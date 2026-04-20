@@ -213,4 +213,7 @@
   <data name="ChecklistUpdated" xml:space="preserve">
     <value>Condition checklist updated successfully.</value>
   </data>
+  <data name="PhotosUploaded" xml:space="preserve">
+    <value>Photos uploaded successfully</value>
+  </data>
 </root>

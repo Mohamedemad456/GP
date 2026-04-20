@@ -177,4 +177,10 @@
   <data name="ConditionDefectItemsNotFound" xml:space="preserve">
     <value>واحد أو أكثر من عناصر الحالة المحددة غير موجودة.</value>
   </data>
+  <data name="PhotoUploadFailed" xml:space="preserve">
+    <value>فشل في رفع الصور</value>
+  </data>
+  <data name="InvalidListingOwner" xml:space="preserve">
+    <value>هذا الإعلان لا يخصك</value>
+  </data>
 </root>

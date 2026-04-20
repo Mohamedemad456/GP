@@ -177,4 +177,10 @@
   <data name="ConditionDefectItemsNotFound" xml:space="preserve">
     <value>One or more selected condition items were not found.</value>
   </data>
+  <data name="PhotoUploadFailed" xml:space="preserve">
+    <value>Failed to upload photos</value>
+  </data>
+  <data name="InvalidListingOwner" xml:space="preserve">
+    <value>This listing does not belong to you</value>
+  </data>
 </root>
