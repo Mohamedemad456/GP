@@ -4,6 +4,7 @@ using Karna.Infrastructure.Persistence._Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Karna.Infrastructure.Persistence._Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260420112200_AddListingDefects")]
+    partial class AddListingDefects
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -176,45 +179,6 @@ namespace Karna.Infrastructure.Persistence._Data.Migrations
                     b.HasIndex("SellerId");
 
                     b.ToTable("Listings");
-                });
-
-            modelBuilder.Entity("Karna.Core.Domain.Entities.ListingPhoto", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("DisplayOrder")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
-                    b.Property<bool>("IsPrimary")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("ListingId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("PhotoUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("UploadedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ListingId");
-
-                    b.ToTable("ListingPhoto");
                 });
 
             modelBuilder.Entity("Karna.Core.Domain.Entities.ListingDefect", b =>
@@ -468,17 +432,6 @@ namespace Karna.Infrastructure.Persistence._Data.Migrations
                     b.Navigation("Listing");
                 });
 
-            modelBuilder.Entity("Karna.Core.Domain.Entities.ListingPhoto", b =>
-                {
-                    b.HasOne("Karna.Core.Domain.Entities.Listing", "Listing")
-                        .WithMany("Photos")
-                        .HasForeignKey("ListingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Listing");
-                });
-
             modelBuilder.Entity("Karna.Core.Domain.Entities.Model", b =>
                 {
                     b.HasOne("Karna.Core.Domain.Entities.Make", "Make")
@@ -503,11 +456,6 @@ namespace Karna.Infrastructure.Persistence._Data.Migrations
             modelBuilder.Entity("Karna.Core.Domain.Entities.Listing", b =>
                 {
                     b.Navigation("ListingDefects");
-                });
-
-            modelBuilder.Entity("Karna.Core.Domain.Entities.Listing", b =>
-                {
-                    b.Navigation("Photos");
                 });
 
             modelBuilder.Entity("Karna.Core.Domain.Entities.Make", b =>

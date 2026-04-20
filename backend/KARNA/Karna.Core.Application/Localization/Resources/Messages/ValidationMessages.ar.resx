@@ -189,6 +189,12 @@
   <data name="InvalidTransmission" xml:space="preserve">
     <value>يرجى اختيار نوع ناقل حركة صالح.</value>
   </data>
+  <data name="ConditionDefectIdsRequired" xml:space="preserve">
+    <value>يجب اختيار عنصر حالة واحد على الأقل.</value>
+  </data>
+  <data name="DuplicateConditionDefectIds" xml:space="preserve">
+    <value>لا يُسمح بتكرار عناصر الحالة.</value>
+  </data>
   <data name="InvalidPhotoType" xml:space="preserve">
     <value>يسمح فقط بالصور</value>
   </data>

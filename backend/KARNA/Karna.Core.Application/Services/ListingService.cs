@@ -6,6 +6,7 @@ using Karna.Core.Application.Abstraction.Persistence;
 using Karna.Core.Application.Abstraction.Services;
 using Karna.Core.Application.Mapping;
 using Karna.Core.Domain.Entities;
+using Karna.Core.Domain.Enums;
 
 namespace Karna.Core.Application.Services
 {
@@ -13,7 +14,8 @@ namespace Karna.Core.Application.Services
 		IUnitOfWork _unitOfWork,
 		ICurrentUserService _currentUserService,
 		ILocalizationService _localizer,
-		IValidator<CreateListingDto> _createValidator
+		IValidator<CreateListingDto> _createValidator,
+		IValidator<AddConditionChecklistDto> _checklistValidator
 	) : IListingService
 	{
 		public async Task<ApiResponse<ListingDto>> CreateAsync(CreateListingDto dto)
@@ -62,6 +64,152 @@ namespace Karna.Core.Application.Services
 				Success = true,
 				Message = _localizer.GetMessage("ListingCreated"),
 				Data = listing.ToDto()
+			};
+		}
+
+		public async Task<ApiResponse<IEnumerable<ListingDefectDto>>> AddChecklistAsync(Guid listingId, AddConditionChecklistDto dto)
+		{
+			// 1. Validate DTO
+			var validationResult = await _checklistValidator.ValidateAsync(dto);
+			if (!validationResult.IsValid)
+			{
+				return new ApiResponse<IEnumerable<ListingDefectDto>>
+				{
+					Success = false,
+					Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage))
+				};
+			}
+
+			// 2. Authenticate current user
+			if (!_currentUserService.IsAuthenticated || _currentUserService.UserId == Guid.Empty)
+			{
+				return new ApiResponse<IEnumerable<ListingDefectDto>>
+				{
+					Success = false,
+					Message = _localizer.GetErrorMessage("Unauthorized")
+				};
+			}
+
+			var userRepo = _unitOfWork.GetRepository<User>();
+			var currentUser = await userRepo.GetAsync(u => u.IdentityUserId == _currentUserService.UserId);
+			if (currentUser is null)
+			{
+				return new ApiResponse<IEnumerable<ListingDefectDto>>
+				{
+					Success = false,
+					Message = _localizer.GetErrorMessage("UserNotFound")
+				};
+			}
+
+			// 3. Get listing
+			var listingRepo = _unitOfWork.GetRepository<Listing>();
+			var listing = await listingRepo.GetAsync(listingId);
+			if (listing is null)
+			{
+				return new ApiResponse<IEnumerable<ListingDefectDto>>
+				{
+					Success = false,
+					Message = _localizer.GetErrorMessage("ListingNotFound")
+				};
+			}
+
+			// 4. Validate ownership
+			if (listing.SellerId != currentUser.Id)
+			{
+				return new ApiResponse<IEnumerable<ListingDefectDto>>
+				{
+					Success = false,
+					Message = _localizer.GetErrorMessage("ListingNotOwnedByUser")
+				};
+			}
+
+			// 5. Validate listing is in Draft state
+			if (listing.Status != ListingStatus.Draft)
+			{
+				return new ApiResponse<IEnumerable<ListingDefectDto>>
+				{
+					Success = false,
+					Message = _localizer.GetErrorMessage("ListingNotInDraftState")
+				};
+			}
+
+			// 6. Load and validate selected condition defects
+			var defectRepo = _unitOfWork.GetRepository<ConditionDefect>();
+			var selectedDefects = (await defectRepo.FindAsync(
+				d => dto.ConditionDefectIds.Contains(d.Id), withTracking: false)).ToList();
+
+			if (selectedDefects.Count != dto.ConditionDefectIds.Count)
+			{
+				return new ApiResponse<IEnumerable<ListingDefectDto>>
+				{
+					Success = false,
+					Message = _localizer.GetErrorMessage("ConditionDefectItemsNotFound")
+				};
+			}
+
+			var inactiveItems = selectedDefects.Where(d => !d.IsActive).ToList();
+			if (inactiveItems.Any())
+			{
+				return new ApiResponse<IEnumerable<ListingDefectDto>>
+				{
+					Success = false,
+					Message = _localizer.GetErrorMessage("ConditionDefectInactive")
+				};
+			}
+
+			// 7. Remove old checklist items (supports update)
+			var listingDefectRepo = _unitOfWork.GetRepository<ListingDefect>();
+			var existingDefects = (await listingDefectRepo.FindAsync(
+				ld => ld.ListingId == listingId, withTracking: true)).ToList();
+
+			if (existingDefects.Any())
+			{
+				listingDefectRepo.DeleteRange(existingDefects);
+			}
+
+			// 8. Create new ListingDefect records
+			var now = DateTime.UtcNow;
+			var newDefects = dto.ConditionDefectIds.Select(defectId => new ListingDefect
+			{
+				ListingId = listingId,
+				ConditionDefectId = defectId,
+				AppliedAt = now
+			}).ToList();
+
+			await listingDefectRepo.AddRangeAsync(newDefects);
+			await _unitOfWork.CompleteAsync();
+
+			// 9. Reload with includes for mapping
+			var savedDefects = (await listingDefectRepo.FindAsync(
+				ld => ld.ListingId == listingId, withTracking: false)).ToList();
+
+			// Load related data for the DTOs
+			var defectIds = savedDefects.Select(ld => ld.ConditionDefectId).ToList();
+			var defectsWithCategories = (await defectRepo.FindAsync(
+				d => defectIds.Contains(d.Id), withTracking: false)).ToList();
+
+			// We need categories too — load them
+			var categoryRepo = _unitOfWork.GetRepository<ConditionChecklistCategory>();
+			var categoryIds = defectsWithCategories.Select(d => d.CategoryId).Distinct().ToList();
+			var categories = (await categoryRepo.FindAsync(
+				c => categoryIds.Contains(c.Id), withTracking: false)).ToList();
+
+			// Attach navigation properties for mapping
+			foreach (var defect in defectsWithCategories)
+			{
+				defect.Category = categories.FirstOrDefault(c => c.Id == defect.CategoryId)!;
+			}
+
+			foreach (var ld in savedDefects)
+			{
+				ld.ConditionDefect = defectsWithCategories.FirstOrDefault(d => d.Id == ld.ConditionDefectId)!;
+			}
+
+			return new ApiResponse<IEnumerable<ListingDefectDto>>
+			{
+				Success = true,
+				Message = _localizer.GetMessage("ChecklistUpdated"),
+				Data = savedDefects.ToDto()
 			};
 		}
 	}

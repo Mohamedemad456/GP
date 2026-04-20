@@ -22,6 +22,9 @@ namespace Karna.Core.Domain.Entities
 		public string Color { get; set; } = null!;
 		public string Description { get; set; } = null!;
 		public ListingStatus Status { get; set; } = ListingStatus.Draft;
+
+		public ICollection<ListingDefect> ListingDefects { get; set; } = new List<ListingDefect>();
+
         public ICollection<ListingPhoto> Photos { get; set; } = new List<ListingPhoto>();
     }
 }

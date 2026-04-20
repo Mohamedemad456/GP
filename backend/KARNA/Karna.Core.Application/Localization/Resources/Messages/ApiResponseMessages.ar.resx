@@ -213,4 +213,7 @@
   <data name="PhotosUploaded" xml:space="preserve">
     <value>تم رفع الصور بنجاح</value>
   </data>
+  <data name="ChecklistUpdated" xml:space="preserve">
+    <value>تم تحديث قائمة فحص الحالة بنجاح.</value>
+  </data>
 </root>

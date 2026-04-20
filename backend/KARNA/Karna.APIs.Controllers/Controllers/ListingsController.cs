@@ -17,5 +17,14 @@ namespace Karna.APIs.Controllers.Controllers
 				return BadRequest(result);
 			return CreatedAtAction(nameof(Create), new { id = result.Data?.Id}, result);
 		}
+
+		[HttpPost("{id}/conditions")]
+		public async Task<IActionResult> AddChecklist(Guid id, [FromBody] AddConditionChecklistDto dto)
+		{
+			var result = await _listingService.AddChecklistAsync(id, dto);
+			if (!result.Success)
+				return BadRequest(result);
+			return Ok(result);
+		}
 	}
 }
