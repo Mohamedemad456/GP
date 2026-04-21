@@ -12,5 +12,7 @@ namespace Karna.Core.Domain.Entities
 
 		public Guid CategoryId { get; set; }
 		public ConditionChecklistCategory Category { get; set; } = null!;
+
+		public ICollection<ListingDefect> ListingDefects { get; set; } = new List<ListingDefect>();
 	}
 }

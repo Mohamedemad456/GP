@@ -165,4 +165,22 @@
   <data name="ConditionDefectNotFound" xml:space="preserve">
     <value>Condition defect not found.</value>
   </data>
+  <data name="ListingNotOwnedByUser" xml:space="preserve">
+    <value>You are not authorized to modify this listing.</value>
+  </data>
+  <data name="ListingNotInDraftState" xml:space="preserve">
+    <value>Listing must be in Draft state to modify the checklist.</value>
+  </data>
+  <data name="ConditionDefectInactive" xml:space="preserve">
+    <value>One or more selected condition items are inactive.</value>
+  </data>
+  <data name="ConditionDefectItemsNotFound" xml:space="preserve">
+    <value>One or more selected condition items were not found.</value>
+  </data>
+  <data name="PhotoUploadFailed" xml:space="preserve">
+    <value>Failed to upload photos</value>
+  </data>
+  <data name="InvalidListingOwner" xml:space="preserve">
+    <value>This listing does not belong to you</value>
+  </data>
 </root>

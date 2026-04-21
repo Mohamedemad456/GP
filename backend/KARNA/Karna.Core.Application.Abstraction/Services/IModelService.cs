@@ -6,15 +6,15 @@ using Karna.Core.Application.Abstraction.DTOs.Model;
 
 namespace Karna.Core.Application.Abstraction.Services
 {
-    public interface IModelService
-    {
-        Task<ApiResponse<ModelDto>> GetByIdAsync(Guid id);
-        Task<ApiResponse<IEnumerable<ModelDto>>> GetAllAsync();
-        Task<ApiResponse<IEnumerable<ModelDto>>> GetAllActiveAsync();
-        Task<ApiResponse<ModelDto>> CreateAsync(CreateModelDto dto);
-        Task<ApiResponse<ModelDto>> UpdateAsync(Guid id, UpdateModelDto dto);
-        Task<ApiResponseDto> ActivateAsync(Guid id);
-        Task<ApiResponseDto> DeactivateAsync(Guid id);
-        Task<ApiResponseDto> DeleteAsync(Guid id);
-    }
+	public interface IModelService
+	{
+		Task<ApiResponse<ModelDto>> GetByIdAsync(Guid id);
+		Task<ApiResponse<Pagination<ModelDto>>> GetAllAsync(ModelSpecParams specParams);
+		Task<ApiResponse<Pagination<ModelDto>>> GetAllActiveAsync(PaginationSpecParams specParams);
+		Task<ApiResponse<ModelDto>> CreateAsync(CreateModelDto dto);
+		Task<ApiResponse<ModelDto>> UpdateAsync(Guid id, UpdateModelDto dto);
+		Task<ApiResponseDto> ActivateAsync(Guid id);
+		Task<ApiResponseDto> DeactivateAsync(Guid id);
+		Task<ApiResponseDto> DeleteAsync(Guid id);
+	}
 }

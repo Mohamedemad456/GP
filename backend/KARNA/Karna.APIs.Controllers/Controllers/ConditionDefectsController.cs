@@ -1,4 +1,5 @@
 using Karna.APIs.Controllers.Controllers._Base;
+using Karna.Core.Application.Abstraction.DTOs._Common;
 using Karna.Core.Application.Abstraction.DTOs.ConditionDefect;
 using Karna.Core.Application.Abstraction.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -9,18 +10,18 @@ namespace Karna.APIs.Controllers.Controllers
 	[Authorize(Roles = "Admin")]
 	public class ConditionDefectsController(IConditionDefectService _conditionDefectService) : ApiControllerBase
 	{
-
 		[HttpGet("All")]
-		public async Task<IActionResult> GetAll()
+		public async Task<IActionResult> GetAll([FromQuery] ConditionDefectSpecParams specParams)
 		{
-			var result = await _conditionDefectService.GetAllAsync();
+			var result = await _conditionDefectService.GetAllAsync(specParams);
 			return Ok(result);
 		}
+
 		[AllowAnonymous]
 		[HttpGet("active")]
-		public async Task<IActionResult> GetActive()
+		public async Task<IActionResult> GetActive([FromQuery] PaginationSpecParams specParams)
 		{
-			var result = await _conditionDefectService.GetAllActiveAsync();
+			var result = await _conditionDefectService.GetAllActiveAsync(specParams);
 			return Ok(result);
 		}
 
@@ -30,10 +31,9 @@ namespace Karna.APIs.Controllers.Controllers
 			var result = await _conditionDefectService.GetByIdAsync(id);
 			if (!result.Success)
 				return NotFound(result);
+
 			return Ok(result);
 		}
-
-		
 
 		[HttpPost("Create")]
 		public async Task<IActionResult> Create([FromBody] CreateConditionDefectDto dto)
@@ -41,6 +41,7 @@ namespace Karna.APIs.Controllers.Controllers
 			var result = await _conditionDefectService.CreateAsync(dto);
 			if (!result.Success)
 				return BadRequest(result);
+
 			return Ok(result);
 		}
 
@@ -50,6 +51,7 @@ namespace Karna.APIs.Controllers.Controllers
 			var result = await _conditionDefectService.UpdateAsync(id, dto);
 			if (!result.Success)
 				return BadRequest(result);
+
 			return Ok(result);
 		}
 
@@ -59,6 +61,7 @@ namespace Karna.APIs.Controllers.Controllers
 			var result = await _conditionDefectService.DeleteAsync(id);
 			if (!result.Success)
 				return BadRequest(result);
+
 			return Ok(result);
 		}
 
@@ -68,6 +71,7 @@ namespace Karna.APIs.Controllers.Controllers
 			var result = await _conditionDefectService.ActivateAsync(id);
 			if (!result.Success)
 				return BadRequest(result);
+
 			return Ok(result);
 		}
 
@@ -77,8 +81,8 @@ namespace Karna.APIs.Controllers.Controllers
 			var result = await _conditionDefectService.DeactivateAsync(id);
 			if (!result.Success)
 				return BadRequest(result);
+
 			return Ok(result);
 		}
-
 	}
 }

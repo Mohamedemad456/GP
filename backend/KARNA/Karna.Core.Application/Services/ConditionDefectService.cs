@@ -23,40 +23,66 @@ namespace Karna.Core.Application.Services
 			var defect = await repo.GetWithSpecAsync(new ConditionDefectWithCategorySpecification(id));
 
 			if (defect is null)
-				return new ApiResponse<ConditionDefectDto> 
+				return new ApiResponse<ConditionDefectDto>
 				{
 					Success = false,
-					Message = _localizer.GetErrorMessage("ConditionDefectNotFound") 
+					Message = _localizer.GetErrorMessage("ConditionDefectNotFound")
 				};
 
-			return new ApiResponse<ConditionDefectDto> 
+			return new ApiResponse<ConditionDefectDto>
 			{
 				Success = true,
-				Data = defect.ToDto() 
+				Data = defect.ToDto()
 			};
 		}
 
-		public async Task<ApiResponse<IEnumerable<ConditionDefectDto>>> GetAllAsync()
+		public async Task<ApiResponse<Pagination<ConditionDefectDto>>> GetAllAsync(ConditionDefectSpecParams specParams)
 		{
 			var repo = _unitOfWork.GetRepository<ConditionDefect>();
-			var defects = await repo.GetAllWithSpecAsync(new ConditionDefectWithCategorySpecification());
 
-			return new ApiResponse<IEnumerable<ConditionDefectDto>> 
-			{ 
+			var dataSpec = new ConditionDefectListSpecification(specParams, activeOnly: false, applyPaging: true, includeCategory: true);
+			var countSpec = new ConditionDefectListSpecification(specParams, activeOnly: false, applyPaging: false, includeCategory: false);
+
+			var defects = await repo.GetAllWithSpecAsync(dataSpec);
+			var count = await repo.GetCountAsync(countSpec);
+
+			return new ApiResponse<Pagination<ConditionDefectDto>>
+			{
 				Success = true,
-				Data = defects.ToDto() 
+				Data = new Pagination<ConditionDefectDto>(specParams.PageIndex, specParams.PageSize, count)
+				{
+					Data = defects.ToDto()
+				}
 			};
 		}
 
-		public async Task<ApiResponse<IEnumerable<ConditionDefectDto>>> GetAllActiveAsync()
+		public async Task<ApiResponse<Pagination<ConditionDefectDto>>> GetAllActiveAsync(PaginationSpecParams specParams)
 		{
 			var repo = _unitOfWork.GetRepository<ConditionDefect>();
-			var defects = await repo.GetAllWithSpecAsync(new ActiveConditionDefectsWithCategorySpec());
 
-			return new ApiResponse<IEnumerable<ConditionDefectDto>> 
+			var defectSpecParams = new ConditionDefectSpecParams
+			{
+				PageIndex = specParams.PageIndex,
+				PageSize = specParams.PageSize,
+				Search = specParams.Search,
+				Sort = specParams.Sort,
+				SortDirection = specParams.SortDirection,
+				IsActive = true
+			};
+
+			var dataSpec = new ConditionDefectListSpecification(defectSpecParams, activeOnly: true, applyPaging: true, includeCategory: true);
+			var countSpec = new ConditionDefectListSpecification(defectSpecParams, activeOnly: true, applyPaging: false, includeCategory: false);
+
+			var defects = await repo.GetAllWithSpecAsync(dataSpec);
+			var count = await repo.GetCountAsync(countSpec);
+
+			return new ApiResponse<Pagination<ConditionDefectDto>>
 			{
 				Success = true,
-				Data = defects.ToDto() 
+				Data = new Pagination<ConditionDefectDto>(specParams.PageIndex, specParams.PageSize, count)
+				{
+					Data = defects.ToDto()
+				}
 			};
 		}
 
@@ -64,10 +90,10 @@ namespace Karna.Core.Application.Services
 		{
 			var validationResult = await _createValidator.ValidateAsync(dto);
 			if (!validationResult.IsValid)
-				return new ApiResponse<ConditionDefectDto> 
+				return new ApiResponse<ConditionDefectDto>
 				{
 					Success = false,
-					Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage)) 
+					Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage))
 				};
 
 			var defectRepo = _unitOfWork.GetRepository<ConditionDefect>();
@@ -75,19 +101,20 @@ namespace Karna.Core.Application.Services
 
 			var category = await categoryRepo.GetAsync(dto.CategoryId);
 			if (category is null)
-				return new ApiResponse<ConditionDefectDto> 
-				{ 
-					Success = false, 
-					Message = _localizer.GetErrorMessage("ConditionChecklistCategoryNotFound") 
+				return new ApiResponse<ConditionDefectDto>
+				{
+					Success = false,
+					Message = _localizer.GetErrorMessage("ConditionChecklistCategoryNotFound")
 				};
 
 			var existing = await defectRepo.GetAsync(d => (d.ItemName == dto.ItemName || d.ItemNameAr == dto.ItemNameAr) && d.CategoryId == dto.CategoryId);
 			if (existing is not null)
-				return new ApiResponse<ConditionDefectDto> 
-				{ 
-					Success = false, 
-					Message = _localizer.GetValidationMessage("ConditionDefectNameAlreadyExists") 
+				return new ApiResponse<ConditionDefectDto>
+				{
+					Success = false,
+					Message = _localizer.GetValidationMessage("ConditionDefectNameAlreadyExists")
 				};
+
 			var defect = dto.ToEntity();
 
 			await defectRepo.AddAsync(defect);
@@ -112,10 +139,10 @@ namespace Karna.Core.Application.Services
 		{
 			var validationResult = await _updateValidator.ValidateAsync(dto);
 			if (!validationResult.IsValid)
-				return new ApiResponse<ConditionDefectDto> 
-				{ 
-					Success = false, 
-					Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage)) 
+				return new ApiResponse<ConditionDefectDto>
+				{
+					Success = false,
+					Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage))
 				};
 
 			var defectRepo = _unitOfWork.GetRepository<ConditionDefect>();
@@ -123,29 +150,30 @@ namespace Karna.Core.Application.Services
 
 			var defect = await defectRepo.GetWithSpecAsync(new ConditionDefectWithCategorySpecification(id));
 			if (defect is null)
-				return new ApiResponse<ConditionDefectDto> 
-				{ 
-					Success = false, 
-					Message = _localizer.GetErrorMessage("ConditionDefectNotFound") 
+				return new ApiResponse<ConditionDefectDto>
+				{
+					Success = false,
+					Message = _localizer.GetErrorMessage("ConditionDefectNotFound")
 				};
 
 			var category = await categoryRepo.GetAsync(dto.CategoryId);
 			if (category is null)
-				return new ApiResponse<ConditionDefectDto> 
-				{ 
-					Success = false, 
-					Message = _localizer.GetErrorMessage("ConditionChecklistCategoryNotFound") 
+				return new ApiResponse<ConditionDefectDto>
+				{
+					Success = false,
+					Message = _localizer.GetErrorMessage("ConditionChecklistCategoryNotFound")
 				};
+
 			var duplicate = await defectRepo.GetAsync(d =>
 				(d.ItemName == dto.ItemName || d.ItemNameAr == dto.ItemNameAr) &&
 				d.CategoryId == dto.CategoryId &&
 				d.Id != id);
 
 			if (duplicate is not null)
-				return new ApiResponse<ConditionDefectDto> 
-				{ 
-					Success = false, 
-					Message = _localizer.GetValidationMessage("ConditionDefectNameAlreadyExists") 
+				return new ApiResponse<ConditionDefectDto>
+				{
+					Success = false,
+					Message = _localizer.GetValidationMessage("ConditionDefectNameAlreadyExists")
 				};
 
 			dto.ApplyTo(defect);
@@ -168,19 +196,19 @@ namespace Karna.Core.Application.Services
 			var defect = await repo.GetAsync(id);
 
 			if (defect is null)
-				return new ApiResponseDto 
-				{ 
-					Success = false, 
-					Message = _localizer.GetErrorMessage("ConditionDefectNotFound") 
+				return new ApiResponseDto
+				{
+					Success = false,
+					Message = _localizer.GetErrorMessage("ConditionDefectNotFound")
 				};
 
 			repo.Delete(defect);
 			await _unitOfWork.CompleteAsync();
 
-			return new ApiResponseDto 
-			{ 
-				Success = true, 
-				Message = _localizer.GetMessage("ConditionDefectDeleted") 
+			return new ApiResponseDto
+			{
+				Success = true,
+				Message = _localizer.GetMessage("ConditionDefectDeleted")
 			};
 		}
 
@@ -190,10 +218,10 @@ namespace Karna.Core.Application.Services
 			var defect = await repo.GetAsync(id);
 
 			if (defect is null)
-				return new ApiResponseDto 
-				{ 
-					Success = false, 
-					Message = _localizer.GetErrorMessage("ConditionDefectNotFound") 
+				return new ApiResponseDto
+				{
+					Success = false,
+					Message = _localizer.GetErrorMessage("ConditionDefectNotFound")
 				};
 
 			if (!defect.IsActive)
@@ -203,10 +231,10 @@ namespace Karna.Core.Application.Services
 				await _unitOfWork.CompleteAsync();
 			}
 
-			return new ApiResponseDto 
-			{ 
-				Success = true, 
-				Message = _localizer.GetMessage("ConditionDefectActivated") 
+			return new ApiResponseDto
+			{
+				Success = true,
+				Message = _localizer.GetMessage("ConditionDefectActivated")
 			};
 		}
 
@@ -216,10 +244,10 @@ namespace Karna.Core.Application.Services
 			var defect = await repo.GetAsync(id);
 
 			if (defect is null)
-				return new ApiResponseDto 
+				return new ApiResponseDto
 				{
 					Success = false,
-					Message = _localizer.GetErrorMessage("ConditionDefectNotFound") 
+					Message = _localizer.GetErrorMessage("ConditionDefectNotFound")
 				};
 
 			if (defect.IsActive)
@@ -229,10 +257,10 @@ namespace Karna.Core.Application.Services
 				await _unitOfWork.CompleteAsync();
 			}
 
-			return new ApiResponseDto 
-			{ 
-				Success = true, 
-				Message = _localizer.GetMessage("ConditionDefectDeactivated") 
+			return new ApiResponseDto
+			{
+				Success = true,
+				Message = _localizer.GetMessage("ConditionDefectDeactivated")
 			};
 		}
 	}
