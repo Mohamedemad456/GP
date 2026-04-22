@@ -1,5 +1,19 @@
 # AI Service Documentation
 
+## Chat Memory (In-Memory, Dev)
+
+The chat endpoint keeps **in-memory** conversation history (RAM only) so consecutive calls to `/api/v1/chat` are contextual.
+
+- This memory is **process-local** and resets when the container/server restarts.
+- During development, the service uses a single global conversation (no `conversation_id` yet).
+- History is capped by a max number of turns (default: 20) to avoid prompt blow-up.
+
+### Reset Memory (Dev Utility)
+
+To clear the in-memory chat history without restarting the server:
+
+`POST /api/v1/chat/reset`
+
 ## Provider Order
 
 The chat service now uses this default fallback order:

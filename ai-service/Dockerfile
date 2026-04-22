@@ -40,8 +40,9 @@ COPY --from=builder /opt/venv /opt/venv
 RUN groupadd --gid 1000 appuser && \
     useradd  --uid 1000 --gid appuser --shell /bin/bash --create-home appuser
 
-# ── Application code ────────────────────────────────────────────
+# ── Application code + data (bundled) ───────────────────────────
 COPY ./app ./app
+COPY ./data ./data
 
 RUN mkdir -p /app/logs
 
