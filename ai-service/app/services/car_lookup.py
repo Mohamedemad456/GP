@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import string
 import csv
 import logging
 import re
@@ -42,8 +43,11 @@ class SearchFilters:
 _ARABIC_DIACRITICS_RE = re.compile(r"[\u064B-\u065F\u0670\u06D6-\u06ED]")
 
 
+_PUNCTUATION_RE = re.compile(f"[{re.escape(string.punctuation + '؟،')}]")
+
 def normalize_arabic(text: str) -> str:
     text = text.strip().lower()
+    text = _PUNCTUATION_RE.sub(" ", text)
     text = _ARABIC_DIACRITICS_RE.sub("", text)
     # Unify common letter variants
     text = re.sub(r"[إأآا]", "ا", text)
@@ -57,6 +61,7 @@ def normalize_arabic(text: str) -> str:
 
 def normalize_latin(text: str) -> str:
     text = text.strip().lower()
+    text = _PUNCTUATION_RE.sub(" ", text)
     text = re.sub(r"\s+", " ", text)
     return text
 
@@ -356,36 +361,40 @@ class CarSpecsLookup:
         year = extract_year(user_message)
         query_norm = normalize_text(user_message)
         query_norm = self._apply_aliases(query_norm)
+        
+        def get_best_candidates(candidates: list[str]) -> list[tuple[str, float]]:
+            matches = process.extract(
+                query_norm,
+                candidates,
+                scorer=fuzz.token_set_ratio,
+                limit=None,
+                score_cutoff=min_score
+            )
+            if not matches:
+                return []
+            best_score = matches[0][1]
+            best_tuple = [(m[0], m[1]) for m in matches if m[1] == best_score]
+            # Tie break by longest candidate string
+            best_tuple.sort(key=lambda x: len(x[0]), reverse=True)
+            return best_tuple
 
         # 1) Prefer matching make+model combo.
-        best = process.extractOne(
-            query_norm,
-            self._make_model_candidates,
-            scorer=fuzz.token_set_ratio,
-        )
-        if best:
-            candidate, score, _ = best
-            if score >= min_score:
-                pair = self._make_model_candidate_map.get(str(candidate))
-                if pair:
-                    make_key, model_key = pair
-                    rows = self._by_make_model.get((make_key, model_key), [])
-                    if rows:
-                        return CarMention(make=rows[0]["make"], model=rows[0]["model"], year=year)
+        best_make_models = get_best_candidates(self._make_model_candidates)
+        if best_make_models:
+            candidate, score = best_make_models[0]
+            pair = self._make_model_candidate_map.get(str(candidate))
+            if pair:
+                make_key, model_key = pair
+                rows = self._by_make_model.get((make_key, model_key), [])
+                if rows:
+                    return CarMention(make=rows[0]["make"], model=rows[0]["model"], year=year)
 
         # 2) Fallback: model-only match, then infer make via most common in dataset.
-        best_model = process.extractOne(
-            query_norm,
-            self._model_candidates,
-            scorer=fuzz.token_set_ratio,
-        )
-        if not best_model:
+        best_models = get_best_candidates(self._model_candidates)
+        if not best_models:
             return None
 
-        model_candidate, model_score, _ = best_model
-        if model_score < min_score:
-            return None
-
+        model_candidate, model_score = best_models[0]
         model_key = normalize_latin(str(model_candidate))
         make_counts: dict[str, int] = {}
         for (make_key, m_key), rows in self._by_make_model.items():
