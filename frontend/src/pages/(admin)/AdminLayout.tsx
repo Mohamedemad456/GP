@@ -145,6 +145,10 @@ const AdminLayout = memo(() => {
                     label: t("admin.sidebar.models"),
                     to: "/admin/models",
                   },
+                  {
+                    label: t("admin.sidebar.conditions"),
+                    to: "/admin/conditions",
+                  },
                 ].map((item) => (
                   <SidebarMenuItem key={item.to}>
                     <SidebarMenuButton
