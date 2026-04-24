@@ -212,5 +212,192 @@ namespace Karna.Core.Application.Services
 				Data = savedDefects.ToDto()
 			};
 		}
+
+		public async Task<ApiResponse<ListingDto>> SubmitAsync(Guid listingId)
+		{
+			if (!_currentUserService.IsAuthenticated || _currentUserService.UserId == Guid.Empty)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("Unauthorized") };
+
+			var userRepo = _unitOfWork.GetRepository<User>();
+			var currentUser = await userRepo.GetAsync(u => u.IdentityUserId == _currentUserService.UserId);
+			if (currentUser is null)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("UserNotFound") };
+
+			var listingRepo = _unitOfWork.GetRepository<Listing>();
+			var listing = await listingRepo.GetAsync(listingId);
+			if (listing is null)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotFound") };
+
+			if (listing.SellerId != currentUser.Id)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotOwnedByUser") };
+
+			if (listing.Status != ListingStatus.Draft)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotInDraftState") };
+
+			var oldStatus = listing.Status;
+			listing.Status = ListingStatus.Pending;
+
+			await RecordStatusChangeAsync(listing.Id, oldStatus, listing.Status, currentUser.Id, null);
+			await _unitOfWork.CompleteAsync();
+
+			return new ApiResponse<ListingDto>
+			{
+				Success = true,
+				Message = _localizer.GetMessage("ListingSubmitted"),
+				Data = listing.ToDto()
+			};
+		}
+
+		public async Task<ApiResponse<ListingDto>> ApproveAsync(Guid listingId)
+		{
+			if (!_currentUserService.IsAuthenticated || _currentUserService.UserId == Guid.Empty)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("Unauthorized") };
+
+			if (!_currentUserService.IsInRole("Admin"))
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("Unauthorized") };
+
+			var userRepo = _unitOfWork.GetRepository<User>();
+			var currentUser = await userRepo.GetAsync(u => u.IdentityUserId == _currentUserService.UserId);
+			if (currentUser is null)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("UserNotFound") };
+
+			var listingRepo = _unitOfWork.GetRepository<Listing>();
+			var listing = await listingRepo.GetAsync(listingId);
+			if (listing is null)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotFound") };
+
+			if (listing.Status != ListingStatus.Pending)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotInPendingState") };
+
+			var oldStatus = listing.Status;
+			listing.Status = ListingStatus.Active;
+
+			await RecordStatusChangeAsync(listing.Id, oldStatus, listing.Status, currentUser.Id, null);
+			await _unitOfWork.CompleteAsync();
+
+			return new ApiResponse<ListingDto>
+			{
+				Success = true,
+				Message = _localizer.GetMessage("ListingApproved"),
+				Data = listing.ToDto()
+			};
+		}
+
+		public async Task<ApiResponse<ListingDto>> RejectAsync(Guid listingId, RejectListingDto dto)
+		{
+			if (!_currentUserService.IsAuthenticated || _currentUserService.UserId == Guid.Empty)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("Unauthorized") };
+
+			if (!_currentUserService.IsInRole("Admin"))
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("Unauthorized") };
+
+			var userRepo = _unitOfWork.GetRepository<User>();
+			var currentUser = await userRepo.GetAsync(u => u.IdentityUserId == _currentUserService.UserId);
+			if (currentUser is null)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("UserNotFound") };
+
+			var listingRepo = _unitOfWork.GetRepository<Listing>();
+			var listing = await listingRepo.GetAsync(listingId);
+			if (listing is null)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotFound") };
+
+			if (listing.Status != ListingStatus.Pending)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotInPendingState") };
+
+			var oldStatus = listing.Status;
+			listing.Status = ListingStatus.Rejected;
+
+			await RecordStatusChangeAsync(listing.Id, oldStatus, listing.Status, currentUser.Id, dto.Reason);
+			await _unitOfWork.CompleteAsync();
+
+			return new ApiResponse<ListingDto>
+			{
+				Success = true,
+				Message = _localizer.GetMessage("ListingRejected"),
+				Data = listing.ToDto()
+			};
+		}
+
+		public async Task<ApiResponse<ListingDto>> MarkAsSoldAsync(Guid listingId)
+		{
+			if (!_currentUserService.IsAuthenticated || _currentUserService.UserId == Guid.Empty)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("Unauthorized") };
+
+			var userRepo = _unitOfWork.GetRepository<User>();
+			var currentUser = await userRepo.GetAsync(u => u.IdentityUserId == _currentUserService.UserId);
+			if (currentUser is null)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("UserNotFound") };
+
+			var listingRepo = _unitOfWork.GetRepository<Listing>();
+			var listing = await listingRepo.GetAsync(listingId);
+			if (listing is null)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotFound") };
+
+			if (listing.SellerId != currentUser.Id)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotOwnedByUser") };
+
+			if (listing.Status != ListingStatus.Active)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotInActiveState") };
+
+			var oldStatus = listing.Status;
+			listing.Status = ListingStatus.Sold;
+
+			await RecordStatusChangeAsync(listing.Id, oldStatus, listing.Status, currentUser.Id, null);
+			await _unitOfWork.CompleteAsync();
+
+			return new ApiResponse<ListingDto>
+			{
+				Success = true,
+				Message = _localizer.GetMessage("ListingMarkedAsSold"),
+				Data = listing.ToDto()
+			};
+		}
+
+		public async Task<ApiResponse<IEnumerable<ListingStatusHistoryDto>>> GetStatusHistoryAsync(Guid listingId)
+		{
+			if (!_currentUserService.IsAuthenticated || _currentUserService.UserId == Guid.Empty)
+				return new ApiResponse<IEnumerable<ListingStatusHistoryDto>> { Success = false, Message = _localizer.GetErrorMessage("Unauthorized") };
+
+			var userRepo = _unitOfWork.GetRepository<User>();
+			var currentUser = await userRepo.GetAsync(u => u.IdentityUserId == _currentUserService.UserId);
+			if (currentUser is null)
+				return new ApiResponse<IEnumerable<ListingStatusHistoryDto>> { Success = false, Message = _localizer.GetErrorMessage("UserNotFound") };
+
+			var listingRepo = _unitOfWork.GetRepository<Listing>();
+			var listing = await listingRepo.GetAsync(listingId);
+			if (listing is null)
+				return new ApiResponse<IEnumerable<ListingStatusHistoryDto>> { Success = false, Message = _localizer.GetErrorMessage("ListingNotFound") };
+
+			// Only listing owner or admin can view status history
+			if (listing.SellerId != currentUser.Id && !_currentUserService.IsInRole("Admin"))
+				return new ApiResponse<IEnumerable<ListingStatusHistoryDto>> { Success = false, Message = _localizer.GetErrorMessage("Unauthorized") };
+
+			var historyRepo = _unitOfWork.GetRepository<ListingStatusHistory>();
+			var history = (await historyRepo.FindAsync(
+				h => h.ListingId == listingId, withTracking: false))
+				.OrderByDescending(h => h.ChangedAt)
+				.ToList();
+
+			return new ApiResponse<IEnumerable<ListingStatusHistoryDto>>
+			{
+				Success = true,
+				Data = history.ToDto()
+			};
+		}
+
+		private async Task RecordStatusChangeAsync(Guid listingId, ListingStatus oldStatus, ListingStatus newStatus, Guid? changedByUserId, string? reason)
+		{
+			var historyRepo = _unitOfWork.GetRepository<ListingStatusHistory>();
+			var record = new ListingStatusHistory
+			{
+				ListingId = listingId,
+				OldStatus = oldStatus,
+				NewStatus = newStatus,
+				ChangedByUserId = changedByUserId,
+				Reason = reason,
+				ChangedAt = DateTime.UtcNow
+			};
+			await historyRepo.AddAsync(record);
+		}
 	}
 }

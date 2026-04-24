@@ -7,5 +7,12 @@ namespace Karna.Core.Application.Abstraction.Services
 	{
 		Task<ApiResponse<ListingDto>> CreateAsync(CreateListingDto dto);
 		Task<ApiResponse<IEnumerable<ListingDefectDto>>> AddChecklistAsync(Guid listingId, AddConditionChecklistDto dto);
+
+		Task<ApiResponse<ListingDto>> SubmitAsync(Guid listingId);
+		Task<ApiResponse<ListingDto>> ApproveAsync(Guid listingId);
+		Task<ApiResponse<ListingDto>> RejectAsync(Guid listingId, RejectListingDto dto);
+		Task<ApiResponse<ListingDto>> MarkAsSoldAsync(Guid listingId);
+
+		Task<ApiResponse<IEnumerable<ListingStatusHistoryDto>>> GetStatusHistoryAsync(Guid listingId);
 	}
 }
