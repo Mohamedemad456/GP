@@ -1,14 +1,7 @@
-"""
-Health check response schemas.
+from pydantic import BaseModel
+from typing import Optional
 
-HealthResponse:
-    - status: "healthy" | "unhealthy"
-    - model_version: active model version string
-    - model_trained_at: training date
-    - uptime_seconds: service uptime
-
-ModelInfoResponse:
-    - version, metrics (mape, r2, mae), feature_list, n_training_samples
-"""
-
-# TODO: Implement Pydantic models
+class HealthResponse(BaseModel):
+    status: str
+    model_version: Optional[str] = None
+    uptime: Optional[str] = None
