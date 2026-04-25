@@ -11,6 +11,13 @@ import {
   type ConditionDefectDto,
 } from "@/lib/conditionDefectsApi";
 import { getAllLookups, type LookupGroupDto } from "@/lib/lookupsApi";
+import {
+  createListing,
+  addListingChecklist,
+  uploadListingPhotos,
+  type FuelType,
+  type TransmissionType,
+} from "@/lib/listingsApi";
 import { getActiveMakes, type MakeDto } from "@/lib/makesApi";
 import { getActiveModels, type ModelDto } from "@/lib/modelsApi";
 import {
@@ -39,27 +46,46 @@ import {
   ImagePlus,
   Car,
   AlertCircle,
-  CircleDollarSign,
   ClipboardCheck,
   FileText,
   Sparkles,
+  Loader2,
+  CheckCircle2,
+  Camera,
 } from "lucide-react";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-const CONDITION_GRADES = ["A+", "A", "A-", "B+", "B", "C+", "C"];
-const COLORS = ["White", "Black", "Silver", "Gray", "Red", "Blue", "Green", "Brown", "Beige", "Other"];
+const COLORS = [
+  "White",
+  "Black",
+  "Silver",
+  "Gray",
+  "Red",
+  "Blue",
+  "Green",
+  "Brown",
+  "Beige",
+  "Other",
+];
 
 const CURRENT_YEAR = new Date().getFullYear();
-const YEARS = Array.from({ length: CURRENT_YEAR - 1989 }, (_, i) => CURRENT_YEAR + 1 - i);
+const YEARS = Array.from(
+  { length: CURRENT_YEAR - 1989 },
+  (_, i) => CURRENT_YEAR + 1 - i,
+);
 
 const MIN_IMAGES = 3;
 const MAX_IMAGES = 10;
+const MAX_IMAGE_SIZE_MB = 5;
+const MAX_IMAGE_SIZE_BYTES = MAX_IMAGE_SIZE_MB * 1024 * 1024;
 
 const SECTION_CARD_CLASS =
   "overflow-hidden rounded-3xl border border-border/60 bg-card/95 shadow-sm shadow-black/5 pt-0";
 
 const SECTION_HEADER_CLASS = "border-b border-border/60 bg-muted/20 pt-3";
+
+const ADD_LISTING_STEPS = ["listing", "conditions", "photos"] as const;
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -73,8 +99,6 @@ interface FormState {
   engineSize: string;
   color: string;
   description: string;
-  listingPrice: string;
-  conditionGrade: string;
 }
 
 interface ConditionSelection {
@@ -94,9 +118,26 @@ const INITIAL_FORM: FormState = {
   engineSize: "",
   color: "",
   description: "",
-  listingPrice: "",
-  conditionGrade: "",
 };
+
+type AddListingStep = (typeof ADD_LISTING_STEPS)[number];
+
+function getApiErrorMessage(error: unknown): string | undefined {
+  const maybeError = error as {
+    response?: { data?: { message?: unknown } };
+    message?: unknown;
+  };
+
+  if (typeof maybeError.response?.data?.message === "string") {
+    return maybeError.response.data.message;
+  }
+
+  if (typeof maybeError.message === "string") {
+    return maybeError.message;
+  }
+
+  return undefined;
+}
 
 // ─── Main Page ───────────────────────────────────────────────────────────────
 
@@ -111,6 +152,10 @@ const AddListing = () => {
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentStep, setCurrentStep] = useState<AddListingStep>("listing");
+  const [createdListingId, setCreatedListingId] = useState<string | null>(null);
+  const [isConditionStepComplete, setIsConditionStepComplete] = useState(false);
 
   // Makes & models from API
   const [makes, setMakes] = useState<MakeDto[]>([]);
@@ -122,16 +167,17 @@ const AddListing = () => {
   const [conditionCategories, setConditionCategories] = useState<
     ConditionChecklistCategoryDto[]
   >([]);
-  const [conditionDefects, setConditionDefects] = useState<ConditionDefectDto[]>(
-    []
-  );
+  const [conditionDefects, setConditionDefects] = useState<
+    ConditionDefectDto[]
+  >([]);
   const [isLoadingConditionCategories, setIsLoadingConditionCategories] =
     useState(true);
   const [isLoadingConditionDefects, setIsLoadingConditionDefects] =
     useState(true);
   const [selectedConditionCategoryId, setSelectedConditionCategoryId] =
     useState("");
-  const [selectedConditionDefectId, setSelectedConditionDefectId] = useState("");
+  const [selectedConditionDefectId, setSelectedConditionDefectId] =
+    useState("");
   const [selectedConditions, setSelectedConditions] = useState<
     ConditionSelection[]
   >([]);
@@ -163,13 +209,36 @@ const AddListing = () => {
     }
   }, [t]);
 
+  const fetchAllActiveModels = useCallback(async () => {
+    setIsLoadingModels(true);
+    try {
+      const accumulated: ModelDto[] = [];
+      let pageIndex = 1;
+      let totalCount = 0;
+
+      while (true) {
+        const res = await getActiveModels({ pageIndex, pageSize: 10 });
+        if (!res.success) throw new Error(res.message);
+
+        const pageData = res.data ?? [];
+        totalCount = res.count ?? pageData.length;
+        accumulated.push(...pageData);
+
+        if (pageData.length === 0 || accumulated.length >= totalCount) break;
+        pageIndex += 1;
+      }
+
+      setAllModels(accumulated);
+    } catch {
+      toast.error(t("seller.addListing.errors.loadModelsFailed"));
+    } finally {
+      setIsLoadingModels(false);
+    }
+  }, [t]);
+
   useEffect(() => {
     fetchAllActiveMakes();
-
-    getActiveModels()
-      .then((res) => { if (res.success) setAllModels(res.data ?? []); })
-      .catch(() => toast.error(t("seller.addListing.errors.loadModelsFailed")))
-      .finally(() => setIsLoadingModels(false));
+    fetchAllActiveModels();
 
     getAllLookups()
       .then((groups) => {
@@ -183,7 +252,9 @@ const AddListing = () => {
         if (res.success) setConditionCategories(res.data ?? []);
       })
       .catch(() =>
-        toast.error(t("seller.addListing.errors.loadConditionCategoriesFailed"))
+        toast.error(
+          t("seller.addListing.errors.loadConditionCategoriesFailed"),
+        ),
       )
       .finally(() => setIsLoadingConditionCategories(false));
 
@@ -192,38 +263,43 @@ const AddListing = () => {
         if (res.success) setConditionDefects(res.data ?? []);
       })
       .catch(() =>
-        toast.error(t("seller.addListing.errors.loadConditionDefectsFailed"))
+        toast.error(t("seller.addListing.errors.loadConditionDefectsFailed")),
       )
       .finally(() => setIsLoadingConditionDefects(false));
-  }, [fetchAllActiveMakes, t]);
+  }, [fetchAllActiveMakes, fetchAllActiveModels, t]);
 
   // Filter models by selected make
   const availableModels = useMemo(
-    () => (form.makeId ? allModels.filter((m) => m.makeId === form.makeId) : []),
-    [allModels, form.makeId]
+    () =>
+      form.makeId ? allModels.filter((m) => m.makeId === form.makeId) : [],
+    [allModels, form.makeId],
   );
 
   const availableConditionDefects = useMemo(
     () =>
       selectedConditionCategoryId
         ? conditionDefects.filter(
-            (defect) => defect.categoryId === selectedConditionCategoryId
+            (defect) => defect.categoryId === selectedConditionCategoryId,
           )
         : [],
-    [conditionDefects, selectedConditionCategoryId]
+    [conditionDefects, selectedConditionCategoryId],
   );
 
   const lookupOptionsByNameKey = useMemo(
     () =>
-      lookupGroups.reduce<Record<string, LookupGroupDto["options"]>>((acc, group) => {
-        acc[group.nameKey] = group.options;
-        return acc;
-      }, {}),
-    [lookupGroups]
+      lookupGroups.reduce<Record<string, LookupGroupDto["options"]>>(
+        (acc, group) => {
+          acc[group.nameKey] = group.options;
+          return acc;
+        },
+        {},
+      ),
+    [lookupGroups],
   );
 
   const fuelTypeOptions = lookupOptionsByNameKey.fuelTypes ?? [];
   const transmissionOptions = lookupOptionsByNameKey.transmissionTypes ?? [];
+  const currentStepIndex = ADD_LISTING_STEPS.indexOf(currentStep);
 
   // ── Handlers ─────────────────────────────────────────────────────────────
 
@@ -246,12 +322,28 @@ const AddListing = () => {
         });
       }
     },
-    [submitted]
+    [submitted],
   );
 
   const handleImageUpload = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const files = Array.from(e.target.files || []);
+      const files = Array.from(e.target.files || []).filter((file) => {
+        if (!file.type.startsWith("image/")) {
+          toast.error(t("seller.addListing.errors.invalidImageType"));
+          return false;
+        }
+
+        if (file.size > MAX_IMAGE_SIZE_BYTES) {
+          toast.error(
+            t("seller.addListing.errors.imageTooLarge", {
+              max: MAX_IMAGE_SIZE_MB,
+            }),
+          );
+          return false;
+        }
+
+        return true;
+      });
       if (files.length === 0) return;
 
       const remaining = MAX_IMAGES - images.length;
@@ -275,7 +367,7 @@ const AddListing = () => {
         fileInputRef.current.value = "";
       }
     },
-    [images.length, submitted]
+    [images.length, submitted, t],
   );
 
   const removeImage = useCallback(
@@ -284,21 +376,24 @@ const AddListing = () => {
       setImages((prev) => prev.filter((_, i) => i !== index));
       setImagePreviews((prev) => prev.filter((_, i) => i !== index));
     },
-    [imagePreviews]
+    [imagePreviews],
   );
 
   const handleConditionCategoryChange = useCallback((value: string) => {
     setSelectedConditionCategoryId(value);
     setSelectedConditionDefectId("");
+    setIsConditionStepComplete(false);
   }, []);
 
   const handleConditionDefectChange = useCallback(
     (value: string) => {
       const selectedCategory = conditionCategories.find(
-        (category) => category.id === selectedConditionCategoryId
+        (category) => category.id === selectedConditionCategoryId,
       );
       const selectedDefect = conditionDefects.find(
-        (defect) => defect.id === value && defect.categoryId === selectedConditionCategoryId
+        (defect) =>
+          defect.id === value &&
+          defect.categoryId === selectedConditionCategoryId,
       );
 
       if (!selectedCategory || !selectedDefect) {
@@ -323,14 +418,16 @@ const AddListing = () => {
       });
 
       setSelectedConditionDefectId("");
+      setIsConditionStepComplete(false);
     },
-    [conditionCategories, conditionDefects, selectedConditionCategoryId]
+    [conditionCategories, conditionDefects, selectedConditionCategoryId],
   );
 
   const removeConditionSelection = useCallback((defectId: string) => {
     setSelectedConditions((prev) =>
-      prev.filter((selection) => selection.defectId !== defectId)
+      prev.filter((selection) => selection.defectId !== defectId),
     );
+    setIsConditionStepComplete(false);
   }, []);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -343,9 +440,23 @@ const AddListing = () => {
       e.preventDefault();
       e.stopPropagation();
 
-      const files = Array.from(e.dataTransfer.files).filter((f) =>
-        f.type.startsWith("image/")
-      );
+      const files = Array.from(e.dataTransfer.files).filter((file) => {
+        if (!file.type.startsWith("image/")) {
+          toast.error(t("seller.addListing.errors.invalidImageType"));
+          return false;
+        }
+
+        if (file.size > MAX_IMAGE_SIZE_BYTES) {
+          toast.error(
+            t("seller.addListing.errors.imageTooLarge", {
+              max: MAX_IMAGE_SIZE_MB,
+            }),
+          );
+          return false;
+        }
+
+        return true;
+      });
       if (files.length === 0) return;
 
       const remaining = MAX_IMAGES - images.length;
@@ -363,12 +474,12 @@ const AddListing = () => {
         });
       }
     },
-    [images.length, submitted]
+    [images.length, submitted, t],
   );
 
   // ── Validation ───────────────────────────────────────────────────────────
 
-  const validate = useCallback(() => {
+  const validateListingStep = useCallback(() => {
     const errs: Record<string, string> = {};
 
     if (!form.makeId) errs.makeId = t("seller.addListing.errors.required");
@@ -380,49 +491,189 @@ const AddListing = () => {
       errs.mileage = t("seller.addListing.errors.invalidMileage");
     }
     if (!form.fuelType) errs.fuelType = t("seller.addListing.errors.required");
-    if (!form.transmission) errs.transmission = t("seller.addListing.errors.required");
-    if (!form.engineSize.trim()) errs.engineSize = t("seller.addListing.errors.required");
+    if (!form.transmission)
+      errs.transmission = t("seller.addListing.errors.required");
+    if (!form.engineSize.trim())
+      errs.engineSize = t("seller.addListing.errors.required");
     if (!form.color) errs.color = t("seller.addListing.errors.required");
     if (!form.description.trim()) {
       errs.description = t("seller.addListing.errors.required");
     } else if (form.description.trim().length < 20) {
       errs.description = t("seller.addListing.errors.descriptionTooShort");
     }
-    if (!form.listingPrice) {
-      errs.listingPrice = t("seller.addListing.errors.required");
-    } else if (Number(form.listingPrice) <= 0) {
-      errs.listingPrice = t("seller.addListing.errors.invalidPrice");
-    }
-    if (!form.conditionGrade) errs.conditionGrade = t("seller.addListing.errors.required");
+
+    return errs;
+  }, [form, t]);
+
+  const validatePhotosStep = useCallback(() => {
+    const errs: Record<string, string> = {};
+
     if (images.length < MIN_IMAGES) {
-      errs.images = t("seller.addListing.errors.minImages", { min: MIN_IMAGES });
+      errs.images = t("seller.addListing.errors.minImages", {
+        min: MIN_IMAGES,
+      });
+    } else if (images.some((image) => image.size > MAX_IMAGE_SIZE_BYTES)) {
+      errs.images = t("seller.addListing.errors.imageTooLarge", {
+        max: MAX_IMAGE_SIZE_MB,
+      });
     }
 
     return errs;
-  }, [form, images.length, t]);
+  }, [images.length, t]);
 
-  const handleSubmit = useCallback(
-    (e: React.FormEvent) => {
-      e.preventDefault();
-      setSubmitted(true);
+  const handleListingStepSubmit = useCallback(async () => {
+    setSubmitted(true);
 
-      const validationErrors = validate();
-      setErrors(validationErrors);
+    const validationErrors = validateListingStep();
+    setErrors(validationErrors);
 
-      if (Object.keys(validationErrors).length > 0) {
-        toast.error(t("seller.addListing.errors.fixErrors"));
+    if (Object.keys(validationErrors).length > 0) {
+      toast.error(t("seller.addListing.errors.fixErrors"));
+      return;
+    }
+
+    if (createdListingId) {
+      setCurrentStep("conditions");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const createResult = await createListing({
+        makeId: form.makeId,
+        modelId: form.modelId,
+        year: parseInt(form.year, 10),
+        mileage: parseInt(form.mileage, 10),
+        fuelType: parseInt(form.fuelType, 10) as FuelType,
+        transmission: parseInt(form.transmission, 10) as TransmissionType,
+        engineSize: parseFloat(form.engineSize),
+        color: form.color,
+        description: form.description.trim(),
+      });
+
+      if (!createResult.success || !createResult.data) {
+        toast.error(t("seller.addListing.errors.submitFailed"), {
+          description: createResult.message,
+        });
         return;
       }
 
-      // Mock submission
+      setCreatedListingId(createResult.data.id);
+      setErrors({});
+      setSubmitted(false);
+      toast.success(t("seller.addListing.steps.listing.created"));
+      setCurrentStep("conditions");
+    } catch (error) {
+      toast.error(t("seller.addListing.errors.submitFailed"), {
+        description: getApiErrorMessage(error),
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [createdListingId, form, t, validateListingStep]);
+
+  const handleConditionStepSubmit = useCallback(async () => {
+    if (!createdListingId) {
+      toast.error(t("seller.addListing.errors.createListingFirst"));
+      setCurrentStep("listing");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      if (selectedConditions.length > 0) {
+        const checklistResult = await addListingChecklist(createdListingId, {
+          conditionDefectIds: selectedConditions.map((c) => c.defectId),
+        });
+
+        if (!checklistResult.success) {
+          toast.warning(t("seller.addListing.errors.checklistFailed"), {
+            description: checklistResult.message,
+          });
+        }
+      }
+
+      setIsConditionStepComplete(true);
+      setSubmitted(false);
+      setCurrentStep("photos");
+    } catch (error) {
+      toast.warning(t("seller.addListing.errors.checklistFailed"), {
+        description: getApiErrorMessage(error),
+      });
+      setIsConditionStepComplete(true);
+      setCurrentStep("photos");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [createdListingId, selectedConditions, t]);
+
+  const handlePhotosStepSubmit = useCallback(async () => {
+    if (!createdListingId) {
+      toast.error(t("seller.addListing.errors.createListingFirst"));
+      setCurrentStep("listing");
+      return;
+    }
+
+    setSubmitted(true);
+
+    const validationErrors = validatePhotosStep();
+    setErrors(validationErrors);
+
+    if (Object.keys(validationErrors).length > 0) {
+      toast.error(t("seller.addListing.errors.fixErrors"));
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const photosResult = await uploadListingPhotos(createdListingId, images);
+
+      if (!photosResult.success) {
+        toast.error(t("seller.addListing.errors.photosFailed"), {
+          description: photosResult.message,
+        });
+        return;
+      }
+
       toast.success(t("seller.addListing.success.title"), {
         description: t("seller.addListing.success.description"),
       });
 
-      // Navigate back to listings after short delay
-      setTimeout(() => navigate("/seller/listings"), 1500);
+      navigate("/seller/listings");
+    } catch (error) {
+      toast.error(t("seller.addListing.errors.photosFailed"), {
+        description: getApiErrorMessage(error),
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [createdListingId, images, navigate, t, validatePhotosStep]);
+
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+
+      if (currentStep === "listing") {
+        await handleListingStepSubmit();
+        return;
+      }
+
+      if (currentStep === "conditions") {
+        await handleConditionStepSubmit();
+        return;
+      }
+
+      await handlePhotosStepSubmit();
     },
-    [validate, t, navigate]
+    [
+      currentStep,
+      handleConditionStepSubmit,
+      handleListingStepSubmit,
+      handlePhotosStepSubmit,
+    ],
   );
 
   // ── Render ───────────────────────────────────────────────────────────────
@@ -454,7 +705,79 @@ const AddListing = () => {
         </div>
       </div>
 
+      <div className="grid gap-3 md:grid-cols-3">
+        {ADD_LISTING_STEPS.map((step, index) => {
+          const isActive = currentStep === step;
+          const isComplete =
+            (step === "listing" && !!createdListingId) ||
+            (step === "conditions" && isConditionStepComplete);
+          const Icon =
+            step === "listing"
+              ? Car
+              : step === "conditions"
+                ? ClipboardCheck
+                : Camera;
+
+          return (
+            <button
+              key={step}
+              type="button"
+              disabled={
+                step === "conditions"
+                  ? !createdListingId
+                  : step === "photos"
+                    ? !isConditionStepComplete
+                    : false
+              }
+              onClick={() => {
+                if (step === "listing" && createdListingId) return;
+                if (step === "listing" || createdListingId) {
+                  if (step !== "photos" || isConditionStepComplete) {
+                    setCurrentStep(step);
+                  }
+                }
+              }}
+              className={`group flex items-center gap-4 rounded-3xl border p-4 text-start transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-55 rtl:text-right ${
+                isActive
+                  ? "border-primary/35 bg-primary/[0.07] shadow-sm shadow-primary/10"
+                  : "border-border/70 bg-card/80 hover:border-primary/25 hover:bg-muted/30"
+              }`}
+            >
+              <span
+                className={`flex size-11 shrink-0 items-center justify-center rounded-2xl ring-1 transition-colors ${
+                  isComplete
+                    ? "bg-primary text-primary-foreground ring-primary/20"
+                    : isActive
+                      ? "bg-background text-primary ring-primary/20"
+                      : "bg-muted text-muted-foreground ring-border/60"
+                }`}
+              >
+                {isComplete ? (
+                  <CheckCircle2 className="size-5" />
+                ) : (
+                  <Icon className="size-5" />
+                )}
+              </span>
+              <span className="min-w-0 space-y-1">
+                <span className="block text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground rtl:tracking-normal">
+                  {t("seller.addListing.steps.stepLabel", {
+                    number: index + 1,
+                  })}
+                </span>
+                <span className="block truncate text-sm font-semibold text-foreground">
+                  {t(`seller.addListing.steps.${step}.title`)}
+                </span>
+                <span className="block text-xs leading-5 text-muted-foreground">
+                  {t(`seller.addListing.steps.${step}.description`)}
+                </span>
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
       {/* Images Section */}
+      {currentStep === "photos" && (
       <Card className={SECTION_CARD_CLASS}>
         <CardHeader className={SECTION_HEADER_CLASS}>
           <CardTitle className="flex items-center gap-3 text-base">
@@ -469,7 +792,11 @@ const AddListing = () => {
             </Badge>
           </CardAction>
           <CardDescription>
-            {t("seller.addListing.images.description", { min: MIN_IMAGES, max: MAX_IMAGES })}
+                {t("seller.addListing.images.description", {
+                  min: MIN_IMAGES,
+                  max: MAX_IMAGES,
+                  maxSize: MAX_IMAGE_SIZE_MB,
+                })}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 pt-6">
@@ -477,8 +804,15 @@ const AddListing = () => {
           {imagePreviews.length > 0 && (
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
               {imagePreviews.map((preview, i) => (
-                <div key={i} className="group relative aspect-4/3 overflow-hidden rounded-2xl border border-border/60 bg-muted shadow-sm transition-transform duration-200 hover:-translate-y-0.5">
-                  <img src={preview} alt={`Upload ${i + 1}`} className="size-full object-cover" />
+                <div
+                  key={i}
+                  className="group relative aspect-4/3 overflow-hidden rounded-2xl border border-border/60 bg-muted shadow-sm transition-transform duration-200 hover:-translate-y-0.5"
+                >
+                  <img
+                    src={preview}
+                    alt={`Upload ${i + 1}`}
+                    className="size-full object-cover"
+                  />
                   <button
                     type="button"
                     onClick={() => removeImage(i)}
@@ -503,7 +837,9 @@ const AddListing = () => {
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
               className={`group flex cursor-pointer flex-col items-center justify-center rounded-3xl border-2 border-dashed px-6 py-10 text-center transition-all hover:border-primary/50 hover:bg-primary/5 ${
-                errors.images ? "border-destructive bg-destructive/5" : "border-border/70 bg-muted/20"
+                errors.images
+                  ? "border-destructive bg-destructive/5"
+                  : "border-border/70 bg-muted/20"
               }`}
             >
               <div className="flex size-14 items-center justify-center rounded-2xl bg-background text-primary shadow-sm ring-1 ring-border/60 transition-transform duration-200 group-hover:scale-105">
@@ -513,10 +849,13 @@ const AddListing = () => {
                 {t("seller.addListing.images.dropzone")}
               </p>
               <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                {t("seller.addListing.images.formats")}
+                {t("seller.addListing.images.formats", {
+                  maxSize: MAX_IMAGE_SIZE_MB,
+                })}
               </p>
               <p className="mt-2 inline-flex items-center rounded-full bg-background px-3 py-1 text-xs font-medium text-muted-foreground ring-1 ring-border/60">
-                {images.length} / {MAX_IMAGES} {t("seller.addListing.images.uploaded")}
+                {images.length} / {MAX_IMAGES}{" "}
+                {t("seller.addListing.images.uploaded")}
               </p>
             </div>
           )}
@@ -538,8 +877,10 @@ const AddListing = () => {
           )}
         </CardContent>
       </Card>
+      )}
 
       {/* Vehicle Information */}
+      {currentStep === "listing" && (
       <Card className={SECTION_CARD_CLASS}>
         <CardHeader className={SECTION_HEADER_CLASS}>
           <CardTitle className="flex items-center gap-3 text-base">
@@ -548,12 +889,18 @@ const AddListing = () => {
             </span>
             {t("seller.addListing.vehicleInfo.title")}
           </CardTitle>
-          <CardDescription>{t("seller.addListing.vehicleInfo.description")}</CardDescription>
+          <CardDescription>
+            {t("seller.addListing.vehicleInfo.description")}
+          </CardDescription>
         </CardHeader>
         <CardContent className="pt-6">
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {/* Make */}
-            <FormField label={t("seller.addListing.fields.make")} error={errors.makeId} required>
+            <FormField
+              label={t("seller.addListing.fields.make")}
+              error={errors.makeId}
+              required
+            >
               <Combobox
                 value={form.makeId}
                 onValueChange={(v) => updateField("makeId", v)}
@@ -563,7 +910,9 @@ const AddListing = () => {
                     ? t("seller.addListing.placeholders.loading")
                     : t("seller.addListing.placeholders.make")
                 }
-                searchPlaceholder={t("seller.addListing.placeholders.searchMake")}
+                searchPlaceholder={t(
+                  "seller.addListing.placeholders.searchMake",
+                )}
                 emptyText={t("seller.addListing.placeholders.noMakeFound")}
                 disabled={isLoadingMakes}
                 aria-invalid={!!errors.makeId}
@@ -571,19 +920,28 @@ const AddListing = () => {
             </FormField>
 
             {/* Model */}
-            <FormField label={t("seller.addListing.fields.model")} error={errors.modelId} required>
+            <FormField
+              label={t("seller.addListing.fields.model")}
+              error={errors.modelId}
+              required
+            >
               <Combobox
                 value={form.modelId}
                 onValueChange={(v) => updateField("modelId", v)}
-                options={availableModels.map((m) => ({ value: m.id, label: m.name }))}
+                options={availableModels.map((m) => ({
+                  value: m.id,
+                  label: m.name,
+                }))}
                 placeholder={
                   isLoadingModels
                     ? t("seller.addListing.placeholders.loading")
                     : !form.makeId
-                    ? t("seller.addListing.placeholders.selectMakeFirst")
-                    : t("seller.addListing.placeholders.model")
+                      ? t("seller.addListing.placeholders.selectMakeFirst")
+                      : t("seller.addListing.placeholders.model")
                 }
-                searchPlaceholder={t("seller.addListing.placeholders.searchModel")}
+                searchPlaceholder={t(
+                  "seller.addListing.placeholders.searchModel",
+                )}
                 emptyText={t("seller.addListing.placeholders.noModelFound")}
                 disabled={!form.makeId || isLoadingModels}
                 aria-invalid={!!errors.modelId}
@@ -591,10 +949,22 @@ const AddListing = () => {
             </FormField>
 
             {/* Year */}
-            <FormField label={t("seller.addListing.fields.year")} error={errors.year} required>
-              <Select value={form.year} onValueChange={(v) => updateField("year", v)}>
-                <SelectTrigger aria-invalid={!!errors.year} className="h-11 rounded-xl bg-background/80">
-                  <SelectValue placeholder={t("seller.addListing.placeholders.year")} />
+            <FormField
+              label={t("seller.addListing.fields.year")}
+              error={errors.year}
+              required
+            >
+              <Select
+                value={form.year}
+                onValueChange={(v) => updateField("year", v)}
+              >
+                <SelectTrigger
+                  aria-invalid={!!errors.year}
+                  className="h-11 rounded-xl bg-background/80"
+                >
+                  <SelectValue
+                    placeholder={t("seller.addListing.placeholders.year")}
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   {YEARS.map((year) => (
@@ -607,7 +977,11 @@ const AddListing = () => {
             </FormField>
 
             {/* Mileage */}
-            <FormField label={t("seller.addListing.fields.mileage")} error={errors.mileage} required>
+            <FormField
+              label={t("seller.addListing.fields.mileage")}
+              error={errors.mileage}
+              required
+            >
               <Input
                 type="number"
                 min={0}
@@ -620,9 +994,19 @@ const AddListing = () => {
             </FormField>
 
             {/* Fuel Type */}
-            <FormField label={t("seller.addListing.fields.fuelType")} error={errors.fuelType} required>
-              <Select value={form.fuelType} onValueChange={(v) => updateField("fuelType", v)}>
-                <SelectTrigger aria-invalid={!!errors.fuelType} className="h-11 rounded-xl bg-background/80">
+            <FormField
+              label={t("seller.addListing.fields.fuelType")}
+              error={errors.fuelType}
+              required
+            >
+              <Select
+                value={form.fuelType}
+                onValueChange={(v) => updateField("fuelType", v)}
+              >
+                <SelectTrigger
+                  aria-invalid={!!errors.fuelType}
+                  className="h-11 rounded-xl bg-background/80"
+                >
                   <SelectValue
                     placeholder={
                       isLoadingLookups
@@ -633,7 +1017,7 @@ const AddListing = () => {
                 </SelectTrigger>
                 <SelectContent>
                   {fuelTypeOptions.map((type) => (
-                    <SelectItem key={type.value} value={type.label}>
+                    <SelectItem key={type.value} value={type.value.toString()}>
                       {type.label}
                     </SelectItem>
                   ))}
@@ -642,9 +1026,19 @@ const AddListing = () => {
             </FormField>
 
             {/* Transmission */}
-            <FormField label={t("seller.addListing.fields.transmission")} error={errors.transmission} required>
-              <Select value={form.transmission} onValueChange={(v) => updateField("transmission", v)}>
-                <SelectTrigger aria-invalid={!!errors.transmission} className="h-11 rounded-xl bg-background/80">
+            <FormField
+              label={t("seller.addListing.fields.transmission")}
+              error={errors.transmission}
+              required
+            >
+              <Select
+                value={form.transmission}
+                onValueChange={(v) => updateField("transmission", v)}
+              >
+                <SelectTrigger
+                  aria-invalid={!!errors.transmission}
+                  className="h-11 rounded-xl bg-background/80"
+                >
                   <SelectValue
                     placeholder={
                       isLoadingLookups
@@ -655,7 +1049,7 @@ const AddListing = () => {
                 </SelectTrigger>
                 <SelectContent>
                   {transmissionOptions.map((type) => (
-                    <SelectItem key={type.value} value={type.label}>
+                    <SelectItem key={type.value} value={type.value.toString()}>
                       {type.label}
                     </SelectItem>
                   ))}
@@ -664,7 +1058,11 @@ const AddListing = () => {
             </FormField>
 
             {/* Engine Size */}
-            <FormField label={t("seller.addListing.fields.engineSize")} error={errors.engineSize} required>
+            <FormField
+              label={t("seller.addListing.fields.engineSize")}
+              error={errors.engineSize}
+              required
+            >
               <Input
                 placeholder={t("seller.addListing.placeholders.engineSize")}
                 value={form.engineSize}
@@ -675,10 +1073,22 @@ const AddListing = () => {
             </FormField>
 
             {/* Color */}
-            <FormField label={t("seller.addListing.fields.color")} error={errors.color} required>
-              <Select value={form.color} onValueChange={(v) => updateField("color", v)}>
-                <SelectTrigger aria-invalid={!!errors.color} className="h-11 rounded-xl bg-background/80">
-                  <SelectValue placeholder={t("seller.addListing.placeholders.color")} />
+            <FormField
+              label={t("seller.addListing.fields.color")}
+              error={errors.color}
+              required
+            >
+              <Select
+                value={form.color}
+                onValueChange={(v) => updateField("color", v)}
+              >
+                <SelectTrigger
+                  aria-invalid={!!errors.color}
+                  className="h-11 rounded-xl bg-background/80"
+                >
+                  <SelectValue
+                    placeholder={t("seller.addListing.placeholders.color")}
+                  />
                 </SelectTrigger>
                 <SelectContent>
                   {COLORS.map((color) => (
@@ -690,61 +1100,13 @@ const AddListing = () => {
               </Select>
             </FormField>
 
-            {/* Condition Grade */}
-            <FormField label={t("seller.addListing.fields.conditionGrade")} error={errors.conditionGrade} required>
-              <Select value={form.conditionGrade} onValueChange={(v) => updateField("conditionGrade", v)}>
-                <SelectTrigger aria-invalid={!!errors.conditionGrade} className="h-11 rounded-xl bg-background/80">
-                  <SelectValue placeholder={t("seller.addListing.placeholders.conditionGrade")} />
-                </SelectTrigger>
-                <SelectContent>
-                  {CONDITION_GRADES.map((grade) => (
-                    <SelectItem key={grade} value={grade}>
-                      {grade}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FormField>
           </div>
         </CardContent>
       </Card>
-
-      {/* Pricing */}
-      <Card className={SECTION_CARD_CLASS}>
-        <CardHeader className={SECTION_HEADER_CLASS}>
-          <CardTitle className="flex items-center gap-3 text-base">
-            <span className="flex size-9 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-              <CircleDollarSign className="size-4" />
-            </span>
-            {t("seller.addListing.pricing.title")}
-          </CardTitle>
-          <CardDescription>{t("seller.addListing.pricing.description")}</CardDescription>
-        </CardHeader>
-        <CardContent className="pt-6">
-          <div className="max-w-md">
-            <FormField label={t("seller.addListing.fields.listingPrice")} error={errors.listingPrice} required>
-              <div className="relative">
-                <Input
-                  type="number"
-                  min={1}
-                  placeholder={t("seller.addListing.placeholders.listingPrice")}
-                  value={form.listingPrice}
-                  onChange={(e) => updateField("listingPrice", e.target.value)}
-                  aria-invalid={!!errors.listingPrice}
-                  className="h-11 rounded-xl bg-background/80 pe-16"
-                />
-                <span
-                  className="pointer-events-none absolute end-3 top-1/2 inline-flex -translate-y-1/2 items-center rounded-full bg-muted px-2.5 py-1 text-[11px] font-semibold tracking-wide text-muted-foreground"
-                >
-                  EGP
-                </span>
-              </div>
-            </FormField>
-          </div>
-        </CardContent>
-      </Card>
+      )}
 
       {/* Condition Checklist */}
+      {currentStep === "conditions" && (
       <Card className={SECTION_CARD_CLASS}>
         <CardHeader className={SECTION_HEADER_CLASS}>
           <CardTitle className="flex items-center gap-3 text-base">
@@ -766,9 +1128,7 @@ const AddListing = () => {
         </CardHeader>
         <CardContent className="space-y-5 pt-6">
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-            <FormField
-              label={t("seller.addListing.fields.conditionCategory")}
-            >
+            <FormField label={t("seller.addListing.fields.conditionCategory")}>
               <Select
                 value={selectedConditionCategoryId}
                 onValueChange={handleConditionCategoryChange}
@@ -792,13 +1152,13 @@ const AddListing = () => {
               </Select>
             </FormField>
 
-            <FormField
-              label={t("seller.addListing.fields.conditionDefect")}
-            >
+            <FormField label={t("seller.addListing.fields.conditionDefect")}>
               <Select
                 value={selectedConditionDefectId}
                 onValueChange={handleConditionDefectChange}
-                disabled={!selectedConditionCategoryId || isLoadingConditionDefects}
+                disabled={
+                  !selectedConditionCategoryId || isLoadingConditionDefects
+                }
               >
                 <SelectTrigger className="h-11 rounded-xl bg-background/80">
                   <SelectValue
@@ -806,7 +1166,9 @@ const AddListing = () => {
                       isLoadingConditionDefects
                         ? t("seller.addListing.placeholders.loading")
                         : !selectedConditionCategoryId
-                          ? t("seller.addListing.placeholders.selectConditionCategoryFirst")
+                          ? t(
+                              "seller.addListing.placeholders.selectConditionCategoryFirst",
+                            )
                           : t("seller.addListing.placeholders.conditionDefect")
                     }
                   />
@@ -850,11 +1212,16 @@ const AddListing = () => {
                     <span className="font-medium">{selection.defectName}</span>
                     <button
                       type="button"
-                      onClick={() => removeConditionSelection(selection.defectId)}
+                      onClick={() =>
+                        removeConditionSelection(selection.defectId)
+                      }
                       className="inline-flex size-5 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-background hover:text-destructive"
-                      aria-label={t("seller.addListing.conditionChecklist.removeSelection", {
-                        defect: selection.defectName,
-                      })}
+                      aria-label={t(
+                        "seller.addListing.conditionChecklist.removeSelection",
+                        {
+                          defect: selection.defectName,
+                        },
+                      )}
                     >
                       <X className="size-3.5" />
                     </button>
@@ -869,8 +1236,10 @@ const AddListing = () => {
           </div>
         </CardContent>
       </Card>
+      )}
 
       {/* Description */}
+      {currentStep === "listing" && (
       <Card className={SECTION_CARD_CLASS}>
         <CardHeader className={SECTION_HEADER_CLASS}>
           <CardTitle className="flex items-center gap-3 text-base">
@@ -879,10 +1248,16 @@ const AddListing = () => {
             </span>
             {t("seller.addListing.descriptionSection.title")}
           </CardTitle>
-          <CardDescription>{t("seller.addListing.descriptionSection.description")}</CardDescription>
+          <CardDescription>
+            {t("seller.addListing.descriptionSection.description")}
+          </CardDescription>
         </CardHeader>
         <CardContent className="pt-6">
-          <FormField label={t("seller.addListing.fields.description")} error={errors.description} required>
+          <FormField
+            label={t("seller.addListing.fields.description")}
+            error={errors.description}
+            required
+          >
             <Textarea
               placeholder={t("seller.addListing.placeholders.description")}
               value={form.description}
@@ -902,26 +1277,58 @@ const AddListing = () => {
           </FormField>
         </CardContent>
       </Card>
+      )}
 
       <Separator className="opacity-60" />
 
       {/* Actions */}
       <div className="sticky bottom-4 z-10 flex flex-col gap-3 rounded-3xl border border-border/70 bg-background/90 p-4 shadow-lg shadow-black/5 backdrop-blur supports-backdrop-filter:bg-background/80 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted-foreground">
-          {t("seller.addListing.footerNote")}
+          {t("seller.addListing.steps.footer", {
+            current: currentStepIndex + 1,
+            total: ADD_LISTING_STEPS.length,
+          })}
         </p>
         <div className="flex items-center justify-end gap-3">
           <Button
             type="button"
             variant="outline"
-            onClick={() => navigate("/seller/listings")}
+            onClick={() =>
+              currentStep === "photos"
+                ? setCurrentStep("conditions")
+                : navigate("/seller/listings")
+            }
+            disabled={isSubmitting}
             className="rounded-xl"
           >
-            {t("buttons.cancel")}
+            {currentStep === "photos"
+              ? t("buttons.back", "Back")
+              : t("buttons.cancel")}
           </Button>
-          <Button type="submit" className="gap-2 rounded-xl px-5 shadow-sm shadow-primary/20">
-            <Car className="size-4" />
-            {t("seller.addListing.submit")}
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="gap-2 rounded-xl px-5 shadow-sm shadow-primary/20"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="size-4 animate-spin" />
+                {t("seller.addListing.submitting", "Submitting…")}
+              </>
+            ) : (
+              <>
+                {currentStep === "listing" ? (
+                  <Car className="size-4" />
+                ) : currentStep === "conditions" ? (
+                  <ClipboardCheck className="size-4" />
+                ) : (
+                  <Camera className="size-4" />
+                )}
+                {currentStep === "photos"
+                  ? t("seller.addListing.submit")
+                  : t("seller.addListing.steps.continue")}
+              </>
+            )}
           </Button>
         </div>
       </div>

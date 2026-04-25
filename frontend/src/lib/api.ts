@@ -45,9 +45,7 @@ let isRefreshing = false;
 let queue: QueueItem[] = [];
 
 function drainQueue(error: unknown = null) {
-  queue.forEach(({ resolve, reject }) =>
-    error ? reject(error) : resolve()
-  );
+  queue.forEach(({ resolve, reject }) => (error ? reject(error) : resolve()));
   queue = [];
 }
 
@@ -82,17 +80,15 @@ api.interceptors.response.use(
 
     try {
       // Ask the server to rotate tokens using the HttpOnly cookies.
-      await axios.post(
-        `${BASE_URL}/api/auth/refresh-cookie`,
-        null,
-        { withCredentials: true },
-      );
+      await axios.post(`${BASE_URL}/api/auth/refresh-cookie`, null, {
+        withCredentials: true,
+      });
 
-      drainQueue();          // let queued requests through
-      return api(original);  // retry the original request
+      drainQueue(); // let queued requests through
+      return api(original); // retry the original request
     } catch (refreshError) {
-      drainQueue(refreshError);  // reject every queued request
-      triggerAuthFailure();       // clears AuthContext in-memory user
+      drainQueue(refreshError); // reject every queued request
+      triggerAuthFailure(); // clears AuthContext in-memory user
       if (window.location.pathname !== "/login") {
         window.location.href = "/login";
       }

@@ -1,0 +1,35 @@
+..........................................................................................F...............F...F.................................................................................................
+======================================================================
+FAIL: test_alias_bomba_lancer_puma (tests.test_car_lookup.TestExtractMention.test_alias_bomba_lancer_puma)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/mo-seif/Documents/GP/ai-service/tests/test_car_lookup.py", line 403, in test_alias_bomba_lancer_puma
+    self.assertEqual(m.make, "Mitsubishi")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'Peugeot' != 'Mitsubishi'
+- Peugeot
++ Mitsubishi
+
+
+======================================================================
+FAIL: test_english_model_only (tests.test_car_lookup.TestExtractMention.test_english_model_only)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/mo-seif/Documents/GP/ai-service/tests/test_car_lookup.py", line 370, in test_english_model_only
+    self.assertIsNotNone(m)
+    ~~~~~~~~~~~~~~~~~~~~^^^
+AssertionError: unexpectedly None
+
+======================================================================
+FAIL: test_mention_without_year_has_none_year (tests.test_car_lookup.TestExtractMention.test_mention_without_year_has_none_year)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/mo-seif/Documents/GP/ai-service/tests/test_car_lookup.py", line 489, in test_mention_without_year_has_none_year
+    self.assertIsNotNone(m)
+    ~~~~~~~~~~~~~~~~~~~~^^^
+AssertionError: unexpectedly None
+
+----------------------------------------------------------------------
+Ran 208 tests in 1.810s
+
+FAILED (failures=3)

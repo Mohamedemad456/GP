@@ -763,6 +763,24 @@
       "title": "Add New Listing",
       "subtitle": "Fill in the details below to submit your car listing for review.",
       "submit": "Submit Listing",
+      "steps": {
+        "stepLabel": "Step {{number}}",
+        "continue": "Continue",
+        "footer": "Step {{current}} of {{total}}. Your listing is saved before condition notes and photos are added.",
+        "listing": {
+          "title": "Listing details",
+          "description": "Create the draft listing first.",
+          "created": "Listing details saved."
+        },
+        "conditions": {
+          "title": "Defects & condition",
+          "description": "Attach visible issues next."
+        },
+        "photos": {
+          "title": "Photos",
+          "description": "Finish with gallery uploads."
+        }
+      },
       "highlights": {
         "photos": "Minimum {{min}} photos",
         "checklist": "Condition checklist ready",
@@ -770,9 +788,9 @@
       },
       "images": {
         "title": "Vehicle Photos",
-        "description": "Upload at least {{min}} and up to {{max}} photos of your vehicle. The first image will be the cover photo.",
+        "description": "Upload at least {{min}} and up to {{max}} photos of your vehicle. Each photo must be {{maxSize}}MB or less.",
         "dropzone": "Click or drag & drop to upload images",
-        "formats": "PNG, JPG, WEBP up to 10MB each",
+        "formats": "PNG, JPG, WEBP up to {{maxSize}}MB each",
         "uploaded": "uploaded",
         "cover": "Cover"
       },
@@ -847,7 +865,13 @@
         "loadLookupsFailed": "Failed to load lookup options. Please refresh the page.",
         "loadConditionCategoriesFailed": "Failed to load condition categories. Please refresh the page.",
         "loadConditionDefectsFailed": "Failed to load condition defects. Please refresh the page.",
-        "fixErrors": "Please fix the errors in the form before submitting"
+        "fixErrors": "Please fix the errors in the form before submitting",
+        "submitFailed": "Failed to submit the listing. Please try again.",
+        "checklistFailed": "The listing was created, but condition items could not be saved.",
+        "photosFailed": "The listing was created, but photos could not be uploaded.",
+        "createListingFirst": "Create the listing details before continuing.",
+        "invalidImageType": "Only image files can be uploaded.",
+        "imageTooLarge": "Each photo must be {{max}}MB or less."
       },
       "footerNote": "Review your details and submit when everything looks right.",
       "success": {

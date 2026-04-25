@@ -1,0 +1,678 @@
+# aliases for Egyptian Arabic spellings.
+# Keys are matched after Arabic normalization (diacritics removed, Alef variants unified).
+# Rule: cover every realistic colloquial/slang/misspelling an Egyptian user might type.
+
+aliases:
+  makes:
+    # ─── Japanese ────────────────────────────────────────────────────
+    تويوتا: Toyota
+    تيوتا: Toyota          # Common misspelling
+    تيوتو: Toyota
+    نيسان: Nissan
+    هوندا: Honda
+    سوزوكي: Suzuki
+    سوزوكى: Suzuki
+    مازدا: Mazda
+    ميتسوبيشي: Mitsubishi
+    ميتسوبيشى: Mitsubishi
+    ميتسوبيشه: Mitsubishi
+    ميتسو: Mitsubishi      # Slang abbreviation
+    سوبارو: Subaru
+    دايهاتسو: Daihatsu
+    اسوزو: Isuzu
+
+    # ─── Korean ──────────────────────────────────────────────────────
+    هيونداي: Hyundai
+    هيونداى: Hyundai
+    هيونداى: Hyundai
+    هيونده: Hyundai        # Common shortening
+    كيا: Kia
+    كيه: Kia               # Slang
+    داو: Daewoo
+    دايو: Daewoo
+    سانج يونج: SsangYong
+    سانج يونغ: SsangYong
+
+    # ─── European ────────────────────────────────────────────────────
+    مرسيدس: Mercedes
+    مرسيدس بنز: Mercedes
+    بنز: Mercedes          # Very common Egyptian slang
+    بي ام دبليو: BMW
+    بي ام: BMW
+    بيمر: BMW              # Slang
+    فولكس فاجن: Volkswagen
+    فولكس واجن: Volkswagen
+    فولكس: Volkswagen
+    فولفو: Volvo
+    اودي: Audi
+    بيجو: Peugeot
+    بيجيو: Peugeot
+    رينو: Renault
+    رينول: Renault
+    فيات: Fiat
+    سكودا: Skoda
+    اوبل: Opel
+    سيات: Seat
+    ستروين: Citroen
+    سيتروين: Citroen
+    الفا روميو: Alfa Romeo
+    بيئو: Peugeot          # Common misspelling
+    لاند روفر: Land Rover
+    جاكوار: Jaguar
+
+    # ─── American ────────────────────────────────────────────────────
+    شيفروليه: Chevrolet
+    شيفورليه: Chevrolet
+    شيفرولية: Chevrolet
+    شيفي: Chevrolet        # Slang
+    منصور: Chevrolet       # Colloquial (Mansour dealers)
+    فورد: Ford
+    جيب: Jeep
+    دودج: Dodge
+    كاديلاك: Cadillac
+    كرايسلر: Chrysler
+    جي ام سي: GMC
+
+    # ─── Chinese ─────────────────────────────────────────────────────
+    ام جي: MG
+    ام. جي: MG
+    ام جي ام: MG
+    شيري: Chery
+    شيرى: Chery
+    بي واي دي: BYD
+    بيواي دي: BYD
+    جيلي: Geely
+    جيلى: Geely
+    جاك: JAC
+    بايك: BAIC
+    هافال: Haval
+    هافاله: Haval
+    هافل: Haval
+    شانجان: Changan
+    شانا: Chana
+    جيتور: Jetour
+    دونج فونج: Dongfeng
+    دونجفونج: Dongfeng
+    دي اف اس كي: DFSK
+    اسبرانزا: Speranza
+    سبرانزا: Speranza
+    جاك: JAC
+    زوتيه: Zotye
+    سينوفا: Senova
+    اكس بنج: XPeng
+    اكسبنج: XPeng
+    زيكر: Zeekr
+    كايي: Kaiyi
+    جي ايه سي: GAC
+    افاتر: Avatr
+    سويست: Soueast
+    بريليانس: Brilliance
+    رواكس: Rox
+    سايبا: Saipa
+
+    # ─── Others ──────────────────────────────────────────────────────
+    لادا: Lada
+    تسلا: Tesla
+    شاومي: Xiaomi
+    لوتس: Lotus
+    ميني: Mini
+    بورش: Porsche
+    مازيراتي: Maserati
+    ماهيندرا: Mahindra
+    بروتون: Proton
+
+  models:
+    # ═══════════════════════════════════════════════════════════════
+    # TOYOTA
+    # ═══════════════════════════════════════════════════════════════
+    كورولا: Corolla
+    كورلا: Corolla          # Very common misspelling
+    كرولا: Corolla
+    يارس: Yaris
+    ياريس: Yaris
+    ياريز: Yaris
+    لاند كروزر: Land Cruiser
+    لاند كروز: Land Cruiser
+    اللاند: Land Cruiser    # Slang
+    برادو: Prado
+    برادو لاند: Prado
+    فورتشنر: Fortuner
+    فورتيشنر: Fortuner
+    فورتشنار: Fortuner
+    افانزا: Avanza
+    افانزه: Avanza
+    راش: Rush
+    سي اتش ار: C-HR
+    كورولا كروس: Corolla Cross
+    كرولا كروس: Corolla Cross
+    بيلتا: Belta
+    ايكو: Echo
+    كورونا: Corona
+    اربان كروزر: Urban Cruiser
+    ميكروباص: Hiace         # Egyptian slang (Hiace/H100)
+    ميكروبص: Hiace
+
+    # ═══════════════════════════════════════════════════════════════
+    # HYUNDAI
+    # ═══════════════════════════════════════════════════════════════
+    النترا: Elantra
+    اي لانترا: Elantra
+    الانترا: Elantra
+    مكواة النترا: Elantra    # Some listings use this phrasing
+    النترا مكواة: Elantra
+    اتش دي: Elantra HD      # Elantra HD
+    ام دي: Elantra MD       # Elantra MD
+    اي دي: Elantra AD       # Elantra AD
+    سي ان سفن: Elantra CN7  # Elantra CN7
+    الجمل: Elantra          # Elantra 2007-2010 slang
+    فيرنا: Verna
+    فيرنه: Verna
+    اكسنت: Accent
+    اكسينت: Accent
+    توسان: Tucson
+    توكسان: Tucson          # Common misspelling
+    توسون: Tucson
+    تكسان: Tucson           # Common misspelling
+    كريتا: Creta
+    كريته: Creta
+    سانتافي: Santa Fe
+    سانتا في: Santa Fe
+    سانتافيه: Santa Fe
+    سونتا: Sonata
+    سوناتا: Sonata
+    ماتريكس: Matrix
+    ايه ون: A1
+    اي تن: I10
+    ايتن: I10
+    اي عشرين: I20
+    ايعشرين: I20
+    اي ثلاثين: I30
+    ايكس ثلاثة وثلاثين: IX35
+    اتس: Atos
+    جيتز: Getz
+    باثفايندر: Pathfinder    # Note: This is Nissan, but often confused
+    باي يون: Bayon
+    سولاريس: Solaris
+    فيلوستر: Veloster
+    اكسل: Excel
+    جراند اي عشرة: Grand i10
+
+    # ═══════════════════════════════════════════════════════════════
+    # KIA
+    # ═══════════════════════════════════════════════════════════════
+    سيراتو: Cerato
+    سيراتو فورتي: Forte     # 2010-2013
+    كيه ثري: K3             # 2014-2018
+    جراند سيراتو: Grand Cerato # 2019+
+    سيراتو جراند: Grand Cerato
+    سبورتاج: Sportage
+    سبورتيج: Sportage
+    بيكانتو: Picanto
+    بيكانتو: Picanto
+    بيكنتو: Picanto
+    ريو: Rio
+    كارنز: Carens
+    سورينتو: Sorento
+    سورنتو: Sorento
+    سول: Soul
+    كي فور: K4
+    اكسيد: Xceed
+    سيد: Ceed
+    كارنيفال: Carnival
+    كيه جي ام: KGM
+    سيفيا: Sephia
+    شوما: Shuma
+    برايد: Pride
+    سبيكترا: Spectra
+
+    # ═══════════════════════════════════════════════════════════════
+    # NISSAN
+    # ═══════════════════════════════════════════════════════════════
+    سينترا: Sentra
+    سنترا: Sentra
+    صني: Sunny
+    الصني: Sunny
+    صني شكل قديم: Sunny     # N16 slang
+    صني ان 16: Sunny        # N16
+    صني ان 17: Sunny        # N17
+    قشقاي: Qashqai
+    قاشقاي: Qashqai
+    جوك: Juke
+    تيدا: Tiida
+    ليفينا: Livina
+    اكس تريل: XTrail
+    اكستريل: XTrail
+    اكس-تريل: XTrail
+    بلوبيرد: Bluebird
+    باثفايندر: Pathfinder    # Actual Nissan model
+
+    # ═══════════════════════════════════════════════════════════════
+    # CHEVROLET / DAEWOO
+    # ═══════════════════════════════════════════════════════════════
+    لانوس: Lanos
+    لانس: Lanos             # Slang
+    اوبترا: Optra
+    اوبتيرا: Optra
+    افيو: Aveo
+    كابتيفا: Captiva
+    كروز: Cruze
+    سبارك: Spark
+    اسبارك: Spark
+    مالبي: Malibu
+    ماليبو: Malibu
+    دبابة: T-Series          # Chevy pickup slang
+    نوبيرا: Nubira
+    نوبيرا 1: Nubira 1
+    نوبيرا 2: Nubira 2
+    جولييت: Juliet           # Daewoo hatchback
+    ليجانزا: Leganza
+    لاسيتي: Lacetti
+    ماتيز: Matiz
+    ماتيس: Matiz
+    تمناية: N300             # Slang for microbus/van (Chevrolet N300 / similar)
+    ن 300: N300
+    ان 300: N300
+
+    # ═══════════════════════════════════════════════════════════════
+    # RENAULT
+    # ═══════════════════════════════════════════════════════════════
+    لوجان: Logan
+    داستر: Duster
+    دستر: Duster
+    ميجان: Megane
+    ميجين: Megane
+    كليو: Clio
+    سيمبول: Symbol
+    سانديرو: Sandero
+    ستيب واي: Sandero Stepway
+    ستيب وي: Sandero Stepway
+    فلونس: Fluence
+    فلوانس: Fluence
+    كادجار: Kadjar
+    كابتر: Captur
+    كاردجيان: Kardian
+    تاليانت: Taliant
+    استرال: Austral
+    رينبو: Rainbow
+    تسعتاشر: 19             # Renault 19 old model
+
+    # ═══════════════════════════════════════════════════════════════
+    # MITSUBISHI
+    # ═══════════════════════════════════════════════════════════════
+    لانسر: Lancer
+    بومة: Lancer Puma        # 2004-2012 Puma slang
+    بومه: Lancer Puma
+    شارك: Lancer EX Shark    # EX Shark slang
+    مكواة: Lancer            # 2001-2003 slang
+    مكوه: Lancer
+    كريستالة: Lancer Crystala # 1996-2000 slang
+    كريستاله: Lancer Crystala
+    بطة: Lancer              # 1991-1995 slang
+    باجيرو: Pajero
+    باجيرو: Pajero
+    اتراج: Attrage
+    اترج: Attrage
+    اكليبس كروس: Eclipse Cross
+    اكليبس: Eclipse
+    اكسباندر: Xpander
+    اكسباندر كروس: Xpander Cross
+    ميراج: Mirage
+    ميرج: Mirage
+    كولت: Colt
+    اوتلاندر: Outlander
+
+    # ═══════════════════════════════════════════════════════════════
+    # SKODA
+    # ═══════════════════════════════════════════════════════════════
+    اوكتافيا: Octavia
+    فانتازيا: Fantasia       # Egyptian slang for Octavia A5
+    فانتازيه: Fantasia
+    اي فايف: Octavia A5      # A5 shape
+    اي فور: Octavia A4       # A4 shape
+    اوكتافيا ايه فايف: Octavia A5
+    اوكتافيا ايه سفن: Octavia A7
+    اوكتافيا ايه تمانية: Octavia A8
+    كودياك: Kodiaq
+    سوبرب: Superb
+    كاروك: Karoq
+    فابيا: Fabia
+    رابيد: Rapid
+    فيليشيا: Felicia
+    فافوريت: Favorit
+
+    # ═══════════════════════════════════════════════════════════════
+    # FIAT
+    # ═══════════════════════════════════════════════════════════════
+    تيبو: Tipo
+    تيبه: Tipo
+    شاهين: Shahin
+    شاهين: Shahin
+    دوجان: Dogan
+    دوغان: Dogan
+    ميئة وثمانية وعشرين: 128
+    ١٢٨: 128
+    مية وتمانية وعشرين: 128
+    ١٣١: 131
+    بونتو: Punto
+    جراند بونتو: Grand Punto
+    باليو: Palio
+    سيينا: Siena
+    لينيا: Linea
+    بيترا: Petra
+    ريجاتا: Regata
+    تيمبرا: Tempra
+    اونو: Uno
+    خمسميه: 500
+
+    # ═══════════════════════════════════════════════════════════════
+    # PEUGEOT
+    # ═══════════════════════════════════════════════════════════════
+    ٢٠٦: 206
+    ٢٠٧: 207
+    ٢٠٨: 208
+    ثلاتميه وواحد: 301
+    ثلاتميه وسبعة: 307
+    ثلاتميه وتمانية: 308
+    ٤٠٥: 405
+    اربعميه وخمسة: 405
+    ٤٠٦: 406
+    ٤٠٧: 407
+    ٤٠٨: 408
+    ثلاتالاف وتمانية: 3008
+    خمسالاف وتمانية: 5008
+    ألفين وثمانية: 2008
+    خمسميه واربعة: 504
+    خمسميه وخمسة: 505
+    خمسميه وتمانية: 508
+
+    # ═══════════════════════════════════════════════════════════════
+    # VOLKSWAGEN
+    # ═══════════════════════════════════════════════════════════════
+    جولف: Golf
+    جولف 3: Golf 3
+    جولف 4: Golf 4
+    جولف 6: Golf 6
+    جولف 7: Golf 7
+    باسات: Passat
+    بولو: Polo
+    تيجوان: Tiguan
+    تيروك: T-Roc
+    توارج: Touareg
+    جيتا: Jetta
+    بورا: Bora
+    بيتل: Beetle
+
+    # ═══════════════════════════════════════════════════════════════
+    # OPEL
+    # ═══════════════════════════════════════════════════════════════
+    استرا: Astra
+    كورسا: Corsa
+    فيكترا: Vectra
+    انسيجنيا: Insignia
+    موكا: Mokka
+    كروسلاند: Crossland
+    جراندلاند: Grandland
+    ميريفا: Meriva
+
+    # ═══════════════════════════════════════════════════════════════
+    # HONDA
+    # ═══════════════════════════════════════════════════════════════
+    سيفيك: Civic
+    اكورد: Accord
+    سيتي: City
+    هوندا سيتي: City
+    سي ار في: CRV
+    سي ار-في: CRV
+    زد ار في: ZRV
+
+    # ═══════════════════════════════════════════════════════════════
+    # SUZUKI
+    # ═══════════════════════════════════════════════════════════════
+    سويفت: Swift
+    بالينو: Baleno
+    سياز: Ciaz
+    ارتيجا: Ertiga
+    ارتيجه: Ertiga
+    التو: Alto
+    فيتارا: Vitara
+    جراند فيتارا: Grand vitara
+    اس بريسو: S Presso
+    سويفت ديزاير: Swift Dzire
+
+    # ═══════════════════════════════════════════════════════════════
+    # MG
+    # ═══════════════════════════════════════════════════════════════
+    ام جي 5: 5
+    ام جي خمسة: 5
+    ام جي 6: 6
+    ام جي ستة: 6
+    ام جي 7: 7
+    ام جي سبعة: 7
+    زد اس: ZS
+    اتش اس: HS
+    ار اكس 5: RX5
+    ام جي زد اس: ZS
+    ام جي اتش اس: HS
+    ام جي ون: One
+    ام جي جي تي: GT
+
+    # ═══════════════════════════════════════════════════════════════
+    # CHERY
+    # ═══════════════════════════════════════════════════════════════
+    تيجو: Tiggo
+    تيجو 3: Tiggo 3
+    تيجو 4: Tiggo 4
+    تيجو 4 برو: Tiggo 4 Pro
+    تيجو 7: Tiggo 7
+    تيجو 7 برو: Tiggo 7 Pro
+    تيجو 7 برو ماكس: Tiggo 7 Pro Max
+    تيجو 8: Tiggo 8
+    تيجو 8 برو: Tiggo 8 Pro
+    تيجو 8 برو ماكس: Tiggo 8 Pro Max
+    اريزو: Arrizo
+    اريزو 5: Arrizo 5
+    اريزو 5 برو: Arrizo 5 Pro
+    اريزو 6: Arrizo 6
+    انفي: Envy
+    اي 11: A11
+    اي 5: A5
+    كيو كيو: QQ
+
+    # ═══════════════════════════════════════════════════════════════
+    # SPERANZA (sold in Egypt as Speranza)
+    # ═══════════════════════════════════════════════════════════════
+    ٥١٦: A516
+    516: A516
+    اي 516: A516
+    ١١٣: A113
+    113: A113
+    اي 113: A113
+
+    # ═══════════════════════════════════════════════════════════════
+    # BYD
+    # ═══════════════════════════════════════════════════════════════
+    اف 3: F3
+    اف3: F3
+    اف ثلاثة: F3
+    ال 3: L3
+    سي جل: Seagull
+    سيلون 6: Sealion 6
+    سونج بلس: Song Plus
+    سونج ال: Song L
+    بي 2: B2
+
+    # ═══════════════════════════════════════════════════════════════
+    # GEELY
+    # ═══════════════════════════════════════════════════════════════
+    امجراند: Emgrand
+    امجراند 7: Emgrand 7
+    امجراند اكس 7: Emgrand X7
+    اوكافانجو: Okavango
+    كول راي: Cool Ray
+    اكس 7: X7
+    جي اكس 3 برو: GX3 Pro
+    ستاراي: Starray
+    باندينو: Pandino
+
+    # ═══════════════════════════════════════════════════════════════
+    # CHANGAN
+    # ═══════════════════════════════════════════════════════════════
+    السفين: Alsvin
+    الزفين: Alsvin           # common mispronunciation
+    بيني: Benni
+    بيني ميني: Benni Mini
+    ايدو: Eado
+    ايدو بلس: Eado Plus
+    ايادو: Eado               # common spelling without space
+    ايادو بلس: Eado Plus
+    ايادو: Eado               # legacy spelling with space
+    ايادو بلس: Eado Plus
+    يوني تي: UNI-T
+    يوني في: UNI-V
+    سي اس 35: CS35
+    سي اس 55: CS55
+    سي اس 55 بلس: CS55 Plus
+
+    # ═══════════════════════════════════════════════════════════════
+    # JAC
+    # ═══════════════════════════════════════════════════════════════
+    جي 7: J7
+    جاك جي 7: J7
+    جاك اس 3: S3
+    جاك جي اس 4: JS4
+    جاك جي اس 3: JS3
+
+    # ═══════════════════════════════════════════════════════════════
+    # HAVAL
+    # ═══════════════════════════════════════════════════════════════
+    اتش 6: H6
+    جوليون: Jolion
+    جوليون برو: Jolion Pro
+
+    # ═══════════════════════════════════════════════════════════════
+    # JETOUR
+    # ═══════════════════════════════════════════════════════════════
+    اكس 70: X70
+    اكس 70 بلس: X70 Plus
+    اكس 70 اس: X70S
+    اكس 90 بلس: X90 Plus
+    اكس 95: X95
+    تي 2: T2
+    داشينج: Dashing
+
+    # ═══════════════════════════════════════════════════════════════
+    # LADA
+    # ═══════════════════════════════════════════════════════════════
+    لادا 2107: Lada
+    سيارة روسية: Lada        # Slang
+    نيفا: Niva               # Lada Niva
+
+  # ─────────────────────────────────────────────────────────────────
+  # Direct make+model combos → canonical "Make Model"
+  # ─────────────────────────────────────────────────────────────────
+  make_models:
+    كيا سيراتو: Kia Cerato
+    كيا سبورتاج: Kia Sportage
+    كيا بيكانتو: Kia Picanto
+    كيا ريو: Kia Rio
+    كيا كارنز: Kia Carens
+    كيا سورينتو: Kia Sorento
+    كيا سول: Kia Soul
+    هيونداي توسان: Hyundai Tucson
+    هيونداي النترا: Hyundai Elantra
+    هيونداي فيرنا: Hyundai Verna
+    هيونداي اكسنت: Hyundai Accent
+    هيونداي كريتا: Hyundai Creta
+    هيونداي سانتافي: Hyundai Santa Fe
+    هيونداي اتش دي: Hyundai Elantra HD
+    هيونداي ام دي: Hyundai Elantra MD
+    هيونداي اي دي: Hyundai Elantra AD
+    هيونداي سي ان سفن: Hyundai Elantra CN7
+    تويوتا كورولا: Toyota Corolla
+    تويوتا يارس: Toyota Yaris
+    تويوتا فورتشنر: Toyota Fortuner
+    تويوتا برادو: Toyota Prado
+    تويوتا لاند كروزر: Toyota Land Cruiser
+    تويوتا افانزا: Toyota Avanza
+    تويوتا راش: Toyota Rush
+    تويوتا ميكروباص: Toyota Hiace
+    نيسان صني: Nissan Sunny
+    نيسان سنترا: Nissan Sentra
+    نيسان سينترا: Nissan Sentra
+    نيسان قشقاي: Nissan Qashqai
+    نيسان جوك: Nissan Juke
+    نيسان تيدا: Nissan Tiida
+    شيفروليه اوبترا: Chevrolet Optra
+    شيفروليه لانوس: Chevrolet Lanos
+    شيفروليه سبارك: Chevrolet Spark
+    شيفروليه كروز: Chevrolet Cruze
+    شيفروليه كابتيفا: Chevrolet Captiva
+    دايو لانوس: Daewoo Lanos
+    دايو نوبيرا: Daewoo Nubira
+    دايو ماتيز: Daewoo Matiz
+    رينو لوجان: Renault Logan
+    رينو داستر: Renault Duster
+    رينو كليو: Renault Clio
+    رينو سانديرو: Renault Sandero
+    رينو ميجان: Renault Megane
+    رينو فلونس: Renault Fluence
+    سكودا اوكتافيا: Skoda Octavia
+    سكودا فانتازيا: Skoda Fantasia
+    سكودا كودياك: Skoda Kodiaq
+    سكودا سوبرب: Skoda Superb
+    ميتسوبيشي لانسر: Mitsubishi Lancer
+    ميتسوبيشي باجيرو: Mitsubishi Pajero
+    ميتسوبيشي اتراج: Mitsubishi Attrage
+    ميتسوبيشي اكسباندر: Mitsubishi Xpander
+    فيات تيبو: Fiat Tipo
+    فيات باليو: Fiat Palio
+    فيات شاهين: Fiat Shahin
+    فيات بونتو: Fiat Punto
+    هوندا سيفيك: Honda Civic
+    هوندا سيتي: Honda City
+    هوندا سي ار في: Honda CRV
+    سوزوكي سويفت: Suzuki Swift
+    سوزوكي بالينو: Suzuki Baleno
+    سوزوكي سياز: Suzuki Ciaz
+    سوزوكي ارتيجا: Suzuki Ertiga
+    ام جي زد اس: MG ZS
+    ام جي 5: MG 5
+    ام جي 6: MG 6
+    ام جي اتش اس: MG HS
+    شيري تيجو: Chery Tiggo
+    شيري اريزو: Chery Arrizo
+    شيري انفي: Chery Envy
+    بي واي دي اف 3: BYD F3
+    بي واي دي سي جل: BYD Seagull
+    جيلي امجراند: Geely Emgrand
+    جيلي اوكافانجو: Geely Okavango
+    شانجان السفين: Changan Alsvin
+    شانجان ايدو: Changan Eado
+    شانجان ايدو بلس: Changan Eado Plus
+    شانجان ايادو: Changan Eado
+    هافال جوليون: Haval Jolion
+    هافال اتش 6: Haval H6
+    جاك جي 7: JAC J7
+    جيتور اكس 70: Jetour X70
+    بيجو 405: Peugeot 405
+    بيجو ٢٠٦: Peugeot 206
+    بيجو 206: Peugeot 206
+    بيجو 301: Peugeot 301
+    بيجو 208: Peugeot 208
+    بيجو 3008: Peugeot 3008
+    فولكس جولف: Volkswagen Golf
+    فولكس باسات: Volkswagen Passat
+    فولكس بولو: Volkswagen Polo
+    فولكس تيجوان: Volkswagen Tiguan
+    هيونداي باثفايندر: Nissan Pathfinder
+    شيفروليه تمناية: Chevrolet N300
+    تيجو شكل قديم: Speranza Tiggo
+    اسبرانزا تيجو: Speranza Tiggo
+    سبرانزا تيجو: Speranza Tiggo
+    اسبرانزا ٥١٦: Speranza A516
+    سبرانزا ٥١٦: Speranza A516
+    اسبرانزا ١١٣: Speranza A113
+    سبرانزا ١١٣: Speranza A113
+    اوبل كورسا: Opel Corsa
+    اوبل استرا: Opel Astra
+    اوبل فيكترا: Opel Vectra

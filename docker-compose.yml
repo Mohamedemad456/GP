@@ -71,6 +71,24 @@ services:
       - db
 
   # =======================
+  # ML Service (FastAPI)
+  # =======================
+  ml-service:
+    container_name: karna_ml_service
+    build:
+      context: ./ml-service
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./ml-service:/app:Z
+    env_file:
+      - .env
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+
+  # =======================
   # Database (SQL Server)
   # =======================
   db:
