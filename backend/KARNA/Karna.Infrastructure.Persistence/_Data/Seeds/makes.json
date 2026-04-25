@@ -14,13 +14,6 @@
     "CountryAr": "ألمانيا"
   },
   {
-    "Name": "Bentley",
-    "NameAr": "بنتلي",
-    "LogoUrl": "icons/Makes/bentley.png",
-    "Country": "United Kingdom",
-    "CountryAr": "المملكة المتحدة"
-  },
-  {
     "Name": "BMW",
     "NameAr": "بي إم دبليو",
     "LogoUrl": "icons/Makes/bmw.png",
@@ -28,16 +21,16 @@
     "CountryAr": "ألمانيا"
   },
   {
-    "Name": "Brilliance",
-    "NameAr": "بريليانس",
-    "LogoUrl": "icons/Makes/brilliance.png",
+    "Name": "BYD",
+    "NameAr": "بي واي دي",
+    "LogoUrl": "icons/Makes/byd.png",
     "Country": "China",
     "CountryAr": "الصين"
   },
   {
-    "Name": "BYD",
-    "NameAr": "بي واي دي",
-    "LogoUrl": "icons/Makes/byd.png",
+    "Name": "Brilliance",
+    "NameAr": "بريليانس",
+    "LogoUrl": "icons/Makes/brilliance.png",
     "Country": "China",
     "CountryAr": "الصين"
   },
@@ -63,7 +56,7 @@
     "CountryAr": "الولايات المتحدة"
   },
   {
-    "Name": "Citroen",
+    "Name": "Citroën",
     "NameAr": "سيتروين",
     "LogoUrl": "icons/Makes/citroen.png",
     "Country": "France",
@@ -77,13 +70,6 @@
     "CountryAr": "إسبانيا"
   },
   {
-    "Name": "Daewoo",
-    "NameAr": "دايو",
-    "LogoUrl": "icons/Makes/daewoo.png",
-    "Country": "South Korea",
-    "CountryAr": "كوريا الجنوبية"
-  },
-  {
     "Name": "DS",
     "NameAr": "دي إس",
     "LogoUrl": "icons/Makes/ds.png",
@@ -91,11 +77,11 @@
     "CountryAr": "فرنسا"
   },
   {
-    "Name": "Ferrari",
-    "NameAr": "فيراري",
-    "LogoUrl": "icons/Makes/ferrari.png",
-    "Country": "Italy",
-    "CountryAr": "إيطاليا"
+    "Name": "Daewoo",
+    "NameAr": "دايو",
+    "LogoUrl": "icons/Makes/daewoo.png",
+    "Country": "South Korea",
+    "CountryAr": "كوريا الجنوبية"
   },
   {
     "Name": "Fiat",
@@ -105,16 +91,16 @@
     "CountryAr": "إيطاليا"
   },
   {
-    "Name": "Ford Mustang",
-    "NameAr": "فورد موستانج",
-    "LogoUrl": "icons/Makes/ford-mustang.png",
+    "Name": "Ford",
+    "NameAr": "فورد",
+    "LogoUrl": "icons/Makes/ford.png",
     "Country": "USA",
     "CountryAr": "الولايات المتحدة"
   },
   {
-    "Name": "Ford",
-    "NameAr": "فورد",
-    "LogoUrl": "icons/Makes/ford.png",
+    "Name": "GMC",
+    "NameAr": "جي إم سي",
+    "LogoUrl": "icons/Makes/gmc.png",
     "Country": "USA",
     "CountryAr": "الولايات المتحدة"
   },
@@ -126,25 +112,11 @@
     "CountryAr": "الصين"
   },
   {
-    "Name": "GMC",
-    "NameAr": "جي إم سي",
-    "LogoUrl": "icons/Makes/gmc.png",
-    "Country": "USA",
-    "CountryAr": "الولايات المتحدة"
-  },
-  {
     "Name": "Haval",
     "NameAr": "هافال",
     "LogoUrl": "icons/Makes/haval.png",
     "Country": "China",
     "CountryAr": "الصين"
-  },
-  {
-    "Name": "Hispano Suiza",
-    "NameAr": "هيسبانو سويزا",
-    "LogoUrl": "icons/Makes/hispano-suiza.png",
-    "Country": "Spain",
-    "CountryAr": "إسبانيا"
   },
   {
     "Name": "Honda",
@@ -189,25 +161,11 @@
     "CountryAr": "الولايات المتحدة"
   },
   {
-    "Name": "JMC",
-    "NameAr": "جيه إم سي",
-    "LogoUrl": "icons/Makes/jmc.png",
-    "Country": "China",
-    "CountryAr": "الصين"
-  },
-  {
     "Name": "Kia",
     "NameAr": "كيا",
     "LogoUrl": "icons/Makes/kia.png",
     "Country": "South Korea",
     "CountryAr": "كوريا الجنوبية"
-  },
-  {
-    "Name": "Lamborghini",
-    "NameAr": "لامبورجيني",
-    "LogoUrl": "icons/Makes/lamborghini.png",
-    "Country": "Italy",
-    "CountryAr": "إيطاليا"
   },
   {
     "Name": "Land Rover",
@@ -217,16 +175,16 @@
     "CountryAr": "المملكة المتحدة"
   },
   {
-    "Name": "Lexus",
-    "NameAr": "لكزس",
-    "LogoUrl": "icons/Makes/lexus.png",
-    "Country": "Japan",
-    "CountryAr": "اليابان"
-  },
-  {
     "Name": "Lotus",
     "NameAr": "لوتس",
     "LogoUrl": "icons/Makes/lotus.png",
+    "Country": "United Kingdom",
+    "CountryAr": "المملكة المتحدة"
+  },
+  {
+    "Name": "MG",
+    "NameAr": "إم جي",
+    "LogoUrl": "icons/Makes/mg.png",
     "Country": "United Kingdom",
     "CountryAr": "المملكة المتحدة"
   },
@@ -252,13 +210,6 @@
     "CountryAr": "ألمانيا"
   },
   {
-    "Name": "MG",
-    "NameAr": "إم جي",
-    "LogoUrl": "icons/Makes/mg.png",
-    "Country": "United Kingdom",
-    "CountryAr": "المملكة المتحدة"
-  },
-  {
     "Name": "Mini",
     "NameAr": "ميني",
     "LogoUrl": "icons/Makes/mini.png",
@@ -269,6 +220,13 @@
     "Name": "Mitsubishi",
     "NameAr": "ميتسوبيشي",
     "LogoUrl": "icons/Makes/mitsubishi.png",
+    "Country": "Japan",
+    "CountryAr": "اليابان"
+  },
+  {
+    "Name": "Nissan",
+    "NameAr": "نيسان",
+    "LogoUrl": "icons/Makes/nissan.png",
     "Country": "Japan",
     "CountryAr": "اليابان"
   },
