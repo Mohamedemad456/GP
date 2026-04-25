@@ -34,6 +34,8 @@ import {
   User,
   FileText,
   Clock,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -254,7 +256,7 @@ const MOCK_CARS: CarListing[] = [
       "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=800&h=600&fit=crop",
       "https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?w=800&h=600&fit=crop",
     ],
-  }
+  },
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -479,13 +481,41 @@ function ListingDetailsDialog({
                 {t("admin.carsPending.vehicleDetails")}
               </p>
               <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-                <DetailRow icon={Car} label={t("admin.carsPending.makeModel")} value={`${car.makeName} ${car.modelName}`} />
-                <DetailRow icon={Calendar} label={t("admin.carsPending.year")} value={car.year} />
-                <DetailRow icon={Gauge} label={t("admin.carsPending.mileage")} value={formatMileage(car.mileage)} />
-                <DetailRow icon={Fuel} label={t("admin.carsPending.fuelType")} value={car.fuelType} />
-                <DetailRow icon={Cog} label={t("admin.carsPending.transmission")} value={car.transmission} />
-                <DetailRow icon={Cog} label={t("admin.carsPending.engineSize")} value={car.engineSize} />
-                <DetailRow icon={Palette} label={t("admin.carsPending.color")} value={car.color} />
+                <DetailRow
+                  icon={Car}
+                  label={t("admin.carsPending.makeModel")}
+                  value={`${car.makeName} ${car.modelName}`}
+                />
+                <DetailRow
+                  icon={Calendar}
+                  label={t("admin.carsPending.year")}
+                  value={car.year}
+                />
+                <DetailRow
+                  icon={Gauge}
+                  label={t("admin.carsPending.mileage")}
+                  value={formatMileage(car.mileage)}
+                />
+                <DetailRow
+                  icon={Fuel}
+                  label={t("admin.carsPending.fuelType")}
+                  value={car.fuelType}
+                />
+                <DetailRow
+                  icon={Cog}
+                  label={t("admin.carsPending.transmission")}
+                  value={car.transmission}
+                />
+                <DetailRow
+                  icon={Cog}
+                  label={t("admin.carsPending.engineSize")}
+                  value={car.engineSize}
+                />
+                <DetailRow
+                  icon={Palette}
+                  label={t("admin.carsPending.color")}
+                  value={car.color}
+                />
                 <DetailRow
                   icon={Car}
                   label={t("admin.carsPending.conditionGrade")}
@@ -506,7 +536,11 @@ function ListingDetailsDialog({
                 {t("admin.carsPending.pricing")}
               </p>
               <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-                <DetailRow icon={DollarSign} label={t("admin.carsPending.basePrice")} value={formatPrice(car.basePrice)} />
+                <DetailRow
+                  icon={DollarSign}
+                  label={t("admin.carsPending.basePrice")}
+                  value={formatPrice(car.basePrice)}
+                />
                 <DetailRow
                   icon={DollarSign}
                   label={t("admin.carsPending.deduction")}
@@ -554,12 +588,36 @@ function ListingDetailsDialog({
                 {t("admin.carsPending.sellerEngagement")}
               </p>
               <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-                <DetailRow icon={User} label={t("admin.carsPending.seller")} value={car.sellerName} />
-                <DetailRow icon={User} label={t("admin.carsPending.sellerId")} value={car.sellerId} />
-                <DetailRow icon={Eye} label={t("admin.carsPending.views")} value={car.viewCount} />
-                <DetailRow icon={Heart} label={t("admin.carsPending.favorites")} value={car.favoriteCount} />
-                <DetailRow icon={Clock} label={t("admin.carsPending.created")} value={formatDate(car.createdAt)} />
-                <DetailRow icon={Clock} label={t("admin.carsPending.updatedAt")} value={formatDate(car.updatedAt)} />
+                <DetailRow
+                  icon={User}
+                  label={t("admin.carsPending.seller")}
+                  value={car.sellerName}
+                />
+                <DetailRow
+                  icon={User}
+                  label={t("admin.carsPending.sellerId")}
+                  value={car.sellerId}
+                />
+                <DetailRow
+                  icon={Eye}
+                  label={t("admin.carsPending.views")}
+                  value={car.viewCount}
+                />
+                <DetailRow
+                  icon={Heart}
+                  label={t("admin.carsPending.favorites")}
+                  value={car.favoriteCount}
+                />
+                <DetailRow
+                  icon={Clock}
+                  label={t("admin.carsPending.created")}
+                  value={formatDate(car.createdAt)}
+                />
+                <DetailRow
+                  icon={Clock}
+                  label={t("admin.carsPending.updatedAt")}
+                  value={formatDate(car.updatedAt)}
+                />
               </div>
             </div>
           </div>
@@ -743,7 +801,9 @@ const CarsPending = () => {
                   {formatDate(car.createdAt)}
                 </TableCell>
                 <TableCell>
-                  <Badge variant="warning">{t("admin.carsPending.pending")}</Badge>
+                  <Badge variant="warning">
+                    {t("admin.carsPending.pending")}
+                  </Badge>
                 </TableCell>
                 <TableCell className="text-right">
                   <div
