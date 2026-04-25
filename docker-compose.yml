@@ -66,9 +66,26 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__DefaultConnection: Server=db;Database=KarnaDb;User=sa;Password=Karna@Pass123;TrustServerCertificate=True
       Urls__ApiBaseUrl: http://localhost:9090
-      MLApiSettings__BaseUrl: http://ai-service:8000
     depends_on:
       - db
+
+  # =======================
+  # ML Service (FastAPI)
+  # =======================
+  ml-service:
+    container_name: karna_ml_service
+    build:
+      context: ./ml-service
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./ml-service:/app:Z
+    env_file:
+      - .env
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
 
   # =======================
   # Database (SQL Server)
@@ -86,4 +103,3 @@ services:
 
 volumes:
   karna_db_data:
-
