@@ -115,6 +115,7 @@ export {
   PaginationPrevious,
   PaginationNext,
   PaginationEllipsis,
+  PaginationBar,
 } from "./pagination";
 export {
   Popover,

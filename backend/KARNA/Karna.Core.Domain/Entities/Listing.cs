@@ -26,5 +26,7 @@ namespace Karna.Core.Domain.Entities
 		public ICollection<ListingDefect> ListingDefects { get; set; } = new List<ListingDefect>();
 
         public ICollection<ListingPhoto> Photos { get; set; } = new List<ListingPhoto>();
+
+		public ICollection<ListingStatusHistory> StatusHistories { get; set; } = new List<ListingStatusHistory>();
     }
 }
