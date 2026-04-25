@@ -1,11 +1,21 @@
-"""
-Health check endpoint.
+from fastapi import APIRouter
+from app.schemas.health import HealthResponse
+import datetime
 
-GET /health
-    Returns: service status, active model version, training date, uptime.
+router = APIRouter()
+start_time = datetime.datetime.now(datetime.timezone.utc)
 
-GET /model-info
-    Returns: current model metrics, feature list, training sample count.
-"""
-
-# TODO: Implement health and model-info endpoints
+@router.get("/health", response_model=HealthResponse)
+async def health_check():
+    """
+    Returns service status, active model version, and uptime.
+    """
+    uptime = datetime.datetime.now(datetime.timezone.utc) - start_time
+    # Hardcoded dummy model version for now
+    active_version = "v1.0.0" 
+    
+    return HealthResponse(
+        status="ok",
+        model_version=active_version,
+        uptime=str(uptime)
+    )
