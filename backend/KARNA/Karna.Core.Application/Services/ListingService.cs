@@ -15,7 +15,8 @@ namespace Karna.Core.Application.Services
 		ICurrentUserService _currentUserService,
 		ILocalizationService _localizer,
 		IValidator<CreateListingDto> _createValidator,
-		IValidator<AddConditionChecklistDto> _checklistValidator
+		IValidator<AddConditionChecklistDto> _checklistValidator,
+		IMLApiClient _mlApiClient
 	) : IListingService
 	{
 		public async Task<ApiResponse<ListingDto>> CreateAsync(CreateListingDto dto)
@@ -382,6 +383,76 @@ namespace Karna.Core.Application.Services
 			{
 				Success = true,
 				Data = history.ToDto()
+			};
+		}
+		public async Task<ApiResponse<GeneratePriceResponseDto>> GeneratePriceAsync(Guid listingId)
+		{
+			// 1. Authenticate current user
+			if (!_currentUserService.IsAuthenticated || _currentUserService.UserId == Guid.Empty)
+				return new ApiResponse<GeneratePriceResponseDto> { Success = false, Message = _localizer.GetErrorMessage("Unauthorized") };
+
+			var userRepo = _unitOfWork.GetRepository<User>();
+			var currentUser = await userRepo.GetAsync(u => u.IdentityUserId == _currentUserService.UserId);
+			if (currentUser is null)
+				return new ApiResponse<GeneratePriceResponseDto> { Success = false, Message = _localizer.GetErrorMessage("UserNotFound") };
+
+			// 2. Get listing
+			var listingRepo = _unitOfWork.GetRepository<Listing>();
+			var listing = await listingRepo.GetAsync(listingId);
+			if (listing is null)
+				return new ApiResponse<GeneratePriceResponseDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotFound") };
+
+			// 3. Validate ownership
+			if (listing.SellerId != currentUser.Id)
+				return new ApiResponse<GeneratePriceResponseDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotOwnedByUser") };
+
+			// 4. Validate listing state (Draft or Pending)
+			if (listing.Status != ListingStatus.Draft && listing.Status != ListingStatus.Pending)
+				return new ApiResponse<GeneratePriceResponseDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotInValidStateForPricing") };
+
+			// 5. Load Make and Model names for ML API
+			var makeRepo = _unitOfWork.GetRepository<Make>();
+			var modelRepo = _unitOfWork.GetRepository<Model>();
+
+			var make = await makeRepo.GetAsync(listing.MakeId);
+			var model = await modelRepo.GetAsync(listing.ModelId);
+
+			if (make is null || model is null)
+				return new ApiResponse<GeneratePriceResponseDto> { Success = false, Message = _localizer.GetErrorMessage("MakeOrModelNotFound") };
+
+			// 6. Call ML API
+			var fuelTypeStr = listing.FuelType.ToString().ToLowerInvariant();
+			var transmissionStr = listing.Transmission.ToString();
+
+			var prediction = await _mlApiClient.GetPricePredictionAsync(
+				brand: make.Name,
+				model: model.Name,
+				year: listing.Year,
+				mileageKm: listing.Mileage,
+				fuel: fuelTypeStr,
+				transmission: transmissionStr,
+				engineSize: listing.EngineSize
+			);
+
+			if (prediction is null)
+				return new ApiResponse<GeneratePriceResponseDto> { Success = false, Message = _localizer.GetErrorMessage("MLServiceUnavailable") };
+
+			// 7. Map response to listing entity fields
+			listing.FairPrice = prediction.FairPrice;
+			listing.NegotiationRangeLower = prediction.NegotiationRangeLower;
+			listing.NegotiationRangeUpper = prediction.NegotiationRangeUpper;
+			listing.ConfidenceLevel = prediction.ConfidenceLevel;
+			listing.ModelVersion = prediction.ModelVersion;
+			listing.PredictedAt = prediction.PredictedAt;
+
+			// 8. Save changes
+			await _unitOfWork.CompleteAsync();
+
+			return new ApiResponse<GeneratePriceResponseDto>
+			{
+				Success = true,
+				Message = _localizer.GetMessage("PriceGenerated"),
+				Data = prediction
 			};
 		}
 

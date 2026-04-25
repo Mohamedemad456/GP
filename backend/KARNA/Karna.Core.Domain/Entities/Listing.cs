@@ -23,6 +23,14 @@ namespace Karna.Core.Domain.Entities
 		public string Description { get; set; } = null!;
 		public ListingStatus Status { get; set; } = ListingStatus.Draft;
 
+		// ML Pricing Fields
+		public decimal? FairPrice { get; set; }
+		public decimal? NegotiationRangeLower { get; set; }
+		public decimal? NegotiationRangeUpper { get; set; }
+		public string? ConfidenceLevel { get; set; }
+		public string? ModelVersion { get; set; }
+		public DateTime? PredictedAt { get; set; }
+
 		public ICollection<ListingDefect> ListingDefects { get; set; } = new List<ListingDefect>();
 
         public ICollection<ListingPhoto> Photos { get; set; } = new List<ListingPhoto>();

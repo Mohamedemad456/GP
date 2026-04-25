@@ -36,7 +36,13 @@ namespace Karna.Core.Application.Mapping
 			Description = source.Description,
 			Status = source.Status,
 			CreatedAt = source.CreatedAt,
-			UpdatedAt = source.UpdatedAt
+			UpdatedAt = source.UpdatedAt,
+			FairPrice = source.FairPrice,
+			NegotiationRangeLower = source.NegotiationRangeLower,
+			NegotiationRangeUpper = source.NegotiationRangeUpper,
+			ConfidenceLevel = source.ConfidenceLevel,
+			ModelVersion = source.ModelVersion,
+			PredictedAt = source.PredictedAt
 		};
 	}
 }

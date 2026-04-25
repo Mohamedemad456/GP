@@ -216,4 +216,7 @@
   <data name="ChecklistUpdated" xml:space="preserve">
     <value>تم تحديث قائمة فحص الحالة بنجاح.</value>
   </data>
+  <data name="PriceGenerated" xml:space="preserve">
+    <value>تم توليد السعر بنجاح.</value>
+  </data>
 </root>

@@ -63,6 +63,24 @@ namespace Karna.Infrastructure.Persistence._Data.Configurations
 				.WithMany()
 				.HasForeignKey(x => x.ModelId)
 				.OnDelete(DeleteBehavior.Restrict);
+
+			// ML Pricing Fields
+			builder.Property(x => x.FairPrice)
+				.HasPrecision(18, 2);
+
+			builder.Property(x => x.NegotiationRangeLower)
+				.HasPrecision(18, 2);
+
+			builder.Property(x => x.NegotiationRangeUpper)
+				.HasPrecision(18, 2);
+
+			builder.Property(x => x.ConfidenceLevel)
+				.HasMaxLength(20);
+
+			builder.Property(x => x.ModelVersion)
+				.HasMaxLength(50);
+
+			builder.Property(x => x.PredictedAt);
 		}
 	}
 }
