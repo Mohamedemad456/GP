@@ -1,8 +1,10 @@
 import { api } from "./api";
 import type { ApiResponse } from "./authApi";
-import type { BaseApiResponse } from "./makesApi";
+import type { BaseApiResponse, PaginatedResponse } from "./makesApi";
 
-const CONDITION_DEFECTS_ENDPOINT = "/api/ConditionDefects";
+const ENDPOINT = "/api/ConditionDefects";
+
+// ─── DTOs ───────────────────────────────────────────────────────────────────
 
 export type ConditionDefectDto = {
   id: string;
@@ -37,10 +39,35 @@ export type CreateConditionDefectRequest = {
 
 export type UpdateConditionDefectRequest = CreateConditionDefectRequest;
 
-const getConditionDefectsForLanguage = (language: "en" | "ar") =>
+/** Matches backend ConditionDefectSpecParams */
+export type ConditionDefectSpecParams = {
+  pageIndex?: number;
+  pageSize?: number;
+  search?: string;
+  sort?: string;
+  sortDirection?: string;
+  categoryId?: string;
+  isActive?: boolean;
+};
+
+/** Paginated result with bilingual merge */
+export type AdminDefectPagedResult = {
+  success: boolean;
+  message: string;
+  data: AdminConditionDefectDto[];
+  totalCount: number;
+};
+
+// ─── Internal helpers ────────────────────────────────────────────────────────
+
+const getDefectsForLanguage = (
+  language: "en" | "ar",
+  params?: ConditionDefectSpecParams,
+) =>
   api
-    .get<ApiResponse<ConditionDefectDto[]>>(`${CONDITION_DEFECTS_ENDPOINT}/All`, {
+    .get<ApiResponse<PaginatedResponse<ConditionDefectDto>>>(`${ENDPOINT}/All`, {
       headers: { "Accept-Language": language },
+      params,
     })
     .then((r) => r.data);
 
@@ -48,76 +75,94 @@ const mergeConditionDefects = (
   englishItems: ConditionDefectDto[] = [],
   arabicItems: ConditionDefectDto[] = [],
 ): AdminConditionDefectDto[] => {
-  const arabicItemsMap = new Map(arabicItems.map((item) => [item.id, item]));
-
+  const arabicMap = new Map(arabicItems.map((item) => [item.id, item]));
   return englishItems.map((item) => {
-    const arabicItem = arabicItemsMap.get(item.id);
-
+    const ar = arabicMap.get(item.id);
     return {
       ...item,
-      itemNameAr: arabicItem?.itemName ?? "",
-      descriptionAr: arabicItem?.description ?? null,
-      categoryNameAr: arabicItem?.categoryName ?? "",
+      itemNameAr: ar?.itemName ?? "",
+      descriptionAr: ar?.description ?? null,
+      categoryNameAr: ar?.categoryName ?? "",
     };
   });
 };
 
-// GET /api/ConditionDefects/Active  — AllowAnonymous
+// ─── Public API functions ────────────────────────────────────────────────────
+
+/**
+ * GET /api/ConditionDefects/Active — AllowAnonymous
+ * Backend returns ApiResponse<Pagination<T>>; unwrapped to a flat array here.
+ */
 export const getActiveConditionDefects = () =>
   api
-    .get<ApiResponse<ConditionDefectDto[]>>(`${CONDITION_DEFECTS_ENDPOINT}/Active`)
-    .then((r) => r.data);
+    .get<ApiResponse<PaginatedResponse<ConditionDefectDto>>>(
+      `${ENDPOINT}/Active`,
+    )
+    .then(
+      (r) =>
+        ({
+          success: r.data.success,
+          message: r.data.message,
+          data: r.data.data?.data ?? [],
+        }) satisfies ApiResponse<ConditionDefectDto[]>,
+    );
 
-// GET /api/ConditionDefects/All  — Admin
-export const getAllConditionDefects = async () => {
-  const [englishResponse, arabicResponse] = await Promise.all([
-    getConditionDefectsForLanguage("en"),
-    getConditionDefectsForLanguage("ar"),
+/**
+ * GET /api/ConditionDefects/All — Admin
+ * Fetches both language versions and merges them. Returns pagination metadata.
+ */
+export const getAllConditionDefects = async (
+  params?: ConditionDefectSpecParams,
+): Promise<AdminDefectPagedResult> => {
+  const [enRes, arRes] = await Promise.all([
+    getDefectsForLanguage("en", params),
+    getDefectsForLanguage("ar", params),
   ]);
 
   return {
-    success: englishResponse.success && arabicResponse.success,
-    message: englishResponse.message || arabicResponse.message,
+    success: enRes.success && arRes.success,
+    message: enRes.message || arRes.message,
     data: mergeConditionDefects(
-      englishResponse.data ?? [],
-      arabicResponse.data ?? [],
+      enRes.data?.data ?? [],
+      arRes.data?.data ?? [],
     ),
-  } satisfies ApiResponse<AdminConditionDefectDto[]>;
+    totalCount: enRes.data?.count ?? 0,
+  };
 };
 
-// GET /api/ConditionDefects/{id}  — Admin/AllowAnonymous based on auth
+/** GET /api/ConditionDefects/{id} — Admin */
 export const getConditionDefectById = async (id: string) => {
-  const [englishResponse, arabicResponse] = await Promise.all([
+  const [enRes, arRes] = await Promise.all([
     api
-      .get<ApiResponse<ConditionDefectDto>>(`${CONDITION_DEFECTS_ENDPOINT}/${id}`, {
+      .get<ApiResponse<ConditionDefectDto>>(`${ENDPOINT}/${id}`, {
         headers: { "Accept-Language": "en" },
       })
       .then((r) => r.data),
     api
-      .get<ApiResponse<ConditionDefectDto>>(`${CONDITION_DEFECTS_ENDPOINT}/${id}`, {
+      .get<ApiResponse<ConditionDefectDto>>(`${ENDPOINT}/${id}`, {
         headers: { "Accept-Language": "ar" },
       })
       .then((r) => r.data),
   ]);
 
   return {
-    success: englishResponse.success && arabicResponse.success,
-    message: englishResponse.message || arabicResponse.message,
-    data: englishResponse.data
+    success: enRes.success && arRes.success,
+    message: enRes.message || arRes.message,
+    data: enRes.data
       ? {
-          ...englishResponse.data,
-          itemNameAr: arabicResponse.data?.itemName ?? "",
-          descriptionAr: arabicResponse.data?.description ?? null,
-          categoryNameAr: arabicResponse.data?.categoryName ?? "",
+          ...enRes.data,
+          itemNameAr: arRes.data?.itemName ?? "",
+          descriptionAr: arRes.data?.description ?? null,
+          categoryNameAr: arRes.data?.categoryName ?? "",
         }
       : undefined,
   } satisfies ApiResponse<AdminConditionDefectDto | undefined>;
 };
 
-// POST /api/ConditionDefects/Create  — Admin
+/** POST /api/ConditionDefects/Create — Admin */
 export const createConditionDefect = (data: CreateConditionDefectRequest) =>
   api
-    .post<ApiResponse<ConditionDefectDto>>(`${CONDITION_DEFECTS_ENDPOINT}/Create`, {
+    .post<ApiResponse<ConditionDefectDto>>(`${ENDPOINT}/Create`, {
       ItemName: data.itemName,
       ItemNameAr: data.itemNameAr,
       Description: data.description?.trim() || null,
@@ -126,38 +171,31 @@ export const createConditionDefect = (data: CreateConditionDefectRequest) =>
     })
     .then((r) => r.data);
 
-// PUT /api/ConditionDefects/Update/{id}  — Admin
+/** PUT /api/ConditionDefects/Update/{id} — Admin */
 export const updateConditionDefect = (
   id: string,
   data: UpdateConditionDefectRequest,
 ) =>
   api
-    .put<ApiResponse<ConditionDefectDto>>(
-      `${CONDITION_DEFECTS_ENDPOINT}/Update/${id}`,
-      {
-        ItemName: data.itemName,
-        ItemNameAr: data.itemNameAr,
-        Description: data.description?.trim() || null,
-        DescriptionAr: data.descriptionAr?.trim() || null,
-        CategoryId: data.categoryId,
-      },
-    )
+    .put<ApiResponse<ConditionDefectDto>>(`${ENDPOINT}/Update/${id}`, {
+      ItemName: data.itemName,
+      ItemNameAr: data.itemNameAr,
+      Description: data.description?.trim() || null,
+      DescriptionAr: data.descriptionAr?.trim() || null,
+      CategoryId: data.categoryId,
+    })
     .then((r) => r.data);
 
-// PATCH /api/ConditionDefects/Activate/{id}  — Admin
+/** PATCH /api/ConditionDefects/Activate/{id} — Admin */
 export const activateConditionDefect = (id: string) =>
-  api
-    .patch<BaseApiResponse>(`${CONDITION_DEFECTS_ENDPOINT}/Activate/${id}`)
-    .then((r) => r.data);
+  api.patch<BaseApiResponse>(`${ENDPOINT}/Activate/${id}`).then((r) => r.data);
 
-// PATCH /api/ConditionDefects/Deactivate/{id}  — Admin
+/** PATCH /api/ConditionDefects/Deactivate/{id} — Admin */
 export const deactivateConditionDefect = (id: string) =>
   api
-    .patch<BaseApiResponse>(`${CONDITION_DEFECTS_ENDPOINT}/Deactivate/${id}`)
+    .patch<BaseApiResponse>(`${ENDPOINT}/Deactivate/${id}`)
     .then((r) => r.data);
 
-// DELETE /api/ConditionDefects/Delete/{id}  — Admin
+/** DELETE /api/ConditionDefects/Delete/{id} — Admin */
 export const deleteConditionDefect = (id: string) =>
-  api
-    .delete<BaseApiResponse>(`${CONDITION_DEFECTS_ENDPOINT}/Delete/${id}`)
-    .then((r) => r.data);
+  api.delete<BaseApiResponse>(`${ENDPOINT}/Delete/${id}`).then((r) => r.data);

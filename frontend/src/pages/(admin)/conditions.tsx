@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   AlertTriangle,
@@ -13,7 +13,6 @@ import {
   Search,
   ShieldAlert,
   Trash2,
-  Wrench,
   X,
 } from "lucide-react";
 
@@ -66,11 +65,9 @@ import {
   type CreateConditionDefectRequest,
 } from "@/lib/conditionDefectsApi";
 
-type CategoryFormState = {
-  name: string;
-  nameAr: string;
-};
+// ─── Types ────────────────────────────────────────────────────────────────────
 
+type CategoryFormState = { name: string; nameAr: string };
 type DefectFormState = {
   itemName: string;
   itemNameAr: string;
@@ -78,14 +75,9 @@ type DefectFormState = {
   descriptionAr: string;
   categoryId: string;
 };
-
 type StatusFilter = "all" | "true" | "false";
 
-const EMPTY_CATEGORY_FORM: CategoryFormState = {
-  name: "",
-  nameAr: "",
-};
-
+const EMPTY_CATEGORY_FORM: CategoryFormState = { name: "", nameAr: "" };
 const EMPTY_DEFECT_FORM: DefectFormState = {
   itemName: "",
   itemNameAr: "",
@@ -95,13 +87,14 @@ const EMPTY_DEFECT_FORM: DefectFormState = {
 };
 
 const PAGE_SIZE_OPTIONS = [5, 10, 20, 50] as const;
-
 const arabicFontStyle = {
   fontFamily: "'Cairo', 'Tajawal', 'IBM Plex Arabic', sans-serif",
 } as const;
 
 const getUpdatedAt = (updatedAt: string | null, createdAt: string) =>
   updatedAt ?? createdAt;
+
+// ─── MetricCard ───────────────────────────────────────────────────────────────
 
 function MetricCard({
   icon: Icon,
@@ -144,6 +137,8 @@ function MetricCard({
   );
 }
 
+// ─── StatusBadge ──────────────────────────────────────────────────────────────
+
 function StatusBadge({
   active,
   activeLabel,
@@ -163,54 +158,65 @@ function StatusBadge({
   );
 }
 
+// ─── Conditions ───────────────────────────────────────────────────────────────
+
 const Conditions = () => {
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language?.startsWith("ar");
   const { success, error } = useToast();
 
-  const [categories, setCategories] = useState<
-    AdminConditionChecklistCategoryDto[]
-  >([]);
-  const [defects, setDefects] = useState<AdminConditionDefectDto[]>([]);
+  // ── Category data ────────────────────────────────────────────────────────
+  const [categories, setCategories] = useState<AdminConditionChecklistCategoryDto[]>([]);
+  const [categoriesForSelect, setCategoriesForSelect] = useState<AdminConditionChecklistCategoryDto[]>([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
-  const [defectsLoading, setDefectsLoading] = useState(true);
+  const [categoryTotal, setCategoryTotal] = useState(0);
 
+  // ── Category filters (server-side) ───────────────────────────────────────
+  const [categorySearchInput, setCategorySearchInput] = useState("");
   const [categorySearch, setCategorySearch] = useState("");
-  const [categoryStatusFilter, setCategoryStatusFilter] =
-    useState<StatusFilter>("all");
+  const [categoryStatusFilter, setCategoryStatusFilter] = useState<StatusFilter>("all");
   const [categoryPage, setCategoryPage] = useState(1);
   const [categoryPageSize, setCategoryPageSize] = useState(5);
 
+  // ── Defect data ──────────────────────────────────────────────────────────
+  const [defects, setDefects] = useState<AdminConditionDefectDto[]>([]);
+  const [defectsLoading, setDefectsLoading] = useState(true);
+  const [defectTotal, setDefectTotal] = useState(0);
+
+  // ── Defect filters (server-side) ─────────────────────────────────────────
+  const [defectSearchInput, setDefectSearchInput] = useState("");
   const [defectSearch, setDefectSearch] = useState("");
-  const [defectStatusFilter, setDefectStatusFilter] =
-    useState<StatusFilter>("all");
+  const [defectStatusFilter, setDefectStatusFilter] = useState<StatusFilter>("all");
   const [defectCategoryFilter, setDefectCategoryFilter] = useState("all");
   const [defectPage, setDefectPage] = useState(1);
   const [defectPageSize, setDefectPageSize] = useState(10);
 
+  // ── Category dialog state ─────────────────────────────────────────────────
   const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
-  const [editingCategory, setEditingCategory] =
-    useState<AdminConditionChecklistCategoryDto | null>(null);
-  const [categoryForm, setCategoryForm] =
-    useState<CategoryFormState>(EMPTY_CATEGORY_FORM);
+  const [editingCategory, setEditingCategory] = useState<AdminConditionChecklistCategoryDto | null>(null);
+  const [categoryForm, setCategoryForm] = useState<CategoryFormState>(EMPTY_CATEGORY_FORM);
   const [isCategorySaving, setIsCategorySaving] = useState(false);
-  const [categoryDeleteTarget, setCategoryDeleteTarget] =
-    useState<AdminConditionChecklistCategoryDto | null>(null);
+  const [categoryDeleteTarget, setCategoryDeleteTarget] = useState<AdminConditionChecklistCategoryDto | null>(null);
   const [isCategoryDeleting, setIsCategoryDeleting] = useState(false);
 
+  // ── Defect dialog state ───────────────────────────────────────────────────
   const [defectDialogOpen, setDefectDialogOpen] = useState(false);
-  const [editingDefect, setEditingDefect] =
-    useState<AdminConditionDefectDto | null>(null);
+  const [editingDefect, setEditingDefect] = useState<AdminConditionDefectDto | null>(null);
   const [defectForm, setDefectForm] = useState<DefectFormState>(EMPTY_DEFECT_FORM);
   const [isDefectSaving, setIsDefectSaving] = useState(false);
-  const [defectDeleteTarget, setDefectDeleteTarget] =
-    useState<AdminConditionDefectDto | null>(null);
+  const [defectDeleteTarget, setDefectDeleteTarget] = useState<AdminConditionDefectDto | null>(null);
   const [isDefectDeleting, setIsDefectDeleting] = useState(false);
 
+  // ── Computed ──────────────────────────────────────────────────────────────
+  const categoryTotalPages = Math.max(1, Math.ceil(categoryTotal / categoryPageSize));
+  const defectTotalPages = Math.max(1, Math.ceil(defectTotal / defectPageSize));
+  const categoriesEmpty = !categoriesLoading && categories.length === 0;
+  const defectsEmpty = !defectsLoading && defects.length === 0;
+
+  // ── Localization helpers ──────────────────────────────────────────────────
   const formatDate = useCallback(
     (value: string | null) => {
       if (!value) return "—";
-
       return new Intl.DateTimeFormat(isArabic ? "ar-SA" : "en-GB", {
         day: "2-digit",
         month: "short",
@@ -228,182 +234,130 @@ const Conditions = () => {
 
   const getLocalizedDefectName = useCallback(
     (defect: AdminConditionDefectDto) =>
-      isArabic
-        ? defect.itemNameAr || defect.itemName
-        : defect.itemName || defect.itemNameAr,
+      isArabic ? defect.itemNameAr || defect.itemName : defect.itemName || defect.itemNameAr,
     [isArabic],
   );
 
   const getLocalizedDefectCategoryName = useCallback(
     (defect: AdminConditionDefectDto) =>
-      isArabic
-        ? defect.categoryNameAr || defect.categoryName
-        : defect.categoryName || defect.categoryNameAr,
+      isArabic ? defect.categoryNameAr || defect.categoryName : defect.categoryName || defect.categoryNameAr,
     [isArabic],
   );
 
   const getLocalizedDefectDescription = useCallback(
     (defect: AdminConditionDefectDto) =>
-      isArabic
-        ? defect.descriptionAr ?? defect.description ?? ""
-        : defect.description ?? defect.descriptionAr ?? "",
+      isArabic ? defect.descriptionAr ?? defect.description ?? "" : defect.description ?? defect.descriptionAr ?? "",
     [isArabic],
   );
 
+  // ── Search debounce ───────────────────────────────────────────────────────
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setCategorySearch(categorySearchInput);
+      setCategoryPage(1);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [categorySearchInput]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDefectSearch(defectSearchInput);
+      setDefectPage(1);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [defectSearchInput]);
+
+  // ── Fetch categories for select/combobox (all pages) ─────────────────────
+  const fetchAllCategoriesForSelect = useCallback(async () => {
+    try {
+      const all: AdminConditionChecklistCategoryDto[] = [];
+      let pageIndex = 1;
+      let total = 0;
+      do {
+        const res = await getAllConditionChecklistCategories({ pageIndex, pageSize: 10 });
+        if (!res.success) break;
+        all.push(...res.data);
+        total = res.totalCount;
+        pageIndex++;
+      } while (all.length < total);
+      setCategoriesForSelect(all);
+    } catch {
+      // non-critical — comboboxes will just be empty
+    }
+  }, []);
+
+  // ── Fetch categories (server-side paginated) ──────────────────────────────
   const fetchCategories = useCallback(async () => {
     setCategoriesLoading(true);
     try {
-      const response = await getAllConditionChecklistCategories();
-
-      if (response.success) {
-        setCategories(response.data ?? []);
+      const res = await getAllConditionChecklistCategories({
+        pageIndex: categoryPage,
+        pageSize: categoryPageSize,
+        ...(categorySearch ? { search: categorySearch } : {}),
+        ...(categoryStatusFilter !== "all"
+          ? { isActive: categoryStatusFilter === "true" }
+          : {}),
+      });
+      if (res.success) {
+        setCategories(res.data ?? []);
+        setCategoryTotal(res.totalCount ?? 0);
       } else {
-        error(t("admin.conditions.loadCategoriesError"), {
-          description: response.message,
-        });
+        error(t("admin.conditions.loadCategoriesError"), { description: res.message });
       }
     } catch {
       error(t("admin.conditions.loadCategoriesError"));
     } finally {
       setCategoriesLoading(false);
     }
-  }, [error, t]);
+  }, [categoryPage, categoryPageSize, categorySearch, categoryStatusFilter, error, t]);
 
+  // ── Fetch defects (server-side paginated) ─────────────────────────────────
   const fetchDefects = useCallback(async () => {
     setDefectsLoading(true);
     try {
-      const response = await getAllConditionDefects();
-
-      if (response.success) {
-        setDefects(response.data ?? []);
+      const res = await getAllConditionDefects({
+        pageIndex: defectPage,
+        pageSize: defectPageSize,
+        ...(defectSearch ? { search: defectSearch } : {}),
+        ...(defectStatusFilter !== "all"
+          ? { isActive: defectStatusFilter === "true" }
+          : {}),
+        ...(defectCategoryFilter !== "all" ? { categoryId: defectCategoryFilter } : {}),
+      });
+      if (res.success) {
+        setDefects(res.data ?? []);
+        setDefectTotal(res.totalCount ?? 0);
       } else {
-        error(t("admin.conditions.loadDefectsError"), {
-          description: response.message,
-        });
+        error(t("admin.conditions.loadDefectsError"), { description: res.message });
       }
     } catch {
       error(t("admin.conditions.loadDefectsError"));
     } finally {
       setDefectsLoading(false);
     }
-  }, [error, t]);
+  }, [defectPage, defectPageSize, defectSearch, defectStatusFilter, defectCategoryFilter, error, t]);
 
+  useEffect(() => { void fetchCategories(); }, [fetchCategories]);
+  useEffect(() => { void fetchDefects(); }, [fetchDefects]);
+  useEffect(() => { void fetchAllCategoriesForSelect(); }, [fetchAllCategoriesForSelect]);
+
+  // Guard: reset to last valid page when total shrinks
   useEffect(() => {
-    void fetchCategories();
-    void fetchDefects();
-  }, [fetchCategories, fetchDefects]);
-
-  const defectCountByCategory = useMemo(() => {
-    const counts = new Map<string, number>();
-
-    defects.forEach((defect) => {
-      counts.set(defect.categoryId, (counts.get(defect.categoryId) ?? 0) + 1);
-    });
-
-    return counts;
-  }, [defects]);
-
-  const categoryOptions = useMemo(
-    () =>
-      categories.map((category) => ({
-        value: category.id,
-        label: getLocalizedCategoryName(category),
-        disabled: false,
-      })),
-    [categories, getLocalizedCategoryName],
-  );
-
-  const filteredCategories = useMemo(() => {
-    const search = categorySearch.trim().toLocaleLowerCase();
-
-    return categories.filter((category) => {
-      const localizedCategoryText = getLocalizedCategoryName(category);
-
-      const matchesSearch =
-        !search || localizedCategoryText.toLocaleLowerCase().includes(search);
-      const matchesStatus =
-        categoryStatusFilter === "all" ||
-        String(category.isActive) === categoryStatusFilter;
-
-      return matchesSearch && matchesStatus;
-    });
-  }, [categories, categorySearch, categoryStatusFilter, getLocalizedCategoryName]);
-
-  const filteredDefects = useMemo(() => {
-    const search = defectSearch.trim().toLocaleLowerCase();
-
-    return defects.filter((defect) => {
-      const localizedDefectText = [
-        getLocalizedDefectName(defect),
-        getLocalizedDefectDescription(defect),
-        getLocalizedDefectCategoryName(defect),
-      ];
-
-      const matchesSearch =
-        !search ||
-        localizedDefectText.join(" ").toLocaleLowerCase().includes(search);
-
-      const matchesStatus =
-        defectStatusFilter === "all" ||
-        String(defect.isActive) === defectStatusFilter;
-
-      const matchesCategory =
-        defectCategoryFilter === "all" ||
-        defect.categoryId === defectCategoryFilter;
-
-      return matchesSearch && matchesStatus && matchesCategory;
-    });
-  }, [
-    defects,
-    defectCategoryFilter,
-    defectSearch,
-    defectStatusFilter,
-    getLocalizedDefectCategoryName,
-    getLocalizedDefectDescription,
-    getLocalizedDefectName,
-  ]);
-
-  const categoryTotalPages = Math.max(
-    1,
-    Math.ceil(filteredCategories.length / categoryPageSize),
-  );
-  const defectTotalPages = Math.max(
-    1,
-    Math.ceil(filteredDefects.length / defectPageSize),
-  );
-
-  useEffect(() => {
-    if (categoryPage > categoryTotalPages) {
-      setCategoryPage(categoryTotalPages);
-    }
+    if (categoryPage > categoryTotalPages) setCategoryPage(categoryTotalPages);
   }, [categoryPage, categoryTotalPages]);
 
   useEffect(() => {
-    if (defectPage > defectTotalPages) {
-      setDefectPage(defectTotalPages);
-    }
+    if (defectPage > defectTotalPages) setDefectPage(defectTotalPages);
   }, [defectPage, defectTotalPages]);
 
-  const paginatedCategories = useMemo(() => {
-    const startIndex = (categoryPage - 1) * categoryPageSize;
-    return filteredCategories.slice(startIndex, startIndex + categoryPageSize);
-  }, [categoryPage, categoryPageSize, filteredCategories]);
+  // ── Combobox options (from all categories, not just current page) ─────────
+  const categoryOptions = categoriesForSelect.map((category) => ({
+    value: category.id,
+    label: getLocalizedCategoryName(category),
+    disabled: false,
+  }));
 
-  const paginatedDefects = useMemo(() => {
-    const startIndex = (defectPage - 1) * defectPageSize;
-    return filteredDefects.slice(startIndex, startIndex + defectPageSize);
-  }, [defectPage, defectPageSize, filteredDefects]);
-
-  const activeCategoriesCount = useMemo(
-    () => categories.filter((category) => category.isActive).length,
-    [categories],
-  );
-
-  const activeDefectsCount = useMemo(
-    () => defects.filter((defect) => defect.isActive).length,
-    [defects],
-  );
-
+  // ── Dialog: open/close ────────────────────────────────────────────────────
   const openCreateCategory = () => {
     setEditingCategory(null);
     setCategoryForm(EMPTY_CATEGORY_FORM);
@@ -412,10 +366,7 @@ const Conditions = () => {
 
   const openEditCategory = (category: AdminConditionChecklistCategoryDto) => {
     setEditingCategory(category);
-    setCategoryForm({
-      name: category.name,
-      nameAr: category.nameAr,
-    });
+    setCategoryForm({ name: category.name, nameAr: category.nameAr });
     setCategoryDialogOpen(true);
   };
 
@@ -441,40 +392,29 @@ const Conditions = () => {
     setDefectDialogOpen(true);
   };
 
+  // ── Field change handlers ─────────────────────────────────────────────────
   const handleCategoryFieldChange =
     (field: keyof CategoryFormState) =>
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setCategoryForm((current) => ({
-        ...current,
-        [field]: event.target.value,
-      }));
-    };
+    (event: React.ChangeEvent<HTMLInputElement>) =>
+      setCategoryForm((prev) => ({ ...prev, [field]: event.target.value }));
 
   const handleDefectInputChange =
     (field: keyof Omit<DefectFormState, "categoryId">) =>
-    (
-      event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-    ) => {
-      setDefectForm((current) => ({
-        ...current,
-        [field]: event.target.value,
-      }));
-    };
+    (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+      setDefectForm((prev) => ({ ...prev, [field]: event.target.value }));
 
+  // ── Save handlers ─────────────────────────────────────────────────────────
   const handleSaveCategory = async () => {
     if (!categoryForm.name.trim() || !categoryForm.nameAr.trim()) {
       error(t("admin.conditions.categoryNameRequired"));
       return;
     }
-
     setIsCategorySaving(true);
-
     try {
       const payload: CreateConditionChecklistCategoryRequest = {
         name: categoryForm.name.trim(),
         nameAr: categoryForm.nameAr.trim(),
       };
-
       const response = editingCategory
         ? await updateConditionChecklistCategory(editingCategory.id, payload)
         : await createConditionChecklistCategory(payload);
@@ -485,7 +425,11 @@ const Conditions = () => {
             ? t("admin.conditions.updateCategorySuccess")
             : t("admin.conditions.createCategorySuccess"),
         );
-        await Promise.all([fetchCategories(), fetchDefects()]);
+        await Promise.all([
+          fetchCategories(),
+          fetchDefects(),
+          fetchAllCategoriesForSelect(),
+        ]);
         setCategoryDialogOpen(false);
       } else {
         error(
@@ -511,14 +455,11 @@ const Conditions = () => {
       error(t("admin.conditions.defectNameRequired"));
       return;
     }
-
     if (!defectForm.categoryId) {
       error(t("admin.conditions.defectCategoryRequired"));
       return;
     }
-
     setIsDefectSaving(true);
-
     try {
       const payload: CreateConditionDefectRequest = {
         itemName: defectForm.itemName.trim(),
@@ -527,7 +468,6 @@ const Conditions = () => {
         descriptionAr: defectForm.descriptionAr.trim() || undefined,
         categoryId: defectForm.categoryId,
       };
-
       const response = editingDefect
         ? await updateConditionDefect(editingDefect.id, payload)
         : await createConditionDefect(payload);
@@ -559,6 +499,7 @@ const Conditions = () => {
     }
   };
 
+  // ── Toggle active handlers ─────────────────────────────────────────────────
   const handleToggleCategoryActive = async (
     category: AdminConditionChecklistCategoryDto,
   ) => {
@@ -575,9 +516,7 @@ const Conditions = () => {
         );
         await Promise.all([fetchCategories(), fetchDefects()]);
       } else {
-        error(t("admin.conditions.categoryToggleError"), {
-          description: response.message,
-        });
+        error(t("admin.conditions.categoryToggleError"), { description: response.message });
       }
     } catch {
       error(t("admin.conditions.categoryToggleError"));
@@ -598,33 +537,25 @@ const Conditions = () => {
         );
         await fetchDefects();
       } else {
-        error(t("admin.conditions.defectToggleError"), {
-          description: response.message,
-        });
+        error(t("admin.conditions.defectToggleError"), { description: response.message });
       }
     } catch {
       error(t("admin.conditions.defectToggleError"));
     }
   };
 
+  // ── Delete handlers ───────────────────────────────────────────────────────
   const handleDeleteCategory = async () => {
     if (!categoryDeleteTarget) return;
-
     setIsCategoryDeleting(true);
-
     try {
-      const response = await deleteConditionChecklistCategory(
-        categoryDeleteTarget.id,
-      );
-
+      const response = await deleteConditionChecklistCategory(categoryDeleteTarget.id);
       if (response.success) {
         success(t("admin.conditions.deleteCategorySuccess"));
         setCategoryDeleteTarget(null);
-        await Promise.all([fetchCategories(), fetchDefects()]);
+        await Promise.all([fetchCategories(), fetchDefects(), fetchAllCategoriesForSelect()]);
       } else {
-        error(t("admin.conditions.deleteCategoryError"), {
-          description: response.message,
-        });
+        error(t("admin.conditions.deleteCategoryError"), { description: response.message });
       }
     } catch {
       error(t("admin.conditions.deleteCategoryError"));
@@ -635,20 +566,15 @@ const Conditions = () => {
 
   const handleDeleteDefect = async () => {
     if (!defectDeleteTarget) return;
-
     setIsDefectDeleting(true);
-
     try {
       const response = await deleteConditionDefect(defectDeleteTarget.id);
-
       if (response.success) {
         success(t("admin.conditions.deleteDefectSuccess"));
         setDefectDeleteTarget(null);
         await fetchDefects();
       } else {
-        error(t("admin.conditions.deleteDefectError"), {
-          description: response.message,
-        });
+        error(t("admin.conditions.deleteDefectError"), { description: response.message });
       }
     } catch {
       error(t("admin.conditions.deleteDefectError"));
@@ -657,24 +583,30 @@ const Conditions = () => {
     }
   };
 
+  // ── Clear filter helpers ───────────────────────────────────────────────────
   const clearCategoryFilters = () => {
+    setCategorySearchInput("");
     setCategorySearch("");
     setCategoryStatusFilter("all");
     setCategoryPage(1);
   };
 
   const clearDefectFilters = () => {
+    setDefectSearchInput("");
     setDefectSearch("");
     setDefectStatusFilter("all");
     setDefectCategoryFilter("all");
     setDefectPage(1);
   };
 
-  const categoriesEmpty = !categoriesLoading && filteredCategories.length === 0;
-  const defectsEmpty = !defectsLoading && filteredDefects.length === 0;
+  // ─────────────────────────────────────────────────────────────────────────
+  // Render
+  // ─────────────────────────────────────────────────────────────────────────
 
   return (
     <div className="space-y-6">
+
+      {/* ── Hero header + metrics ────────────────────────────────────── */}
       <section className="relative overflow-hidden rounded-[28px] border border-border/70 bg-linear-to-br from-card via-card to-primary/5 p-6 shadow-sm">
         <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-primary/40 to-transparent" />
         <div className="relative flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
@@ -707,34 +639,23 @@ const Conditions = () => {
           </div>
         </div>
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="mt-6 grid gap-3 sm:grid-cols-2">
           <MetricCard
             icon={Layers3}
             label={t("admin.conditions.totalCategories")}
-            value={categories.length}
+            value={categoryTotal}
             tone="primary"
-          />
-          <MetricCard
-            icon={FolderTree}
-            label={t("admin.conditions.activeCategories")}
-            value={activeCategoriesCount}
-            tone="success"
           />
           <MetricCard
             icon={ShieldAlert}
             label={t("admin.conditions.totalDefects")}
-            value={defects.length}
+            value={defectTotal}
             tone="warning"
-          />
-          <MetricCard
-            icon={Wrench}
-            label={t("admin.conditions.activeDefects")}
-            value={activeDefectsCount}
-            tone="muted"
           />
         </div>
       </section>
 
+      {/* ── Categories section ────────────────────────────────────────── */}
       <section className="overflow-hidden rounded-[28px] border border-border/70 bg-card shadow-sm">
         <div className="border-b border-border/70 bg-muted/20 px-5 py-5 sm:px-6">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
@@ -748,12 +669,11 @@ const Conditions = () => {
                     <h2 className="text-xl font-semibold tracking-tight text-foreground">
                       {t("admin.conditions.categoriesTitle")}
                     </h2>
-                    <Badge
-                      variant="outline"
-                      className="rounded-full bg-background px-2.5 py-1"
-                    >
-                      {filteredCategories.length}
-                    </Badge>
+                    {!categoriesLoading && (
+                      <Badge variant="outline" className="rounded-full bg-background px-2.5 py-1">
+                        {categoryTotal}
+                      </Badge>
+                    )}
                   </div>
                   <p className="mt-1 text-sm leading-6 text-muted-foreground">
                     {t("admin.conditions.categoriesDescription")}
@@ -761,7 +681,6 @@ const Conditions = () => {
                 </div>
               </div>
             </div>
-
             <Button onClick={openCreateCategory} className="gap-2 self-start">
               <Plus className="size-4" />
               {t("admin.conditions.addCategory")}
@@ -770,17 +689,12 @@ const Conditions = () => {
 
           <div className="mt-5 grid gap-3 lg:grid-cols-[minmax(0,1.25fr)_180px_auto]">
             <div className="space-y-1.5">
-              <Label className="text-xs font-medium">
-                {t("admin.conditions.search")}
-              </Label>
+              <Label className="text-xs font-medium">{t("admin.conditions.search")}</Label>
               <div className="relative">
                 <Search className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground/60" />
                 <Input
-                  value={categorySearch}
-                  onChange={(event) => {
-                    setCategorySearch(event.target.value);
-                    setCategoryPage(1);
-                  }}
+                  value={categorySearchInput}
+                  onChange={(e) => setCategorySearchInput(e.target.value)}
                   placeholder={t("admin.conditions.searchCategoriesPlaceholder")}
                   className="h-10 ps-9"
                 />
@@ -788,13 +702,11 @@ const Conditions = () => {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs font-medium">
-                {t("admin.conditions.status")}
-              </Label>
+              <Label className="text-xs font-medium">{t("admin.conditions.status")}</Label>
               <Select
                 value={categoryStatusFilter}
-                onValueChange={(value) => {
-                  setCategoryStatusFilter(value as StatusFilter);
+                onValueChange={(v) => {
+                  setCategoryStatusFilter(v as StatusFilter);
                   setCategoryPage(1);
                 }}
               >
@@ -802,15 +714,9 @@ const Conditions = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">
-                    {t("admin.conditions.filterAllStatuses")}
-                  </SelectItem>
-                  <SelectItem value="true">
-                    {t("admin.conditions.active")}
-                  </SelectItem>
-                  <SelectItem value="false">
-                    {t("admin.conditions.inactive")}
-                  </SelectItem>
+                  <SelectItem value="all">{t("admin.conditions.filterAllStatuses")}</SelectItem>
+                  <SelectItem value="true">{t("admin.conditions.active")}</SelectItem>
+                  <SelectItem value="false">{t("admin.conditions.inactive")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -835,9 +741,6 @@ const Conditions = () => {
                 {t("admin.conditions.name")}
               </TableHead>
               <TableHead className="py-3 text-[11px] uppercase tracking-[0.18em] text-muted-foreground/80">
-                {t("admin.conditions.linkedDefects")}
-              </TableHead>
-              <TableHead className="py-3 text-[11px] uppercase tracking-[0.18em] text-muted-foreground/80">
                 {t("admin.conditions.status")}
               </TableHead>
               <TableHead className="py-3 text-[11px] uppercase tracking-[0.18em] text-muted-foreground/80">
@@ -851,16 +754,13 @@ const Conditions = () => {
 
           <TableBody>
             {categoriesLoading ? (
-              Array.from({ length: categoryPageSize }).map((_, index) => (
-                <TableRow key={index}>
+              Array.from({ length: categoryPageSize }).map((_, i) => (
+                <TableRow key={i}>
                   <TableCell className="py-4">
                     <div className="space-y-2">
                       <Skeleton className="h-4 w-32" />
                       <Skeleton className="h-4 w-24" />
                     </div>
-                  </TableCell>
-                  <TableCell className="py-4">
-                    <Skeleton className="h-6 w-14 rounded-full" />
                   </TableCell>
                   <TableCell className="py-4">
                     <Skeleton className="h-6 w-20 rounded-full" />
@@ -879,7 +779,7 @@ const Conditions = () => {
               ))
             ) : categoriesEmpty ? (
               <TableRow>
-                <TableCell colSpan={5} className="py-20 text-center">
+                <TableCell colSpan={4} className="py-20 text-center">
                   <div className="mx-auto flex max-w-sm flex-col items-center gap-3 px-4">
                     <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-muted/50 text-muted-foreground/45 ring-1 ring-border/50">
                       <FolderTree className="size-7" />
@@ -891,7 +791,7 @@ const Conditions = () => {
                 </TableCell>
               </TableRow>
             ) : (
-              paginatedCategories.map((category) => (
+              categories.map((category) => (
                 <TableRow
                   key={category.id}
                   className="border-border/50 hover:bg-muted/20"
@@ -904,11 +804,6 @@ const Conditions = () => {
                     >
                       {getLocalizedCategoryName(category)}
                     </p>
-                  </TableCell>
-                  <TableCell className="py-4">
-                    <Badge variant="outline" className="rounded-full px-2.5 py-1">
-                      {defectCountByCategory.get(category.id) ?? 0}
-                    </Badge>
                   </TableCell>
                   <TableCell className="py-4">
                     <StatusBadge
@@ -971,16 +866,14 @@ const Conditions = () => {
           onPageChange={setCategoryPage}
           pageSize={categoryPageSize}
           pageSizeOptions={PAGE_SIZE_OPTIONS}
-          onPageSizeChange={(size) => {
-            setCategoryPage(1);
-            setCategoryPageSize(size);
-          }}
-          totalItems={filteredCategories.length}
+          onPageSizeChange={(size) => { setCategoryPage(1); setCategoryPageSize(size); }}
+          totalItems={categoryTotal}
           rowsPerPageLabel={t("admin.common.rowsPerPage")}
           dir="ltr"
         />
       </section>
 
+      {/* ── Defects section ───────────────────────────────────────────── */}
       <section className="overflow-hidden rounded-[28px] border border-border/70 bg-card shadow-sm">
         <div className="border-b border-border/70 bg-muted/20 px-5 py-5 sm:px-6">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
@@ -994,12 +887,11 @@ const Conditions = () => {
                     <h2 className="text-xl font-semibold tracking-tight text-foreground">
                       {t("admin.conditions.defectsTitle")}
                     </h2>
-                    <Badge
-                      variant="outline"
-                      className="rounded-full bg-background px-2.5 py-1"
-                    >
-                      {filteredDefects.length}
-                    </Badge>
+                    {!defectsLoading && (
+                      <Badge variant="outline" className="rounded-full bg-background px-2.5 py-1">
+                        {defectTotal}
+                      </Badge>
+                    )}
                   </div>
                   <p className="mt-1 text-sm leading-6 text-muted-foreground">
                     {t("admin.conditions.defectsDescription")}
@@ -1007,7 +899,6 @@ const Conditions = () => {
                 </div>
               </div>
             </div>
-
             <Button onClick={openCreateDefect} className="gap-2 self-start">
               <Plus className="size-4" />
               {t("admin.conditions.addDefect")}
@@ -1016,17 +907,12 @@ const Conditions = () => {
 
           <div className="mt-5 grid gap-3 xl:grid-cols-[minmax(0,1.1fr)_190px_220px_auto]">
             <div className="space-y-1.5">
-              <Label className="text-xs font-medium">
-                {t("admin.conditions.search")}
-              </Label>
+              <Label className="text-xs font-medium">{t("admin.conditions.search")}</Label>
               <div className="relative">
                 <Search className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground/60" />
                 <Input
-                  value={defectSearch}
-                  onChange={(event) => {
-                    setDefectSearch(event.target.value);
-                    setDefectPage(1);
-                  }}
+                  value={defectSearchInput}
+                  onChange={(e) => setDefectSearchInput(e.target.value)}
                   placeholder={t("admin.conditions.searchDefectsPlaceholder")}
                   className="h-10 ps-9"
                 />
@@ -1034,13 +920,11 @@ const Conditions = () => {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs font-medium">
-                {t("admin.conditions.status")}
-              </Label>
+              <Label className="text-xs font-medium">{t("admin.conditions.status")}</Label>
               <Select
                 value={defectStatusFilter}
-                onValueChange={(value) => {
-                  setDefectStatusFilter(value as StatusFilter);
+                onValueChange={(v) => {
+                  setDefectStatusFilter(v as StatusFilter);
                   setDefectPage(1);
                 }}
               >
@@ -1048,38 +932,25 @@ const Conditions = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">
-                    {t("admin.conditions.filterAllStatuses")}
-                  </SelectItem>
-                  <SelectItem value="true">
-                    {t("admin.conditions.active")}
-                  </SelectItem>
-                  <SelectItem value="false">
-                    {t("admin.conditions.inactive")}
-                  </SelectItem>
+                  <SelectItem value="all">{t("admin.conditions.filterAllStatuses")}</SelectItem>
+                  <SelectItem value="true">{t("admin.conditions.active")}</SelectItem>
+                  <SelectItem value="false">{t("admin.conditions.inactive")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs font-medium">
-                {t("admin.conditions.category")}
-              </Label>
+              <Label className="text-xs font-medium">{t("admin.conditions.category")}</Label>
               <Select
                 value={defectCategoryFilter}
-                onValueChange={(value) => {
-                  setDefectCategoryFilter(value);
-                  setDefectPage(1);
-                }}
+                onValueChange={(v) => { setDefectCategoryFilter(v); setDefectPage(1); }}
               >
                 <SelectTrigger className="h-10">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">
-                    {t("admin.conditions.filterAllCategories")}
-                  </SelectItem>
-                  {categories.map((category) => (
+                  <SelectItem value="all">{t("admin.conditions.filterAllCategories")}</SelectItem>
+                  {categoriesForSelect.map((category) => (
                     <SelectItem key={category.id} value={category.id}>
                       {getLocalizedCategoryName(category)}
                     </SelectItem>
@@ -1127,8 +998,8 @@ const Conditions = () => {
 
           <TableBody>
             {defectsLoading ? (
-              Array.from({ length: defectPageSize }).map((_, index) => (
-                <TableRow key={index}>
+              Array.from({ length: defectPageSize > 5 ? 5 : defectPageSize }).map((_, i) => (
+                <TableRow key={i}>
                   <TableCell className="py-4">
                     <div className="space-y-2">
                       <Skeleton className="h-4 w-36" />
@@ -1173,11 +1044,8 @@ const Conditions = () => {
                 </TableCell>
               </TableRow>
             ) : (
-              paginatedDefects.map((defect) => (
-                <TableRow
-                  key={defect.id}
-                  className="border-border/50 hover:bg-muted/20"
-                >
+              defects.map((defect) => (
+                <TableRow key={defect.id} className="border-border/50 hover:bg-muted/20">
                   <TableCell className="py-4">
                     <p
                       className="font-medium text-foreground"
@@ -1188,10 +1056,7 @@ const Conditions = () => {
                     </p>
                   </TableCell>
                   <TableCell className="py-4">
-                    <Badge
-                      variant="outline"
-                      className="max-w-full rounded-full px-2.5 py-1"
-                    >
+                    <Badge variant="outline" className="max-w-full rounded-full px-2.5 py-1">
                       <span
                         className="truncate"
                         dir={isArabic ? "rtl" : "ltr"}
@@ -1271,16 +1136,14 @@ const Conditions = () => {
           onPageChange={setDefectPage}
           pageSize={defectPageSize}
           pageSizeOptions={PAGE_SIZE_OPTIONS}
-          onPageSizeChange={(size) => {
-            setDefectPage(1);
-            setDefectPageSize(size);
-          }}
-          totalItems={filteredDefects.length}
+          onPageSizeChange={(size) => { setDefectPage(1); setDefectPageSize(size); }}
+          totalItems={defectTotal}
           rowsPerPageLabel={t("admin.common.rowsPerPage")}
           dir="ltr"
         />
       </section>
 
+      {/* ── Category create/edit dialog ───────────────────────────────── */}
       <Dialog open={categoryDialogOpen} onOpenChange={setCategoryDialogOpen}>
         <DialogContent className="sm:max-w-xl">
           <DialogHeader>
@@ -1302,7 +1165,6 @@ const Conditions = () => {
                 {t("admin.conditions.bilingualFields")}
               </p>
             </div>
-
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <Label htmlFor="category-name">
@@ -1317,7 +1179,6 @@ const Conditions = () => {
                   maxLength={100}
                 />
               </div>
-
               <div className="space-y-1.5">
                 <Label htmlFor="category-name-ar">
                   {t("admin.conditions.nameAr")} ({t("admin.conditions.arLabel")}){" "}
@@ -1344,11 +1205,7 @@ const Conditions = () => {
             >
               {t("buttons.cancel")}
             </Button>
-            <Button
-              onClick={handleSaveCategory}
-              disabled={isCategorySaving}
-              className="gap-2"
-            >
+            <Button onClick={handleSaveCategory} disabled={isCategorySaving} className="gap-2">
               {isCategorySaving ? (
                 <>
                   <Loader2 className="size-4 animate-spin" />
@@ -1362,6 +1219,7 @@ const Conditions = () => {
         </DialogContent>
       </Dialog>
 
+      {/* ── Defect create/edit dialog ─────────────────────────────────── */}
       <Dialog open={defectDialogOpen} onOpenChange={setDefectDialogOpen}>
         <DialogContent className="sm:max-w-3xl">
           <DialogHeader>
@@ -1387,7 +1245,7 @@ const Conditions = () => {
                 <Combobox
                   value={defectForm.categoryId}
                   onValueChange={(value) =>
-                    setDefectForm((current) => ({ ...current, categoryId: value }))
+                    setDefectForm((prev) => ({ ...prev, categoryId: value }))
                   }
                   options={categoryOptions}
                   placeholder={t("admin.conditions.selectCategory")}
@@ -1396,7 +1254,6 @@ const Conditions = () => {
                   aria-invalid={!defectForm.categoryId}
                 />
               </div>
-
               <div className="rounded-2xl border border-info/20 bg-info/8 px-4 py-3">
                 <div className="flex items-start gap-3">
                   <Info className="mt-0.5 size-4 shrink-0 text-info" />
@@ -1427,7 +1284,6 @@ const Conditions = () => {
                   maxLength={200}
                 />
               </div>
-
               <div className="space-y-1.5">
                 <Label htmlFor="defect-name-ar">
                   {t("admin.conditions.defect")} ({t("admin.conditions.arLabel")}){" "}
@@ -1443,7 +1299,6 @@ const Conditions = () => {
                   style={arabicFontStyle}
                 />
               </div>
-
               <div className="space-y-1.5">
                 <Label htmlFor="defect-description">
                   {t("admin.conditions.description")} ({t("admin.conditions.enLabel")})
@@ -1457,7 +1312,6 @@ const Conditions = () => {
                   className="min-h-28"
                 />
               </div>
-
               <div className="space-y-1.5">
                 <Label htmlFor="defect-description-ar">
                   {t("admin.conditions.descriptionAr")} ({t("admin.conditions.arLabel")})
@@ -1484,11 +1338,7 @@ const Conditions = () => {
             >
               {t("buttons.cancel")}
             </Button>
-            <Button
-              onClick={handleSaveDefect}
-              disabled={isDefectSaving}
-              className="gap-2"
-            >
+            <Button onClick={handleSaveDefect} disabled={isDefectSaving} className="gap-2">
               {isDefectSaving ? (
                 <>
                   <Loader2 className="size-4 animate-spin" />
@@ -1502,11 +1352,10 @@ const Conditions = () => {
         </DialogContent>
       </Dialog>
 
+      {/* ── Category delete dialog ────────────────────────────────────── */}
       <Dialog
         open={!!categoryDeleteTarget}
-        onOpenChange={(open) => {
-          if (!open) setCategoryDeleteTarget(null);
-        }}
+        onOpenChange={(open) => { if (!open) setCategoryDeleteTarget(null); }}
       >
         <DialogContent className="sm:max-w-md">
           <DialogHeader className="space-y-3">
@@ -1522,7 +1371,6 @@ const Conditions = () => {
               </DialogDescription>
             </div>
           </DialogHeader>
-
           <div className="rounded-2xl border border-warning/25 bg-warning/10 px-4 py-3">
             <div className="flex items-start gap-3">
               <AlertTriangle className="mt-0.5 size-4 shrink-0 text-warning" />
@@ -1531,7 +1379,6 @@ const Conditions = () => {
               </p>
             </div>
           </div>
-
           <DialogFooter className="gap-2">
             <Button
               variant="outline"
@@ -1559,11 +1406,10 @@ const Conditions = () => {
         </DialogContent>
       </Dialog>
 
+      {/* ── Defect delete dialog ──────────────────────────────────────── */}
       <Dialog
         open={!!defectDeleteTarget}
-        onOpenChange={(open) => {
-          if (!open) setDefectDeleteTarget(null);
-        }}
+        onOpenChange={(open) => { if (!open) setDefectDeleteTarget(null); }}
       >
         <DialogContent className="sm:max-w-md">
           <DialogHeader className="space-y-3">
@@ -1579,7 +1425,6 @@ const Conditions = () => {
               </DialogDescription>
             </div>
           </DialogHeader>
-
           <DialogFooter className="gap-2">
             <Button
               variant="outline"
@@ -1606,6 +1451,7 @@ const Conditions = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
     </div>
   );
 };
