@@ -12,7 +12,6 @@ namespace Karna.Infrastructure.Persistence._Data
 		public DbSet<Make> Makes { get; set; } = null!;
 		public DbSet<Model> Models { get; set; } = null!;
 		public DbSet<Listing> Listings { get; set; } = null!;
-		public DbSet<ListingPhoto> ListingPhotos { get; set; } = null!;
 		public DbSet<ConditionChecklistCategory> ConditionChecklistCategories { get; set; } = null!;
 		public DbSet<ConditionDefect> ConditionDefects { get; set; } = null!;
 		public DbSet<ListingDefect> ListingDefects { get; set; } = null!;
