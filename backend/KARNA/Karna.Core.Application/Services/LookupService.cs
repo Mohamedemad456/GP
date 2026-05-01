@@ -16,13 +16,17 @@ namespace Karna.Core.Application.Services
 		public IEnumerable<LookupOptionDto> GetListingStatuses()
 			=> GetEnumOptions<ListingStatus>();
 
+		public IEnumerable<LookupOptionDto> GetLocations()
+			=> GetEnumOptions<EgyptLocation>();
+
 		public IEnumerable<LookupGroupDto> GetAll()
 		{
 			return
 			[
 				new LookupGroupDto { Name = "fuelTypes", Options = GetFuelTypes() },
 				new LookupGroupDto { Name = "transmissionTypes", Options = GetTransmissionTypes() },
-				new LookupGroupDto { Name = "listingStatuses", Options = GetListingStatuses() }
+				new LookupGroupDto { Name = "listingStatuses", Options = GetListingStatuses() },
+				new LookupGroupDto { Name = "locations", Options = GetLocations() }
 			];
 		}
 

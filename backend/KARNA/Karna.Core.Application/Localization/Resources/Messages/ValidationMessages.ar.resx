@@ -225,4 +225,7 @@
   <data name="MaxPhotosExceeded" xml:space="preserve">
     <value>يمكنك رفع 10 صور كحد أقصى</value>
   </data>
+  <data name="InvalidLocation" xml:space="preserve">
+    <value>يرجى اختيار موقع صالح.</value>
+  </data>
 </root>

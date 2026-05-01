@@ -192,4 +192,13 @@
   <data name="MLServiceUnavailable" xml:space="preserve">
     <value>خدمة التسعير غير متاحة حالياً. يرجى المحاولة لاحقاً.</value>
   </data>
+  <data name="NoPriceGeneratedYet" xml:space="preserve">
+    <value>يرجى توليد السعر المقترح أولاً قبل القبول.</value>
+  </data>
+  <data name="InvalidListingPrice" xml:space="preserve">
+    <value>يرجى إدخال سعر صحيح أكبر من صفر.</value>
+  </data>
+  <data name="ListingDataIncompleteForPricing" xml:space="preserve">
+    <value>يرجى استكمال جميع بيانات السيارة المطلوبة قبل توليد السعر.</value>
+  </data>
 </root>

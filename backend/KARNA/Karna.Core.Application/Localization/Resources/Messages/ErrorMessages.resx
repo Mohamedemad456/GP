@@ -192,4 +192,13 @@
   <data name="MLServiceUnavailable" xml:space="preserve">
     <value>The pricing service is temporarily unavailable. Please try again later.</value>
   </data>
+  <data name="NoPriceGeneratedYet" xml:space="preserve">
+    <value>Please generate a price suggestion first before accepting.</value>
+  </data>
+  <data name="InvalidListingPrice" xml:space="preserve">
+    <value>Please enter a valid price greater than zero.</value>
+  </data>
+  <data name="ListingDataIncompleteForPricing" xml:space="preserve">
+    <value>Please complete all required vehicle details before generating price.</value>
+  </data>
 </root>

@@ -55,19 +55,27 @@ services:
     build:
       context: ./backend/KARNA
       dockerfile: Karna.APIs/Dockerfile
-      target: build 
+      target: build
     volumes:
-      - ./backend/KARNA:/src 
+      - ./backend/KARNA:/src
     working_dir: /src/Karna.APIs
-    command: dotnet watch run --urls=http://0.0.0.0:8080
+    entrypoint:
+      - dotnet
+    command:
+      - run
+      - --urls=http://0.0.0.0:8080
     ports:
       - "9090:8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__DefaultConnection: Server=db;Database=KarnaDb;User=sa;Password=Karna@Pass123;TrustServerCertificate=True
       Urls__ApiBaseUrl: http://localhost:9090
+      MLApiSettings__BaseUrl: http://ml-service:8000
     depends_on:
       - db
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
 
   # =======================
   # ML Service (FastAPI)

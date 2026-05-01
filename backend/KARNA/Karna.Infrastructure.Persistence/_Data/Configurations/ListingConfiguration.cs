@@ -64,6 +64,11 @@ namespace Karna.Infrastructure.Persistence._Data.Configurations
 				.HasForeignKey(x => x.ModelId)
 				.OnDelete(DeleteBehavior.Restrict);
 
+			builder.Property(x => x.Location);
+
+			builder.Property(x => x.Price)
+				.HasPrecision(18, 2);
+
 			// ML Pricing Fields
 			builder.Property(x => x.FairPrice)
 				.HasPrecision(18, 2);

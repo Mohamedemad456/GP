@@ -16,5 +16,6 @@ namespace Karna.Core.Application.Abstraction.Services
 		Task<ApiResponse<IEnumerable<ListingStatusHistoryDto>>> GetStatusHistoryAsync(Guid listingId);
 
 		Task<ApiResponse<GeneratePriceResponseDto>> GeneratePriceAsync(Guid listingId);
+		Task<ApiResponse<ListingDto>> SetPriceAsync(Guid listingId, SetListingPriceDto dto);
 	}
 }

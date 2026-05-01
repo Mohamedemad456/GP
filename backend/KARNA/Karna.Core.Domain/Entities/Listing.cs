@@ -21,6 +21,8 @@ namespace Karna.Core.Domain.Entities
 		public decimal EngineSize { get; set; }
 		public string Color { get; set; } = null!;
 		public string Description { get; set; } = null!;
+		public EgyptLocation Location { get; set; }
+		public decimal? Price { get; set; }
 		public ListingStatus Status { get; set; } = ListingStatus.Draft;
 
 		// ML Pricing Fields

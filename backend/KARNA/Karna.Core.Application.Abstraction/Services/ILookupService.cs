@@ -7,6 +7,7 @@ namespace Karna.Core.Application.Abstraction.Services
 		IEnumerable<LookupOptionDto> GetFuelTypes();
 		IEnumerable<LookupOptionDto> GetTransmissionTypes();
 		IEnumerable<LookupOptionDto> GetListingStatuses();
+		IEnumerable<LookupOptionDto> GetLocations();
 		IEnumerable<LookupGroupDto> GetAll();
 	}
 }
