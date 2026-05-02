@@ -70,11 +70,29 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to At least one condition item must be selected..
+        /// </summary>
+        internal static string ConditionDefectIdsRequired {
+            get {
+                return ResourceManager.GetString("ConditionDefectIdsRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to A condition defect with this name already exists for this category..
         /// </summary>
         internal static string ConditionDefectNameAlreadyExists {
             get {
                 return ResourceManager.GetString("ConditionDefectNameAlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Duplicate condition items are not allowed..
+        /// </summary>
+        internal static string DuplicateConditionDefectIds {
+            get {
+                return ResourceManager.GetString("DuplicateConditionDefectIds", resourceCulture);
             }
         }
         
@@ -156,6 +174,15 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         internal static string InvalidYear {
             get {
                 return ResourceManager.GetString("InvalidYear", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Listing is already deleted..
+        /// </summary>
+        internal static string ListingAlreadyDeleted {
+            get {
+                return ResourceManager.GetString("ListingAlreadyDeleted", resourceCulture);
             }
         }
         

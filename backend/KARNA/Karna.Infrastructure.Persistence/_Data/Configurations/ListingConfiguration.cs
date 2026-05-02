@@ -45,7 +45,10 @@ namespace Karna.Infrastructure.Persistence._Data.Configurations
 				.HasConversion<string>()
 				.HasMaxLength(20);
 
-			builder.HasIndex(x => x.MakeId);
+            builder.Property(e => e.DeletedAt)
+                .IsRequired(false);
+
+            builder.HasIndex(x => x.MakeId);
 			builder.HasIndex(x => x.ModelId);
 			builder.HasIndex(x => x.SellerId);
 
@@ -63,6 +66,10 @@ namespace Karna.Infrastructure.Persistence._Data.Configurations
 				.WithMany()
 				.HasForeignKey(x => x.ModelId)
 				.OnDelete(DeleteBehavior.Restrict);
-		}
+
+            builder.HasMany(x => x.StatusHistories)
+				.WithOne(h => h.Listing)
+				.HasForeignKey(h => h.ListingId);
+        }
 	}
 }

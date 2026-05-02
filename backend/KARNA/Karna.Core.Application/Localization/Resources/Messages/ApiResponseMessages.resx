@@ -216,4 +216,10 @@
   <data name="PhotosUploaded" xml:space="preserve">
     <value>Photos uploaded successfully</value>
   </data>
+  <data name="ListingArchived" xml:space="preserve">
+    <value>Listing archived successfully.</value>
+  </data>
+  <data name="ListingDeletedReason" xml:space="preserve">
+    <value>Deleted by seller</value>
+  </data>
 </root>

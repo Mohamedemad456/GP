@@ -88,6 +88,24 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to One or more selected condition items are inactive..
+        /// </summary>
+        internal static string ConditionDefectInactive {
+            get {
+                return ResourceManager.GetString("ConditionDefectInactive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to One or more selected condition items were not found..
+        /// </summary>
+        internal static string ConditionDefectItemsNotFound {
+            get {
+                return ResourceManager.GetString("ConditionDefectItemsNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Condition defect not found..
         /// </summary>
         internal static string ConditionDefectNotFound {
@@ -142,11 +160,38 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This listing cannot be deleted..
+        /// </summary>
+        internal static string ListingCannotBeDeleted {
+            get {
+                return ResourceManager.GetString("ListingCannotBeDeleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Listing not found..
         /// </summary>
         internal static string ListingNotFound {
             get {
                 return ResourceManager.GetString("ListingNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Listing must be in Draft state to modify the checklist..
+        /// </summary>
+        internal static string ListingNotInDraftState {
+            get {
+                return ResourceManager.GetString("ListingNotInDraftState", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You are not authorized to modify this listing..
+        /// </summary>
+        internal static string ListingNotOwnedByUser {
+            get {
+                return ResourceManager.GetString("ListingNotOwnedByUser", resourceCulture);
             }
         }
         

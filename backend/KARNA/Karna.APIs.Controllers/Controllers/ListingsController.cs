@@ -15,7 +15,7 @@ namespace Karna.APIs.Controllers.Controllers
 			var result = await _listingService.CreateAsync(dto);
 			if (!result.Success)
 				return BadRequest(result);
-			return CreatedAtAction(nameof(Create), new { id = result.Data?.Id}, result);
+			return CreatedAtAction(nameof(Create), new { id = result.Data?.Id }, result);
 		}
 
 		[HttpPost("{id}/conditions")]
@@ -76,6 +76,19 @@ namespace Karna.APIs.Controllers.Controllers
 			if (!result.Success)
 				return BadRequest(result);
 			return Ok(result);
+		}
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "User")]
+		public async Task<IActionResult> Delete(Guid id)
+		{
+			var result = await _listingService.DeleteAsync(id);
+
+			if (!result.Success)
+				return BadRequest(result);
+
+			return Ok(result);
+
 		}
 	}
 }

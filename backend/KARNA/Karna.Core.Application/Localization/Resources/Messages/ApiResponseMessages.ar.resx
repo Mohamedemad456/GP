@@ -210,10 +210,16 @@
   <data name="ConditionDefectDeactivated" xml:space="preserve">
     <value>تم تعطيل عيب الحالة بنجاح.</value>
   </data>
+  <data name="ChecklistUpdated" xml:space="preserve">
+    <value>تم تحديث قائمة فحص الحالة بنجاح.</value>
+  </data>
   <data name="PhotosUploaded" xml:space="preserve">
     <value>تم رفع الصور بنجاح</value>
   </data>
-  <data name="ChecklistUpdated" xml:space="preserve">
-    <value>تم تحديث قائمة فحص الحالة بنجاح.</value>
+  <data name="ListingArchived" xml:space="preserve">
+    <value>تم أرشفة الإعلان بنجاح.</value>
+  </data>
+  <data name="ListingDeletedReason" xml:space="preserve">
+    <value>تم حذف الإعلان بواسطة البائع</value>
   </data>
 </root>

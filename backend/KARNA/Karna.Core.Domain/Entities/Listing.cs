@@ -21,7 +21,8 @@ namespace Karna.Core.Domain.Entities
 		public decimal EngineSize { get; set; }
 		public string Color { get; set; } = null!;
 		public string Description { get; set; } = null!;
-		public ListingStatus Status { get; set; } = ListingStatus.Draft;
+        public DateTime? DeletedAt { get; set; }
+        public ListingStatus Status { get; set; } = ListingStatus.Draft;
 
 		public ICollection<ListingDefect> ListingDefects { get; set; } = new List<ListingDefect>();
 

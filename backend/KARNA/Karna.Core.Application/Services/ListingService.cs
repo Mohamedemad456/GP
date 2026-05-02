@@ -399,5 +399,78 @@ namespace Karna.Core.Application.Services
 			};
 			await historyRepo.AddAsync(record);
 		}
-	}
+
+        public async  Task<ApiResponseDto> DeleteAsync(Guid id)
+        {
+            var listingRepo = _unitOfWork.GetRepository<Listing>();
+            var historyRepo = _unitOfWork.GetRepository<ListingStatusHistory>();
+
+            var listing = await listingRepo.GetAsync(id);
+
+            if (listing is null)
+            {
+                return new ApiResponseDto
+                {
+                    Success = false,
+                    Message = _localizer.GetErrorMessage("ListingNotFound")
+                };
+            }
+
+            if (listing.IsDeleted)
+            {
+                return new ApiResponseDto
+                {
+                    Success = false,
+                    Message = _localizer.GetValidationMessage("ListingAlreadyDeleted")
+                };
+            }
+
+            var currentUserId = _currentUserService.UserId;
+
+            if (listing.SellerId != currentUserId)
+            {
+                return new ApiResponseDto
+                {
+                    Success = false,
+                    Message = _localizer.GetErrorMessage("InvalidListingOwner")
+                };
+            }
+
+            if (listing.Status == ListingStatus.Sold)
+            {
+                return new ApiResponseDto
+                {
+                    Success = false,
+                    Message = _localizer.GetValidationMessage("ListingCannotBeDeleted")
+                };
+            }
+
+            var now = DateTime.UtcNow;
+
+            listing.IsDeleted = true;
+            listing.DeletedAt = now;
+
+            var oldStatus = listing.Status;
+            listing.Status = ListingStatus.Archived;
+
+            var history = new ListingStatusHistory
+            {
+                ListingId = listing.Id,
+                OldStatus = oldStatus,
+                NewStatus = ListingStatus.Archived,
+                ChangedByUserId = currentUserId,
+                ChangedAt = now,
+                Reason = _localizer.GetMessage("ListingDeletedReason")
+            };
+
+            await historyRepo.AddAsync(history);
+            await _unitOfWork.CompleteAsync();
+
+            return new ApiResponseDto
+            {
+                Success = true,
+                Message = _localizer.GetMessage("ListingArchived")
+            };
+        }
+    }
 }
