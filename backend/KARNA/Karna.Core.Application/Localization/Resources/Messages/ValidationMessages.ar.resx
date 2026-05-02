@@ -225,4 +225,7 @@
   <data name="MaxPhotosExceeded" xml:space="preserve">
     <value>يمكنك رفع 10 صور كحد أقصى</value>
   </data>
+  <data name="ListingAlreadyDeleted" xml:space="preserve">
+    <value>الإعلان محذوف بالفعل</value>
+  </data>
 </root>

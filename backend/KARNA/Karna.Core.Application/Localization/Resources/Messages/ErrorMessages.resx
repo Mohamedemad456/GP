@@ -183,4 +183,7 @@
   <data name="InvalidListingOwner" xml:space="preserve">
     <value>This listing does not belong to you</value>
   </data>
+  <data name="ListingCannotBeDeleted" xml:space="preserve">
+    <value>This listing cannot be deleted</value>
+  </data>
 </root>
