@@ -70,7 +70,7 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__DefaultConnection: Server=db;Database=KarnaDb;User=sa;Password=Karna@Pass123;TrustServerCertificate=True
       Urls__ApiBaseUrl: http://localhost:9090
-      MLApiSettings__BaseUrl: http://ml-service:8000
+      MLApiSettings__BaseUrl: http://ml-service:8001
     depends_on:
       - db
     dns:
@@ -86,7 +86,7 @@ services:
       context: ./ml-service
       dockerfile: Dockerfile
     ports:
-      - "8001:8000"
+      - "8001:8001"
     volumes:
       - ./ml-service:/app:Z
     env_file:
