@@ -183,4 +183,22 @@
   <data name="InvalidListingOwner" xml:space="preserve">
     <value>هذا الإعلان لا يخصك</value>
   </data>
+  <data name="ListingNotInValidStateForPricing" xml:space="preserve">
+    <value>يجب أن يكون الإعلان في حالة مسودة أو معلق لتوليد السعر.</value>
+  </data>
+  <data name="MakeOrModelNotFound" xml:space="preserve">
+    <value>لم يتم العثور على الشركة المصنعة أو الموديل الخاص بالإعلان.</value>
+  </data>
+  <data name="MLServiceUnavailable" xml:space="preserve">
+    <value>خدمة التسعير غير متاحة حالياً. يرجى المحاولة لاحقاً.</value>
+  </data>
+  <data name="NoPriceGeneratedYet" xml:space="preserve">
+    <value>يرجى توليد السعر المقترح أولاً قبل القبول.</value>
+  </data>
+  <data name="InvalidListingPrice" xml:space="preserve">
+    <value>يرجى إدخال سعر صحيح أكبر من صفر.</value>
+  </data>
+  <data name="ListingDataIncompleteForPricing" xml:space="preserve">
+    <value>يرجى استكمال جميع بيانات السيارة المطلوبة قبل توليد السعر.</value>
+  </data>
 </root>

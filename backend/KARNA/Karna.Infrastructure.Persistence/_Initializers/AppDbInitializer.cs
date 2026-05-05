@@ -19,31 +19,37 @@ namespace Karna.Infrastructure.Persistence._Initializers
 
 		private async Task SeedMakesAsync()
 		{
-			if (await _dbContext.Makes.AnyAsync())
-				return;
-
 			var seedData = await SeedLoader.LoadAsync<MakeSeedDto>("makes.json");
 			if (seedData.Count == 0)
 				return;
 
-			var makes = seedData.Select(s => new Make
-			{
-				Name = s.Name,
-				NameAr = s.NameAr,
-				LogoUrl = s.LogoUrl,
-				Country = s.Country,
-				CountryAr = s.CountryAr
-			});
+			var existingNames = (await _dbContext.Makes
+				.AsNoTracking()
+				.Select(m => m.Name)
+				.ToListAsync())
+				.ToHashSet();
 
-			await _dbContext.Makes.AddRangeAsync(makes);
+			var newMakes = seedData
+				.Where(s => !existingNames.Contains(s.Name))
+				.Select(s => new Make
+				{
+					Name = s.Name,
+					NameAr = s.NameAr,
+					LogoUrl = s.LogoUrl,
+					Country = s.Country,
+					CountryAr = s.CountryAr
+				})
+				.ToList();
+
+			if (newMakes.Count == 0)
+				return;
+
+			await _dbContext.Makes.AddRangeAsync(newMakes);
 			await _dbContext.SaveChangesAsync();
 		}
 
 		private async Task SeedModelsAsync()
 		{
-			if (await _dbContext.Models.AnyAsync())
-				return;
-
 			var seedData = await SeedLoader.LoadAsync<ModelSeedDto>("models.json");
 			if (seedData.Count == 0)
 				return;
@@ -52,43 +58,62 @@ namespace Karna.Infrastructure.Persistence._Initializers
 				.AsNoTracking()
 				.ToDictionaryAsync(m => m.Name, m => m.Id);
 
-			var models = seedData
+			var existingModels = await _dbContext.Models
+				.AsNoTracking()
+				.Select(m => new { m.MakeId, m.Name })
+				.ToListAsync();
+
+			var existingSet = new HashSet<(Guid MakeId, string Name)>(
+				existingModels.Select(m => (m.MakeId, m.Name)));
+
+			var newModels = seedData
 				.Where(s => makeLookup.ContainsKey(s.MakeName))
 				.Select(s => new Model
 				{
 					Name = s.Name,
 					NameAr = s.NameAr,
 					MakeId = makeLookup[s.MakeName]
-				});
+				})
+				.Where(m => !existingSet.Contains((m.MakeId, m.Name)))
+				.ToList();
 
-			await _dbContext.Models.AddRangeAsync(models);
+			if (newModels.Count == 0)
+				return;
+
+			await _dbContext.Models.AddRangeAsync(newModels);
 			await _dbContext.SaveChangesAsync();
 		}
 
 		private async Task SeedConditionChecklistCategoriesAsync()
 		{
-			if (await _dbContext.ConditionChecklistCategories.AnyAsync())
-				return;
-
 			var seedData = await SeedLoader.LoadAsync<ConditionChecklistCategorySeedDto>("condition-checklist-categories.json");
 			if (seedData.Count == 0)
 				return;
 
-			var categories = seedData.Select(s => new ConditionChecklistCategory
-			{
-				Name = s.Name,
-				NameAr = s.NameAr
-			});
+			var existingNames = (await _dbContext.ConditionChecklistCategories
+				.AsNoTracking()
+				.Select(c => c.Name)
+				.ToListAsync())
+				.ToHashSet();
 
-			await _dbContext.ConditionChecklistCategories.AddRangeAsync(categories);
+			var newCategories = seedData
+				.Where(s => !existingNames.Contains(s.Name))
+				.Select(s => new ConditionChecklistCategory
+				{
+					Name = s.Name,
+					NameAr = s.NameAr
+				})
+				.ToList();
+
+			if (newCategories.Count == 0)
+				return;
+
+			await _dbContext.ConditionChecklistCategories.AddRangeAsync(newCategories);
 			await _dbContext.SaveChangesAsync();
 		}
 
 		private async Task SeedConditionDefectsAsync()
 		{
-			if (await _dbContext.ConditionDefects.AnyAsync())
-				return;
-
 			var seedData = await SeedLoader.LoadAsync<ConditionDefectSeedDto>("condition-defects.json");
 			if (seedData.Count == 0)
 				return;
@@ -97,7 +122,15 @@ namespace Karna.Infrastructure.Persistence._Initializers
 				.AsNoTracking()
 				.ToDictionaryAsync(c => c.Name, c => c.Id);
 
-			var defects = seedData
+			var existingDefects = await _dbContext.ConditionDefects
+				.AsNoTracking()
+				.Select(d => new { d.CategoryId, d.ItemName })
+				.ToListAsync();
+
+			var existingSet = new HashSet<(Guid CategoryId, string ItemName)>(
+				existingDefects.Select(d => (d.CategoryId, d.ItemName)));
+
+			var newDefects = seedData
 				.Where(s => categoryLookup.ContainsKey(s.CategoryName))
 				.Select(s => new ConditionDefect
 				{
@@ -106,9 +139,14 @@ namespace Karna.Infrastructure.Persistence._Initializers
 					Description = s.Description,
 					DescriptionAr = s.DescriptionAr,
 					CategoryId = categoryLookup[s.CategoryName]
-				});
+				})
+				.Where(d => !existingSet.Contains((d.CategoryId, d.ItemName)))
+				.ToList();
 
-			await _dbContext.ConditionDefects.AddRangeAsync(defects);
+			if (newDefects.Count == 0)
+				return;
+
+			await _dbContext.ConditionDefects.AddRangeAsync(newDefects);
 			await _dbContext.SaveChangesAsync();
 		}
 	}

@@ -216,4 +216,10 @@
   <data name="PhotosUploaded" xml:space="preserve">
     <value>Photos uploaded successfully</value>
   </data>
+  <data name="PriceGenerated" xml:space="preserve">
+    <value>Price generated successfully.</value>
+  </data>
+  <data name="PriceSet" xml:space="preserve">
+    <value>Listing price set successfully.</value>
+  </data>
 </root>

@@ -39,6 +39,9 @@ namespace Karna.Core.Application.Validators.Listing
 			RuleFor(x => x.Description)
 				.NotEmpty().WithMessage(localizer.GetValidationMessage("RequiredField"))
 				.MaximumLength(2000).WithMessage(localizer.GetValidationMessage("MaxLengthExceeded", 2000));
+
+			RuleFor(x => x.Location)
+				.IsInEnum().WithMessage(localizer.GetValidationMessage("InvalidLocation"));
 		}
 	}
 }

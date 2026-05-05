@@ -225,4 +225,7 @@
   <data name="MaxPhotosExceeded" xml:space="preserve">
     <value>You can upload up to 10 photos only</value>
   </data>
+  <data name="InvalidLocation" xml:space="preserve">
+    <value>Please select a valid location.</value>
+  </data>
 </root>

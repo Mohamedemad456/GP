@@ -13,5 +13,6 @@ namespace Karna.Core.Application.Abstraction.DTOs.Listing
 		public decimal EngineSize { get; set; }
 		public string Color { get; set; } = null!;
 		public string Description { get; set; } = null!;
+		public EgyptLocation Location { get; set; }
 	}
 }

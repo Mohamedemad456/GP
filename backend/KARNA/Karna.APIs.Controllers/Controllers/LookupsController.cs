@@ -29,5 +29,11 @@ namespace Karna.APIs.Controllers.Controllers
 		{
 			return Ok(_lookupService.GetListingStatuses());
 		}
+
+		[HttpGet("locations")]
+		public IActionResult GetLocations()
+		{
+			return Ok(_lookupService.GetLocations());
+		}
 	}
 }
