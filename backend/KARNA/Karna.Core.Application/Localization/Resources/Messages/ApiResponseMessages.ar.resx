@@ -228,4 +228,16 @@
   <data name="PriceSet" xml:space="preserve">
     <value>تم تحديد سعر الإعلان بنجاح.</value>
   </data>
+  <data name="ListingSubmitted" xml:space="preserve">
+    <value>تم تقديم الإعلان للمراجعة بنجاح.</value>
+  </data>
+  <data name="ListingApproved" xml:space="preserve">
+    <value>تم قبول الإعلان بنجاح.</value>
+  </data>
+  <data name="ListingRejected" xml:space="preserve">
+    <value>تم رفض الإعلان.</value>
+  </data>
+  <data name="ListingMarkedAsSold" xml:space="preserve">
+    <value>تم تحديد الإعلان كمباع بنجاح.</value>
+  </data>
 </root>

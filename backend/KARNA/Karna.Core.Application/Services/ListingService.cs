@@ -235,6 +235,26 @@ namespace Karna.Core.Application.Services
 			if (listing.Status != ListingStatus.Draft)
 				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotInDraftState") };
 
+			// Validate core data completeness
+			if (!IsListingDataComplete(listing))
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingIncompleteData") };
+
+			// Validate at least 3 photos uploaded
+			var photoRepo = _unitOfWork.GetRepository<ListingPhoto>();
+			var photos = await photoRepo.FindAsync(p => p.ListingId == listingId, withTracking: false);
+			if (photos.Count() < 3)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingInsufficientPhotos") };
+
+			// Validate condition checklist is added
+			var listingDefectRepo = _unitOfWork.GetRepository<ListingDefect>();
+			var defects = await listingDefectRepo.FindAsync(ld => ld.ListingId == listingId, withTracking: false);
+			if (!defects.Any())
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingMissingChecklist") };
+
+			// Validate ML pricing has been generated
+			if (!HasRequiredPricing(listing))
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingMissingPricing") };
+
 			var oldStatus = listing.Status;
 			listing.Status = ListingStatus.Pending;
 
@@ -479,6 +499,28 @@ namespace Karna.Core.Application.Services
 				&& Enum.IsDefined(listing.FuelType)
 				&& Enum.IsDefined(listing.Transmission)
 				&& Enum.IsDefined(listing.Location);
+		}
+
+		private static bool IsListingDataComplete(Listing listing)
+		{
+			return listing.MakeId != Guid.Empty
+				&& listing.ModelId != Guid.Empty
+				&& listing.Year > 0
+				&& listing.Mileage > 0
+				&& listing.EngineSize > 0
+				&& !string.IsNullOrWhiteSpace(listing.Color)
+				&& !string.IsNullOrWhiteSpace(listing.Description)
+				&& Enum.IsDefined(listing.FuelType)
+				&& Enum.IsDefined(listing.Transmission)
+				&& Enum.IsDefined(listing.Location);
+		}
+
+		private static bool HasRequiredPricing(Listing listing)
+		{
+			return listing.FairPrice is not null
+				&& listing.NegotiationRangeLower is not null
+				&& listing.NegotiationRangeUpper is not null
+				&& !string.IsNullOrWhiteSpace(listing.ConfidenceLevel);
 		}
 
 		public async Task<ApiResponse<ListingDto>> SetPriceAsync(Guid listingId, SetListingPriceDto dto)
