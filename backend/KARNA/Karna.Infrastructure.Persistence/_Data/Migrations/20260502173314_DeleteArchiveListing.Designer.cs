@@ -4,6 +4,7 @@ using Karna.Infrastructure.Persistence._Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,13 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Karna.Infrastructure.Persistence._Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260502173314_DeleteArchiveListing")]
+    partial class DeleteArchiveListing
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.7")
+                .HasAnnotation("ProductVersion", "10.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -56,7 +59,7 @@ namespace Karna.Infrastructure.Persistence._Data.Migrations
                     b.HasIndex("NameAr")
                         .IsUnique();
 
-                    b.ToTable("ConditionChecklistCategories", (string)null);
+                    b.ToTable("ConditionChecklistCategories");
                 });
 
             modelBuilder.Entity("Karna.Core.Domain.Entities.ConditionDefect", b =>
@@ -104,7 +107,7 @@ namespace Karna.Infrastructure.Persistence._Data.Migrations
                     b.HasIndex("CategoryId", "ItemNameAr")
                         .IsUnique();
 
-                    b.ToTable("ConditionDefects", (string)null);
+                    b.ToTable("ConditionDefects");
                 });
 
             modelBuilder.Entity("Karna.Core.Domain.Entities.Listing", b =>
@@ -178,7 +181,7 @@ namespace Karna.Infrastructure.Persistence._Data.Migrations
 
                     b.HasIndex("SellerId");
 
-                    b.ToTable("Listings", (string)null);
+                    b.ToTable("Listings");
                 });
 
             modelBuilder.Entity("Karna.Core.Domain.Entities.ListingDefect", b =>
@@ -204,7 +207,7 @@ namespace Karna.Infrastructure.Persistence._Data.Migrations
                     b.HasIndex("ListingId", "ConditionDefectId")
                         .IsUnique();
 
-                    b.ToTable("ListingDefects", (string)null);
+                    b.ToTable("ListingDefects");
                 });
 
             modelBuilder.Entity("Karna.Core.Domain.Entities.ListingPhoto", b =>
@@ -243,7 +246,7 @@ namespace Karna.Infrastructure.Persistence._Data.Migrations
 
                     b.HasIndex("ListingId");
 
-                    b.ToTable("ListingPhoto", (string)null);
+                    b.ToTable("ListingPhoto");
                 });
 
             modelBuilder.Entity("Karna.Core.Domain.Entities.ListingStatusHistory", b =>
@@ -280,7 +283,7 @@ namespace Karna.Infrastructure.Persistence._Data.Migrations
 
                     b.HasIndex("ListingId");
 
-                    b.ToTable("ListingStatusHistories", (string)null);
+                    b.ToTable("ListingStatusHistories");
                 });
 
             modelBuilder.Entity("Karna.Core.Domain.Entities.Make", b =>
@@ -329,7 +332,7 @@ namespace Karna.Infrastructure.Persistence._Data.Migrations
                     b.HasIndex("NameAr")
                         .IsUnique();
 
-                    b.ToTable("Makes", (string)null);
+                    b.ToTable("Makes");
                 });
 
             modelBuilder.Entity("Karna.Core.Domain.Entities.Model", b =>
@@ -369,7 +372,7 @@ namespace Karna.Infrastructure.Persistence._Data.Migrations
                     b.HasIndex("MakeId", "NameAr")
                         .IsUnique();
 
-                    b.ToTable("Models", (string)null);
+                    b.ToTable("Models");
                 });
 
             modelBuilder.Entity("Karna.Core.Domain.Entities.RefreshToken", b =>
@@ -407,7 +410,7 @@ namespace Karna.Infrastructure.Persistence._Data.Migrations
 
                     b.HasIndex("TokenHashed");
 
-                    b.ToTable("RefreshTokens", (string)null);
+                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("Karna.Core.Domain.Entities.User", b =>
@@ -448,7 +451,7 @@ namespace Karna.Infrastructure.Persistence._Data.Migrations
                     b.HasIndex("IdentityUserId")
                         .IsUnique();
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("Karna.Core.Domain.Entities.ConditionDefect", b =>

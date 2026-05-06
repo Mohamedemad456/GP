@@ -61,6 +61,15 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Condition checklist updated successfully..
+        /// </summary>
+        public static string ChecklistUpdated {
+            get {
+                return ResourceManager.GetString("ChecklistUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Condition checklist category activated successfully..
         /// </summary>
         public static string ConditionChecklistCategoryActivated {
@@ -169,6 +178,15 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Listing archived successfully..
+        /// </summary>
+        public static string ListingArchived {
+            get {
+                return ResourceManager.GetString("ListingArchived", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Listing created successfully..
         /// </summary>
         public static string ListingCreated {
@@ -183,6 +201,15 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         public static string ListingDeleted {
             get {
                 return ResourceManager.GetString("ListingDeleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deleted by seller.
+        /// </summary>
+        public static string ListingDeletedReason {
+            get {
+                return ResourceManager.GetString("ListingDeletedReason", resourceCulture);
             }
         }
         

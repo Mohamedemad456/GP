@@ -78,6 +78,20 @@ namespace Karna.APIs.Controllers.Controllers
 			return Ok(result);
 		}
 
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "User")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            var result = await _listingService.DeleteAsync(id);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
+
+        }
+    
+
 		[HttpPost("{id}/generate-price")]
 		[Authorize(Roles = "User")]
 		public async Task<IActionResult> GeneratePrice(Guid id)

@@ -183,6 +183,9 @@
   <data name="InvalidListingOwner" xml:space="preserve">
     <value>هذا الإعلان لا يخصك</value>
   </data>
+  <data name="ListingCannotBeDeleted" xml:space="preserve">
+    <value>لا يمكن حذف هذا الإعلان</value>
+  </data>
   <data name="ListingNotInValidStateForPricing" xml:space="preserve">
     <value>يجب أن يكون الإعلان في حالة مسودة أو معلق لتوليد السعر.</value>
   </data>
