@@ -18,6 +18,7 @@ namespace Karna.Core.Application.Mapping
 			EngineSize = dto.EngineSize,
 			Color = dto.Color,
 			Description = dto.Description,
+			Location = dto.Location,
 			Status = ListingStatus.Draft
 		};
 
@@ -34,9 +35,17 @@ namespace Karna.Core.Application.Mapping
 			EngineSize = source.EngineSize,
 			Color = source.Color,
 			Description = source.Description,
+			Location = source.Location,
+			Price = source.Price,
 			Status = source.Status,
 			CreatedAt = source.CreatedAt,
-			UpdatedAt = source.UpdatedAt
+			UpdatedAt = source.UpdatedAt,
+			FairPrice = source.FairPrice,
+			NegotiationRangeLower = source.NegotiationRangeLower,
+			NegotiationRangeUpper = source.NegotiationRangeUpper,
+			ConfidenceLevel = source.ConfidenceLevel,
+			ModelVersion = source.ModelVersion,
+			PredictedAt = source.PredictedAt
 		};
 	}
 }

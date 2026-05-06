@@ -186,4 +186,22 @@
   <data name="ListingCannotBeDeleted" xml:space="preserve">
     <value>This listing cannot be deleted</value>
   </data>
+  <data name="ListingNotInValidStateForPricing" xml:space="preserve">
+    <value>Listing must be in Draft or Pending state to generate a price.</value>
+  </data>
+  <data name="MakeOrModelNotFound" xml:space="preserve">
+    <value>The listing's make or model could not be found.</value>
+  </data>
+  <data name="MLServiceUnavailable" xml:space="preserve">
+    <value>The pricing service is temporarily unavailable. Please try again later.</value>
+  </data>
+  <data name="NoPriceGeneratedYet" xml:space="preserve">
+    <value>Please generate a price suggestion first before accepting.</value>
+  </data>
+  <data name="InvalidListingPrice" xml:space="preserve">
+    <value>Please enter a valid price greater than zero.</value>
+  </data>
+  <data name="ListingDataIncompleteForPricing" xml:space="preserve">
+    <value>Please complete all required vehicle details before generating price.</value>
+  </data>
 </root>

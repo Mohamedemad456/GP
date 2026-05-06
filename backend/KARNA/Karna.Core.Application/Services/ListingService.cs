@@ -15,7 +15,8 @@ namespace Karna.Core.Application.Services
 		ICurrentUserService _currentUserService,
 		ILocalizationService _localizer,
 		IValidator<CreateListingDto> _createValidator,
-		IValidator<AddConditionChecklistDto> _checklistValidator
+		IValidator<AddConditionChecklistDto> _checklistValidator,
+		IMLApiClient _mlApiClient
 	) : IListingService
 	{
 		public async Task<ApiResponse<ListingDto>> CreateAsync(CreateListingDto dto)
@@ -382,6 +383,153 @@ namespace Karna.Core.Application.Services
 			{
 				Success = true,
 				Data = history.ToDto()
+			};
+		}
+		public async Task<ApiResponse<GeneratePriceResponseDto>> GeneratePriceAsync(Guid listingId)
+		{
+			// 1. Authenticate current user
+			if (!_currentUserService.IsAuthenticated || _currentUserService.UserId == Guid.Empty)
+				return new ApiResponse<GeneratePriceResponseDto> { Success = false, Message = _localizer.GetErrorMessage("Unauthorized") };
+
+			var userRepo = _unitOfWork.GetRepository<User>();
+			var currentUser = await userRepo.GetAsync(u => u.IdentityUserId == _currentUserService.UserId);
+			if (currentUser is null)
+				return new ApiResponse<GeneratePriceResponseDto> { Success = false, Message = _localizer.GetErrorMessage("UserNotFound") };
+
+			// 2. Get listing
+			var listingRepo = _unitOfWork.GetRepository<Listing>();
+			var listing = await listingRepo.GetAsync(listingId);
+			if (listing is null)
+				return new ApiResponse<GeneratePriceResponseDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotFound") };
+
+			// 3. Validate ownership
+			if (listing.SellerId != currentUser.Id)
+				return new ApiResponse<GeneratePriceResponseDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotOwnedByUser") };
+
+			// 4. Validate listing state (Draft or Pending)
+			if (listing.Status != ListingStatus.Draft && listing.Status != ListingStatus.Pending)
+				return new ApiResponse<GeneratePriceResponseDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotInValidStateForPricing") };
+
+			// 5. Validate required data completeness before calling ML service.
+			if (!HasRequiredPricingData(listing))
+				return new ApiResponse<GeneratePriceResponseDto> { Success = false, Message = _localizer.GetErrorMessage("ListingDataIncompleteForPricing") };
+
+			// 6. Load Make and Model names for ML API
+			var makeRepo = _unitOfWork.GetRepository<Make>();
+			var modelRepo = _unitOfWork.GetRepository<Model>();
+
+			var make = await makeRepo.GetAsync(listing.MakeId);
+			var model = await modelRepo.GetAsync(listing.ModelId);
+
+			if (make is null || model is null)
+				return new ApiResponse<GeneratePriceResponseDto> { Success = false, Message = _localizer.GetErrorMessage("MakeOrModelNotFound") };
+
+			// 7. Call ML API
+			var fuelTypeStr = listing.FuelType.ToString().ToLowerInvariant();
+			var transmissionStr = listing.Transmission.ToString();
+			var locationStr = listing.Location.ToDisplayString();
+
+			var mlResult = await _mlApiClient.GetPricePredictionAsync(
+				brand: make.Name,
+				model: model.Name,
+				year: listing.Year,
+				mileageKm: listing.Mileage,
+				fuel: fuelTypeStr,
+				transmission: transmissionStr,
+				location: locationStr
+			);
+
+			if (!mlResult.Success || mlResult.Data is null)
+			{
+				var errorMessage = string.IsNullOrWhiteSpace(mlResult.ErrorMessage)
+					? _localizer.GetErrorMessage("MLServiceUnavailable")
+					: mlResult.ErrorMessage;
+
+				return new ApiResponse<GeneratePriceResponseDto> { Success = false, Message = errorMessage };
+			}
+
+			var prediction = mlResult.Data;
+
+			// 8. Map response to listing entity fields
+			listing.FairPrice = prediction.FairPrice;
+			listing.NegotiationRangeLower = prediction.NegotiationRangeLower;
+			listing.NegotiationRangeUpper = prediction.NegotiationRangeUpper;
+			listing.ConfidenceLevel = prediction.ConfidenceLevel;
+			listing.ModelVersion = prediction.ModelVersion;
+			listing.PredictedAt = prediction.PredictedAt;
+
+			// 9. Save changes
+			await _unitOfWork.CompleteAsync();
+
+			return new ApiResponse<GeneratePriceResponseDto>
+			{
+				Success = true,
+				Message = _localizer.GetMessage("PriceGenerated"),
+				Data = prediction
+			};
+		}
+
+		private static bool HasRequiredPricingData(Listing listing)
+		{
+			return listing.MakeId != Guid.Empty
+				&& listing.ModelId != Guid.Empty
+				&& listing.Year > 0
+				&& listing.Mileage > 0
+				&& listing.EngineSize > 0
+				&& Enum.IsDefined(listing.FuelType)
+				&& Enum.IsDefined(listing.Transmission)
+				&& Enum.IsDefined(listing.Location);
+		}
+
+		public async Task<ApiResponse<ListingDto>> SetPriceAsync(Guid listingId, SetListingPriceDto dto)
+		{
+			// 1. Authenticate current user
+			if (!_currentUserService.IsAuthenticated || _currentUserService.UserId == Guid.Empty)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("Unauthorized") };
+
+			var userRepo = _unitOfWork.GetRepository<User>();
+			var currentUser = await userRepo.GetAsync(u => u.IdentityUserId == _currentUserService.UserId);
+			if (currentUser is null)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("UserNotFound") };
+
+			// 2. Get listing
+			var listingRepo = _unitOfWork.GetRepository<Listing>();
+			var listing = await listingRepo.GetAsync(listingId);
+			if (listing is null)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotFound") };
+
+			// 3. Validate ownership
+			if (listing.SellerId != currentUser.Id)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotOwnedByUser") };
+
+			// 4. Validate listing state
+			if (listing.Status != ListingStatus.Draft && listing.Status != ListingStatus.Pending)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotInValidStateForPricing") };
+
+			// 5. Set price
+			if (dto.AcceptFairPrice)
+			{
+				if (listing.FairPrice is null)
+					return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("NoPriceGeneratedYet") };
+
+				listing.Price = listing.FairPrice;
+			}
+			else
+			{
+				if (dto.Price is null || dto.Price <= 0)
+					return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("InvalidListingPrice") };
+
+				listing.Price = dto.Price;
+			}
+
+			// 6. Save
+			await _unitOfWork.CompleteAsync();
+
+			return new ApiResponse<ListingDto>
+			{
+				Success = true,
+				Message = _localizer.GetMessage("PriceSet"),
+				Data = listing.ToDto()
 			};
 		}
 

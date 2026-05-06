@@ -90,5 +90,26 @@ namespace Karna.APIs.Controllers.Controllers
             return Ok(result);
 
         }
-    }
+    
+
+		[HttpPost("{id}/generate-price")]
+		[Authorize(Roles = "User")]
+		public async Task<IActionResult> GeneratePrice(Guid id)
+		{
+			var result = await _listingService.GeneratePriceAsync(id);
+			if (!result.Success)
+				return BadRequest(result);
+			return Ok(result);
+		}
+
+		[HttpPost("{id}/set-price")]
+		[Authorize(Roles = "User")]
+		public async Task<IActionResult> SetPrice(Guid id, [FromBody] SetListingPriceDto dto)
+		{
+			var result = await _listingService.SetPriceAsync(id, dto);
+			if (!result.Success)
+				return BadRequest(result);
+			return Ok(result);
+		}
+	}
 }

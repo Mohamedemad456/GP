@@ -228,4 +228,7 @@
   <data name="ListingAlreadyDeleted" xml:space="preserve">
     <value>الإعلان محذوف بالفعل</value>
   </data>
+  <data name="InvalidLocation" xml:space="preserve">
+    <value>يرجى اختيار موقع صالح.</value>
+  </data>
 </root>

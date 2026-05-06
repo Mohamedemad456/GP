@@ -1,4 +1,4 @@
-﻿using Karna.Core.Application.Abstraction.Initializers;
+using Karna.Core.Application.Abstraction.Initializers;
 
 namespace Karna.APIs.Extensions
 {

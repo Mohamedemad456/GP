@@ -21,9 +21,20 @@ namespace Karna.Core.Domain.Entities
 		public decimal EngineSize { get; set; }
 		public string Color { get; set; } = null!;
 		public string Description { get; set; } = null!;
+		public EgyptLocation Location { get; set; }
+		public decimal? Price { get; set; }
 		public ListingStatus Status { get; set; } = ListingStatus.Draft;
         public DateTime? DeletedAt { get; set; }
-        public ICollection<ListingDefect> ListingDefects { get; set; } = new List<ListingDefect>();
+
+		// ML Pricing Fields
+		public decimal? FairPrice { get; set; }
+		public decimal? NegotiationRangeLower { get; set; }
+		public decimal? NegotiationRangeUpper { get; set; }
+		public string? ConfidenceLevel { get; set; }
+		public string? ModelVersion { get; set; }
+		public DateTime? PredictedAt { get; set; }
+
+		public ICollection<ListingDefect> ListingDefects { get; set; } = new List<ListingDefect>();
 
         public ICollection<ListingPhoto> Photos { get; set; } = new List<ListingPhoto>();
 

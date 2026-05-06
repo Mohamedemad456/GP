@@ -530,11 +530,6 @@
     "MakeName": "DS"
   },
   {
-    "Name": "Juliet",
-    "NameAr": "جولييت",
-    "MakeName": "Daewoo"
-  },
-  {
     "Name": "Lacetti",
     "NameAr": "لاسيتي",
     "MakeName": "Daewoo"
@@ -620,11 +615,6 @@
     "MakeName": "Fiat"
   },
   {
-    "Name": "Jetta",
-    "NameAr": "جيتا",
-    "MakeName": "Fiat"
-  },
-  {
     "Name": "Linea",
     "NameAr": "لينيا",
     "MakeName": "Fiat"
@@ -637,11 +627,6 @@
   {
     "Name": "Petra",
     "NameAr": "بيترا",
-    "MakeName": "Fiat"
-  },
-  {
-    "Name": "Polo",
-    "NameAr": "بولو",
     "MakeName": "Fiat"
   },
   {
@@ -817,11 +802,6 @@
   {
     "Name": "Civic",
     "NameAr": "سيفيك",
-    "MakeName": "Honda"
-  },
-  {
-    "Name": "Cr V",
-    "NameAr": "سي آر في",
     "MakeName": "Honda"
   },
   {
@@ -1110,11 +1090,6 @@
     "MakeName": "Kia"
   },
   {
-    "Name": "Saipa",
-    "NameAr": "سايبا",
-    "MakeName": "Kia"
-  },
-  {
     "Name": "Sephia",
     "NameAr": "سيفيا",
     "MakeName": "Kia"
@@ -1232,11 +1207,6 @@
   {
     "Name": "RX5",
     "NameAr": "إم جي آر إكس 5",
-    "MakeName": "MG"
-  },
-  {
-    "Name": "Rx5",
-    "NameAr": "آر إكس 5",
     "MakeName": "MG"
   },
   {
@@ -2142,11 +2112,6 @@
   {
     "Name": "Tayron",
     "NameAr": "تايرون",
-    "MakeName": "Volkswagen"
-  },
-  {
-    "Name": "Tiggo",
-    "NameAr": "تيجو",
     "MakeName": "Volkswagen"
   },
   {
