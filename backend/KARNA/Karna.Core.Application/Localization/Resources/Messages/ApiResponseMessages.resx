@@ -228,4 +228,16 @@
   <data name="PriceSet" xml:space="preserve">
     <value>Listing price set successfully.</value>
   </data>
+  <data name="ListingSubmitted" xml:space="preserve">
+    <value>Listing submitted for review successfully.</value>
+  </data>
+  <data name="ListingApproved" xml:space="preserve">
+    <value>Listing approved successfully.</value>
+  </data>
+  <data name="ListingRejected" xml:space="preserve">
+    <value>Listing rejected.</value>
+  </data>
+  <data name="ListingMarkedAsSold" xml:space="preserve">
+    <value>Listing marked as sold successfully.</value>
+  </data>
 </root>

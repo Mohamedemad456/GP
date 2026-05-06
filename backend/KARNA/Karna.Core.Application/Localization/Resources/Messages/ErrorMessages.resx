@@ -204,4 +204,22 @@
   <data name="ListingDataIncompleteForPricing" xml:space="preserve">
     <value>Please complete all required vehicle details before generating price.</value>
   </data>
+  <data name="ListingIncompleteData" xml:space="preserve">
+    <value>Please complete all required listing details before submitting.</value>
+  </data>
+  <data name="ListingInsufficientPhotos" xml:space="preserve">
+    <value>At least 3 photos are required to submit a listing.</value>
+  </data>
+  <data name="ListingMissingChecklist" xml:space="preserve">
+    <value>Please add a condition checklist before submitting.</value>
+  </data>
+  <data name="ListingMissingPricing" xml:space="preserve">
+    <value>Please generate ML pricing before submitting.</value>
+  </data>
+  <data name="ListingNotInPendingState" xml:space="preserve">
+    <value>Listing must be in Pending state.</value>
+  </data>
+  <data name="ListingNotInActiveState" xml:space="preserve">
+    <value>Listing must be in Active state.</value>
+  </data>
 </root>
