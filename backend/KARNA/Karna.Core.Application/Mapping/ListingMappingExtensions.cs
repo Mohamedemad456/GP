@@ -47,5 +47,19 @@ namespace Karna.Core.Application.Mapping
 			ModelVersion = source.ModelVersion,
 			PredictedAt = source.PredictedAt
 		};
+
+		public static void ApplyUpdate(this Listing listing, UpdateListingDto dto)
+		{
+			listing.MakeId = dto.MakeId;
+			listing.ModelId = dto.ModelId;
+			listing.Year = dto.Year;
+			listing.Mileage = dto.Mileage;
+			listing.FuelType = dto.FuelType;
+			listing.Transmission = dto.Transmission;
+			listing.EngineSize = dto.EngineSize;
+			listing.Color = dto.Color;
+			listing.Description = dto.Description;
+			listing.Location = dto.Location;
+		}
 	}
 }

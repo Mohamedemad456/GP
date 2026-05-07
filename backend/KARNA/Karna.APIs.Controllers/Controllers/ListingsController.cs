@@ -18,6 +18,16 @@ namespace Karna.APIs.Controllers.Controllers
 			return CreatedAtAction(nameof(Create), new { id = result.Data?.Id}, result);
 		}
 
+		[HttpPut("{id}")]
+		[Authorize(Roles = "User")]
+		public async Task<IActionResult> Update(Guid id, [FromBody] UpdateListingDto dto)
+		{
+			var result = await _listingService.UpdateAsync(id, dto);
+			if (!result.Success)
+				return BadRequest(result);
+			return Ok(result);
+		}
+
 		[HttpPost("{id}/conditions")]
 		[Authorize(Roles = "User")]
 		public async Task<IActionResult> AddChecklist(Guid id, [FromBody] AddConditionChecklistDto dto)
