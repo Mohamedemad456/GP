@@ -62,5 +62,23 @@ namespace Karna.Core.Application.Mapping
 			listing.Description = dto.Description;
 			listing.Location = dto.Location;
 		}
+
+		public static PendingListingDto ToPendingDto(this Listing source) => new()
+		{
+			Id = source.Id,
+			SellerId = source.SellerId,
+			SellerName = source.Seller?.Name ?? string.Empty,
+			Make = source.Make?.Name ?? string.Empty,
+			Model = source.Model?.Name ?? string.Empty,
+			Year = source.Year,
+			Mileage = source.Mileage,
+			Price = source.Price,
+			FairPrice = source.FairPrice,
+			Status = source.Status.ToString(),
+			CreatedAt = source.CreatedAt
+		};
+
+		public static IEnumerable<PendingListingDto> ToPendingDto(this IEnumerable<Listing> source)
+			=> source.Select(l => l.ToPendingDto());
 	}
 }
