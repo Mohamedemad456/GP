@@ -443,6 +443,7 @@ namespace Karna.Core.Application.Services
 
 			var oldStatus = listing.Status;
 			listing.Status = ListingStatus.Sold;
+			listing.SoldAt = DateTime.UtcNow;
 
 			await RecordStatusChangeAsync(listing.Id, oldStatus, listing.Status, currentUser.Id, null);
 			await _unitOfWork.CompleteAsync();
