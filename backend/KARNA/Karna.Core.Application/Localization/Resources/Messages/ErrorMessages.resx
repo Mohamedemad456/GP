@@ -222,4 +222,7 @@
   <data name="ListingNotInActiveState" xml:space="preserve">
     <value>Listing must be in Active state.</value>
   </data>
+  <data name="ListingNotInValidStateForUpdate" xml:space="preserve">
+    <value>Listing cannot be updated in its current state.</value>
+  </data>
 </root>

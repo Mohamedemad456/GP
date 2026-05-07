@@ -222,4 +222,7 @@
   <data name="ListingNotInActiveState" xml:space="preserve">
     <value>يجب أن يكون الإعلان في حالة نشط.</value>
   </data>
+  <data name="ListingNotInValidStateForUpdate" xml:space="preserve">
+    <value>لا يمكن تعديل الإعلان في حالته الحالية.</value>
+  </data>
 </root>

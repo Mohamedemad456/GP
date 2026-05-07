@@ -15,6 +15,7 @@ namespace Karna.Core.Application.Services
 		ICurrentUserService _currentUserService,
 		ILocalizationService _localizer,
 		IValidator<CreateListingDto> _createValidator,
+		IValidator<UpdateListingDto> _updateValidator,
 		IValidator<AddConditionChecklistDto> _checklistValidator,
 		IMLApiClient _mlApiClient
 	) : IListingService
@@ -64,6 +65,86 @@ namespace Karna.Core.Application.Services
 			{
 				Success = true,
 				Message = _localizer.GetMessage("ListingCreated"),
+				Data = listing.ToDto()
+			};
+		}
+
+		public async Task<ApiResponse<ListingDto>> UpdateAsync(Guid listingId, UpdateListingDto dto)
+		{
+			// 1. Validate DTO
+			var validationResult = await _updateValidator.ValidateAsync(dto);
+			if (!validationResult.IsValid)
+			{
+				return new ApiResponse<ListingDto>
+				{
+					Success = false,
+					Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage))
+				};
+			}
+
+			// 2. Authenticate current user
+			if (!_currentUserService.IsAuthenticated || _currentUserService.UserId == Guid.Empty)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("Unauthorized") };
+
+			var userRepo = _unitOfWork.GetRepository<User>();
+			var currentUser = await userRepo.GetAsync(u => u.IdentityUserId == _currentUserService.UserId);
+			if (currentUser is null)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("UserNotFound") };
+
+			// 3. Get listing
+			var listingRepo = _unitOfWork.GetRepository<Listing>();
+			var listing = await listingRepo.GetAsync(listingId);
+			if (listing is null)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotFound") };
+
+			// 4. Validate ownership
+			if (listing.SellerId != currentUser.Id)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotOwnedByUser") };
+
+			// 5. Block updates for Sold / Archived listings
+			if (listing.Status == ListingStatus.Sold || listing.Status == ListingStatus.Archived)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotInValidStateForUpdate") };
+
+			// 6. Validate Model belongs to Make
+			var makeRepo = _unitOfWork.GetRepository<Make>();
+			var modelRepo = _unitOfWork.GetRepository<Model>();
+
+			var make = await makeRepo.GetAsync(dto.MakeId);
+			if (make is null)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("MakeNotFound") };
+
+			var model = await modelRepo.GetAsync(dto.ModelId);
+			if (model is null)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ModelNotFound") };
+
+			if (model.MakeId != dto.MakeId)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetValidationMessage("ModelDoesNotBelongToMake") };
+
+			// 7. Apply field updates
+			listing.ApplyUpdate(dto);
+
+			// 8. Handle status transitions
+			var oldStatus = listing.Status;
+			var newStatus = oldStatus switch
+			{
+				ListingStatus.Active => ListingStatus.Pending,    // Approved → Pending (re-review)
+				ListingStatus.Rejected => ListingStatus.Draft,     // Rejected → Draft
+				_ => oldStatus                                     // Draft/Pending → no change
+			};
+
+			listing.Status = newStatus;
+
+			// 9. Track status history if status changed
+			if (oldStatus != newStatus)
+				await RecordStatusChangeAsync(listing.Id, oldStatus, newStatus, currentUser.Id, null);
+
+			// 10. Save changes
+			await _unitOfWork.CompleteAsync();
+
+			return new ApiResponse<ListingDto>
+			{
+				Success = true,
+				Message = _localizer.GetMessage("ListingUpdated"),
 				Data = listing.ToDto()
 			};
 		}
