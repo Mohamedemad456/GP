@@ -1,0 +1,26 @@
+{
+  "version_id": "v1.0.0",
+  "rank_by_r2": 2,
+  "model_type": "Ridge(tuned)",
+  "saved_at": "2026-04-26T13:03:34.474249+00:00",
+  "train_config": {
+    "target": "price_egp_log",
+    "is_log_target": true,
+    "split": "E_stratified_by_price_range"
+  },
+  "metrics": {
+    "r2": 0.9083802019131931,
+    "mae": 162642.66846303933,
+    "rmse": 441400.3198261917,
+    "mape_pct": 16.855535837132702
+  },
+  "hyperparams": {
+    "alpha": 0.01,
+    "fit_intercept": true,
+    "max_iter": null
+  },
+  "artifacts": {
+    "model_pkl": "/home/mo-seif/Documents/GP/ml-service/models/pickles/Baseline2__ridgetuned.pkl",
+    "preprocessor_pkl": "/home/mo-seif/Documents/GP/ml-service/models/preprocessors/preprocessor__v1.0.0.joblib"
+  }
+}

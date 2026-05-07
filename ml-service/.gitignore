@@ -10,7 +10,12 @@ data/processed/*.parquet
 data/lookups/*
 
 # Models
+*.pkl
+*.joblib
+
+# Versioned model export folders (keep registries/metadata JSON tracked)
 models/v*/
+models/v*/**
 
 # Python
 __pycache__/

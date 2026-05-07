@@ -1,4 +1,39 @@
 {
-  "active_version": null,
-  "versions": {}
+  "active_version": "v1.0.0",
+  "active_model": {
+    "rank": 1,
+    "model_type": "HuberRegressor(tuned)",
+    "R2": 0.90882664995491,
+    "MAE": 156056.25950585405,
+    "pkl_path": "models/pickles/Baseline1__huberregressortuned.pkl",
+    "meta_path": "models/metadata/Baseline1__huberregressortuned.json"
+  },
+  "versions": {
+    "v1.0.0": {
+      "trained_at": "2026-04-26T13:03:34.474249+00:00",
+      "n_samples": 20461,
+      "preprocessor": {
+        "pkl_path": "models/preprocessors/preprocessor__v1.0.0.joblib",
+        "meta_path": "models/metadata/preprocessor__v1.0.0.json"
+      },
+      "models": [
+        {
+          "rank": 1,
+          "model_type": "HuberRegressor(tuned)",
+          "R2": 0.90882664995491,
+          "MAE": 156056.25950585405,
+          "pkl_path": "models/pickles/Baseline1__huberregressortuned.pkl",
+          "meta_path": "models/metadata/Baseline1__huberregressortuned.json"
+        },
+        {
+          "rank": 2,
+          "model_type": "Ridge(tuned)",
+          "R2": 0.9083802019131931,
+          "MAE": 162642.66846303933,
+          "pkl_path": "models/pickles/Baseline2__ridgetuned.pkl",
+          "meta_path": "models/metadata/Baseline2__ridgetuned.json"
+        }
+      ]
+    }
+  }
 }
