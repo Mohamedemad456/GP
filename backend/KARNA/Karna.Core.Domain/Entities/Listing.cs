@@ -25,6 +25,7 @@ namespace Karna.Core.Domain.Entities
 		public decimal? Price { get; set; }
 		public ListingStatus Status { get; set; } = ListingStatus.Draft;
         public DateTime? DeletedAt { get; set; }
+		public DateTime? SoldAt { get; set; }
 
 		// ML Pricing Fields
 		public decimal? FairPrice { get; set; }

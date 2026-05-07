@@ -40,6 +40,7 @@ namespace Karna.Core.Application.Mapping
 			Status = source.Status,
 			CreatedAt = source.CreatedAt,
 			UpdatedAt = source.UpdatedAt,
+			SoldAt = source.SoldAt,
 			FairPrice = source.FairPrice,
 			NegotiationRangeLower = source.NegotiationRangeLower,
 			NegotiationRangeUpper = source.NegotiationRangeUpper,

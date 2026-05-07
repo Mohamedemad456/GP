@@ -20,6 +20,7 @@ namespace Karna.Core.Application.Abstraction.DTOs.Listing
 		public ListingStatus Status { get; set; }
 		public DateTime CreatedAt { get; set; }
 		public DateTime? UpdatedAt { get; set; }
+		public DateTime? SoldAt { get; set; }
 
 		// ML Pricing Fields
 		public decimal? FairPrice { get; set; }
