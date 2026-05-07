@@ -11,6 +11,8 @@ data/lookups/*
 
 # Models
 models/v*/
+*.pkl
+*.joblib
 
 # Python
 __pycache__/
