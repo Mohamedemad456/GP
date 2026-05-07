@@ -5,10 +5,8 @@ from app.services.predictor import load_valid_cars
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: Load the lookup list of valid car models so we can validate requests
     load_valid_cars()
     yield
-    # Shutdown
     pass
 
 app = FastAPI(
