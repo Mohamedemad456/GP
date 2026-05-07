@@ -78,9 +78,6 @@ class Settings(BaseSettings):
     def raw_data_dir(self) -> Path:
         return self.data_dir / "raw"
 
-    @property
-    def cleaned_data_dir(self) -> Path:
-        return self.data_dir / "cleaned"
 
     @property
     def processed_data_dir(self) -> Path:

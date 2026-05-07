@@ -10,17 +10,42 @@ export type BaseApiResponse = {
   message: string;
 };
 
-// Matches backend MakeDto — note: NameAr / CountryAr are NOT in the response DTO
+// Matches backend MakeDto — NameAr / CountryAr are not in the response DTO
 export type MakeDto = {
   id: string;
   name: string;
-  nameAr: string;
   logoUrl: string | null;
   country: string | null;
-  countryAr: string | null;
   isActive: boolean;
   createdAt: string;
   updatedAt: string | null;
+};
+
+// Matches backend Pagination<T>
+export type PaginatedResponse<T> = {
+  data: T[];
+  pageIndex: number;
+  pageSize: number;
+  count: number;
+};
+
+// Matches backend MakeSpecParams (extends PaginationSpecParams)
+export type MakeSpecParams = {
+  pageIndex?: number;
+  pageSize?: number;
+  search?: string;
+  sort?: string;
+  sortDirection?: string;
+  isActive?: boolean;
+};
+
+// Matches backend PaginationSpecParams
+export type PaginationSpecParams = {
+  pageIndex?: number;
+  pageSize?: number;
+  search?: string;
+  sort?: string;
+  sortDirection?: string;
 };
 
 // Matches backend CreateMakeDto / UpdateMakeDto (NameAr + CountryAr ARE in request DTOs)
@@ -41,12 +66,16 @@ export const getMakeLogoUrl = (logoUrl: string | null): string => {
 };
 
 // GET /api/Makes/Active  — AllowAnonymous
-export const getActiveMakes = () =>
-  api.get<ApiResponse<MakeDto[]>>("/api/Makes/Active").then((r) => r.data);
+export const getActiveMakes = (params?: PaginationSpecParams) =>
+  api
+    .get<ApiResponse<PaginatedResponse<MakeDto>>>("/api/Makes/Active", { params })
+    .then((r) => r.data);
 
 // GET /api/Makes/All  — Admin
-export const getAllMakes = () =>
-  api.get<ApiResponse<MakeDto[]>>("/api/Makes/All").then((r) => r.data);
+export const getAllMakes = (params?: MakeSpecParams) =>
+  api
+    .get<ApiResponse<PaginatedResponse<MakeDto>>>("/api/Makes/All", { params })
+    .then((r) => r.data);
 
 // GET /api/Makes/{id}  — AllowAnonymous
 export const getMakeById = (id: string) =>

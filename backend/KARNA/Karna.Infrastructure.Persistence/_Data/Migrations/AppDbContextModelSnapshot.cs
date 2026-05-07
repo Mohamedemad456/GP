@@ -178,6 +178,32 @@ namespace Karna.Infrastructure.Persistence._Data.Migrations
                     b.ToTable("Listings");
                 });
 
+            modelBuilder.Entity("Karna.Core.Domain.Entities.ListingDefect", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("AppliedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("ConditionDefectId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ListingId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ConditionDefectId");
+
+                    b.HasIndex("ListingId");
+
+                    b.HasIndex("ListingId", "ConditionDefectId")
+                        .IsUnique();
+
+                    b.ToTable("ListingDefects");
+                });
+
             modelBuilder.Entity("Karna.Core.Domain.Entities.ListingPhoto", b =>
                 {
                     b.Property<Guid>("Id")
@@ -217,30 +243,41 @@ namespace Karna.Infrastructure.Persistence._Data.Migrations
                     b.ToTable("ListingPhoto");
                 });
 
-            modelBuilder.Entity("Karna.Core.Domain.Entities.ListingDefect", b =>
+            modelBuilder.Entity("Karna.Core.Domain.Entities.ListingStatusHistory", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("AppliedAt")
+                    b.Property<DateTime>("ChangedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("ConditionDefectId")
+                    b.Property<Guid?>("ChangedByUserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("ListingId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("NewStatus")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("OldStatus")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("ConditionDefectId");
+                    b.HasIndex("ChangedByUserId");
 
                     b.HasIndex("ListingId");
 
-                    b.HasIndex("ListingId", "ConditionDefectId")
-                        .IsUnique();
-
-                    b.ToTable("ListingDefects");
+                    b.ToTable("ListingStatusHistories");
                 });
 
             modelBuilder.Entity("Karna.Core.Domain.Entities.Make", b =>
@@ -479,6 +516,24 @@ namespace Karna.Infrastructure.Persistence._Data.Migrations
                     b.Navigation("Listing");
                 });
 
+            modelBuilder.Entity("Karna.Core.Domain.Entities.ListingStatusHistory", b =>
+                {
+                    b.HasOne("Karna.Core.Domain.Entities.User", "ChangedByUser")
+                        .WithMany()
+                        .HasForeignKey("ChangedByUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("Karna.Core.Domain.Entities.Listing", "Listing")
+                        .WithMany("StatusHistories")
+                        .HasForeignKey("ListingId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ChangedByUser");
+
+                    b.Navigation("Listing");
+                });
+
             modelBuilder.Entity("Karna.Core.Domain.Entities.Model", b =>
                 {
                     b.HasOne("Karna.Core.Domain.Entities.Make", "Make")
@@ -503,11 +558,10 @@ namespace Karna.Infrastructure.Persistence._Data.Migrations
             modelBuilder.Entity("Karna.Core.Domain.Entities.Listing", b =>
                 {
                     b.Navigation("ListingDefects");
-                });
 
-            modelBuilder.Entity("Karna.Core.Domain.Entities.Listing", b =>
-                {
                     b.Navigation("Photos");
+
+                    b.Navigation("StatusHistories");
                 });
 
             modelBuilder.Entity("Karna.Core.Domain.Entities.Make", b =>

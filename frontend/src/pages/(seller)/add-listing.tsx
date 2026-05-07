@@ -2,10 +2,21 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import {
+  getActiveConditionChecklistCategories,
+  type ConditionChecklistCategoryDto,
+} from "@/lib/conditionChecklistCategoriesApi";
+import {
+  getActiveConditionDefects,
+  type ConditionDefectDto,
+} from "@/lib/conditionDefectsApi";
+import { getAllLookups, type LookupGroupDto } from "@/lib/lookupsApi";
 import { getActiveMakes, type MakeDto } from "@/lib/makesApi";
 import { getActiveModels, type ModelDto } from "@/lib/modelsApi";
 import {
+  Badge,
   Card,
+  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
@@ -28,12 +39,14 @@ import {
   ImagePlus,
   Car,
   AlertCircle,
+  CircleDollarSign,
+  ClipboardCheck,
+  FileText,
+  Sparkles,
 } from "lucide-react";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-const FUEL_TYPES = ["Gasoline", "Diesel", "Hybrid", "Electric", "Other"];
-const TRANSMISSIONS = ["Automatic", "Manual"];
 const CONDITION_GRADES = ["A+", "A", "A-", "B+", "B", "C+", "C"];
 const COLORS = ["White", "Black", "Silver", "Gray", "Red", "Blue", "Green", "Brown", "Beige", "Other"];
 
@@ -42,6 +55,11 @@ const YEARS = Array.from({ length: CURRENT_YEAR - 1989 }, (_, i) => CURRENT_YEAR
 
 const MIN_IMAGES = 3;
 const MAX_IMAGES = 10;
+
+const SECTION_CARD_CLASS =
+  "overflow-hidden rounded-3xl border border-border/60 bg-card/95 shadow-sm shadow-black/5 pt-0";
+
+const SECTION_HEADER_CLASS = "border-b border-border/60 bg-muted/20 pt-3";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -57,6 +75,13 @@ interface FormState {
   description: string;
   listingPrice: string;
   conditionGrade: string;
+}
+
+interface ConditionSelection {
+  categoryId: string;
+  categoryName: string;
+  defectId: string;
+  defectName: string;
 }
 
 const INITIAL_FORM: FormState = {
@@ -76,9 +101,10 @@ const INITIAL_FORM: FormState = {
 // ─── Main Page ───────────────────────────────────────────────────────────────
 
 const AddListing = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const isRtl = i18n.language?.startsWith("ar");
 
   const [form, setForm] = useState<FormState>(INITIAL_FORM);
   const [images, setImages] = useState<File[]>([]);
@@ -91,24 +117,113 @@ const AddListing = () => {
   const [allModels, setAllModels] = useState<ModelDto[]>([]);
   const [isLoadingMakes, setIsLoadingMakes] = useState(true);
   const [isLoadingModels, setIsLoadingModels] = useState(true);
+  const [lookupGroups, setLookupGroups] = useState<LookupGroupDto[]>([]);
+  const [isLoadingLookups, setIsLoadingLookups] = useState(true);
+  const [conditionCategories, setConditionCategories] = useState<
+    ConditionChecklistCategoryDto[]
+  >([]);
+  const [conditionDefects, setConditionDefects] = useState<ConditionDefectDto[]>(
+    []
+  );
+  const [isLoadingConditionCategories, setIsLoadingConditionCategories] =
+    useState(true);
+  const [isLoadingConditionDefects, setIsLoadingConditionDefects] =
+    useState(true);
+  const [selectedConditionCategoryId, setSelectedConditionCategoryId] =
+    useState("");
+  const [selectedConditionDefectId, setSelectedConditionDefectId] = useState("");
+  const [selectedConditions, setSelectedConditions] = useState<
+    ConditionSelection[]
+  >([]);
+
+  const fetchAllActiveMakes = useCallback(async () => {
+    setIsLoadingMakes(true);
+    try {
+      const allMakes: MakeDto[] = [];
+      let pageIndex = 1;
+      let totalCount = 0;
+
+      while (true) {
+        const res = await getActiveMakes({ pageIndex, pageSize: 100 });
+        if (!res.success) throw new Error(res.message);
+
+        const pageData = res.data?.data ?? [];
+        totalCount = res.data?.count ?? pageData.length;
+        allMakes.push(...pageData);
+
+        if (pageData.length === 0 || allMakes.length >= totalCount) break;
+        pageIndex += 1;
+      }
+
+      setMakes(allMakes);
+    } catch {
+      toast.error(t("seller.addListing.errors.loadMakesFailed"));
+    } finally {
+      setIsLoadingMakes(false);
+    }
+  }, [t]);
 
   useEffect(() => {
-    getActiveMakes()
-      .then((res) => { if (res.success) setMakes(res.data ?? []); })
-      .catch(() => toast.error(t("seller.addListing.errors.loadMakesFailed")))
-      .finally(() => setIsLoadingMakes(false));
+    fetchAllActiveMakes();
 
     getActiveModels()
       .then((res) => { if (res.success) setAllModels(res.data ?? []); })
       .catch(() => toast.error(t("seller.addListing.errors.loadModelsFailed")))
       .finally(() => setIsLoadingModels(false));
-  }, [t]);
+
+    getAllLookups()
+      .then((groups) => {
+        setLookupGroups(groups);
+      })
+      .catch(() => toast.error(t("seller.addListing.errors.loadLookupsFailed")))
+      .finally(() => setIsLoadingLookups(false));
+
+    getActiveConditionChecklistCategories()
+      .then((res) => {
+        if (res.success) setConditionCategories(res.data ?? []);
+      })
+      .catch(() =>
+        toast.error(t("seller.addListing.errors.loadConditionCategoriesFailed"))
+      )
+      .finally(() => setIsLoadingConditionCategories(false));
+
+    getActiveConditionDefects()
+      .then((res) => {
+        if (res.success) setConditionDefects(res.data ?? []);
+      })
+      .catch(() =>
+        toast.error(t("seller.addListing.errors.loadConditionDefectsFailed"))
+      )
+      .finally(() => setIsLoadingConditionDefects(false));
+  }, [fetchAllActiveMakes, t]);
 
   // Filter models by selected make
   const availableModels = useMemo(
     () => (form.makeId ? allModels.filter((m) => m.makeId === form.makeId) : []),
     [allModels, form.makeId]
   );
+
+  const availableConditionDefects = useMemo(
+    () =>
+      selectedConditionCategoryId
+        ? conditionDefects.filter(
+            (defect) => defect.categoryId === selectedConditionCategoryId
+          )
+        : [],
+    [conditionDefects, selectedConditionCategoryId]
+  );
+
+  const lookupOptionsByNameKey = useMemo(
+    () =>
+      lookupGroups.reduce<Record<string, LookupGroupDto["options"]>>((acc, group) => {
+        acc[group.nameKey] = group.options;
+        return acc;
+      }, {}),
+    [lookupGroups]
+  );
+
+  const fuelTypeOptions = lookupOptionsByNameKey.fuelTypes ?? [];
+  const transmissionOptions = lookupOptionsByNameKey.transmissionTypes ?? [];
 
   // ── Handlers ─────────────────────────────────────────────────────────────
 
@@ -171,6 +286,52 @@ const AddListing = () => {
     },
     [imagePreviews]
   );
+
+  const handleConditionCategoryChange = useCallback((value: string) => {
+    setSelectedConditionCategoryId(value);
+    setSelectedConditionDefectId("");
+  }, []);
+
+  const handleConditionDefectChange = useCallback(
+    (value: string) => {
+      const selectedCategory = conditionCategories.find(
+        (category) => category.id === selectedConditionCategoryId
+      );
+      const selectedDefect = conditionDefects.find(
+        (defect) => defect.id === value && defect.categoryId === selectedConditionCategoryId
+      );
+
+      if (!selectedCategory || !selectedDefect) {
+        setSelectedConditionDefectId("");
+        return;
+      }
+
+      setSelectedConditions((prev) => {
+        if (prev.some((item) => item.defectId === selectedDefect.id)) {
+          return prev;
+        }
+
+        return [
+          ...prev,
+          {
+            categoryId: selectedCategory.id,
+            categoryName: selectedCategory.name,
+            defectId: selectedDefect.id,
+            defectName: selectedDefect.itemName,
+          },
+        ];
+      });
+
+      setSelectedConditionDefectId("");
+    },
+    [conditionCategories, conditionDefects, selectedConditionCategoryId]
+  );
+
+  const removeConditionSelection = useCallback((defectId: string) => {
+    setSelectedConditions((prev) =>
+      prev.filter((selection) => selection.defectId !== defectId)
+    );
+  }, []);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -267,44 +428,66 @@ const AddListing = () => {
   // ── Render ───────────────────────────────────────────────────────────────
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+    <form
+      onSubmit={handleSubmit}
+      className="mx-auto space-y-8 pb-10"
+      dir={isRtl ? "rtl" : "ltr"}
+      noValidate
+    >
       {/* Header */}
-      <div>
-        <h1 className="font-heading text-2xl font-bold text-foreground">
-          {t("seller.addListing.title")}
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {t("seller.addListing.subtitle")}
-        </p>
+      <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-linear-to-br from-background via-background to-muted/40 p-6 shadow-sm shadow-black/5 sm:p-8">
+        <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-primary/30 to-transparent" />
+        <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-3xl space-y-3">
+            <div className="inline-flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-inner shadow-primary/10">
+              <Sparkles className="size-5" />
+            </div>
+            <div className="space-y-2">
+              <h1 className="font-heading text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                {t("seller.addListing.title")}
+              </h1>
+              <p className="max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
+                {t("seller.addListing.subtitle")}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Images Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Upload className="size-4 text-primary" />
+      <Card className={SECTION_CARD_CLASS}>
+        <CardHeader className={SECTION_HEADER_CLASS}>
+          <CardTitle className="flex items-center gap-3 text-base">
+            <span className="flex size-9 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <Upload className="size-4" />
+            </span>
             {t("seller.addListing.images.title")}
           </CardTitle>
+          <CardAction>
+            <Badge variant="secondary" className="rounded-full px-3 py-1">
+              {images.length} / {MAX_IMAGES}
+            </Badge>
+          </CardAction>
           <CardDescription>
             {t("seller.addListing.images.description", { min: MIN_IMAGES, max: MAX_IMAGES })}
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4 pt-6">
           {/* Uploaded image previews */}
           {imagePreviews.length > 0 && (
-            <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
               {imagePreviews.map((preview, i) => (
-                <div key={i} className="group relative aspect-4/3 overflow-hidden rounded-lg border border-border bg-muted">
+                <div key={i} className="group relative aspect-4/3 overflow-hidden rounded-2xl border border-border/60 bg-muted shadow-sm transition-transform duration-200 hover:-translate-y-0.5">
                   <img src={preview} alt={`Upload ${i + 1}`} className="size-full object-cover" />
                   <button
                     type="button"
                     onClick={() => removeImage(i)}
-                    className="absolute top-1.5 right-1.5 flex size-6 items-center justify-center rounded-full bg-destructive text-destructive-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:bg-destructive/90"
+                    className="absolute right-2 top-2 flex size-7 items-center justify-center rounded-full bg-background/90 text-foreground opacity-0 shadow-sm backdrop-blur transition-all group-hover:opacity-100 hover:bg-destructive hover:text-destructive-foreground"
                   >
                     <X className="size-3.5" />
                   </button>
                   {i === 0 && (
-                    <span className="absolute bottom-1.5 left-1.5 rounded bg-primary px-1.5 py-0.5 text-[10px] font-medium text-primary-foreground">
+                    <span className="absolute bottom-2 left-2 rounded-full bg-primary px-2 py-1 text-[10px] font-semibold text-primary-foreground shadow-sm">
                       {t("seller.addListing.images.cover")}
                     </span>
                   )}
@@ -319,18 +502,20 @@ const AddListing = () => {
               onDragOver={handleDragOver}
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
-              className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-8 transition-colors hover:border-primary/50 hover:bg-muted/50 ${
-                errors.images ? "border-destructive bg-destructive/5" : "border-border"
+              className={`group flex cursor-pointer flex-col items-center justify-center rounded-3xl border-2 border-dashed px-6 py-10 text-center transition-all hover:border-primary/50 hover:bg-primary/5 ${
+                errors.images ? "border-destructive bg-destructive/5" : "border-border/70 bg-muted/20"
               }`}
             >
-              <ImagePlus className="size-10 text-muted-foreground/50" />
-              <p className="mt-3 text-sm font-medium text-foreground">
+              <div className="flex size-14 items-center justify-center rounded-2xl bg-background text-primary shadow-sm ring-1 ring-border/60 transition-transform duration-200 group-hover:scale-105">
+                <ImagePlus className="size-6" />
+              </div>
+              <p className="mt-4 text-sm font-semibold text-foreground">
                 {t("seller.addListing.images.dropzone")}
               </p>
-              <p className="mt-1 text-xs text-muted-foreground">
+              <p className="mt-1 text-xs leading-5 text-muted-foreground">
                 {t("seller.addListing.images.formats")}
               </p>
-              <p className="mt-1 text-xs text-muted-foreground">
+              <p className="mt-2 inline-flex items-center rounded-full bg-background px-3 py-1 text-xs font-medium text-muted-foreground ring-1 ring-border/60">
                 {images.length} / {MAX_IMAGES} {t("seller.addListing.images.uploaded")}
               </p>
             </div>
@@ -355,16 +540,18 @@ const AddListing = () => {
       </Card>
 
       {/* Vehicle Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Car className="size-4 text-primary" />
+      <Card className={SECTION_CARD_CLASS}>
+        <CardHeader className={SECTION_HEADER_CLASS}>
+          <CardTitle className="flex items-center gap-3 text-base">
+            <span className="flex size-9 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <Car className="size-4" />
+            </span>
             {t("seller.addListing.vehicleInfo.title")}
           </CardTitle>
           <CardDescription>{t("seller.addListing.vehicleInfo.description")}</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <CardContent className="pt-6">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {/* Make */}
             <FormField label={t("seller.addListing.fields.make")} error={errors.makeId} required>
               <Combobox
@@ -406,7 +593,7 @@ const AddListing = () => {
             {/* Year */}
             <FormField label={t("seller.addListing.fields.year")} error={errors.year} required>
               <Select value={form.year} onValueChange={(v) => updateField("year", v)}>
-                <SelectTrigger aria-invalid={!!errors.year}>
+                <SelectTrigger aria-invalid={!!errors.year} className="h-11 rounded-xl bg-background/80">
                   <SelectValue placeholder={t("seller.addListing.placeholders.year")} />
                 </SelectTrigger>
                 <SelectContent>
@@ -428,19 +615,26 @@ const AddListing = () => {
                 value={form.mileage}
                 onChange={(e) => updateField("mileage", e.target.value)}
                 aria-invalid={!!errors.mileage}
+                className="h-11 rounded-xl bg-background/80"
               />
             </FormField>
 
             {/* Fuel Type */}
             <FormField label={t("seller.addListing.fields.fuelType")} error={errors.fuelType} required>
               <Select value={form.fuelType} onValueChange={(v) => updateField("fuelType", v)}>
-                <SelectTrigger aria-invalid={!!errors.fuelType}>
-                  <SelectValue placeholder={t("seller.addListing.placeholders.fuelType")} />
+                <SelectTrigger aria-invalid={!!errors.fuelType} className="h-11 rounded-xl bg-background/80">
+                  <SelectValue
+                    placeholder={
+                      isLoadingLookups
+                        ? t("seller.addListing.placeholders.loading")
+                        : t("seller.addListing.placeholders.fuelType")
+                    }
+                  />
                 </SelectTrigger>
                 <SelectContent>
-                  {FUEL_TYPES.map((type) => (
-                    <SelectItem key={type} value={type}>
-                      {type}
+                  {fuelTypeOptions.map((type) => (
+                    <SelectItem key={type.value} value={type.label}>
+                      {type.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -450,13 +644,19 @@ const AddListing = () => {
             {/* Transmission */}
             <FormField label={t("seller.addListing.fields.transmission")} error={errors.transmission} required>
               <Select value={form.transmission} onValueChange={(v) => updateField("transmission", v)}>
-                <SelectTrigger aria-invalid={!!errors.transmission}>
-                  <SelectValue placeholder={t("seller.addListing.placeholders.transmission")} />
+                <SelectTrigger aria-invalid={!!errors.transmission} className="h-11 rounded-xl bg-background/80">
+                  <SelectValue
+                    placeholder={
+                      isLoadingLookups
+                        ? t("seller.addListing.placeholders.loading")
+                        : t("seller.addListing.placeholders.transmission")
+                    }
+                  />
                 </SelectTrigger>
                 <SelectContent>
-                  {TRANSMISSIONS.map((type) => (
-                    <SelectItem key={type} value={type}>
-                      {type}
+                  {transmissionOptions.map((type) => (
+                    <SelectItem key={type.value} value={type.label}>
+                      {type.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -470,13 +670,14 @@ const AddListing = () => {
                 value={form.engineSize}
                 onChange={(e) => updateField("engineSize", e.target.value)}
                 aria-invalid={!!errors.engineSize}
+                className="h-11 rounded-xl bg-background/80"
               />
             </FormField>
 
             {/* Color */}
             <FormField label={t("seller.addListing.fields.color")} error={errors.color} required>
               <Select value={form.color} onValueChange={(v) => updateField("color", v)}>
-                <SelectTrigger aria-invalid={!!errors.color}>
+                <SelectTrigger aria-invalid={!!errors.color} className="h-11 rounded-xl bg-background/80">
                   <SelectValue placeholder={t("seller.addListing.placeholders.color")} />
                 </SelectTrigger>
                 <SelectContent>
@@ -492,7 +693,7 @@ const AddListing = () => {
             {/* Condition Grade */}
             <FormField label={t("seller.addListing.fields.conditionGrade")} error={errors.conditionGrade} required>
               <Select value={form.conditionGrade} onValueChange={(v) => updateField("conditionGrade", v)}>
-                <SelectTrigger aria-invalid={!!errors.conditionGrade}>
+                <SelectTrigger aria-invalid={!!errors.conditionGrade} className="h-11 rounded-xl bg-background/80">
                   <SelectValue placeholder={t("seller.addListing.placeholders.conditionGrade")} />
                 </SelectTrigger>
                 <SelectContent>
@@ -509,12 +710,17 @@ const AddListing = () => {
       </Card>
 
       {/* Pricing */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">{t("seller.addListing.pricing.title")}</CardTitle>
+      <Card className={SECTION_CARD_CLASS}>
+        <CardHeader className={SECTION_HEADER_CLASS}>
+          <CardTitle className="flex items-center gap-3 text-base">
+            <span className="flex size-9 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <CircleDollarSign className="size-4" />
+            </span>
+            {t("seller.addListing.pricing.title")}
+          </CardTitle>
           <CardDescription>{t("seller.addListing.pricing.description")}</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <div className="max-w-md">
             <FormField label={t("seller.addListing.fields.listingPrice")} error={errors.listingPrice} required>
               <div className="relative">
@@ -525,10 +731,12 @@ const AddListing = () => {
                   value={form.listingPrice}
                   onChange={(e) => updateField("listingPrice", e.target.value)}
                   aria-invalid={!!errors.listingPrice}
-                  className="pr-14"
+                  className="h-11 rounded-xl bg-background/80 pe-16"
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-muted-foreground">
-                  SAR
+                <span
+                  className="pointer-events-none absolute end-3 top-1/2 inline-flex -translate-y-1/2 items-center rounded-full bg-muted px-2.5 py-1 text-[11px] font-semibold tracking-wide text-muted-foreground"
+                >
+                  EGP
                 </span>
               </div>
             </FormField>
@@ -536,13 +744,144 @@ const AddListing = () => {
         </CardContent>
       </Card>
 
+      {/* Condition Checklist */}
+      <Card className={SECTION_CARD_CLASS}>
+        <CardHeader className={SECTION_HEADER_CLASS}>
+          <CardTitle className="flex items-center gap-3 text-base">
+            <span className="flex size-9 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <ClipboardCheck className="size-4" />
+            </span>
+            {t("seller.addListing.conditionChecklist.title")}
+          </CardTitle>
+          <CardAction>
+            <Badge variant="secondary" className="rounded-full px-3 py-1">
+              {t("seller.addListing.conditionChecklist.selectedCount", {
+                count: selectedConditions.length,
+              })}
+            </Badge>
+          </CardAction>
+          <CardDescription>
+            {t("seller.addListing.conditionChecklist.description")}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-5 pt-6">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+            <FormField
+              label={t("seller.addListing.fields.conditionCategory")}
+            >
+              <Select
+                value={selectedConditionCategoryId}
+                onValueChange={handleConditionCategoryChange}
+              >
+                <SelectTrigger className="h-11 rounded-xl bg-background/80">
+                  <SelectValue
+                    placeholder={
+                      isLoadingConditionCategories
+                        ? t("seller.addListing.placeholders.loading")
+                        : t("seller.addListing.placeholders.conditionCategory")
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {conditionCategories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FormField>
+
+            <FormField
+              label={t("seller.addListing.fields.conditionDefect")}
+            >
+              <Select
+                value={selectedConditionDefectId}
+                onValueChange={handleConditionDefectChange}
+                disabled={!selectedConditionCategoryId || isLoadingConditionDefects}
+              >
+                <SelectTrigger className="h-11 rounded-xl bg-background/80">
+                  <SelectValue
+                    placeholder={
+                      isLoadingConditionDefects
+                        ? t("seller.addListing.placeholders.loading")
+                        : !selectedConditionCategoryId
+                          ? t("seller.addListing.placeholders.selectConditionCategoryFirst")
+                          : t("seller.addListing.placeholders.conditionDefect")
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableConditionDefects.map((defect) => (
+                    <SelectItem key={defect.id} value={defect.id}>
+                      {defect.itemName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FormField>
+          </div>
+
+          <div className="rounded-2xl border border-dashed border-border/70 bg-muted/20 p-4">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <p className="text-sm font-medium text-foreground">
+                {t("seller.addListing.conditionChecklist.selectedTitle")}
+              </p>
+              {selectedConditionCategoryId && (
+                <span className="text-xs text-muted-foreground">
+                  {t("seller.addListing.conditionChecklist.availableDefects", {
+                    count: availableConditionDefects.length,
+                  })}
+                </span>
+              )}
+            </div>
+
+            {selectedConditions.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {selectedConditions.map((selection) => (
+                  <div
+                    key={selection.defectId}
+                    className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/[0.06] px-3 py-2 text-sm text-foreground shadow-xs"
+                  >
+                    <span className="text-xs text-muted-foreground">
+                      {selection.categoryName}
+                    </span>
+                    <span className="size-1 rounded-full bg-border" />
+                    <span className="font-medium">{selection.defectName}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeConditionSelection(selection.defectId)}
+                      className="inline-flex size-5 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-background hover:text-destructive"
+                      aria-label={t("seller.addListing.conditionChecklist.removeSelection", {
+                        defect: selection.defectName,
+                      })}
+                    >
+                      <X className="size-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm leading-6 text-muted-foreground">
+                {t("seller.addListing.conditionChecklist.emptySelections")}
+              </p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Description */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">{t("seller.addListing.descriptionSection.title")}</CardTitle>
+      <Card className={SECTION_CARD_CLASS}>
+        <CardHeader className={SECTION_HEADER_CLASS}>
+          <CardTitle className="flex items-center gap-3 text-base">
+            <span className="flex size-9 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <FileText className="size-4" />
+            </span>
+            {t("seller.addListing.descriptionSection.title")}
+          </CardTitle>
           <CardDescription>{t("seller.addListing.descriptionSection.description")}</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           <FormField label={t("seller.addListing.fields.description")} error={errors.description} required>
             <Textarea
               placeholder={t("seller.addListing.placeholders.description")}
@@ -550,25 +889,41 @@ const AddListing = () => {
               onChange={(e) => updateField("description", e.target.value)}
               rows={5}
               aria-invalid={!!errors.description}
+              className="min-h-36 rounded-2xl bg-background/80 px-4 py-3 leading-7"
             />
-            <p className="mt-1 text-xs text-muted-foreground">
-              {form.description.length} / 20 {t("seller.addListing.minChars")}
-            </p>
+            <div className="mt-2 flex items-center justify-between gap-3">
+              <p className="text-xs text-muted-foreground">
+                {t("seller.addListing.descriptionSection.helper")}
+              </p>
+              <p className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
+                {form.description.length} / 20 {t("seller.addListing.minChars")}
+              </p>
+            </div>
           </FormField>
         </CardContent>
       </Card>
 
-      <Separator />
+      <Separator className="opacity-60" />
 
       {/* Actions */}
-      <div className="flex items-center justify-end gap-3">
-        <Button type="button" variant="outline" onClick={() => navigate("/seller/listings")}>
-          {t("buttons.cancel")}
-        </Button>
-        <Button type="submit" className="gap-2">
-          <Car className="size-4" />
-          {t("seller.addListing.submit")}
-        </Button>
+      <div className="sticky bottom-4 z-10 flex flex-col gap-3 rounded-3xl border border-border/70 bg-background/90 p-4 shadow-lg shadow-black/5 backdrop-blur supports-backdrop-filter:bg-background/80 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm text-muted-foreground">
+          {t("seller.addListing.footerNote")}
+        </p>
+        <div className="flex items-center justify-end gap-3">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => navigate("/seller/listings")}
+            className="rounded-xl"
+          >
+            {t("buttons.cancel")}
+          </Button>
+          <Button type="submit" className="gap-2 rounded-xl px-5 shadow-sm shadow-primary/20">
+            <Car className="size-4" />
+            {t("seller.addListing.submit")}
+          </Button>
+        </div>
       </div>
     </form>
   );
@@ -588,14 +943,14 @@ function FormField({
   children: React.ReactNode;
 }) {
   return (
-    <div className="space-y-1.5">
-      <Label className="text-sm">
-        {label}
-        {required && <span className="text-destructive ml-0.5">*</span>}
+    <div className="space-y-2">
+      <Label className="inline-flex items-center gap-1 text-sm font-medium text-foreground/90">
+        <span>{label}</span>
+        {required && <span className="text-destructive">*</span>}
       </Label>
       {children}
       {error && (
-        <p className="flex items-center gap-1 text-xs text-destructive">
+        <p className="flex items-center gap-1.5 text-xs text-destructive">
           <AlertCircle className="size-3" />
           {error}
         </p>
