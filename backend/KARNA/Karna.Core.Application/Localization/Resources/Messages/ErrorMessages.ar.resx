@@ -183,4 +183,46 @@
   <data name="InvalidListingOwner" xml:space="preserve">
     <value>هذا الإعلان لا يخصك</value>
   </data>
+  <data name="ListingCannotBeDeleted" xml:space="preserve">
+    <value>لا يمكن حذف هذا الإعلان</value>
+  </data>
+  <data name="ListingNotInValidStateForPricing" xml:space="preserve">
+    <value>يجب أن يكون الإعلان في حالة مسودة أو معلق لتوليد السعر.</value>
+  </data>
+  <data name="MakeOrModelNotFound" xml:space="preserve">
+    <value>لم يتم العثور على الشركة المصنعة أو الموديل الخاص بالإعلان.</value>
+  </data>
+  <data name="MLServiceUnavailable" xml:space="preserve">
+    <value>خدمة التسعير غير متاحة حالياً. يرجى المحاولة لاحقاً.</value>
+  </data>
+  <data name="NoPriceGeneratedYet" xml:space="preserve">
+    <value>يرجى توليد السعر المقترح أولاً قبل القبول.</value>
+  </data>
+  <data name="InvalidListingPrice" xml:space="preserve">
+    <value>يرجى إدخال سعر صحيح أكبر من صفر.</value>
+  </data>
+  <data name="ListingDataIncompleteForPricing" xml:space="preserve">
+    <value>يرجى استكمال جميع بيانات السيارة المطلوبة قبل توليد السعر.</value>
+  </data>
+  <data name="ListingIncompleteData" xml:space="preserve">
+    <value>يرجى استكمال جميع بيانات الإعلان المطلوبة قبل التقديم.</value>
+  </data>
+  <data name="ListingInsufficientPhotos" xml:space="preserve">
+    <value>يجب رفع 3 صور على الأقل لتقديم الإعلان.</value>
+  </data>
+  <data name="ListingMissingChecklist" xml:space="preserve">
+    <value>يرجى إضافة قائمة فحص الحالة قبل التقديم.</value>
+  </data>
+  <data name="ListingMissingPricing" xml:space="preserve">
+    <value>يرجى توليد تسعير الذكاء الاصطناعي قبل التقديم.</value>
+  </data>
+  <data name="ListingNotInPendingState" xml:space="preserve">
+    <value>يجب أن يكون الإعلان في حالة معلق.</value>
+  </data>
+  <data name="ListingNotInActiveState" xml:space="preserve">
+    <value>يجب أن يكون الإعلان في حالة نشط.</value>
+  </data>
+  <data name="ListingNotInValidStateForUpdate" xml:space="preserve">
+    <value>لا يمكن تعديل الإعلان في حالته الحالية.</value>
+  </data>
 </root>

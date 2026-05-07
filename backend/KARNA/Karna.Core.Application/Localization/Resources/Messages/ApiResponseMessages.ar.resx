@@ -210,10 +210,34 @@
   <data name="ConditionDefectDeactivated" xml:space="preserve">
     <value>تم تعطيل عيب الحالة بنجاح.</value>
   </data>
+  <data name="ChecklistUpdated" xml:space="preserve">
+    <value>تم تحديث قائمة فحص الحالة بنجاح.</value>
+  </data>
   <data name="PhotosUploaded" xml:space="preserve">
     <value>تم رفع الصور بنجاح</value>
   </data>
-  <data name="ChecklistUpdated" xml:space="preserve">
-    <value>تم تحديث قائمة فحص الحالة بنجاح.</value>
+  <data name="ListingDeletedReason" xml:space="preserve">
+    <value>تم حذف الإعلان بواسطة البائع</value>
+  </data>
+  <data name="ListingArchived" xml:space="preserve">
+    <value>تم أرشفة الإعلان بنجاح</value>
+  </data>
+  <data name="PriceGenerated" xml:space="preserve">
+    <value>تم توليد السعر بنجاح.</value>
+  </data>
+  <data name="PriceSet" xml:space="preserve">
+    <value>تم تحديد سعر الإعلان بنجاح.</value>
+  </data>
+  <data name="ListingSubmitted" xml:space="preserve">
+    <value>تم تقديم الإعلان للمراجعة بنجاح.</value>
+  </data>
+  <data name="ListingApproved" xml:space="preserve">
+    <value>تم قبول الإعلان بنجاح.</value>
+  </data>
+  <data name="ListingRejected" xml:space="preserve">
+    <value>تم رفض الإعلان.</value>
+  </data>
+  <data name="ListingMarkedAsSold" xml:space="preserve">
+    <value>تم تحديد الإعلان كمباع بنجاح.</value>
   </data>
 </root>

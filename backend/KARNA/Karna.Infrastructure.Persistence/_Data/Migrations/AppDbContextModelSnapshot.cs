@@ -17,7 +17,7 @@ namespace Karna.Infrastructure.Persistence._Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.5")
+                .HasAnnotation("ProductVersion", "10.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -117,7 +117,14 @@ namespace Karna.Infrastructure.Persistence._Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("ConfidenceLevel")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
@@ -129,6 +136,10 @@ namespace Karna.Infrastructure.Persistence._Data.Migrations
                         .HasPrecision(4, 1)
                         .HasColumnType("decimal(4,1)");
 
+                    b.Property<decimal?>("FairPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("FuelType")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -139,6 +150,9 @@ namespace Karna.Infrastructure.Persistence._Data.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
 
+                    b.Property<int>("Location")
+                        .HasColumnType("int");
+
                     b.Property<Guid>("MakeId")
                         .HasColumnType("uniqueidentifier");
 
@@ -148,8 +162,30 @@ namespace Karna.Infrastructure.Persistence._Data.Migrations
                     b.Property<Guid>("ModelId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("ModelVersion")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal?>("NegotiationRangeLower")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("NegotiationRangeUpper")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("PredictedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal?>("Price")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<Guid>("SellerId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("SoldAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Status")
                         .IsRequired()

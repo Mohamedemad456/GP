@@ -183,4 +183,46 @@
   <data name="InvalidListingOwner" xml:space="preserve">
     <value>This listing does not belong to you</value>
   </data>
+  <data name="ListingCannotBeDeleted" xml:space="preserve">
+    <value>This listing cannot be deleted</value>
+  </data>
+  <data name="ListingNotInValidStateForPricing" xml:space="preserve">
+    <value>Listing must be in Draft or Pending state to generate a price.</value>
+  </data>
+  <data name="MakeOrModelNotFound" xml:space="preserve">
+    <value>The listing's make or model could not be found.</value>
+  </data>
+  <data name="MLServiceUnavailable" xml:space="preserve">
+    <value>The pricing service is temporarily unavailable. Please try again later.</value>
+  </data>
+  <data name="NoPriceGeneratedYet" xml:space="preserve">
+    <value>Please generate a price suggestion first before accepting.</value>
+  </data>
+  <data name="InvalidListingPrice" xml:space="preserve">
+    <value>Please enter a valid price greater than zero.</value>
+  </data>
+  <data name="ListingDataIncompleteForPricing" xml:space="preserve">
+    <value>Please complete all required vehicle details before generating price.</value>
+  </data>
+  <data name="ListingIncompleteData" xml:space="preserve">
+    <value>Please complete all required listing details before submitting.</value>
+  </data>
+  <data name="ListingInsufficientPhotos" xml:space="preserve">
+    <value>At least 3 photos are required to submit a listing.</value>
+  </data>
+  <data name="ListingMissingChecklist" xml:space="preserve">
+    <value>Please add a condition checklist before submitting.</value>
+  </data>
+  <data name="ListingMissingPricing" xml:space="preserve">
+    <value>Please generate ML pricing before submitting.</value>
+  </data>
+  <data name="ListingNotInPendingState" xml:space="preserve">
+    <value>Listing must be in Pending state.</value>
+  </data>
+  <data name="ListingNotInActiveState" xml:space="preserve">
+    <value>Listing must be in Active state.</value>
+  </data>
+  <data name="ListingNotInValidStateForUpdate" xml:space="preserve">
+    <value>Listing cannot be updated in its current state.</value>
+  </data>
 </root>

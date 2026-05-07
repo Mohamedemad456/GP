@@ -1,6 +1,7 @@
-﻿using Karna.Core.Application.Abstraction.External;
+using Karna.Core.Application.Abstraction.External;
 using Karna.Core.Application.Abstraction.Settings;
 using Karna.Infrastructure.Identity;
+using Karna.Infrastructure.ML;
 using Karna.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
@@ -60,6 +61,16 @@ namespace Karna.Infrastructure.DependencyInjection
 			services.AddScoped<IIdentityService, IdentityServiceAdapter>();
 			services.AddLocalization();
 			services.AddScoped<ILocalizationService, LocalizationService>();
+
+			// ML API Client
+			services.Configure<MLApiSettings>(configuration.GetSection("MLApiSettings"));
+
+			services.AddHttpClient<IMLApiClient, MLApiClient>((sp, client) =>
+			{
+				var settings = configuration.GetSection("MLApiSettings").Get<MLApiSettings>();
+				client.BaseAddress = new Uri(settings!.BaseUrl);
+				client.Timeout = TimeSpan.FromSeconds(settings.TimeoutSeconds);
+			});
 
 			return services;
 		}

@@ -51,9 +51,28 @@ namespace Karna.Core.Application.Services
                 };
             }
 
-            var currentUserId = _currentUser.UserId;
+            if (!_currentUser.IsAuthenticated || _currentUser.UserId == Guid.Empty)
+            {
+                return new ApiResponse<IEnumerable<ListingPhotoDto>>
+                {
+                    Success = false,
+                    Message = _localizer.GetErrorMessage("Unauthorized")
+                };
+            }
 
-            if (listing.SellerId != currentUserId)
+            var userRepo = _unitOfWork.GetRepository<User>();
+            var currentUser = await userRepo.GetAsync(u => u.IdentityUserId == _currentUser.UserId);
+
+            if (currentUser is null)
+            {
+                return new ApiResponse<IEnumerable<ListingPhotoDto>>
+                {
+                    Success = false,
+                    Message = _localizer.GetErrorMessage("UserNotFound")
+                };
+            }
+
+            if (listing.SellerId != currentUser.Id)
             {
                 return new ApiResponse<IEnumerable<ListingPhotoDto>>
                 {
