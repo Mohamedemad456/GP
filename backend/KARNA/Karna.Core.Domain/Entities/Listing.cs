@@ -32,6 +32,9 @@ namespace Karna.Core.Domain.Entities
 		public User? ApprovedByAdmin { get; set; }
 		public DateTime? ApprovedAt { get; set; }
 
+		// Admin Rejection Fields
+		public string? RejectionReason { get; set; }
+
 		// ML Pricing Fields
 		public decimal? FairPrice { get; set; }
 		public decimal? NegotiationRangeLower { get; set; }

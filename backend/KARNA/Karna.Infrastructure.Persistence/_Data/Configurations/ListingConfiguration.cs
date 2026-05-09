@@ -80,6 +80,10 @@ namespace Karna.Infrastructure.Persistence._Data.Configurations
 			builder.Property(x => x.ApprovedAt)
 				.IsRequired(false);
 
+			builder.Property(x => x.RejectionReason)
+				.IsRequired(false)
+				.HasMaxLength(500);
+
 			builder.Property(x => x.Location);
 
 			builder.Property(x => x.Price)

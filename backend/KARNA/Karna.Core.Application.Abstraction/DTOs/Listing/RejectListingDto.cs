@@ -2,6 +2,6 @@ namespace Karna.Core.Application.Abstraction.DTOs.Listing
 {
 	public class RejectListingDto
 	{
-		public string? Reason { get; set; }
+		public required string Reason { get; set; }
 	}
 }

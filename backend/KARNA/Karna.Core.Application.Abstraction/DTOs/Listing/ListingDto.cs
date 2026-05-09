@@ -22,6 +22,10 @@ namespace Karna.Core.Application.Abstraction.DTOs.Listing
 		public DateTime? UpdatedAt { get; set; }
 		public DateTime? SoldAt { get; set; }
 
+		// Admin Moderation Fields
+		public DateTime? ApprovedAt { get; set; }
+		public string? RejectionReason { get; set; }
+
 		// ML Pricing Fields
 		public decimal? FairPrice { get; set; }
 		public decimal? NegotiationRangeLower { get; set; }
