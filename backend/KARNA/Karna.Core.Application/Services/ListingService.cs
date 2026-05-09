@@ -350,41 +350,6 @@ namespace Karna.Core.Application.Services
 			};
 		}
 
-		public async Task<ApiResponse<ListingDto>> ApproveAsync(Guid listingId)
-		{
-			if (!_currentUserService.IsAuthenticated || _currentUserService.UserId == Guid.Empty)
-				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("Unauthorized") };
-
-			if (!_currentUserService.IsInRole("Admin"))
-				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("Unauthorized") };
-
-			var userRepo = _unitOfWork.GetRepository<User>();
-			var currentUser = await userRepo.GetAsync(u => u.IdentityUserId == _currentUserService.UserId);
-			if (currentUser is null)
-				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("UserNotFound") };
-
-			var listingRepo = _unitOfWork.GetRepository<Listing>();
-			var listing = await listingRepo.GetAsync(listingId);
-			if (listing is null)
-				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotFound") };
-
-			if (listing.Status != ListingStatus.Pending)
-				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotInPendingState") };
-
-			var oldStatus = listing.Status;
-			listing.Status = ListingStatus.Active;
-
-			await RecordStatusChangeAsync(listing.Id, oldStatus, listing.Status, currentUser.Id, null);
-			await _unitOfWork.CompleteAsync();
-
-			return new ApiResponse<ListingDto>
-			{
-				Success = true,
-				Message = _localizer.GetMessage("ListingApproved"),
-				Data = listing.ToDto()
-			};
-		}
-
 		public async Task<ApiResponse<ListingDto>> RejectAsync(Guid listingId, RejectListingDto dto)
 		{
 			if (!_currentUserService.IsAuthenticated || _currentUserService.UserId == Guid.Empty)

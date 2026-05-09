@@ -6,5 +6,6 @@ namespace Karna.Core.Application.Abstraction.Services
 	public interface IAdminService
 	{
 		Task<ApiResponse<Pagination<PendingListingDto>>> GetPendingListingsAsync(PendingListingSpecParams specParams);
+		Task<ApiResponse<ListingDto>> ApproveListingAsync(Guid listingId);
 	}
 }

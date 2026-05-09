@@ -71,6 +71,15 @@ namespace Karna.Infrastructure.Persistence._Data.Configurations
 				.WithOne(h => h.Listing)
 				.HasForeignKey(h => h.ListingId);
 
+			builder.HasOne(x => x.ApprovedByAdmin)
+				.WithMany()
+				.HasForeignKey(x => x.ApprovedByAdminId)
+				.OnDelete(DeleteBehavior.Restrict)
+				.IsRequired(false);
+
+			builder.Property(x => x.ApprovedAt)
+				.IsRequired(false);
+
 			builder.Property(x => x.Location);
 
 			builder.Property(x => x.Price)

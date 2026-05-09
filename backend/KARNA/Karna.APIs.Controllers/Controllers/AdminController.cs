@@ -16,5 +16,14 @@ namespace Karna.APIs.Controllers.Controllers
 			var result = await _adminService.GetPendingListingsAsync(specParams);
 			return Ok(result);
 		}
+
+		[HttpPost("listings/{id:guid}/approve")]
+		public async Task<IActionResult> ApproveListing(Guid id)
+		{
+			var result = await _adminService.ApproveListingAsync(id);
+			if (!result.Success)
+				return BadRequest(result);
+			return Ok(result);
+		}
 	}
 }
