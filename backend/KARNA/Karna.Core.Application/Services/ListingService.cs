@@ -134,7 +134,11 @@ namespace Karna.Core.Application.Services
 
 			listing.Status = newStatus;
 
-			// 9. Track status history if status changed
+			// 9. Clear rejection reason if moving back to Draft
+			if (oldStatus == ListingStatus.Rejected && newStatus == ListingStatus.Draft)
+				listing.RejectionReason = null;
+
+			// 10. Track status history if status changed
 			if (oldStatus != newStatus)
 				await RecordStatusChangeAsync(listing.Id, oldStatus, newStatus, currentUser.Id, null);
 
@@ -346,41 +350,6 @@ namespace Karna.Core.Application.Services
 			{
 				Success = true,
 				Message = _localizer.GetMessage("ListingSubmitted"),
-				Data = listing.ToDto()
-			};
-		}
-
-		public async Task<ApiResponse<ListingDto>> RejectAsync(Guid listingId, RejectListingDto dto)
-		{
-			if (!_currentUserService.IsAuthenticated || _currentUserService.UserId == Guid.Empty)
-				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("Unauthorized") };
-
-			if (!_currentUserService.IsInRole("Admin"))
-				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("Unauthorized") };
-
-			var userRepo = _unitOfWork.GetRepository<User>();
-			var currentUser = await userRepo.GetAsync(u => u.IdentityUserId == _currentUserService.UserId);
-			if (currentUser is null)
-				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("UserNotFound") };
-
-			var listingRepo = _unitOfWork.GetRepository<Listing>();
-			var listing = await listingRepo.GetAsync(listingId);
-			if (listing is null)
-				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotFound") };
-
-			if (listing.Status != ListingStatus.Pending)
-				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotInPendingState") };
-
-			var oldStatus = listing.Status;
-			listing.Status = ListingStatus.Rejected;
-
-			await RecordStatusChangeAsync(listing.Id, oldStatus, listing.Status, currentUser.Id, dto.Reason);
-			await _unitOfWork.CompleteAsync();
-
-			return new ApiResponse<ListingDto>
-			{
-				Success = true,
-				Message = _localizer.GetMessage("ListingRejected"),
 				Data = listing.ToDto()
 			};
 		}

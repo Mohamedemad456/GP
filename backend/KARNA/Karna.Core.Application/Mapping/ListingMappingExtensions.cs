@@ -41,6 +41,8 @@ namespace Karna.Core.Application.Mapping
 			CreatedAt = source.CreatedAt,
 			UpdatedAt = source.UpdatedAt,
 			SoldAt = source.SoldAt,
+			ApprovedAt = source.ApprovedAt,
+			RejectionReason = source.RejectionReason,
 			FairPrice = source.FairPrice,
 			NegotiationRangeLower = source.NegotiationRangeLower,
 			NegotiationRangeUpper = source.NegotiationRangeUpper,

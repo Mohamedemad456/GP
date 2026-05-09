@@ -58,6 +58,7 @@ namespace Karna.Core.Application.Services
 			listing.Status = ListingStatus.Active;
 			listing.ApprovedByAdminId = adminUser.Id;
 			listing.ApprovedAt = DateTime.UtcNow;
+			listing.RejectionReason = null;
 
 			// 5. Record status history
 			await RecordStatusChangeAsync(listing.Id, oldStatus, listing.Status, adminUser.Id, null);
@@ -72,6 +73,49 @@ namespace Karna.Core.Application.Services
 			{
 				Success = true,
 				Message = _localizer.GetMessage("ListingApproved"),
+				Data = listing.ToDto()
+			};
+		}
+
+		public async Task<ApiResponse<ListingDto>> RejectListingAsync(Guid listingId, RejectListingDto dto)
+		{
+			// 1. Validate reason
+			if (string.IsNullOrWhiteSpace(dto.Reason))
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("RejectionReasonRequired") };
+
+			// 2. Resolve current admin
+			var adminUser = await ResolveCurrentAdminAsync();
+			if (adminUser is null)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("Unauthorized") };
+
+			// 3. Get listing
+			var listingRepo = _unitOfWork.GetRepository<Listing>();
+			var listing = await listingRepo.GetAsync(listingId);
+			if (listing is null)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotFound") };
+
+			// 4. Validate status
+			if (listing.Status != ListingStatus.Pending)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotInPendingState") };
+
+			// 5. Update status
+			var oldStatus = listing.Status;
+			listing.Status = ListingStatus.Rejected;
+			listing.RejectionReason = dto.Reason;
+
+			// 6. Record status history (with reason)
+			await RecordStatusChangeAsync(listing.Id, oldStatus, listing.Status, adminUser.Id, dto.Reason);
+
+			// 7. Log admin activity (with reason as details)
+			await LogAdminActivityAsync(adminUser.Id, "RejectListing", "Listing", listing.Id, dto.Reason);
+
+			// 8. Save
+			await _unitOfWork.CompleteAsync();
+
+			return new ApiResponse<ListingDto>
+			{
+				Success = true,
+				Message = _localizer.GetMessage("ListingRejected"),
 				Data = listing.ToDto()
 			};
 		}
