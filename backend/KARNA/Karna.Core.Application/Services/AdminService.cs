@@ -1,15 +1,19 @@
 using Karna.Core.Application.Abstraction.DTOs._Common;
 using Karna.Core.Application.Abstraction.DTOs.Listing;
+using Karna.Core.Application.Abstraction.External;
 using Karna.Core.Application.Abstraction.Persistence;
 using Karna.Core.Application.Abstraction.Services;
 using Karna.Core.Application.Mapping;
 using Karna.Core.Application.Specifications.Listings;
 using Karna.Core.Domain.Entities;
+using Karna.Core.Domain.Enums;
 
 namespace Karna.Core.Application.Services
 {
 	internal class AdminService(
-		IUnitOfWork _unitOfWork
+		IUnitOfWork _unitOfWork,
+		ICurrentUserService _currentUserService,
+		ILocalizationService _localizer
 	) : IAdminService
 	{
 		public async Task<ApiResponse<Pagination<PendingListingDto>>> GetPendingListingsAsync(PendingListingSpecParams specParams)
@@ -31,5 +35,87 @@ namespace Karna.Core.Application.Services
 				}
 			};
 		}
+
+		public async Task<ApiResponse<ListingDto>> ApproveListingAsync(Guid listingId)
+		{
+			// 1. Resolve current admin
+			var adminUser = await ResolveCurrentAdminAsync();
+			if (adminUser is null)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("Unauthorized") };
+
+			// 2. Get listing
+			var listingRepo = _unitOfWork.GetRepository<Listing>();
+			var listing = await listingRepo.GetAsync(listingId);
+			if (listing is null)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotFound") };
+
+			// 3. Validate status
+			if (listing.Status != ListingStatus.Pending)
+				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotInPendingState") };
+
+			// 4. Update status
+			var oldStatus = listing.Status;
+			listing.Status = ListingStatus.Active;
+			listing.ApprovedByAdminId = adminUser.Id;
+			listing.ApprovedAt = DateTime.UtcNow;
+
+			// 5. Record status history
+			await RecordStatusChangeAsync(listing.Id, oldStatus, listing.Status, adminUser.Id, null);
+
+			// 6. Log admin activity
+			await LogAdminActivityAsync(adminUser.Id, "ApproveListing", "Listing", listing.Id, null);
+
+			// 7. Save
+			await _unitOfWork.CompleteAsync();
+
+			return new ApiResponse<ListingDto>
+			{
+				Success = true,
+				Message = _localizer.GetMessage("ListingApproved"),
+				Data = listing.ToDto()
+			};
+		}
+
+		#region Private Helpers
+
+		private async Task<User?> ResolveCurrentAdminAsync()
+		{
+			if (!_currentUserService.IsAuthenticated || _currentUserService.UserId == Guid.Empty)
+				return null;
+
+			var userRepo = _unitOfWork.GetRepository<User>();
+			return await userRepo.GetAsync(u => u.IdentityUserId == _currentUserService.UserId);
+		}
+
+		private async Task RecordStatusChangeAsync(Guid listingId, ListingStatus oldStatus, ListingStatus newStatus, Guid changedByUserId, string? reason)
+		{
+			var historyRepo = _unitOfWork.GetRepository<ListingStatusHistory>();
+			await historyRepo.AddAsync(new ListingStatusHistory
+			{
+				ListingId = listingId,
+				OldStatus = oldStatus,
+				NewStatus = newStatus,
+				ChangedByUserId = changedByUserId,
+				Reason = reason,
+				ChangedAt = DateTime.UtcNow
+			});
+		}
+
+
+		private async Task LogAdminActivityAsync(Guid adminId, string action, string entityType, Guid entityId, string? details)
+		{
+			var logRepo = _unitOfWork.GetRepository<AdminActivityLog>();
+			await logRepo.AddAsync(new AdminActivityLog
+			{
+				AdminId = adminId,
+				Action = action,
+				EntityType = entityType,
+				EntityId = entityId,
+				Details = details,
+				PerformedAt = DateTime.UtcNow
+			});
+		}
+
+		#endregion
 	}
 }
