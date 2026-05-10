@@ -20,7 +20,7 @@
     "max_iter": null
   },
   "artifacts": {
-    "model_pkl": "/home/mo-seif/Documents/GP/ml-service/models/pickles/Baseline2__ridgetuned.pkl",
-    "preprocessor_pkl": "/home/mo-seif/Documents/GP/ml-service/models/preprocessors/preprocessor__v1.0.0.joblib"
+    "model_pkl": "models/pickles/Baseline2__ridgetuned.pkl",
+    "preprocessor_pkl": "models/preprocessors/preprocessor__v1.0.0.joblib"
   }
 }

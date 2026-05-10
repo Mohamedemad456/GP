@@ -22,7 +22,7 @@
     "warm_start": true
   },
   "artifacts": {
-    "model_pkl": "/home/mo-seif/Documents/GP/ml-service/models/pickles/Baseline1__huberregressortuned.pkl",
-    "preprocessor_pkl": "/home/mo-seif/Documents/GP/ml-service/models/preprocessors/preprocessor__v1.0.0.joblib"
+    "model_pkl": "models/pickles/Baseline1__huberregressortuned.pkl",
+    "preprocessor_pkl": "models/preprocessors/preprocessor__v1.0.0.joblib"
   }
 }
