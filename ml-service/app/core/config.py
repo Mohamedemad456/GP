@@ -62,7 +62,7 @@ class Settings(BaseSettings):
     # --- File Names ---
     raw_snapshot_file_stem: str = Field(default="cars_raw")
     model_registry_file: str = Field(default="model_registry.json")
-    lookup_file_name: str = Field(default="car_specs_lookup_full_cleaned.csv")
+    lookup_file_name: str = Field(default="car_specs_lookup_full_cleaned.fixed.csv")
     main_info_file_name: str = Field(default="car_main_info")
 
     def model_post_init(self, __context: Any) -> None:
@@ -101,9 +101,9 @@ class Settings(BaseSettings):
             raise ValueError("version must be greater than or equal to 1")
         return self.raw_data_dir / f"{self.raw_snapshot_file_stem}_v{version:03d}.parquet"
 
-    @property
-    def cleaned_data_path(self) -> Path:
-        return self.cleaned_data_dir / "cleaned_data.parquet"
+    # @property
+    # # def cleaned_data_path(self) -> Path:
+    # #     return self.cleaned_data_dir / "cleaned_data.parquet"
 
     @property
     def processed_data_path(self) -> Path:
@@ -176,7 +176,7 @@ class Settings(BaseSettings):
         # Dispatch map for direct paths
         paths = {
             "raw": self.raw_data_path,
-            "cleaned": self.cleaned_data_path,
+            # "cleaned": self.cleaned_data_path,
             "processed": self.processed_data_path,
         }
 
@@ -217,7 +217,6 @@ class Settings(BaseSettings):
         
         path_map = {
             "raw": self.raw_data_path,
-            "cleaned": self.cleaned_data_path,
             "processed": self.processed_data_path,
             "lookup": self.lookup_data_path,
             "main_info": self.main_info_data_path,

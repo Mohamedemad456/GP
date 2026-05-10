@@ -96,8 +96,8 @@ def main(argv: list[str]) -> int:
     parser.add_argument(
         "--input",
         type=Path,
-        default=Path("ml-service/data/lookups/car_main_info.csv"),
-        help="Input CSV (default: ml-service/data/lookups/car_main_info.csv)",
+        default=Path("ml-service/data/lookups/AI_lookup.fixed.csv"),
+        help="Input CSV (default: ml-service/data/lookups/AI_lookup.fixed.csv)",
     )
     parser.add_argument(
         "--output",

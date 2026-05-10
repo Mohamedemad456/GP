@@ -22,6 +22,8 @@ httpx>=0.27             # async HTTP (health checks & tests)
 # ── Config & utilities ────────────────────────────────────────────────────────
 python-dotenv>=1.0
 tqdm>=4.66
+pyyaml>=6.0
+pytest>=8.0
 
 # ── Notebooks & visualisation ─────────────────────────────────────────────────
 jupyter>=1.0

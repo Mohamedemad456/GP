@@ -6,6 +6,15 @@
 
 This is intentionally conservative: it only applies targeted overrides that you can
 review and extend.
+
+IMPORTANT: This script must run AFTER fix_lookups_make_model.py --apply.
+It reads car_specs_lookup_full_cleaned.fixed.csv (not the original).
+The pipeline order is:
+  1. fix_lookups_make_model.py --apply
+  2. fix_car_specs_lookup_full.py          ← this script
+  3. fix_car_main_info_ev_fuel.py
+  4. clean_impossible_model_years.py
+  5. BACKEND.ipynb
 """
 
 from __future__ import annotations
@@ -112,7 +121,10 @@ def _only_engine_cc_is_zero(row: dict[str, str]) -> bool:
     return parse_int(row.get("engine_cc")) == 0
 
 
-def _only_engine_cc_hp(engine_cc: int | None = None, horsepower: int | None = None) -> Callable[[dict[str, str]], bool]:
+def _only_engine_cc_hp(
+    engine_cc: int | None = None,
+    horsepower: int | None = None,
+) -> Callable[[dict[str, str]], bool]:
     def _predicate(row: dict[str, str]) -> bool:
         if engine_cc is not None and parse_int(row.get("engine_cc")) != engine_cc:
             return False
@@ -138,10 +150,17 @@ def _only_col_equals(col: str, expected: str) -> Callable[[dict[str, str]], bool
     return _predicate
 
 
-# Targeted correction map based on the issues described in your review thread.
+# ---------------------------------------------------------------------------
+# Correction rules
+# ---------------------------------------------------------------------------
 # Notes:
 # - Keep rules tight to avoid unintended edits.
 # - Extend by appending additional Rule(...) entries.
+# - Make/model values must match the CANONICAL form produced by
+#   fix_lookups_make_model.py (e.g. "Changan" not "Chana", because
+#   Chana is aliased to Changan during canonicalization).
+# ---------------------------------------------------------------------------
+
 RULES: list[Rule] = [
     Rule(
         id="deepal_s07_erev_generator_engine",
@@ -173,9 +192,11 @@ RULES: list[Rule] = [
         year_range=(2024, 2026),
         updates={"engine_cc": 1598, "horsepower": 197, "drivetrain": "FWD"},
     ),
+    # FIX: was make="Chana" — Chana is aliased to Changan by
+    # fix_lookups_make_model.py, so the fixed CSV contains "Changan" only.
     Rule(
-        id="chana_benni_egypt_spec",
-        make="Chana",
+        id="changan_benni_egypt_spec",
+        make="Changan",
         model="Benni",
         year_range=(2008, 2009),
         updates={"engine_cc": 1301, "horsepower": 86},
@@ -215,7 +236,13 @@ RULES: list[Rule] = [
         model="GLE450",
         year=2022,
         only_if=_only_engine_cc_hp(engine_cc=1600, horsepower=156),
-        updates={"engine_cc": 2999, "horsepower": 362, "body_type": "SUV", "drivetrain": "4WD", "car_segment": "luxury_suv"},
+        updates={
+            "engine_cc": 2999,
+            "horsepower": 362,
+            "body_type": "SUV",
+            "drivetrain": "4WD",
+            "car_segment": "luxury_suv",
+        },
     ),
     Rule(
         id="citroen_grand_c4_spacetourer_2016_thp",
@@ -258,7 +285,6 @@ RULES: list[Rule] = [
         only_if=_only_brand_market_share_le(0.0010),
         updates={"brand_market_share": 0.0035},
     ),
-
     # Segment mismatches (confirmed)
     Rule(
         id="segment_ds_ds7_luxury_suv",
@@ -295,7 +321,14 @@ RULES: list[Rule] = [
 ]
 
 
-def apply_rules(rows: list[dict[str, str]], rules: Iterable[Rule]) -> tuple[list[dict[str, str]], dict[str, int]]:
+# ---------------------------------------------------------------------------
+# Core logic
+# ---------------------------------------------------------------------------
+
+def apply_rules(
+    rows: list[dict[str, str]],
+    rules: Iterable[Rule],
+) -> tuple[list[dict[str, str]], dict[str, int]]:
     counts: dict[str, int] = {}
 
     def bump(rule_id: str) -> None:
@@ -331,7 +364,11 @@ def read_csv(path: Path) -> tuple[list[str], list[dict[str, str]]]:
         return list(reader.fieldnames), rows
 
 
-def write_csv(path: Path, fieldnames: list[str], rows: list[dict[str, str]]) -> None:
+def write_csv(
+    path: Path,
+    fieldnames: list[str],
+    rows: list[dict[str, str]],
+) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
@@ -346,37 +383,79 @@ def atomic_replace(src: Path, dst: Path) -> None:
 def default_paths() -> tuple[Path, Path]:
     # This script lives in ml-service/src; derive the ml-service root reliably.
     ml_service_root = Path(__file__).resolve().parents[1]
-    # The canonical, production-ready lookup is the cleaned file.
-    input_path = ml_service_root / "data" / "lookups" / "car_specs_lookup_full_cleaned.csv"
-    output_path = ml_service_root / "data" / "lookups" / "car_specs_lookup_full_cleaned_fixed.csv"
+
+    # FIX: reads the fixed file produced by fix_lookups_make_model.py --apply,
+    # NOT the original car_specs_lookup_full_cleaned.csv.
+    input_path = (
+        ml_service_root / "data" / "lookups" / "car_specs_lookup_full_cleaned.fixed.csv"
+    )
+    # FIX: output uses .fixed.csv naming convention (dot, not underscore)
+    # to stay consistent with the rest of the pipeline.
+    output_path = (
+        ml_service_root / "data" / "lookups" / "car_specs_lookup_full_cleaned.fixed.csv"
+    )
     return input_path, output_path
 
+
+# ---------------------------------------------------------------------------
+# CLI
+# ---------------------------------------------------------------------------
 
 def main(argv: list[str]) -> int:
     default_in, default_out = default_paths()
 
-    parser = argparse.ArgumentParser(description="Apply deterministic corrections to the car specs lookup CSV")
-    parser.add_argument("--input", type=Path, default=default_in, help=f"Input CSV (default: {default_in})")
-    parser.add_argument("--output", type=Path, default=default_out, help=f"Output CSV (default: {default_out})")
-    parser.add_argument("--in-place", action="store_true", help="Overwrite the input file (creates a .bak backup)")
-    parser.add_argument("--dry-run", action="store_true", help="Do not write any files; just print a summary")
+    parser = argparse.ArgumentParser(
+        description="Apply deterministic spec corrections to the fixed car specs lookup CSV.",
+        epilog=(
+            "Run fix_lookups_make_model.py --apply first. "
+            "This script operates on the .fixed.csv output, not the original."
+        ),
+    )
+    parser.add_argument(
+        "--input",
+        type=Path,
+        default=default_in,
+        help=f"Input CSV (default: {default_in})",
+    )
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=default_out,
+        help=f"Output CSV (default: {default_out})",
+    )
+    parser.add_argument(
+        "--in-place",
+        action="store_true",
+        help="Overwrite the input file (creates a timestamped .bak backup first)",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Do not write any files; just print a rule application summary",
+    )
 
     args = parser.parse_args(argv)
 
     if not args.input.exists():
         print(f"ERROR: input file not found: {args.input}", file=sys.stderr)
+        print(
+            "Did you run fix_lookups_make_model.py --apply first?",
+            file=sys.stderr,
+        )
         return 2
 
     fieldnames, rows = read_csv(args.input)
     corrected, counts = apply_rules(rows, RULES)
 
     total_changes = sum(counts.values())
-    print(f"Rows: {len(rows)}")
+    print(f"Input:  {args.input}")
+    print(f"Rows:   {len(rows)}")
     print(f"Rule applications: {total_changes}")
     for rule_id, n in sorted(counts.items(), key=lambda x: (-x[1], x[0])):
         print(f"  - {rule_id}: {n}")
 
     if args.dry_run:
+        print("Dry run — no files written.")
         return 0
 
     if args.in_place:
@@ -384,13 +463,11 @@ def main(argv: list[str]) -> int:
         backup_path = args.input.with_suffix(args.input.suffix + f".{timestamp}.bak")
         tmp_out = args.input.with_suffix(args.input.suffix + ".tmp")
 
-        # Backup original (copy, don't move)
         shutil.copy2(args.input, backup_path)
-
-        # Write corrected to temp then move into place
         write_csv(tmp_out, fieldnames, corrected)
         atomic_replace(tmp_out, args.input)
-        print(f"Backup written: {backup_path}")
+
+        print(f"Backup written:   {backup_path}")
         print(f"Updated in place: {args.input}")
         return 0
 
