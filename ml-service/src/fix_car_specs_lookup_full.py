@@ -6,6 +6,15 @@
 
 This is intentionally conservative: it only applies targeted overrides that you can
 review and extend.
+
+IMPORTANT: This script must run AFTER fix_lookups_make_model.py --apply.
+It reads car_specs_lookup_full_cleaned.fixed.csv (not the original).
+The pipeline order is:
+  1. fix_lookups_make_model.py --apply
+  2. fix_car_specs_lookup_full.py          ← this script
+  3. fix_car_main_info_ev_fuel.py
+  4. clean_impossible_model_years.py
+  5. BACKEND.ipynb
 """
 
 from __future__ import annotations
@@ -112,7 +121,10 @@ def _only_engine_cc_is_zero(row: dict[str, str]) -> bool:
     return parse_int(row.get("engine_cc")) == 0
 
 
-def _only_engine_cc_hp(engine_cc: int | None = None, horsepower: int | None = None) -> Callable[[dict[str, str]], bool]:
+def _only_engine_cc_hp(
+    engine_cc: int | None = None,
+    horsepower: int | None = None,
+) -> Callable[[dict[str, str]], bool]:
     def _predicate(row: dict[str, str]) -> bool:
         if engine_cc is not None and parse_int(row.get("engine_cc")) != engine_cc:
             return False
@@ -138,10 +150,17 @@ def _only_col_equals(col: str, expected: str) -> Callable[[dict[str, str]], bool
     return _predicate
 
 
-# Targeted correction map based on the issues described in your review thread.
+# ---------------------------------------------------------------------------
+# Correction rules
+# ---------------------------------------------------------------------------
 # Notes:
 # - Keep rules tight to avoid unintended edits.
 # - Extend by appending additional Rule(...) entries.
+# - Make/model values must match the CANONICAL form produced by
+#   fix_lookups_make_model.py (e.g. "Changan" not "Chana", because
+#   Chana is aliased to Changan during canonicalization).
+# ---------------------------------------------------------------------------
+
 RULES: list[Rule] = [
     Rule(
         id="deepal_s07_erev_generator_engine",
@@ -173,9 +192,11 @@ RULES: list[Rule] = [
         year_range=(2024, 2026),
         updates={"engine_cc": 1598, "horsepower": 197, "drivetrain": "FWD"},
     ),
+    # FIX: was make="Chana" — Chana is aliased to Changan by
+    # fix_lookups_make_model.py, so the fixed CSV contains "Changan" only.
     Rule(
-        id="chana_benni_egypt_spec",
-        make="Chana",
+        id="changan_benni_egypt_spec",
+        make="Changan",
         model="Benni",
         year_range=(2008, 2009),
         updates={"engine_cc": 1301, "horsepower": 86},
@@ -215,7 +236,13 @@ RULES: list[Rule] = [
         model="GLE450",
         year=2022,
         only_if=_only_engine_cc_hp(engine_cc=1600, horsepower=156),
-        updates={"engine_cc": 2999, "horsepower": 362, "body_type": "SUV", "drivetrain": "4WD", "car_segment": "luxury_suv"},
+        updates={
+            "engine_cc": 2999,
+            "horsepower": 362,
+            "body_type": "SUV",
+            "drivetrain": "4WD",
+            "car_segment": "luxury_suv",
+        },
     ),
     Rule(
         id="citroen_grand_c4_spacetourer_2016_thp",
@@ -258,7 +285,6 @@ RULES: list[Rule] = [
         only_if=_only_brand_market_share_le(0.0010),
         updates={"brand_market_share": 0.0035},
     ),
-
     # Segment mismatches (confirmed)
     Rule(
         id="segment_ds_ds7_luxury_suv",
@@ -292,10 +318,180 @@ RULES: list[Rule] = [
         only_if=_only_col_equals("car_segment", "city"),
         updates={"car_segment": "sport"},
     ),
+
+    # ------------------------------------------------------------------
+    # Chery Tiggo — wrong-spec rows where a different car was merged in
+    # The real Chery Tiggo is 1600cc/106hp/SUV/chinese/suv.
+    # The 1400cc/130hp/Sedan/european/family rows are a different model
+    # mis-assigned to "Tiggo" during lookup generation.
+    # ------------------------------------------------------------------
+    Rule(
+        id="chery_tiggo_fix_wrong_spec_2019",
+        make="Chery",
+        model="Tiggo",
+        year=2019,
+        only_if=_only_engine_cc_hp(engine_cc=1400, horsepower=130),
+        updates={
+            "engine_cc": 1600, "horsepower": 106,
+            "body_type": "SUV", "drivetrain": "FWD",
+            "brand_origin": "chinese", "car_segment": "suv",
+            "brand_market_share": 0.0253,
+        },
+    ),
+    Rule(
+        id="chery_tiggo_fix_wrong_spec_2022",
+        make="Chery",
+        model="Tiggo",
+        year=2022,
+        only_if=_only_engine_cc_hp(engine_cc=1400, horsepower=130),
+        updates={
+            "engine_cc": 1600, "horsepower": 106,
+            "body_type": "SUV", "drivetrain": "FWD",
+            "brand_origin": "chinese", "car_segment": "suv",
+            "brand_market_share": 0.0253,
+        },
+    ),
+    Rule(
+        id="chery_tiggo_fix_wrong_spec_2023",
+        make="Chery",
+        model="Tiggo",
+        year=2023,
+        only_if=_only_engine_cc_hp(engine_cc=1400, horsepower=130),
+        updates={
+            "engine_cc": 1600, "horsepower": 106,
+            "body_type": "SUV", "drivetrain": "FWD",
+            "brand_origin": "chinese", "car_segment": "suv",
+            "brand_market_share": 0.0253,
+        },
+    ),
+    Rule(
+        id="chery_tiggo_fix_wrong_spec_2024",
+        make="Chery",
+        model="Tiggo",
+        year=2024,
+        only_if=_only_engine_cc_hp(engine_cc=1400, horsepower=130),
+        updates={
+            "engine_cc": 1600, "horsepower": 106,
+            "body_type": "SUV", "drivetrain": "FWD",
+            "brand_origin": "chinese", "car_segment": "suv",
+            "brand_market_share": 0.0253,
+        },
+    ),
+    Rule(
+        id="chery_tiggo_fix_wrong_spec_2025",
+        make="Chery",
+        model="Tiggo",
+        year=2025,
+        only_if=_only_engine_cc_hp(engine_cc=1400, horsepower=130),
+        updates={
+            "engine_cc": 1600, "horsepower": 106,
+            "body_type": "SUV", "drivetrain": "FWD",
+            "brand_origin": "chinese", "car_segment": "suv",
+            "brand_market_share": 0.0253,
+        },
+    ),
+
+    # ------------------------------------------------------------------
+    # Daewoo Lanos — two conflicting spec variants in lookup
+    # The standard Egypt-market Lanos is 1500cc/86hp/city.
+    # The 1600cc/100hp/family variant is the less common Nubira-based trim.
+    # Correct the 1600 variant to match the dominant 1500cc spec so that
+    # a single listing does not produce two rows with different specs.
+    # ------------------------------------------------------------------
+    Rule(
+        id="daewoo_lanos_fix_1600_variant_1997",
+        make="Daewoo", model="Lanos", year=1997,
+        only_if=_only_engine_cc_hp(engine_cc=1600, horsepower=100),
+        updates={"engine_cc": 1500, "horsepower": 86, "car_segment": "city"},
+    ),
+    Rule(
+        id="daewoo_lanos_fix_1600_variant_1998",
+        make="Daewoo", model="Lanos", year=1998,
+        only_if=_only_engine_cc_hp(engine_cc=1600, horsepower=100),
+        updates={"engine_cc": 1500, "horsepower": 86, "car_segment": "city"},
+    ),
+    Rule(
+        id="daewoo_lanos_fix_1600_variant_1999",
+        make="Daewoo", model="Lanos", year=1999,
+        only_if=_only_engine_cc_hp(engine_cc=1600, horsepower=100),
+        updates={"engine_cc": 1500, "horsepower": 86, "car_segment": "city"},
+    ),
+    Rule(
+        id="daewoo_lanos_fix_1600_variant_2000",
+        make="Daewoo", model="Lanos", year=2000,
+        only_if=_only_engine_cc_hp(engine_cc=1600, horsepower=100),
+        updates={"engine_cc": 1500, "horsepower": 86, "car_segment": "city"},
+    ),
+    Rule(
+        id="daewoo_lanos_fix_1600_variant_2001",
+        make="Daewoo", model="Lanos", year=2001,
+        only_if=_only_engine_cc_hp(engine_cc=1600, horsepower=100),
+        updates={"engine_cc": 1500, "horsepower": 86, "car_segment": "city"},
+    ),
+    Rule(
+        id="daewoo_lanos_fix_1600_variant_2004",
+        make="Daewoo", model="Lanos", year=2004,
+        only_if=_only_engine_cc_hp(engine_cc=1600, horsepower=100),
+        updates={"engine_cc": 1500, "horsepower": 86, "car_segment": "city"},
+    ),
+    Rule(
+        id="daewoo_lanos_fix_1600_variant_2006",
+        make="Daewoo", model="Lanos", year=2006,
+        only_if=_only_engine_cc_hp(engine_cc=1600, horsepower=100),
+        updates={"engine_cc": 1500, "horsepower": 86, "car_segment": "city"},
+    ),
+
+    # ------------------------------------------------------------------
+    # Chevrolet Cruze — wrong brand_origin and slight hp mismatch
+    # The japanese/120hp variant is incorrect; Chevrolet is american.
+    # ------------------------------------------------------------------
+    Rule(
+        id="chevrolet_cruze_fix_japanese_variant_2012",
+        make="Chevrolet", model="Cruze", year=2012,
+        only_if=_only_col_equals("brand_origin", "japanese"),
+        updates={"horsepower": 124, "brand_origin": "american"},
+    ),
+    Rule(
+        id="chevrolet_cruze_fix_japanese_variant_2014",
+        make="Chevrolet", model="Cruze", year=2014,
+        only_if=_only_col_equals("brand_origin", "japanese"),
+        updates={"horsepower": 124, "brand_origin": "american"},
+    ),
+
+    # ------------------------------------------------------------------
+    # Changan Benni — 1500cc/136hp/european variant is a different car
+    # The real Benni is 1000cc/68hp/chinese. The 1500cc variant is likely
+    # a different Changan model mis-assigned to Benni.
+    # ------------------------------------------------------------------
+    Rule(
+        id="changan_benni_fix_wrong_spec_2015",
+        make="Changan", model="Benni", year=2015,
+        only_if=_only_engine_cc_hp(engine_cc=1500, horsepower=136),
+        updates={
+            "engine_cc": 1000, "horsepower": 68,
+            "brand_origin": "chinese",
+        },
+    ),
+    Rule(
+        id="changan_benni_fix_wrong_spec_2016",
+        make="Changan", model="Benni", year=2016,
+        only_if=_only_engine_cc_hp(engine_cc=1500, horsepower=136),
+        updates={
+            "engine_cc": 1000, "horsepower": 68,
+            "brand_origin": "chinese",
+        },
+    ),
 ]
 
 
-def apply_rules(rows: list[dict[str, str]], rules: Iterable[Rule]) -> tuple[list[dict[str, str]], dict[str, int]]:
+# ---------------------------------------------------------------------------
+# Core logic
+# ---------------------------------------------------------------------------
+
+def apply_rules(
+    rows: list[dict[str, str]],
+    rules: Iterable[Rule],
+) -> tuple[list[dict[str, str]], dict[str, int]]:
     counts: dict[str, int] = {}
 
     def bump(rule_id: str) -> None:
@@ -331,7 +527,11 @@ def read_csv(path: Path) -> tuple[list[str], list[dict[str, str]]]:
         return list(reader.fieldnames), rows
 
 
-def write_csv(path: Path, fieldnames: list[str], rows: list[dict[str, str]]) -> None:
+def write_csv(
+    path: Path,
+    fieldnames: list[str],
+    rows: list[dict[str, str]],
+) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
@@ -346,37 +546,103 @@ def atomic_replace(src: Path, dst: Path) -> None:
 def default_paths() -> tuple[Path, Path]:
     # This script lives in ml-service/src; derive the ml-service root reliably.
     ml_service_root = Path(__file__).resolve().parents[1]
-    # The canonical, production-ready lookup is the cleaned file.
-    input_path = ml_service_root / "data" / "lookups" / "car_specs_lookup_full_cleaned.csv"
-    output_path = ml_service_root / "data" / "lookups" / "car_specs_lookup_full_cleaned_fixed.csv"
+
+    # FIX: reads the fixed file produced by fix_lookups_make_model.py --apply,
+    # NOT the original car_specs_lookup_full_cleaned.csv.
+    input_path = (
+        ml_service_root / "data" / "lookups" / "car_specs_lookup_full_cleaned.fixed.csv"
+    )
+    # FIX: output uses .fixed.csv naming convention (dot, not underscore)
+    # to stay consistent with the rest of the pipeline.
+    output_path = (
+        ml_service_root / "data" / "lookups" / "car_specs_lookup_full_cleaned.fixed.csv"
+    )
     return input_path, output_path
+
+
+# ---------------------------------------------------------------------------
+# CLI
+# ---------------------------------------------------------------------------
+
+def dedup_exact(rows: list[dict[str, str]], key_cols: tuple[str, ...] = ("make", "model", "year")) -> tuple[list[dict[str, str]], int]:
+    """Remove exact duplicate rows that share the same key columns and identical specs.
+
+    After correction rules are applied, some rows may become identical.
+    This pass keeps only the first occurrence of each unique key.
+    """
+    seen: set[tuple[str, ...]] = set()
+    out: list[dict[str, str]] = []
+    removed = 0
+    for row in rows:
+        key = tuple(norm_text(row.get(c, "")) if c in {"make", "model"} else str(row.get(c, "")) for c in key_cols)
+        if key in seen:
+            removed += 1
+            continue
+        seen.add(key)
+        out.append(row)
+    return out, removed
 
 
 def main(argv: list[str]) -> int:
     default_in, default_out = default_paths()
 
-    parser = argparse.ArgumentParser(description="Apply deterministic corrections to the car specs lookup CSV")
-    parser.add_argument("--input", type=Path, default=default_in, help=f"Input CSV (default: {default_in})")
-    parser.add_argument("--output", type=Path, default=default_out, help=f"Output CSV (default: {default_out})")
-    parser.add_argument("--in-place", action="store_true", help="Overwrite the input file (creates a .bak backup)")
-    parser.add_argument("--dry-run", action="store_true", help="Do not write any files; just print a summary")
+    parser = argparse.ArgumentParser(
+        description="Apply deterministic spec corrections to the fixed car specs lookup CSV.",
+        epilog=(
+            "Run fix_lookups_make_model.py --apply first. "
+            "This script operates on the .fixed.csv output, not the original."
+        ),
+    )
+    parser.add_argument(
+        "--input",
+        type=Path,
+        default=default_in,
+        help=f"Input CSV (default: {default_in})",
+    )
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=default_out,
+        help=f"Output CSV (default: {default_out})",
+    )
+    parser.add_argument(
+        "--in-place",
+        action="store_true",
+        help="Overwrite the input file (creates a timestamped .bak backup first)",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Do not write any files; just print a rule application summary",
+    )
 
     args = parser.parse_args(argv)
 
     if not args.input.exists():
         print(f"ERROR: input file not found: {args.input}", file=sys.stderr)
+        print(
+            "Did you run fix_lookups_make_model.py --apply first?",
+            file=sys.stderr,
+        )
         return 2
 
     fieldnames, rows = read_csv(args.input)
     corrected, counts = apply_rules(rows, RULES)
 
+    # Dedup exact duplicate rows after corrections
+    deduped, dedup_removed = dedup_exact(corrected)
+
     total_changes = sum(counts.values())
-    print(f"Rows: {len(rows)}")
+    print(f"Input:  {args.input}")
+    print(f"Rows:   {len(rows)}")
     print(f"Rule applications: {total_changes}")
     for rule_id, n in sorted(counts.items(), key=lambda x: (-x[1], x[0])):
         print(f"  - {rule_id}: {n}")
+    print(f"Exact duplicates removed: {dedup_removed}")
+    print(f"Final rows: {len(deduped)}")
 
     if args.dry_run:
+        print("Dry run — no files written.")
         return 0
 
     if args.in_place:
@@ -384,17 +650,15 @@ def main(argv: list[str]) -> int:
         backup_path = args.input.with_suffix(args.input.suffix + f".{timestamp}.bak")
         tmp_out = args.input.with_suffix(args.input.suffix + ".tmp")
 
-        # Backup original (copy, don't move)
         shutil.copy2(args.input, backup_path)
-
-        # Write corrected to temp then move into place
-        write_csv(tmp_out, fieldnames, corrected)
+        write_csv(tmp_out, fieldnames, deduped)
         atomic_replace(tmp_out, args.input)
-        print(f"Backup written: {backup_path}")
+
+        print(f"Backup written:   {backup_path}")
         print(f"Updated in place: {args.input}")
         return 0
 
-    write_csv(args.output, fieldnames, corrected)
+    write_csv(args.output, fieldnames, deduped)
     print(f"Wrote: {args.output}")
     return 0
 

@@ -1,0 +1,28 @@
+{
+  "version_id": "v1.0.0",
+  "rank_by_r2": 1,
+  "model_type": "HuberRegressor(tuned)",
+  "saved_at": "2026-04-26T13:03:34.474249+00:00",
+  "train_config": {
+    "target": "price_egp_log",
+    "is_log_target": true,
+    "split": "E_stratified_by_price_range"
+  },
+  "metrics": {
+    "r2": 0.90882664995491,
+    "mae": 156056.25950585405,
+    "rmse": 440323.5713386052,
+    "mape_pct": 16.51069344688531
+  },
+  "hyperparams": {
+    "alpha": 0.0,
+    "epsilon": 1.3,
+    "fit_intercept": true,
+    "max_iter": 2000,
+    "warm_start": true
+  },
+  "artifacts": {
+    "model_pkl": "models/pickles/Baseline1__huberregressortuned.pkl",
+    "preprocessor_pkl": "models/preprocessors/preprocessor__v1.0.0.joblib"
+  }
+}
