@@ -318,6 +318,169 @@ RULES: list[Rule] = [
         only_if=_only_col_equals("car_segment", "city"),
         updates={"car_segment": "sport"},
     ),
+
+    # ------------------------------------------------------------------
+    # Chery Tiggo — wrong-spec rows where a different car was merged in
+    # The real Chery Tiggo is 1600cc/106hp/SUV/chinese/suv.
+    # The 1400cc/130hp/Sedan/european/family rows are a different model
+    # mis-assigned to "Tiggo" during lookup generation.
+    # ------------------------------------------------------------------
+    Rule(
+        id="chery_tiggo_fix_wrong_spec_2019",
+        make="Chery",
+        model="Tiggo",
+        year=2019,
+        only_if=_only_engine_cc_hp(engine_cc=1400, horsepower=130),
+        updates={
+            "engine_cc": 1600, "horsepower": 106,
+            "body_type": "SUV", "drivetrain": "FWD",
+            "brand_origin": "chinese", "car_segment": "suv",
+            "brand_market_share": 0.0253,
+        },
+    ),
+    Rule(
+        id="chery_tiggo_fix_wrong_spec_2022",
+        make="Chery",
+        model="Tiggo",
+        year=2022,
+        only_if=_only_engine_cc_hp(engine_cc=1400, horsepower=130),
+        updates={
+            "engine_cc": 1600, "horsepower": 106,
+            "body_type": "SUV", "drivetrain": "FWD",
+            "brand_origin": "chinese", "car_segment": "suv",
+            "brand_market_share": 0.0253,
+        },
+    ),
+    Rule(
+        id="chery_tiggo_fix_wrong_spec_2023",
+        make="Chery",
+        model="Tiggo",
+        year=2023,
+        only_if=_only_engine_cc_hp(engine_cc=1400, horsepower=130),
+        updates={
+            "engine_cc": 1600, "horsepower": 106,
+            "body_type": "SUV", "drivetrain": "FWD",
+            "brand_origin": "chinese", "car_segment": "suv",
+            "brand_market_share": 0.0253,
+        },
+    ),
+    Rule(
+        id="chery_tiggo_fix_wrong_spec_2024",
+        make="Chery",
+        model="Tiggo",
+        year=2024,
+        only_if=_only_engine_cc_hp(engine_cc=1400, horsepower=130),
+        updates={
+            "engine_cc": 1600, "horsepower": 106,
+            "body_type": "SUV", "drivetrain": "FWD",
+            "brand_origin": "chinese", "car_segment": "suv",
+            "brand_market_share": 0.0253,
+        },
+    ),
+    Rule(
+        id="chery_tiggo_fix_wrong_spec_2025",
+        make="Chery",
+        model="Tiggo",
+        year=2025,
+        only_if=_only_engine_cc_hp(engine_cc=1400, horsepower=130),
+        updates={
+            "engine_cc": 1600, "horsepower": 106,
+            "body_type": "SUV", "drivetrain": "FWD",
+            "brand_origin": "chinese", "car_segment": "suv",
+            "brand_market_share": 0.0253,
+        },
+    ),
+
+    # ------------------------------------------------------------------
+    # Daewoo Lanos — two conflicting spec variants in lookup
+    # The standard Egypt-market Lanos is 1500cc/86hp/city.
+    # The 1600cc/100hp/family variant is the less common Nubira-based trim.
+    # Correct the 1600 variant to match the dominant 1500cc spec so that
+    # a single listing does not produce two rows with different specs.
+    # ------------------------------------------------------------------
+    Rule(
+        id="daewoo_lanos_fix_1600_variant_1997",
+        make="Daewoo", model="Lanos", year=1997,
+        only_if=_only_engine_cc_hp(engine_cc=1600, horsepower=100),
+        updates={"engine_cc": 1500, "horsepower": 86, "car_segment": "city"},
+    ),
+    Rule(
+        id="daewoo_lanos_fix_1600_variant_1998",
+        make="Daewoo", model="Lanos", year=1998,
+        only_if=_only_engine_cc_hp(engine_cc=1600, horsepower=100),
+        updates={"engine_cc": 1500, "horsepower": 86, "car_segment": "city"},
+    ),
+    Rule(
+        id="daewoo_lanos_fix_1600_variant_1999",
+        make="Daewoo", model="Lanos", year=1999,
+        only_if=_only_engine_cc_hp(engine_cc=1600, horsepower=100),
+        updates={"engine_cc": 1500, "horsepower": 86, "car_segment": "city"},
+    ),
+    Rule(
+        id="daewoo_lanos_fix_1600_variant_2000",
+        make="Daewoo", model="Lanos", year=2000,
+        only_if=_only_engine_cc_hp(engine_cc=1600, horsepower=100),
+        updates={"engine_cc": 1500, "horsepower": 86, "car_segment": "city"},
+    ),
+    Rule(
+        id="daewoo_lanos_fix_1600_variant_2001",
+        make="Daewoo", model="Lanos", year=2001,
+        only_if=_only_engine_cc_hp(engine_cc=1600, horsepower=100),
+        updates={"engine_cc": 1500, "horsepower": 86, "car_segment": "city"},
+    ),
+    Rule(
+        id="daewoo_lanos_fix_1600_variant_2004",
+        make="Daewoo", model="Lanos", year=2004,
+        only_if=_only_engine_cc_hp(engine_cc=1600, horsepower=100),
+        updates={"engine_cc": 1500, "horsepower": 86, "car_segment": "city"},
+    ),
+    Rule(
+        id="daewoo_lanos_fix_1600_variant_2006",
+        make="Daewoo", model="Lanos", year=2006,
+        only_if=_only_engine_cc_hp(engine_cc=1600, horsepower=100),
+        updates={"engine_cc": 1500, "horsepower": 86, "car_segment": "city"},
+    ),
+
+    # ------------------------------------------------------------------
+    # Chevrolet Cruze — wrong brand_origin and slight hp mismatch
+    # The japanese/120hp variant is incorrect; Chevrolet is american.
+    # ------------------------------------------------------------------
+    Rule(
+        id="chevrolet_cruze_fix_japanese_variant_2012",
+        make="Chevrolet", model="Cruze", year=2012,
+        only_if=_only_col_equals("brand_origin", "japanese"),
+        updates={"horsepower": 124, "brand_origin": "american"},
+    ),
+    Rule(
+        id="chevrolet_cruze_fix_japanese_variant_2014",
+        make="Chevrolet", model="Cruze", year=2014,
+        only_if=_only_col_equals("brand_origin", "japanese"),
+        updates={"horsepower": 124, "brand_origin": "american"},
+    ),
+
+    # ------------------------------------------------------------------
+    # Changan Benni — 1500cc/136hp/european variant is a different car
+    # The real Benni is 1000cc/68hp/chinese. The 1500cc variant is likely
+    # a different Changan model mis-assigned to Benni.
+    # ------------------------------------------------------------------
+    Rule(
+        id="changan_benni_fix_wrong_spec_2015",
+        make="Changan", model="Benni", year=2015,
+        only_if=_only_engine_cc_hp(engine_cc=1500, horsepower=136),
+        updates={
+            "engine_cc": 1000, "horsepower": 68,
+            "brand_origin": "chinese",
+        },
+    ),
+    Rule(
+        id="changan_benni_fix_wrong_spec_2016",
+        make="Changan", model="Benni", year=2016,
+        only_if=_only_engine_cc_hp(engine_cc=1500, horsepower=136),
+        updates={
+            "engine_cc": 1000, "horsepower": 68,
+            "brand_origin": "chinese",
+        },
+    ),
 ]
 
 
@@ -401,6 +564,25 @@ def default_paths() -> tuple[Path, Path]:
 # CLI
 # ---------------------------------------------------------------------------
 
+def dedup_exact(rows: list[dict[str, str]], key_cols: tuple[str, ...] = ("make", "model", "year")) -> tuple[list[dict[str, str]], int]:
+    """Remove exact duplicate rows that share the same key columns and identical specs.
+
+    After correction rules are applied, some rows may become identical.
+    This pass keeps only the first occurrence of each unique key.
+    """
+    seen: set[tuple[str, ...]] = set()
+    out: list[dict[str, str]] = []
+    removed = 0
+    for row in rows:
+        key = tuple(norm_text(row.get(c, "")) if c in {"make", "model"} else str(row.get(c, "")) for c in key_cols)
+        if key in seen:
+            removed += 1
+            continue
+        seen.add(key)
+        out.append(row)
+    return out, removed
+
+
 def main(argv: list[str]) -> int:
     default_in, default_out = default_paths()
 
@@ -447,12 +629,17 @@ def main(argv: list[str]) -> int:
     fieldnames, rows = read_csv(args.input)
     corrected, counts = apply_rules(rows, RULES)
 
+    # Dedup exact duplicate rows after corrections
+    deduped, dedup_removed = dedup_exact(corrected)
+
     total_changes = sum(counts.values())
     print(f"Input:  {args.input}")
     print(f"Rows:   {len(rows)}")
     print(f"Rule applications: {total_changes}")
     for rule_id, n in sorted(counts.items(), key=lambda x: (-x[1], x[0])):
         print(f"  - {rule_id}: {n}")
+    print(f"Exact duplicates removed: {dedup_removed}")
+    print(f"Final rows: {len(deduped)}")
 
     if args.dry_run:
         print("Dry run — no files written.")
@@ -464,14 +651,14 @@ def main(argv: list[str]) -> int:
         tmp_out = args.input.with_suffix(args.input.suffix + ".tmp")
 
         shutil.copy2(args.input, backup_path)
-        write_csv(tmp_out, fieldnames, corrected)
+        write_csv(tmp_out, fieldnames, deduped)
         atomic_replace(tmp_out, args.input)
 
         print(f"Backup written:   {backup_path}")
         print(f"Updated in place: {args.input}")
         return 0
 
-    write_csv(args.output, fieldnames, corrected)
+    write_csv(args.output, fieldnames, deduped)
     print(f"Wrote: {args.output}")
     return 0
 

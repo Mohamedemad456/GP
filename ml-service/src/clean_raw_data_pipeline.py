@@ -467,6 +467,30 @@ def run_apply(args: argparse.Namespace) -> int:
     logger.info("\nStage 3: Impossible Model-Year Cleaning")
     logger.info("  Rows removed: %d", year_cleaned)
     
+    # Stage 4: Merge validation — detect row-count inflation risk
+    lookup_path = PROJECT_ROOT / "data" / "lookups" / "car_specs_lookup_full_cleaned.fixed.csv"
+    if lookup_path.exists():
+        lookup_df = pd.read_csv(lookup_path)
+        merge_keys = ["make", "model", "year"]
+        if all(k in lookup_df.columns for k in merge_keys):
+            dup_groups = lookup_df.groupby(merge_keys).size()
+            ambiguous = dup_groups[dup_groups > 1]
+            n_ambiguous = len(ambiguous)
+            total_affected = int(ambiguous.sum())
+            logger.info("\nStage 4: Merge Validation (lookup duplicate check)")
+            logger.info("  Ambiguous (make,model,year) groups: %d", n_ambiguous)
+            logger.info("  Total lookup rows in ambiguous groups: %d", total_affected)
+            if n_ambiguous > 0:
+                logger.warning(
+                    "  WARNING: %d ambiguous lookup groups may cause row inflation "
+                    "when raw data is merged with specs. Run fix_car_specs_lookup_full.py "
+                    "--in-place to resolve.", n_ambiguous,
+                )
+        else:
+            logger.info("\nStage 4: Skipped (lookup missing required columns)")
+    else:
+        logger.info("\nStage 4: Skipped (lookup file not found)")
+    
     final_rows = len(df_final)
     
     # Write output

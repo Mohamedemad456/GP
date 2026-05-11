@@ -35,5 +35,20 @@
         }
       ]
     }
-  }
+  },
+  "models": {
+    "XGBoost_quantile_v1.0.0": {
+      "framework": "XGBoost",
+      "version": "v1.0.0",
+      "pkl_path": "/home/mo-seif/Documents/GP/ml-service/models/pickles/xgb_quantile_models.joblib",
+      "meta_path": "/home/mo-seif/Documents/GP/ml-service/models/metadata/XGBoost_quantile_v1.0.0.json",
+      "metrics": {
+        "MAPE_pct": 13.534287251846361,
+        "R2": 0.8925476133332477
+      },
+      "registered_at": "2026-05-10T22:23:54.675358+00:00"
+    }
+  },
+  "active_model_id": "XGBoost_quantile_v1.0.0",
+  "promoted_at": "2026-05-10T22:23:54.679057+00:00"
 }
