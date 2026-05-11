@@ -5,10 +5,10 @@ class PredictionRequest(BaseModel):
     brand: str
     model: str
     year: int
-    mileage_km: float
-    transmission: str
-    fuel: str
-    location: str
+    mileage_km: Optional[float] = None
+    transmission: Optional[str] = None
+    fuel: Optional[str] = None
+    location: Optional[str] = None
     include_factors: Optional[bool] = False
     
     model_config = ConfigDict(

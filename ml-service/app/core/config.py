@@ -131,6 +131,24 @@ class Settings(BaseSettings):
         return self.models_dir / self.model_registry_file
 
     @property
+    def model_pickles_dir(self) -> Path:
+        return self.models_dir / "pickles"
+
+    @property
+    def model_metadata_dir(self) -> Path:
+        return self.models_dir / "metadata"
+
+    @property
+    def model_preprocessors_dir(self) -> Path:
+        return self.models_dir / "preprocessors"
+
+    def model_plots_dir(self, name: str) -> Path:
+        """Return (and create) a plots directory for a given notebook/model name."""
+        d = self.models_dir / f"plots_{name}"
+        d.mkdir(parents=True, exist_ok=True)
+        return d
+
+    @property
     def lookup_candidates(self) -> tuple[Path, ...]:
         return (
             self.lookup_data_path,
