@@ -1,6 +1,6 @@
 import pytest
 
-from app.services import predictor
+from app.services.confidence import confidence_label_from_signals
 
 
 @pytest.mark.parametrize(
@@ -14,7 +14,7 @@ from app.services import predictor
 )
 def test_confidence_base_mape(mape, n_support, width_pct, is_quantile, expected):
     assert (
-        predictor._confidence_label_from_signals(
+        confidence_label_from_signals(
             mape_pct=mape,
             n_support=n_support,
             width_pct=width_pct,
@@ -26,7 +26,7 @@ def test_confidence_base_mape(mape, n_support, width_pct, is_quantile, expected)
 
 def test_confidence_low_support_forces_low():
     assert (
-        predictor._confidence_label_from_signals(
+        confidence_label_from_signals(
             mape_pct=13.0,
             n_support=4,
             width_pct=0.2,
@@ -39,7 +39,7 @@ def test_confidence_low_support_forces_low():
 def test_confidence_wide_interval_degrades():
     # Start high, degrade by wide interval
     assert (
-        predictor._confidence_label_from_signals(
+        confidence_label_from_signals(
             mape_pct=13.0,
             n_support=100,
             width_pct=1.1,
@@ -51,7 +51,7 @@ def test_confidence_wide_interval_degrades():
 
 def test_confidence_extremely_wide_interval_forces_low():
     assert (
-        predictor._confidence_label_from_signals(
+        confidence_label_from_signals(
             mape_pct=13.0,
             n_support=100,
             width_pct=1.6,

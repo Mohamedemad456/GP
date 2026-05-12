@@ -2,6 +2,9 @@
 GPENV
 .env
 __pycache__
+logs/
+*.log
+*.jsonl
 
 .vscode
 *.csv
