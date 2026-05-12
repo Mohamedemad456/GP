@@ -48,26 +48,6 @@ namespace Karna.APIs.Controllers.Controllers
 			return Ok(result);
 		}
 
-		[HttpPatch("{id}/approve")]
-		[Authorize(Roles = "Admin")]
-		public async Task<IActionResult> Approve(Guid id)
-		{
-			var result = await _listingService.ApproveAsync(id);
-			if (!result.Success)
-				return BadRequest(result);
-			return Ok(result);
-		}
-
-		[HttpPatch("{id}/reject")]
-		[Authorize(Roles = "Admin")]
-		public async Task<IActionResult> Reject(Guid id, [FromBody] RejectListingDto dto)
-		{
-			var result = await _listingService.RejectAsync(id, dto);
-			if (!result.Success)
-				return BadRequest(result);
-			return Ok(result);
-		}
-
 		[HttpPatch("{id}/sold")]
 		[Authorize(Roles = "User")]
 		public async Task<IActionResult> MarkAsSold(Guid id)

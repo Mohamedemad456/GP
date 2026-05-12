@@ -27,6 +27,14 @@ namespace Karna.Core.Domain.Entities
         public DateTime? DeletedAt { get; set; }
 		public DateTime? SoldAt { get; set; }
 
+		// Admin Approval Fields
+		public Guid? ApprovedByAdminId { get; set; }
+		public User? ApprovedByAdmin { get; set; }
+		public DateTime? ApprovedAt { get; set; }
+
+		// Admin Rejection Fields
+		public string? RejectionReason { get; set; }
+
 		// ML Pricing Fields
 		public decimal? FairPrice { get; set; }
 		public decimal? NegotiationRangeLower { get; set; }

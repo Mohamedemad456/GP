@@ -18,6 +18,7 @@ namespace Karna.Infrastructure.Persistence._Data
 
 		public DbSet<ListingPhoto> ListingPhoto { get; set; } = null!;
 		public DbSet<ListingStatusHistory> ListingStatusHistories { get; set; } = null!;
+		public DbSet<AdminActivityLog> AdminActivityLogs { get; set; } = null!;
 
 		public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
 		{
