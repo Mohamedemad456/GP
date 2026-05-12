@@ -3,6 +3,28 @@ Model registry helpers for reading, writing, and promoting model artifacts.
 
 This module centralizes all registry/metadata operations so that both
 notebooks and the backend API use the same logic.
+
+Registry schema v2:
+{
+  "schema_version": "2.0",
+  "active_model_id": "<model_id>",
+  "active_version": "<semver>",
+  "promoted_at": "<iso-ts>",
+  "models": {
+    "<model_id>": {
+      "model_id": "...",
+      "framework": "...",
+      "version": "...",
+      "stage": "production|candidate|archived",
+      "pkl_path": "models/pickles/...",   # always relative
+      "meta_path": "models/metadata/...",  # always relative
+      "metrics": { ... },
+      "artifacts": { ... },                # optional extra deps
+      "source_notebook": "...",
+      "registered_at": "<iso-ts>"
+    }
+  }
+}
 """
 from __future__ import annotations
 
@@ -12,6 +34,8 @@ from pathlib import Path
 from typing import Any
 
 from app.core.config import settings
+
+REGISTRY_SCHEMA_VERSION = "2.0"
 
 
 # ---------------------------------------------------------------------------
@@ -35,6 +59,24 @@ def model_plots_dir(name: str) -> Path:
     d = settings.models_dir / f"plots_{name}"
     d.mkdir(parents=True, exist_ok=True)
     return d
+
+
+def _to_relative_path(path_value: str | Path) -> str:
+    """Convert an absolute path to a project-relative string for portability.
+
+    If the path is already relative or cannot be made relative to the project
+    root, return it as-is.
+    """
+    p = Path(path_value)
+    if not p.is_absolute():
+        return str(p)
+    try:
+        return str(p.relative_to(settings.project_root))
+    except ValueError:
+        parts = p.parts
+        if "models" in parts:
+            return str(Path(*parts[parts.index("models")]))
+        return str(p)
 
 
 def resolve_registry_path(path_value: str | Path) -> Path:
@@ -72,21 +114,44 @@ def resolve_registry_path(path_value: str | Path) -> Path:
 # Registry I/O
 # ---------------------------------------------------------------------------
 
+def _empty_registry() -> dict[str, Any]:
+    """Return a minimal clean v2 registry dict."""
+    return {
+        "schema_version": REGISTRY_SCHEMA_VERSION,
+        "active_model_id": None,
+        "active_version": None,
+        "promoted_at": None,
+        "models": {},
+    }
+
+
 def load_registry() -> dict[str, Any]:
     """Load the model registry JSON. Returns empty structure if missing."""
     path = settings.model_registry_path
     if not path.exists():
-        return {"active_version": None, "active_model_id": None, "models": {}}
+        return _empty_registry()
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
 def save_registry(registry: dict[str, Any]) -> None:
-    """Write the full registry dict to disk."""
+    """Write the full registry dict to disk.
+
+    Ensures only v2 keys are persisted — strips legacy keys like
+    ``active_model`` and ``versions`` that belong to the old schema.
+    """
+    allowed_top_keys = {
+        "schema_version", "active_model_id", "active_version",
+        "promoted_at", "models",
+    }
+    registry.setdefault("schema_version", REGISTRY_SCHEMA_VERSION)
+    cleaned = {k: v for k, v in registry.items() if k in allowed_top_keys}
+    cleaned.setdefault("models", {})
+
     path = settings.model_registry_path
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
-        json.dump(registry, f, indent=2, ensure_ascii=False)
+        json.dump(cleaned, f, indent=2, ensure_ascii=False)
 
 
 # ---------------------------------------------------------------------------
@@ -94,36 +159,15 @@ def save_registry(registry: dict[str, Any]) -> None:
 # ---------------------------------------------------------------------------
 
 def get_active_model_info() -> dict[str, Any] | None:
-    """Return the full info dict for the currently active model, or None.
-
-    Handles both new format (active_model_id → models[id]) and
-    legacy format (active_model inline dict).
-    """
+    """Return the full info dict for the currently active model, or None."""
     reg = load_registry()
     model_id = reg.get("active_model_id")
-    if model_id is not None:
-        info = reg.get("models", {}).get(model_id)
-        if info:
-            return info
-
-    # Fallback: try legacy active_model key (inline dict)
-    legacy = reg.get("active_model")
-    if legacy:
-        # Enrich with artifacts from the metadata JSON if available
-        if "artifacts" not in legacy or not legacy.get("artifacts"):
-            meta_path_str = legacy.get("meta_path")
-            if meta_path_str:
-                mp = Path(meta_path_str)
-                if not mp.is_absolute():
-                    mp = settings.project_root / mp
-                if mp.exists():
-                    with open(mp, "r", encoding="utf-8") as f:
-                        meta = json.load(f)
-                    if "artifacts" in meta:
-                        legacy["artifacts"] = meta["artifacts"]
-        return legacy
-
-    return None
+    if model_id is None:
+        return None
+    info = reg.get("models", {}).get(model_id)
+    if info is not None:
+        info.setdefault("model_id", model_id)
+    return info
 
 
 def get_active_model_path() -> Path | None:
@@ -229,29 +273,55 @@ def register_model(
     framework: str,
     version: str,
     metrics: dict[str, float] | None = None,
+    source_notebook: str | None = None,
+    artifacts: dict[str, str] | None = None,
+    stage: str = "candidate",
     **extra: Any,
 ) -> None:
-    """Add or update a model entry in the registry."""
+    """Add or update a model entry in the registry.
+
+    Paths are automatically converted to project-relative strings.
+    """
     reg = load_registry()
     models = reg.setdefault("models", {})
+
+    rel_artifacts: dict[str, str] = {}
+    if artifacts:
+        rel_artifacts = {k: _to_relative_path(v) for k, v in artifacts.items()}
+
     models[model_id] = {
+        "model_id": model_id,
         "framework": framework,
         "version": version,
-        "pkl_path": str(pkl_path),
-        "meta_path": str(meta_path),
+        "stage": stage,
+        "pkl_path": _to_relative_path(pkl_path),
+        "meta_path": _to_relative_path(meta_path),
         "metrics": metrics or {},
+        "artifacts": rel_artifacts,
+        "source_notebook": source_notebook,
         "registered_at": dt.datetime.now(dt.timezone.utc).isoformat(),
-        **extra,
+        **{k: v for k, v in extra.items()
+           if k not in ("model_id", "stage", "artifacts", "source_notebook")},
     }
     save_registry(reg)
 
 
 def promote_active_model(model_id: str) -> None:
-    """Set the given model_id as the active production model."""
+    """Set the given model_id as the active production model.
+
+    Archives the previously active model (sets stage='archived') and
+    marks the new one as stage='production'.
+    """
     reg = load_registry()
     models = reg.get("models", {})
     if model_id not in models:
         raise ValueError(f"Model '{model_id}' not found in registry. Register it first.")
+
+    prev_id = reg.get("active_model_id")
+    if prev_id and prev_id in models and prev_id != model_id:
+        models[prev_id]["stage"] = "archived"
+
+    models[model_id]["stage"] = "production"
     reg["active_model_id"] = model_id
     reg["active_version"] = models[model_id].get("version", "unknown")
     reg["promoted_at"] = dt.datetime.now(dt.timezone.utc).isoformat()
