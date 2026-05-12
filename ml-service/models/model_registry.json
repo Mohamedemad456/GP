@@ -1,8 +1,8 @@
 {
   "schema_version": "2.0",
-  "active_model_id": "xgboost_quantile_v1.1.0",
-  "active_version": "v1.1.0",
-  "promoted_at": "2026-05-12T13:00:00+00:00",
+  "active_model_id": "ensemble_robust_average_v1.1.0",
+  "active_version": "v1.2.0",
+  "promoted_at": "2026-05-12T18:31:00+00:00",
   "models": {
     "huber_baseline_v1.0.0": {
       "model_id": "huber_baseline_v1.0.0",
