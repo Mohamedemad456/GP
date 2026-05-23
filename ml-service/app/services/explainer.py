@@ -36,6 +36,10 @@ def _get_or_build_shap_explainer():
     if model_obj is None:
         return None
 
+    # Skip SHAP for ensemble models — would need libgomp in Docker image
+    if _ms.ACTIVE_FRAMEWORK == "ensemble":
+        return None
+
     if _ms.ACTIVE_FRAMEWORK not in {"XGBoost", "LightGBM"}:
         return None
 

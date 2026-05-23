@@ -39,6 +39,12 @@ BATCH_REQUESTS = Counter(
     "Total batch prediction requests",
 )
 
+PREDICTION_REQUESTS_BY_ENDPOINT = Counter(
+    "prediction_requests_by_endpoint_total",
+    "Total prediction requests labelled by endpoint type",
+    ["endpoint"],
+)
+
 HTTP_REQUEST_DURATION = Histogram(
     "http_request_duration_seconds",
     "HTTP request latency in seconds",
@@ -71,6 +77,11 @@ def record_batch_request() -> None:
     BATCH_REQUESTS.inc()
 
 
+def record_prediction_by_endpoint(endpoint: str) -> None:
+    """Record a prediction request by endpoint type (single or batch)."""
+    PREDICTION_REQUESTS_BY_ENDPOINT.labels(endpoint=endpoint).inc()
+
+
 class MetricsMiddleware:
     """ASGI middleware to record generic HTTP timing and unhandled errors."""
 
@@ -91,7 +102,7 @@ class MetricsMiddleware:
             nonlocal status_code
             if message["type"] == "http.response.start":
                 status_code = str(message.get("status", 500))
-            if message["type"] == "http.response.body" and message.get("more_body") is False:
+            if message["type"] == "http.response.body" and not message.get("more_body") is True:
                 HTTP_REQUEST_DURATION.labels(
                     method=method,
                     path=path,

@@ -1,8 +1,8 @@
 {
   "schema_version": "2.0",
-  "active_model_id": "ensemble_robust_average_v1.1.0",
-  "active_version": "v1.2.0",
-  "promoted_at": "2026-05-12T18:31:00+00:00",
+  "active_model_id": "xgboost_quantile_v1.1.0",
+  "active_version": "v1.1.0",
+  "promoted_at": "2026-05-13T02:50:00+00:00",
   "models": {
     "huber_baseline_v1.0.0": {
       "model_id": "huber_baseline_v1.0.0",
@@ -43,7 +43,7 @@
         "Mean_width_pct": 86.452
       },
       "artifacts": {
-        "diagnostics_csv": "models/metadata/make_model_mape.csv"
+        "diagnostics_csv": "models/metrics/make_model_mape_cv.csv"
       },
       "source_notebook": "notebooks/05_xgboost_lgbm_quantile.ipynb",
       "registered_at": "2026-05-10T22:23:54.675358+00:00"

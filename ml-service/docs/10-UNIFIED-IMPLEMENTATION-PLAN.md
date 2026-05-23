@@ -103,7 +103,7 @@ Key conflicts:
   - `register_model()`: adds a new model entry to the registry
   - `set_active_model()`: marks a model as active by ID
 - **`app/core/config.py`** updates:
-  - Added `pickles_dir`, `metadata_dir`, `preprocessors_dir`, `plots_dir`, `registry_path` properties
+  - Added `pickles_dir`, `metadata_dir`, `metrics_dir`, `preprocessors_dir`, `plots_dir`, `registry_path` properties
   - All paths derived from `settings.project_root`
 
 ### Results
@@ -134,7 +134,7 @@ Key conflicts:
 
 ### Results
 - Cleaner feature set: year, mileage_km, mileage_per_year, transmission, fuel, location, engine_cc, horsepower, body_type, drivetrain, seating_capacity, brand_origin, car_segment, brand_market_share
-- Organized output: models/pickles/, models/metadata/, models/preprocessors/, models/plots_05_xgboost_lgbm_quantile/
+- Organized output: models/pickles/, models/metadata/, models/metrics/, models/preprocessors/, models/plots_05_xgboost_lgbm_quantile/
 - Registry updated automatically after training
 
 ---

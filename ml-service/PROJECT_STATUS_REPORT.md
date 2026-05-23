@@ -166,6 +166,7 @@ After re-running with the fixed lookups, the output `processed_data.csv` will no
 ### Artifact Saving
 - Model pickles → `models/pickles/`
 - Metadata JSON → `models/metadata/`
+- Metrics CSVs → `models/metrics/`
 - Preprocessors → `models/preprocessors/`
 - Plots → `models/plots_05_xgboost_lgbm_quantile/`
 - Model registry → `models/model_registry.json`
@@ -207,7 +208,7 @@ After re-running with the fixed lookups, the output `processed_data.csv` will no
 ### Schema (`app/schemas/prediction.py`)
 - `mileage_km`, `transmission`, `fuel`, `location` are **optional** — the feature builder fills them from lookup data if not provided
 
-### Configuration (`app/core/config.py`)
+### Configuration (`app/core/config.py`)metrics_dir`, `
 - Added model artifact directory properties: `pickles_dir`, `metadata_dir`, `preprocessors_dir`, `plots_dir`, `registry_path`
 - All paths derived from `settings.project_root`
 
