@@ -30,6 +30,7 @@ from app.core.metrics import MetricsMiddleware, metrics_endpoint
 from app.api import predict, health
 from app.services.model_state import load_valid_cars, load_active_model, load_model_diagnostics
 from app.services.explainer import warm_up_shap
+from app.services.ensemble_explainer import init_ensemble_explainer, warm_up_ensemble_shap
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +44,8 @@ async def lifespan(app: FastAPI):
     load_active_model()
     load_model_diagnostics()
     warm_up_shap()
+    init_ensemble_explainer()
+    warm_up_ensemble_shap()
     logger.info("ML Pricing Engine ready.")
     yield
     logger.info("ML Pricing Engine shutting down.")

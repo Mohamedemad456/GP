@@ -1,6 +1,8 @@
 from fastapi import APIRouter
 from app.schemas.health import HealthResponse
 import app.services.model_state as _ms
+from app.services.explainer import ACTIVE_SHAP_EXPLAINER
+from app.services.ensemble_explainer import is_ensemble_explainer_ready
 import datetime
 
 router = APIRouter()
@@ -21,4 +23,6 @@ def health_check():
         framework=_ms.ACTIVE_FRAMEWORK,
         active_model_id=_ms.ACTIVE_MODEL_ID,
         diagnostics_loaded=_ms.is_diagnostics_loaded(),
+        shap_explainer_ready=ACTIVE_SHAP_EXPLAINER is not None,
+        ensemble_explainer_ready=is_ensemble_explainer_ready(),
     )

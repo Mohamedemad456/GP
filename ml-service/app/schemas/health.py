@@ -9,3 +9,5 @@ class HealthResponse(BaseModel):
     framework: Optional[str] = None
     active_model_id: Optional[str] = None
     diagnostics_loaded: bool = False
+    shap_explainer_ready: bool = False
+    ensemble_explainer_ready: bool = False
