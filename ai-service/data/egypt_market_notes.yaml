@@ -11,7 +11,7 @@
 toyota_corolla:
   notes: |
     EGYPT MARKET STATUS: The gold standard. "شيك في البنك" — resale value holds better than any competitor.
-    TRANSMISSION IN EGYPT: 4-speed Automatic (pre-2014), CVT (2014+). Note: 2008-2009 had MMT (robotized manual) which was a serious reliability problem — avoid those years for the automatic variant. From 2010 onward automatic is conventional.
+    TRANSMISSION IN EGYPT: 4-speed Automatic or MMT on older years, then CVT on newer years depending on generation. Note: 2008-2009 had MMT (robotized manual) which was a serious reliability problem — avoid those years for the automatic variant. The safest used choices are the conventional automatic years before the CVT era or well-maintained newer CVT cars with fluid history.
     ENGINE: 1.6L petrol only in Egyptian market. 122hp. Simple and easy to service.
     BODY: Sedan only in Egypt.
     ASSEMBLY: Was locally assembled (TAC), now imported (Turkish/South African depending on year).
@@ -59,6 +59,7 @@ toyota_avanza:
     PROS: Fits 7 people, cheap to run, cheap parts, easy maintenance, high ground clearance for rough roads.
     CONS: Underpowered with full load, basic interior, suspension is soft and can bottom out on bad roads, not stylish.
     USER COMPLAINTS: Engine struggles with AC on full load, gearbox can be jerky on older automatic variants. Rust issues on door bottoms on older models.
+    BUYING ADVICE: Good budget family transporter. Check rust carefully on all lower body panels. Manual is more reliable than automatic on older units. 1.5L handles the load better than 1.3L.
 
 toyota_prado:
   notes: |
@@ -67,6 +68,8 @@ toyota_prado:
     TRANSMISSION: Automatic with 4WD.
     PROS: Reliable, off-road capable, more car-like to drive than Land Cruiser 200, strong resale.
     CONS: Expensive to maintain, diesel injectors sensitive to fuel quality.
+    COMMON ISSUES: Diesel injector failure from low-quality fuel, suspension bushings on high-mileage cars, AC compressor on older units, coolant leaks on ageing radiators.
+    BUYING ADVICE: Always verify service history. Diesel: confirm fuel quality habits. Petrol 2.7L is underpowered for the weight but simpler and cheaper to maintain. 4.0L is the sweet spot for power vs cost. Fabrica body commands a huge premium.
 
 # ────────────────────────────────────────────────────────────────────────────
 # HYUNDAI
@@ -80,7 +83,7 @@ hyundai_elantra:
       - Elantra MD (ام دي) 2011-2015: Known steering box (تيش) issues — can develop play/noise. Otherwise good.
       - Elantra AD (اي دي) 2016-2020: More refined, better features, same reliable drivetrain.
       - Elantra CN7 (سي ان سفن) 2021+: Latest shape. Most features. Premium feel. Excellent resale.
-    TRANSMISSION: Automatic (all variants in Egypt market). 6-speed AT standard.
+    TRANSMISSION: Automatic is the mainstream Egyptian choice, but gearbox type varies by generation. HD could be manual or 4-speed automatic, while newer generations are typically 6-speed automatic or newer automatic gearboxes depending on trim/year.
     ENGINE: 1.6L petrol, 128hp.
     PROS: Outstanding resale value (HD especially), very cheap spare parts, every mechanic knows it, good fuel economy, comfortable inside.
     CONS: MD had notorious steering box issues, HD interior is very dated now, newer CN7 is significantly more expensive.
@@ -106,6 +109,24 @@ hyundai_elantra_md:
     INTERIOR: Significant upgrade over HD — better materials, larger screen.
     BUYING ADVICE: Always test steering for play before buying. If it's been replaced with a good quality unit, car is a good buy. Avoid cars with unrepaired steering issues.
 
+hyundai_elantra_ad:
+  notes: |
+    EGYPT MARKET STATUS: The sweet spot between the older MD and the expensive CN7. Very popular with families and company users.
+    TRANSMISSION: 6-speed Automatic.
+    ENGINE: 1.6L petrol. Reliable and well understood in the market.
+    PROS: Better cabin quality and sound insulation than HD/MD, smoother ride, strong resale, wide parts availability.
+    CONS: Pricier to buy and repair than HD, some owners report minor sensor/electrical annoyances, clean cars carry a noticeable premium.
+    BUYING ADVICE: One of the safest modern Korean used-car bets in Egypt if accident history is clean. Focus on body condition, steering feel, and regular gearbox service.
+
+hyundai_elantra_cn7:
+  notes: |
+    EGYPT MARKET STATUS: One of the hottest modern sedans in the Egyptian market. Strong demand and premium used prices.
+    TRANSMISSION: Automatic.
+    ENGINE: 1.6L petrol in the common Egyptian-market setup.
+    PROS: Sharp design, very good features, strong resale, better safety and interior quality than older Elantras.
+    CONS: Expensive compared with AD/MD, body repairs and original parts cost more, many cars in the market are overpriced because of demand.
+    BUYING ADVICE: Great choice if budget allows, but do not overpay just for the shape. Check for dealership maintenance history and avoid repaired front-end accident cars.
+
 hyundai_verna:
   notes: |
     EGYPT MARKET STATUS: Absolute street king for reliability and parts availability. One of the cheapest to own and maintain.
@@ -115,7 +136,7 @@ hyundai_verna:
     FUEL ECONOMY: Excellent. 7-9L/100km.
     PARTS: The cheapest in Egypt after Lanos. Every market has Verna parts.
     PROS: Extremely reliable, cheapest running costs of any car, very high resale value for its price point, simple mechanics.
-    CONS: Zero safety features, outdated interior, very basic technology, lightweight body feels flimsy at speed.
+    CONS: Minimal to no safety features on most variants (some later models added basic ABS and a single airbag, but overall safety remains very weak), outdated interior, very basic technology, lightweight body feels flimsy at speed.
     USER FEEDBACK: "مسيرة مؤمنة بس خايف على روحه فالطريق السريع" — reliable but dangerous on the highway. A common sentiment.
     BUYING ADVICE: Perfect for city use, short trips, delivery/service work. Never take on highways with family. Check for rust under carpets.
 
@@ -137,6 +158,8 @@ hyundai_creta:
     TRANSMISSION: Automatic or CVT depending on year.
     PROS: Affordable SUV entry point, good fuel economy, decent features, rising resale value.
     CONS: Smaller than Tucson, parts slightly harder to find than Tucson, less established resale history.
+    USER COMPLAINTS: Rear seat and trunk are acceptable but not generous for bigger families. Highway insulation is average and some owners feel the suspension is tuned more for comfort than stability.
+    BUYING ADVICE: Good fit if you want SUV shape and daily ease more than outright space. Buy on condition and trim, not hype, because resale is improving but still below Tucson/Sportage.
 
 hyundai_accent:
   notes: |
@@ -147,6 +170,8 @@ hyundai_accent:
     PROS: Affordable, decent features, better safety than old Verna, low running costs.
     CONS: Not as cheap to run as Verna, smaller trunk, not as common as Elantra so parts slightly pricier.
     USER FEEDBACK: Seen as the "grown-up Verna" with more safety and refinement.
+    MARKET SPLIT: RB is the more familiar workhorse on the street, while HCI feels more modern and private-owner oriented.
+    BUYING ADVICE: A solid city/family budget sedan if you want something newer than Verna. Check suspension wear, steering feel, and whether the car spent its life in fleet or heavy service use.
 
 # ────────────────────────────────────────────────────────────────────────────
 # KIA
@@ -166,6 +191,24 @@ kia_cerato:
     CONS: Forte has stiff ride on bad roads, CVT needs scheduled fluid changes, Grand Cerato is significantly more expensive than K3.
     USER COMPLAINTS: Forte: suspension too stiff for older Egyptians/families. K3: minor electrical issues. Grand Cerato: CVT requires proper maintenance or it deteriorates.
     BUYING ADVICE: Grand Cerato for best overall package if budget allows. K3 for best value. Forte only if you like firm suspension and find a clean one cheap.
+
+kia_k3:
+  notes: |
+    EGYPT MARKET STATUS: Often considered the best-value Cerato generation in Egypt. Very common and easy to resell.
+    TRANSMISSION: 6-speed Automatic in the common Egyptian-market cars.
+    ENGINE: 1.6L petrol.
+    PROS: Balanced ride comfort, good cabin space, strong parts network, better refinement than Forte without Grand Cerato pricing.
+    CONS: Not as feature-rich or modern as Grand Cerato, many used examples were driven hard, and clean low-km cars are not cheap anymore.
+    BUYING ADVICE: Usually the sweet spot for buyers who want Cerato resale without paying Grand Cerato money. Prioritize clean body condition and proof of regular maintenance.
+
+kia_grand_cerato:
+  notes: |
+    EGYPT MARKET STATUS: One of the most desirable mainstream sedans in the market. Strong demand from families and younger buyers.
+    TRANSMISSION: Automatic CVT/IVT depending on market labeling.
+    ENGINE: 1.6L petrol.
+    PROS: Modern interior, strong features, good safety perception, smooth gearbox in city driving, excellent resale.
+    CONS: Expensive versus older Cerato generations, gearbox service history matters, and body/lighting parts are costly after accidents.
+    BUYING ADVICE: Excellent all-rounder if maintained correctly. Ask specifically about gearbox oil service and avoid overpriced examples that rely only on shape and brand popularity.
 
 kia_sportage:
   notes: |
@@ -195,6 +238,8 @@ kia_rio:
     TRANSMISSION: Manual or Automatic.
     PROS: More space than Picanto, decent fuel economy, reasonable price.
     CONS: Less popular than Cerato so resale is weaker, parts slightly less common.
+    USER COMPLAINTS: Ride can feel a bit firm on broken city streets and cabin insulation is only average on highway speeds.
+    BUYING ADVICE: Good choice for someone who wants a simple Korean daily driver without paying Cerato money. Buy the cleanest example you can find because resale depends heavily on condition.
 
 kia_sorento:
   notes: |
@@ -202,7 +247,9 @@ kia_sorento:
     ENGINE: 2.0L or 2.4L petrol, some diesel variants.
     TRANSMISSION: Automatic with AWD on higher trims.
     PROS: 7-seater option, strong resale for the segment, family-friendly features.
-    CONS: High fuel consumption, expensive parts by local standards.
+    CONS: High fuel consumption, expensive parts by local standards, diesel variants need good fuel quality.
+    COMMON ISSUES: Timing chain on older 2.4L petrol if oil changes were neglected, diesel injector sensitivity, suspension wear on rough roads.
+    BUYING ADVICE: Best for families needing a genuine 7-seater with Korean reliability. Service history is critical. If diesel, same fuel-quality caution as any diesel SUV in Egypt.
 
 kia_carens:
   notes: |
@@ -211,6 +258,8 @@ kia_carens:
     TRANSMISSION: Manual or Automatic.
     PROS: 7 seats, affordable MPV, reasonable running costs.
     CONS: Not stylish, basic interior, weaker resale than SUVs.
+    USER COMPLAINTS: Third row is mostly for children, full-load performance is average, and many used cars have seen heavy family use.
+    BUYING ADVICE: Practical buy for bigger families that do not want SUV pricing. Check cooling efficiency, suspension condition, and whether all three rows and seat mechanisms are still in good shape.
 
 # ────────────────────────────────────────────────────────────────────────────
 # NISSAN
@@ -237,7 +286,7 @@ nissan_sunny:
       - N16 (شكل قديم / صني شكل قديم) 2004-2012: Older boxy shape. Imported (Japanese domestic market). Heavier build, more solid body, older tech but respected for durability. Still highly sought after by people who value build quality.
       - N17 (شكل جديد) 2012-present: Locally assembled. Modern shape. Better interior, excellent AC, much better fuel economy. BUT: lighter sheet metal ("صفيح خفيف"), softer suspension, weaker brakes compared to N16.
     TRANSMISSION: Manual (very common on N16) or Automatic. N17 is predominantly Automatic.
-    ENGINE: 1.6L petrol. 110hp.
+    ENGINE: 1.5L or 1.6L petrol depending on variant and year. Power output approximately 99-116hp.
     PROS (N17): Outstanding AC performance (best in class for summer heat), excellent fuel economy (7-8L/100km city), great for ride-hailing, cheap parts, every mechanic knows it.
     CONS (N17): Lightweight body feels unsafe at highway speeds, brakes are weak (common complaint), thin sheet metal dents easily.
     PROS (N16): More solid build, heavier and more planted at speed, respected by older mechanics.
@@ -271,6 +320,9 @@ nissan_tiida:
     ENGINE: 1.6L petrol.
     TRANSMISSION: Automatic or Manual.
     NOTES: Was popular mid-2000s to 2010s. Now being replaced by newer models. Decent parts availability from its peak popularity years. Good for budget buyers.
+    PROS: Spacious cabin for its class, comfortable seats, dependable basic drivetrain, and generally less overpriced than Sunny/Corolla equivalents.
+    CONS: Age is now the main issue, resale is softer, and many cars in the market need suspension, AC, or cosmetic work.
+    BUYING ADVICE: Good under-the-radar buy if you find a cared-for one. Prioritize maintenance history and air-conditioning condition over shape or trim.
 
 # ────────────────────────────────────────────────────────────────────────────
 # CHEVROLET / DAEWOO
@@ -434,6 +486,9 @@ mitsubishi_pajero:
     TRANSMISSION: Automatic with 4WD.
     PROS: Legendary off-road capability, prestige, spacious, strong resale.
     CONS: Very high fuel consumption, expensive parts, diesel needs good fuel quality.
+    COMMON ISSUES: Transfer case can develop play on high-mileage 4WD units, AC compressor failure, radiator leaks on ageing cars, diesel injectors if cheap fuel was used.
+    USER FEEDBACK: "عربية صحرا بجد مش مجرد شكل" — a real desert car, not just looks. Respected by off-road enthusiasts.
+    BUYING ADVICE: Only buy with documented service history. Check 4WD engagement (test in all modes). Budget for high fuel and maintenance costs. Clean Pajero with low km holds value well.
 
 mitsubishi_xpander:
   notes: |
@@ -442,6 +497,8 @@ mitsubishi_xpander:
     TRANSMISSION: Manual or Automatic.
     PROS: Modern design MPV, 7 seats, reasonable fuel consumption, better interior than Avanza.
     CONS: Less established resale history, parts newer to market.
+    USER FEEDBACK: Gaining ground against Avanza due to more modern design and better interior. Egyptian families appreciate the 7 seats and reasonable fuel economy.
+    BUYING ADVICE: Good modern alternative to Avanza if you want a fresher design. Buy from authorized dealers for warranty. Resale is improving as the model becomes more common.
 
 # ────────────────────────────────────────────────────────────────────────────
 # SKODA
@@ -479,6 +536,8 @@ skoda_kodiaq:
     TRANSMISSION: DSG Automatic with AWD.
     PROS: Spacious, 7-seater option, excellent build quality, premium brand perception.
     CONS: Expensive DSG repairs, high maintenance costs, parts not widely stocked, expensive to insure.
+    COMMON ISSUES: Same DSG mechatronic concerns as Octavia (service DSG oil+filter every 60k km or risk expensive failure), turbo maintenance, requires European-specialist workshop.
+    BUYING ADVICE: Only for buyers with premium maintenance budget and access to a Skoda or VW-group specialist. Check DSG service records thoroughly. The 2.0T AWD is powerful but thirsty and expensive to maintain.
 
 # ────────────────────────────────────────────────────────────────────────────
 # FIAT
@@ -489,7 +548,7 @@ fiat_tipo:
     EGYPT MARKET STATUS: Strong growth. Best-selling European budget car in Egypt. Excellent safety at its price point.
     ENGINE: 1.4L or 1.6L petrol depending on year.
     TRANSMISSION: Automatic (6-speed) or Manual.
-    SAFETY: Significantly better safety than equivalent Korean/Japanese budget cars — 5-star Euro NCAP. Multiple airbags standard. ABS + stability control standard.
+    SAFETY: Significantly better safety reputation than many budget-market rivals, especially in trims equipped with ABS, ESC, and multiple airbags. Exact safety equipment varies by year and trim, so always verify the specific car.
     PROS: European safety standards, spacious interior, good build quality, stylish, decent resale growth, features above price point.
     CONS: Some early batches had engine oil consumption issues (1.4L MultiAir — check oil level frequently on 2016-2018 units), parts slightly pricier than Korean, requires good mechanic.
     KNOWN ISSUE: 1.4L MultiAir engine (2016-2018) — some units showed elevated oil consumption. Always check oil level on these years. 2019+ units improved significantly.
@@ -502,6 +561,9 @@ fiat_palio:
     EGYPT MARKET STATUS: Older budget hatchback. Less common now but still on roads.
     ENGINE: 1.2L or 1.4L petrol.
     NOTES: Budget-friendly, parts available. Older tech. Good for very limited budgets.
+    PROS: Very cheap to buy, simple mechanicals, parts from Fiat specialist importers, decent city car.
+    CONS: Ageing, outdated technology, rust-prone on older units, minimal safety features, declining resale.
+    BUYING ADVICE: Only for extreme-budget buyers or those who already know and trust this car. Check for rust thoroughly, especially around wheel arches and floor.
 
 fiat_shahin:
   notes: |
@@ -542,16 +604,17 @@ peugeot_301:
     ENGINE: 1.2L PureTech or 1.6L.
     TRANSMISSION: Manual or Automatic.
     PROS: European interior quality at competitive price.
-    CONS: 1.2L PureTech had timing chain issues in some markets — verify on Egyptian-sold units. Parts not as widely available as Korean.
+    CONS: 1.2L PureTech had wet timing-belt concerns in some markets — verify maintenance history carefully on Egyptian-sold units. Parts not as widely available as Korean.
+    BUYING ADVICE: The 1.6L is the safer mainstream choice for Egyptian buyers. If considering the 1.2 PureTech, ask directly about belt service history and oil-change discipline.
 
 peugeot_208:
   notes: |
     EGYPT MARKET STATUS: Growing popularity. Modern compact hatchback.
     ENGINE: 1.2L PureTech (3-cylinder) or 1.6L.
     TRANSMISSION: Automatic or Manual.
-    KNOWN ISSUE: PureTech 1.2L 3-cylinder — timing chain can stretch prematurely in some early production years. Check for rattling on cold start. This was acknowledged by Peugeot globally.
+    KNOWN ISSUE: PureTech 1.2L 3-cylinder — wet timing-belt / belt-in-oil maintenance is the main concern on some early production years, not a conventional chain issue. Check service history carefully.
     PROS: Stylish, modern, good features, decent fuel economy.
-    CONS: PureTech chain risk, parts pricier than Korean.
+    CONS: PureTech belt-service risk, parts pricier than Korean.
 
 peugeot_3008:
   notes: |
@@ -560,6 +623,9 @@ peugeot_3008:
     TRANSMISSION: Automatic.
     PROS: Premium French design, excellent interior, good features.
     CONS: Expensive maintenance, parts costly, requires specialist mechanic.
+    KNOWN ISSUES: 1.6L THP engine (EP6) is known across all PSA brands for timing chain and thermostat issues — especially if oil changes are skipped. Always check for engine rattling on cold start.
+    USER FEEDBACK: Very attractive to buyers who want something different from the Korean SUV mainstream. "من جوه حاجة تانية" — the interior is on another level.
+    BUYING ADVICE: Only buy with complete documented service history. The 1.6L THP needs strict oil discipline. Budget for specialist Peugeot workshop. Great car if well maintained, expensive headache if neglected.
 
 # ────────────────────────────────────────────────────────────────────────────
 # VOLKSWAGEN
@@ -584,12 +650,18 @@ volkswagen_passat:
     ENGINE: 1.4T or 1.8T.
     TRANSMISSION: DSG Automatic.
     SAME DSG CONCERNS as Golf apply. Executive feel at high running cost.
+    PROS: Spacious executive cabin, excellent highway cruiser, premium build quality, strong brand prestige.
+    CONS: Parts and labor very expensive, DSG risk in Cairo traffic, requires premium fuel (95+), specialist workshop needed.
+    BUYING ADVICE: Only if you have a serious maintenance budget. The 1.8T is the more common and smoother engine in Egypt. Check DSG history thoroughly.
 
 volkswagen_polo:
   notes: |
     ENGINE: 1.2L or 1.4L petrol.
     TRANSMISSION: Manual, Automatic, or DSG.
     STATUS: Entry VW. More accessible than Golf. Same part cost concerns on DSG variants.
+    PROS: Solid build quality for a small car, good driving dynamics, premium brand at entry price.
+    CONS: Parts still expensive relative to Korean/Japanese city cars, DSG variants carry the same judder risk, resale can be slow.
+    BUYING ADVICE: Avoid DSG variants if possible — the manual or torque-converter automatic are more reliable in Egyptian conditions. Good city car if you can afford VW-level servicing.
 
 # ────────────────────────────────────────────────────────────────────────────
 # HONDA
@@ -599,7 +671,7 @@ honda_civic:
   notes: |
     EGYPT MARKET STATUS: Prestigious sporty sedan. VTEC reputation is legendary in Egypt's car culture.
     VARIANTS IN EGYPT: Multiple generations. 2016+ has 1.5T turbocharged engine.
-    ENGINE: 1.6L VTEC (older), 1.5L Turbo (2016+) or 2.0L.
+    ENGINE: 1.6L VTEC (very old), 1.8L i-VTEC (8th/9th gen — most common used Civic in Egypt), 1.5L Turbo (2016+), or 2.0L.
     TRANSMISSION: CVT (1.5T), 6-speed Manual or CVT/Automatic depending on year.
     REPUTATION: "فيتك عنده صوت ومتعة" — VTEC has sound and driving pleasure. Strong enthusiast following.
     PROS: Sporty driving feel, premium interior perception, VTEC engines have excellent reputation, good resale among enthusiasts.
@@ -615,6 +687,8 @@ honda_city:
     TRANSMISSION: Automatic CVT or Manual.
     PROS: Good fuel economy, Honda reliability, decent features, easier to maintain than Civic.
     CONS: Parts still pricier than Korean, less exciting than Civic.
+    COMMON ISSUES: CVT needs scheduled maintenance (same as any CVT car), AC performance can degrade on older units.
+    BUYING ADVICE: Solid daily driver if you value Honda reliability without Civic pricing. Ask about CVT service history. The 1.5L is more comfortable for highway use than the 1.3L.
 
 honda_crv:
   notes: |
@@ -623,6 +697,9 @@ honda_crv:
     TRANSMISSION: CVT Automatic.
     PROS: Spacious, premium feel, Honda reliability, good resale.
     CONS: Very expensive parts and maintenance, 1.5T oil dilution concern (same as Civic), requires specialized workshop.
+    COMMON ISSUES: 1.5T oil dilution (check if addressed by Honda recall/update), CVT needs regular fluid changes, AC compressor on older 2.4L units.
+    USER FEEDBACK: Aspirational purchase for many Egyptian families. "هوندا يعني مفيش مشاكل بس الصيانة غالية" — Honda means no problems, but maintenance is expensive.
+    BUYING ADVICE: Buy with full service history only. Older 2.4L NA is simpler and cheaper to maintain but less fuel-efficient. 1.5T: verify oil dilution status.
 
 # ────────────────────────────────────────────────────────────────────────────
 # SUZUKI
@@ -660,7 +737,8 @@ suzuki_ertiga:
     ENGINE: 1.4L or 1.5L petrol.
     TRANSMISSION: Automatic or Manual.
     PROS: 7 seats, affordable, Suzuki reliability.
-    CONS: Underpowered with full load, basic interior.
+    CONS: Underpowered with full load, basic interior, not as refined as Xpander or Avanza at similar prices.
+    BUYING ADVICE: Good Suzuki-reliability budget MPV if you need 7 seats. The 1.5L handles better than the 1.4L with passengers. Check AC performance with full cabin — some owners report it struggles.
 
 suzuki_alto:
   notes: |
@@ -691,6 +769,8 @@ mg_5:
     TRANSMISSION: Automatic CVT.
     PROS: Large sedan at competitive price, loaded with features, decent fuel economy.
     CONS: Brand perception still building trust for sedan segment, resale less established than Korean/Japanese equivalents.
+    USER COMPLAINTS: The main market hesitation is long-term durability and resale, not day-one features. Some owners also complain that interior materials show wear earlier than Korean rivals.
+    BUYING ADVICE: Strong value if you want shape and features for the money, but do not treat it like a Corolla/Cerato on resale. Full service history matters, especially for CVT confidence.
 
 mg_6:
   notes: |
@@ -698,7 +778,9 @@ mg_6:
     ENGINE: 1.5T petrol.
     TRANSMISSION: Automatic.
     PROS: Sporty styling, good performance for price, features.
-    CONS: 1.5T maintenance cost higher, brand trust for performance cars less established.
+    CONS: 1.5T maintenance cost higher, brand trust for performance cars less established, resale value is still unproven.
+    USER FEEDBACK: Attracts younger buyers who want sporty looks and turbo performance without European pricing. "شكل رياضي بسعر عادي" — sporty looks at a normal price.
+    BUYING ADVICE: Good value if you want turbo performance and sporty design on a budget. Service at authorized MG centers only. Turbo engines need more disciplined oil changes — use recommended grade and interval.
 
 mg_hs:
   notes: |
@@ -706,7 +788,10 @@ mg_hs:
     ENGINE: 1.5T petrol.
     TRANSMISSION: Automatic (DCT or CVT depending on year).
     PROS: Large, well-featured, competitive price for SUV segment.
-    CONS: Turbo maintenance more complex, DCT requires careful service, long-term reliability tracking.
+    CONS: Turbo maintenance more complex, DCT requires careful service, long-term reliability tracking, resale is still building.
+    COMMON ISSUES: DCT judder possible in heavy Cairo traffic (same concern as Hyundai/Haval DCT variants), turbo engines need premium oil and strict service intervals.
+    USER FEEDBACK: Competes directly with Tucson/Sportage on features and size but at a lower price. Buyers trade proven Korean resale for better spec-per-pound.
+    BUYING ADVICE: Good value large SUV. If DCT variant, ask about gearbox service history. If CVT, ask about fluid changes. Service only at authorized centers to protect warranty and resale.
 
 # ────────────────────────────────────────────────────────────────────────────
 # CHERY
@@ -730,12 +815,18 @@ chery_arrizo:
     ENGINE: 1.5L or 1.6T petrol.
     TRANSMISSION: CVT or Automatic.
     STATUS: Arrizo 5 and 5 Pro are the main sellers. Improving quality in newer versions.
+    PROS: Competitive pricing, decent features and interior quality on Pro versions, improving reliability perception.
+    CONS: Brand trust still lags behind MG/Haval, resale is weaker than Korean equivalents, parts availability developing.
+    BUYING ADVICE: Decent budget sedan if bought from authorized dealer with warranty. Pro versions are noticeably better than standard. Keep full service records — they matter heavily for resale.
 
 chery_envy:
   notes: |
     EGYPT MARKET STATUS: Budget sedan. Popular for ride-hailing.
     ENGINE: 1.3L petrol.
     NOTES: Very budget-oriented. Cheap to buy and run. Used heavily by ride-hailing drivers.
+    PROS: Very low purchase price, simple mechanicals, acceptable fuel economy for ride-hailing.
+    CONS: Minimal features, basic safety, interior quality reflects the price, resale is weak.
+    BUYING ADVICE: Only consider for ride-hailing or absolute budget use. Most cars on the market have been driven hard in service — inspect engine, gearbox, and suspension carefully.
 
 # ────────────────────────────────────────────────────────────────────────────
 # BYD
@@ -756,13 +847,18 @@ byd_seagull:
     EGYPT MARKET STATUS: Growing presence. Small electric city car.
     TYPE: Full electric.
     NOTES: New entrant to Egyptian market. Limited charging infrastructure concern. Good for pure city use if charging access is available.
+    PROS: Very low running cost (electricity vs petrol), quiet and smooth city driving, modern tech features, competitive price for an EV.
+    CONS: Charging infrastructure in Egypt is underdeveloped outside Cairo/Giza, range anxiety for longer trips, battery replacement cost is an unknown long-term concern, no established resale market.
+    BUYING ADVICE: Only practical if you have reliable home charging. Great for daily short-distance city commuting. Not suitable for intercity travel yet. Service only at BYD authorized centers.
 
 byd_song_plus:
   notes: |
     EGYPT MARKET STATUS: BYD's attempt at the premium Chinese SUV segment.
-    ENGINE: Hybrid or petrol variants.
-    TRANSMISSION: Automatic.
-    STATUS: Growing. Part of BYD's push into Egyptian premium segment.
+    POWERTRAIN: Primarily the DM-i plug-in hybrid (PHEV) in Egypt. Combines a 1.5L petrol engine with an electric motor and battery for very low fuel consumption in city driving. Pure petrol variants may also exist in smaller numbers.
+    TRANSMISSION: Automatic (e-CVT on DM-i).
+    PROS: Excellent fuel economy in city, smooth and quiet driving, modern tech and features, competitive pricing for a PHEV SUV.
+    CONS: Charging infrastructure in Egypt is still limited, battery long-term durability in extreme heat is unknown, service network for PHEV-specific components is new and thin.
+    BUYING ADVICE: Excellent city fuel economy, but buyers should have reliable home or workplace charging. Service only at authorized BYD centers for anything electrical/hybrid related.
 
 # ────────────────────────────────────────────────────────────────────────────
 # GEELY
@@ -774,7 +870,9 @@ geely_emgrand:
     ENGINE: 1.5L or 1.8L petrol.
     TRANSMISSION: Manual or Automatic.
     PROS: Cheap, functional, improving quality over the years.
-    CONS: Brand recognition weaker than MG, resale lower.
+    CONS: Brand recognition weaker than MG, resale lower, parts network less developed than MG or Chery.
+    USER FEEDBACK: Quietly gaining some acceptance but overshadowed by MG and Chery marketing. "عربية كويسة بس محدش يعرفها" — good car but nobody knows it.
+    BUYING ADVICE: Reasonable budget option if you find a good price. Buy from authorized dealer for warranty. Keep full documentation because resale depends heavily on proof of care.
 
 geely_okavango:
   notes: |
@@ -782,7 +880,9 @@ geely_okavango:
     ENGINE: 1.5T petrol (3-cylinder turbo).
     TRANSMISSION: Automatic.
     PROS: 7 seats, modern design, good features, Volvo-inspired design (Geely owns Volvo).
-    CONS: 3-cylinder turbo less familiar to Egyptian mechanics, brand trust still building.
+    CONS: 3-cylinder turbo less familiar to Egyptian mechanics, brand trust still building, resale is unknown.
+    COMMON ISSUES: 3-cylinder turbo vibration is inherent to the design — some owners notice it, especially at idle. Turbo maintenance needs strict oil discipline.
+    BUYING ADVICE: Interesting choice for families wanting 7 seats with modern tech. Service at authorized Geely only — random mechanics are not equipped for 3-cylinder turbo diagnostics. Resale is a gamble this early in the model's Egyptian life.
 
 # ────────────────────────────────────────────────────────────────────────────
 # CHANGAN
@@ -802,6 +902,9 @@ changan_eado:
     EGYPT MARKET STATUS: Mid-size Chinese sedan.
     ENGINE: 1.5L or 1.6T petrol.
     NOTES: Decent quality for price. Growing market share.
+    PROS: Good features for the money, reasonable build quality, competitive pricing.
+    CONS: Brand awareness in Egypt is low, resale is weak, parts availability developing.
+    BUYING ADVICE: Reasonable budget mid-size sedan. Keep full service documentation — resale depends heavily on proof of maintenance for lesser-known brands.
 
 # ────────────────────────────────────────────────────────────────────────────
 # HAVAL
@@ -822,6 +925,9 @@ haval_h6:
     ENGINE: 2.0T petrol.
     TRANSMISSION: DCT Automatic with AWD options.
     NOTES: Premium Chinese SUV positioning. Similar DCT concerns apply.
+    PROS: Spacious, powerful 2.0T engine, premium feel, AWD option for rough terrain.
+    CONS: DCT judder risk in traffic, high fuel consumption for a Chinese SUV, service network still developing, resale unproven.
+    BUYING ADVICE: Compelling on paper but the 2.0T DCT AWD combination needs strict service discipline. Buy from authorized dealer, keep full records, and budget for higher fuel costs than a 1.5T competitor.
 
 # ────────────────────────────────────────────────────────────────────────────
 # JAC
@@ -846,6 +952,7 @@ jetour_x70:
     TRANSMISSION: Automatic or CVT.
     PROS: Large SUV body at very competitive price, decent features.
     CONS: Brand very new to Egypt, resale unknown, parts network developing.
+    BUYING ADVICE: Very competitive on price-to-size ratio. Early adopter risk applies — resale, parts availability, and long-term reliability are all unproven. Buy from authorized dealer and keep every service record.
 
 # ────────────────────────────────────────────────────────────────────────────
 # OPEL
@@ -916,7 +1023,7 @@ general_market_trends:
 
     SPARE PARTS ECONOMICS:
       Cheapest to most expensive (rough ranking for common cars):
-      Lanos ≈ Verna (cheapest) → Logan → Sunny → Elantra → Corolla → Cerato/Sentra → Tucson/Sportage → European brands (most expensive)
+      Lanos ≈ Verna ≈ Lancer Puma (cheapest) → Logan → Sunny → Elantra HD → Corolla → Cerato/Sentra → Tucson/Sportage → European brands (most expensive)
 
     FUEL TYPES IN EGYPT PRACTICE:
       - Most Egyptians use 92 octane (the standard).

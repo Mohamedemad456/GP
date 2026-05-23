@@ -20,11 +20,12 @@ aliases:
     سوبارو: Subaru
     دايهاتسو: Daihatsu
     اسوزو: Isuzu
+    ايسوزو: Isuzu
 
     # ─── Korean ──────────────────────────────────────────────────────
     هيونداي: Hyundai
     هيونداى: Hyundai
-    هيونداى: Hyundai
+    هونداي: Hyundai
     هيونده: Hyundai        # Common shortening
     كيا: Kia
     كيه: Kia               # Slang
@@ -36,12 +37,16 @@ aliases:
     # ─── European ────────────────────────────────────────────────────
     مرسيدس: Mercedes
     مرسيدس بنز: Mercedes
+    مرسيديس: Mercedes
+    مرسيديس بنز: Mercedes
     بنز: Mercedes          # Very common Egyptian slang
     بي ام دبليو: BMW
+    بى ام دبليو: BMW
     بي ام: BMW
     بيمر: BMW              # Slang
     فولكس فاجن: Volkswagen
     فولكس واجن: Volkswagen
+    فولكسفاجن: Volkswagen
     فولكس: Volkswagen
     فولفو: Volvo
     اودي: Audi
@@ -77,10 +82,12 @@ aliases:
     ام جي: MG
     ام. جي: MG
     ام جي ام: MG
+    ام جى: MG
     شيري: Chery
     شيرى: Chery
     بي واي دي: BYD
     بيواي دي: BYD
+    بى واى دى: BYD
     جيلي: Geely
     جيلى: Geely
     جاك: JAC
@@ -169,6 +176,8 @@ aliases:
     فيرنه: Verna
     اكسنت: Accent
     اكسينت: Accent
+    اكسنت ار بي: Accent RB
+    اكسنت RB: Accent RB
     توسان: Tucson
     توكسان: Tucson          # Common misspelling
     توسون: Tucson
@@ -181,7 +190,6 @@ aliases:
     سونتا: Sonata
     سوناتا: Sonata
     ماتريكس: Matrix
-    ايه ون: A1
     اي تن: I10
     ايتن: I10
     اي عشرين: I20
@@ -190,7 +198,8 @@ aliases:
     ايكس ثلاثة وثلاثين: IX35
     اتس: Atos
     جيتز: Getz
-    باثفايندر: Pathfinder    # Note: This is Nissan, but often confused
+    اكسنت اتش سي اي: Accent HCI
+    اكسنت HCI: Accent HCI
     باي يون: Bayon
     سولاريس: Solaris
     فيلوستر: Veloster
@@ -208,10 +217,10 @@ aliases:
     سبورتاج: Sportage
     سبورتيج: Sportage
     بيكانتو: Picanto
-    بيكانتو: Picanto
     بيكنتو: Picanto
     ريو: Rio
     كارنز: Carens
+    كيرنز: Carens
     سورينتو: Sorento
     سورنتو: Sorento
     سول: Soul
@@ -219,7 +228,6 @@ aliases:
     اكسيد: Xceed
     سيد: Ceed
     كارنيفال: Carnival
-    كيه جي ام: KGM
     سيفيا: Sephia
     شوما: Shuma
     برايد: Pride
@@ -233,6 +241,7 @@ aliases:
     صني: Sunny
     الصني: Sunny
     صني شكل قديم: Sunny     # N16 slang
+    صني شكل جديد: Sunny
     صني ان 16: Sunny        # N16
     صني ان 17: Sunny        # N17
     قشقاي: Qashqai
@@ -302,13 +311,14 @@ aliases:
     لانسر: Lancer
     بومة: Lancer Puma        # 2004-2012 Puma slang
     بومه: Lancer Puma
+    لانسر بومة: Lancer Puma
     شارك: Lancer EX Shark    # EX Shark slang
+    لانسر شارك: Lancer EX Shark
     مكواة: Lancer            # 2001-2003 slang
     مكوه: Lancer
     كريستالة: Lancer Crystala # 1996-2000 slang
     كريستاله: Lancer Crystala
     بطة: Lancer              # 1991-1995 slang
-    باجيرو: Pajero
     باجيرو: Pajero
     اتراج: Attrage
     اترج: Attrage
@@ -435,9 +445,10 @@ aliases:
     ارتيجه: Ertiga
     التو: Alto
     فيتارا: Vitara
-    جراند فيتارا: Grand vitara
+    جراند فيتارا: Grand Vitara
     اس بريسو: S Presso
     سويفت ديزاير: Swift Dzire
+    ديزاير: Swift Dzire
 
     # ═══════════════════════════════════════════════════════════════
     # MG
@@ -547,6 +558,7 @@ aliases:
     # ═══════════════════════════════════════════════════════════════
     اتش 6: H6
     جوليون: Jolion
+    جوليان: Jolion
     جوليون برو: Jolion Pro
 
     # ═══════════════════════════════════════════════════════════════
@@ -578,6 +590,8 @@ aliases:
     كيا كارنز: Kia Carens
     كيا سورينتو: Kia Sorento
     كيا سول: Kia Soul
+    كيا كيه ثري: Kia K3
+    كيا جراند سيراتو: Kia Grand Cerato
     هيونداي توسان: Hyundai Tucson
     هيونداي النترا: Hyundai Elantra
     هيونداي فيرنا: Hyundai Verna
@@ -587,7 +601,9 @@ aliases:
     هيونداي اتش دي: Hyundai Elantra HD
     هيونداي ام دي: Hyundai Elantra MD
     هيونداي اي دي: Hyundai Elantra AD
+    هيونداي النترا اي دي: Hyundai Elantra AD
     هيونداي سي ان سفن: Hyundai Elantra CN7
+    هيونداي النترا سي ان سفن: Hyundai Elantra CN7
     تويوتا كورولا: Toyota Corolla
     تويوتا يارس: Toyota Yaris
     تويوتا فورتشنر: Toyota Fortuner
@@ -664,7 +680,7 @@ aliases:
     فولكس باسات: Volkswagen Passat
     فولكس بولو: Volkswagen Polo
     فولكس تيجوان: Volkswagen Tiguan
-    هيونداي باثفايندر: Nissan Pathfinder
+    نيسان باثفايندر: Nissan Pathfinder
     شيفروليه تمناية: Chevrolet N300
     تيجو شكل قديم: Speranza Tiggo
     اسبرانزا تيجو: Speranza Tiggo
