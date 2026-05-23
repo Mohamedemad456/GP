@@ -60,9 +60,9 @@ class ChatRequest(BaseModel):
         default=None,
         description=(
             "Optional provider/model selector for testing: auto, cerebras/qwen (primary), "
-            "groq/llama_groq, Llama_samba, or gemini"
+            "deepinfra/qwen_deepinfra (secondary), groq/llama_groq, Llama_samba, or gemini"
         ),
-        examples=["auto", "cerebras", "qwen", "groq", "llama_groq", "Llama_samba", "gemini"],
+        examples=["auto", "cerebras", "qwen", "deepinfra", "qwen_deepinfra", "groq", "llama_groq", "Llama_samba", "gemini"],
     )
 
 

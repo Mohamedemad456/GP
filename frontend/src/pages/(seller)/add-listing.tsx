@@ -15,7 +15,10 @@ import {
   createListing,
   addListingChecklist,
   uploadListingPhotos,
+  generateListingPrice,
+  submitListing,
   type FuelType,
+  type EgyptLocation,
   type TransmissionType,
 } from "@/lib/listingsApi";
 import { getActiveMakes, type MakeDto } from "@/lib/makesApi";
@@ -96,6 +99,7 @@ interface FormState {
   mileage: string;
   fuelType: string;
   transmission: string;
+  location: string;
   engineSize: string;
   color: string;
   description: string;
@@ -115,6 +119,7 @@ const INITIAL_FORM: FormState = {
   mileage: "",
   fuelType: "",
   transmission: "",
+  location: "",
   engineSize: "",
   color: "",
   description: "",
@@ -145,6 +150,7 @@ const AddListing = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const previewUrlsRef = useRef<Set<string>>(new Set());
   const isRtl = i18n.language?.startsWith("ar");
 
   const [form, setForm] = useState<FormState>(INITIAL_FORM);
@@ -185,23 +191,38 @@ const AddListing = () => {
   const fetchAllActiveMakes = useCallback(async () => {
     setIsLoadingMakes(true);
     try {
-      const allMakes: MakeDto[] = [];
-      let pageIndex = 1;
-      let totalCount = 0;
+      const firstRes = await getActiveMakes({
+        pageIndex: 1,
+        pageSize: 10,
+        sort: "name",
+        sortDirection: "asc",
+      });
+      if (!firstRes.success) throw new Error(firstRes.message);
 
-      while (true) {
-        const res = await getActiveMakes({ pageIndex, pageSize: 100 });
-        if (!res.success) throw new Error(res.message);
+      const firstPage = firstRes.data?.data ?? [];
+      const totalCount = firstRes.data?.count ?? firstPage.length;
+      const effectivePageSize = firstRes.data?.pageSize ?? 10;
+      const totalPages = Math.ceil(totalCount / effectivePageSize);
 
-        const pageData = res.data?.data ?? [];
-        totalCount = res.data?.count ?? pageData.length;
-        allMakes.push(...pageData);
+      const remainingPages =
+        totalPages > 1
+          ? await Promise.all(
+              Array.from({ length: totalPages - 1 }, (_, index) =>
+                getActiveMakes({
+                  pageIndex: index + 2,
+                  pageSize: effectivePageSize,
+                  sort: "name",
+                  sortDirection: "asc",
+                }),
+              ),
+            )
+          : [];
+      if (remainingPages.some((res) => !res.success)) throw new Error("Failed to load makes");
 
-        if (pageData.length === 0 || allMakes.length >= totalCount) break;
-        pageIndex += 1;
-      }
-
-      setMakes(allMakes);
+      setMakes([
+        ...firstPage,
+        ...remainingPages.flatMap((res) => (res.success ? res.data?.data ?? [] : [])),
+      ]);
     } catch {
       toast.error(t("seller.addListing.errors.loadMakesFailed"));
     } finally {
@@ -212,23 +233,37 @@ const AddListing = () => {
   const fetchAllActiveModels = useCallback(async () => {
     setIsLoadingModels(true);
     try {
-      const accumulated: ModelDto[] = [];
-      let pageIndex = 1;
-      let totalCount = 0;
+      const pageSize = 10;
+      const firstRes = await getActiveModels({
+        pageIndex: 1,
+        pageSize,
+        sort: "name",
+        sortDirection: "asc",
+      });
+      if (!firstRes.success) throw new Error(firstRes.message);
 
-      while (true) {
-        const res = await getActiveModels({ pageIndex, pageSize: 10 });
-        if (!res.success) throw new Error(res.message);
+      const firstPage = firstRes.data ?? [];
+      const totalCount = firstRes.count ?? firstPage.length;
+      const totalPages = Math.ceil(totalCount / pageSize);
+      const remainingPages =
+        totalPages > 1
+          ? await Promise.all(
+              Array.from({ length: totalPages - 1 }, (_, index) =>
+                getActiveModels({
+                  pageIndex: index + 2,
+                  pageSize,
+                  sort: "name",
+                  sortDirection: "asc",
+                }),
+              ),
+            )
+          : [];
+      if (remainingPages.some((res) => !res.success)) throw new Error("Failed to load models");
 
-        const pageData = res.data ?? [];
-        totalCount = res.count ?? pageData.length;
-        accumulated.push(...pageData);
-
-        if (pageData.length === 0 || accumulated.length >= totalCount) break;
-        pageIndex += 1;
-      }
-
-      setAllModels(accumulated);
+      setAllModels([
+        ...firstPage,
+        ...remainingPages.flatMap((res) => (res.success ? res.data ?? [] : [])),
+      ]);
     } catch {
       toast.error(t("seller.addListing.errors.loadModelsFailed"));
     } finally {
@@ -268,6 +303,13 @@ const AddListing = () => {
       .finally(() => setIsLoadingConditionDefects(false));
   }, [fetchAllActiveMakes, fetchAllActiveModels, t]);
 
+  useEffect(() => {
+    return () => {
+      previewUrlsRef.current.forEach((previewUrl) => URL.revokeObjectURL(previewUrl));
+      previewUrlsRef.current.clear();
+    };
+  }, []);
+
   // Filter models by selected make
   const availableModels = useMemo(
     () =>
@@ -299,6 +341,7 @@ const AddListing = () => {
 
   const fuelTypeOptions = lookupOptionsByNameKey.fuelTypes ?? [];
   const transmissionOptions = lookupOptionsByNameKey.transmissionTypes ?? [];
+  const locationOptions = lookupOptionsByNameKey.locations ?? [];
   const currentStepIndex = ADD_LISTING_STEPS.indexOf(currentStep);
 
   // ── Handlers ─────────────────────────────────────────────────────────────
@@ -351,6 +394,7 @@ const AddListing = () => {
 
       setImages((prev) => [...prev, ...toAdd]);
       const newPreviews = toAdd.map((f) => URL.createObjectURL(f));
+      newPreviews.forEach((previewUrl) => previewUrlsRef.current.add(previewUrl));
       setImagePreviews((prev) => [...prev, ...newPreviews]);
 
       // Clear image error when user adds images
@@ -372,7 +416,9 @@ const AddListing = () => {
 
   const removeImage = useCallback(
     (index: number) => {
-      URL.revokeObjectURL(imagePreviews[index]);
+      const previewUrl = imagePreviews[index];
+      URL.revokeObjectURL(previewUrl);
+      previewUrlsRef.current.delete(previewUrl);
       setImages((prev) => prev.filter((_, i) => i !== index));
       setImagePreviews((prev) => prev.filter((_, i) => i !== index));
     },
@@ -487,12 +533,13 @@ const AddListing = () => {
     if (!form.year) errs.year = t("seller.addListing.errors.required");
     if (!form.mileage) {
       errs.mileage = t("seller.addListing.errors.required");
-    } else if (Number(form.mileage) < 0) {
+    } else if (Number(form.mileage) <= 0) {
       errs.mileage = t("seller.addListing.errors.invalidMileage");
     }
     if (!form.fuelType) errs.fuelType = t("seller.addListing.errors.required");
     if (!form.transmission)
       errs.transmission = t("seller.addListing.errors.required");
+    if (!form.location) errs.location = t("seller.addListing.errors.required");
     if (!form.engineSize.trim())
       errs.engineSize = t("seller.addListing.errors.required");
     if (!form.color) errs.color = t("seller.addListing.errors.required");
@@ -547,6 +594,7 @@ const AddListing = () => {
         mileage: parseInt(form.mileage, 10),
         fuelType: parseInt(form.fuelType, 10) as FuelType,
         transmission: parseInt(form.transmission, 10) as TransmissionType,
+        location: parseInt(form.location, 10) as EgyptLocation,
         engineSize: parseFloat(form.engineSize),
         color: form.color,
         description: form.description.trim(),
@@ -583,27 +631,30 @@ const AddListing = () => {
     setIsSubmitting(true);
 
     try {
-      if (selectedConditions.length > 0) {
-        const checklistResult = await addListingChecklist(createdListingId, {
-          conditionDefectIds: selectedConditions.map((c) => c.defectId),
-        });
+      if (selectedConditions.length === 0) {
+        toast.error(t("seller.addListing.conditionChecklist.emptySelections"));
+        return;
+      }
 
-        if (!checklistResult.success) {
-          toast.warning(t("seller.addListing.errors.checklistFailed"), {
-            description: checklistResult.message,
-          });
-        }
+      const checklistResult = await addListingChecklist(createdListingId, {
+        conditionDefectIds: selectedConditions.map((c) => c.defectId),
+      });
+
+      if (!checklistResult.success) {
+        toast.error(t("seller.addListing.errors.checklistFailed"), {
+          description: checklistResult.message,
+        });
+        return;
       }
 
       setIsConditionStepComplete(true);
       setSubmitted(false);
       setCurrentStep("photos");
     } catch (error) {
-      toast.warning(t("seller.addListing.errors.checklistFailed"), {
+      toast.error(t("seller.addListing.errors.checklistFailed"), {
         description: getApiErrorMessage(error),
       });
-      setIsConditionStepComplete(true);
-      setCurrentStep("photos");
+      return;
     } finally {
       setIsSubmitting(false);
     }
@@ -638,13 +689,29 @@ const AddListing = () => {
         return;
       }
 
+      const priceResult = await generateListingPrice(createdListingId);
+      if (!priceResult.success) {
+        toast.error(t("seller.addListing.errors.submitFailed"), {
+          description: priceResult.message,
+        });
+        return;
+      }
+
+      const submitResult = await submitListing(createdListingId);
+      if (!submitResult.success) {
+        toast.error(t("seller.addListing.errors.submitFailed"), {
+          description: submitResult.message,
+        });
+        return;
+      }
+
       toast.success(t("seller.addListing.success.title"), {
         description: t("seller.addListing.success.description"),
       });
 
       navigate("/seller/listings");
     } catch (error) {
-      toast.error(t("seller.addListing.errors.photosFailed"), {
+      toast.error(t("seller.addListing.errors.submitFailed"), {
         description: getApiErrorMessage(error),
       });
     } finally {
@@ -1051,6 +1118,39 @@ const AddListing = () => {
                   {transmissionOptions.map((type) => (
                     <SelectItem key={type.value} value={type.value.toString()}>
                       {type.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FormField>
+
+            {/* Location */}
+            <FormField
+              label={t("seller.addListing.fields.location")}
+              error={errors.location}
+              required
+            >
+              <Select
+                value={form.location}
+                onValueChange={(v) => updateField("location", v)}
+                disabled={isLoadingLookups}
+              >
+                <SelectTrigger
+                  aria-invalid={!!errors.location}
+                  className="h-11 rounded-xl bg-background/80"
+                >
+                  <SelectValue
+                    placeholder={
+                      isLoadingLookups
+                        ? t("seller.addListing.placeholders.loading")
+                        : t("seller.addListing.placeholders.location")
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {locationOptions.map((loc) => (
+                    <SelectItem key={loc.value} value={loc.value.toString()}>
+                      {loc.label}
                     </SelectItem>
                   ))}
                 </SelectContent>

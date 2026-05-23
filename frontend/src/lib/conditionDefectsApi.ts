@@ -93,10 +93,13 @@ const mergeConditionDefects = (
  * GET /api/ConditionDefects/Active — AllowAnonymous
  * Backend returns ApiResponse<Pagination<T>>; unwrapped to a flat array here.
  */
-export const getActiveConditionDefects = () =>
+export const getActiveConditionDefects = (
+  params?: Omit<ConditionDefectSpecParams, "categoryId" | "isActive">,
+) =>
   api
     .get<ApiResponse<PaginatedResponse<ConditionDefectDto>>>(
       `${ENDPOINT}/Active`,
+      { params },
     )
     .then(
       (r) =>

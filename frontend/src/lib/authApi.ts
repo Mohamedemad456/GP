@@ -66,6 +66,11 @@ export const logoutUser = () =>
     .post<{ success: boolean; message: string }>("/api/auth/logout")
     .then((r) => r.data);
 
+export const logoutFromAllDevices = () =>
+  api
+    .post<{ success: boolean; message: string }>("/api/auth/logout-all")
+    .then((r) => r.data);
+
 export const getProfile = () =>
   api.get<ApiResponse<UserDto>>("/api/user/profile").then((r) => r.data);
 

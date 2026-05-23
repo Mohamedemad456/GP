@@ -74,16 +74,17 @@ ModelChoice = Optional[str]
 class LLMService:
     """
     Service for generating AI responses with automatic provider fallback.
-    Uses Cerebras first (Qwen), then Groq, then SambaNova, then Gemini.
+    Uses Cerebras first (Qwen), then DeepInfra (Qwen), then Groq, then SambaNova, then Gemini.
 
     Providers:
     - Primary: Cerebras (Qwen 3 235B)
-    - Secondary: Groq (Llama 3.3 70B)
-    - Tertiary: SambaNova (Meta-Llama-3.3-70B-Instruct)
-    - Quaternary: Google (Gemini-3-preview)
+    - Secondary: DeepInfra (Qwen 3 235B)
+    - Tertiary: Groq (Llama 3.3 70B)
+    - Quaternary: SambaNova (Meta-Llama-3.3-70B-Instruct)
+    - Quinary: Google (Gemini-3-preview)
 
     Flow:
-    User message → Try Cerebras → If fails → Try Groq → If fails → Try SambaNova → If fails → Try Gemini → Return response
+    User message → Try Cerebras → If fails → Try DeepInfra → If fails → Try Groq → If fails → Try SambaNova → If fails → Try Gemini → Return response
 
     Loads system prompts and parameters from YAML configuration.
     """
@@ -96,6 +97,13 @@ class LLMService:
             self.cerebras_client = AsyncOpenAI(
                 base_url=settings.cerebras_base_url,
                 api_key=settings.cerebras_api_key,
+            )
+
+        self.deepinfra_client: AsyncOpenAI | None = None
+        if settings.deepinfra_api_key:
+            self.deepinfra_client = AsyncOpenAI(
+                base_url=settings.deepinfra_base_url,
+                api_key=settings.deepinfra_api_key,
             )
 
         self.groq_client = AsyncOpenAI(
@@ -302,6 +310,11 @@ class LLMService:
             "qwen_cerebras": "cerebras",
             "cerebras_qwen": "cerebras",
 
+            # DeepInfra (Qwen)
+            "deepinfra": "deepinfra",
+            "qwen_deepinfra": "deepinfra",
+            "deepinfra_qwen": "deepinfra",
+
             # Groq (Llama)
             "groq": "groq_primary",
             "llama_groq": "groq_primary",
@@ -316,7 +329,7 @@ class LLMService:
 
         if normalized not in aliases:
             raise ValueError(
-                "Unknown model choice. Use auto, cerebras/qwen, groq/llama_groq, llama_samba, or gemini."
+                "Unknown model choice. Use auto, cerebras/qwen, deepinfra/qwen_deepinfra, groq/llama_groq, llama_samba, or gemini."
             )
 
         return aliases[normalized]
@@ -409,6 +422,36 @@ class LLMService:
             logger.warning("Cerebras failed: %s", e)
             return None
 
+    async def _try_deepinfra(
+        self,
+        conversation_key: str,
+        user_message: str,
+        temperature: float,
+        max_tokens: int,
+    ) -> Optional[str]:
+        """Try to get a response from DeepInfra (secondary Qwen provider)."""
+
+        if not self.deepinfra_client:
+            return None
+
+        try:
+            history = await self._get_history(conversation_key)
+            messages = self._format_openai_messages(history, user_message)
+
+            response = await self.deepinfra_client.chat.completions.create(
+                model=settings.deepinfra_model,
+                messages=messages,
+                temperature=temperature,
+                max_tokens=max_tokens,
+                top_p=self.model_params.get("top_p", 0.85),
+                timeout=self.timeout,
+            )
+            return response.choices[0].message.content
+
+        except Exception as e:
+            logger.warning("DeepInfra failed: %s", e)
+            return None
+
     async def _try_sambanova(
         self,
         conversation_key: str,
@@ -499,17 +542,18 @@ class LLMService:
 
         When model_choice is omitted or set to auto, the fallback pattern is:
         1. Try Cerebras Qwen first
-        2. If fails → Try Groq Llama
-        3. If fails → Try SambaNova Llama
-        4. If fails → Try Gemini
-        5. If all fail → Raise exception
+        2. If fails → Try DeepInfra Qwen
+        3. If fails → Try Groq Llama
+        4. If fails → Try SambaNova Llama
+        5. If fails → Try Gemini
+        6. If all fail → Raise exception
 
         When model_choice is provided, the matching provider is used directly.
 
         Args:
             user_message: The user's input text
             model_choice: Optional provider alias for testing (auto, qwen/cerebras,
-                groq/llama_groq, Llama_samba, or gemini)
+                deepinfra/qwen_deepinfra, groq/llama_groq, Llama_samba, or gemini)
 
         Returns:
             str: AI-generated response text
@@ -542,6 +586,13 @@ class LLMService:
             if cerebras_response:
                 return await _finalize(cerebras_response)
             raise RuntimeError("Cerebras failed to generate a response")
+
+        if selected_model == "deepinfra":
+            logger.info("Using DeepInfra explicitly: %s", settings.deepinfra_model)
+            deepinfra_response = await self._try_deepinfra(conversation_key, user_message, temp, max_tok)
+            if deepinfra_response:
+                return await _finalize(deepinfra_response)
+            raise RuntimeError("DeepInfra failed to generate a response")
 
         if selected_model == "groq_primary":
             chosen = self._get_effective_groq_model()
@@ -577,6 +628,14 @@ class LLMService:
             if cerebras_response:
                 logger.info("Cerebras succeeded")
                 return await _finalize(cerebras_response)
+
+        # Then try DeepInfra
+        if self.deepinfra_client:
+            logger.info("Trying DeepInfra (Secondary): %s", settings.deepinfra_model)
+            deepinfra_response = await self._try_deepinfra(conversation_key, user_message, temp, max_tok)
+            if deepinfra_response:
+                logger.info("DeepInfra succeeded")
+                return await _finalize(deepinfra_response)
 
         # Then try Groq
         groq_model = self._get_effective_groq_model()

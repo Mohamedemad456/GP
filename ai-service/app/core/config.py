@@ -17,6 +17,10 @@ class Settings(BaseSettings):
     cerebras_base_url: str = "https://api.cerebras.ai/v1"
     cerebras_model: str = "qwen-3-235b-a22b-instruct-2507"
 
+    deepinfra_api_key: str | None = None
+    deepinfra_base_url: str = "https://api.deepinfra.com/v1/openai"
+    deepinfra_model: str = "Qwen/Qwen3-235B-A22B-Instruct-2507"
+
     # ── Groq (fallback provider) ────────────────────────────────
     groq_api_key: str
     groq_base_url: str
@@ -84,6 +88,9 @@ if __name__ == "__main__":
     print(f"Cerebras Enabled: {bool(settings.cerebras_api_key)}")
     print(f"Cerebras Base URL: {settings.cerebras_base_url}")
     print(f"Cerebras Model: {settings.cerebras_model}")
+    print(f"DeepInfra Enabled: {bool(settings.deepinfra_api_key)}")
+    print(f"DeepInfra Base URL: {settings.deepinfra_base_url}")
+    print(f"DeepInfra Model: {settings.deepinfra_model}")
     print(f"Groq API Key: ****{settings.groq_api_key[-4:]}")
     print(f"Groq Base URL: {settings.groq_base_url}")
     effective_groq_primary = settings.groq_model
