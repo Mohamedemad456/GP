@@ -41,3 +41,7 @@ export const getListingStatuses = () =>
   api
     .get<LookupOptionDto[]>("/api/Lookups/listing-statuses")
     .then((r) => r.data);
+
+// GET /api/Lookups/locations
+export const getLocations = () =>
+  api.get<LookupOptionDto[]>("/api/Lookups/locations").then((r) => r.data);

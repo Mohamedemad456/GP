@@ -74,10 +74,13 @@ const mergeConditionChecklistCategories = (
  * GET /api/ConditionChecklistCategories/Active — AllowAnonymous
  * Backend returns ApiResponse<Pagination<T>>; unwrapped to a flat array here.
  */
-export const getActiveConditionChecklistCategories = () =>
+export const getActiveConditionChecklistCategories = (
+  params?: Omit<ConditionChecklistCategorySpecParams, "isActive">,
+) =>
   api
     .get<ApiResponse<PaginatedResponse<ConditionChecklistCategoryDto>>>(
       `${ENDPOINT}/Active`,
+      { params },
     )
     .then(
       (r) =>

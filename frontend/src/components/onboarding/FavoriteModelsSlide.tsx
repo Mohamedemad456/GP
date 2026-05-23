@@ -13,8 +13,8 @@ import { cn } from "@/lib/utils";
 import type { FavoriteModelsSlideProps } from "@/types";
 
 const MAX_SELECTIONS = 3;
-const INITIAL_COUNT = 12;
-const LOAD_MORE_STEP = 8;
+const INITIAL_COUNT = 15;
+const LOAD_MORE_STEP = 15;
 
 const FavoriteModelsSlide = ({ carModels, onSubmit }: FavoriteModelsSlideProps) => {
   const { t } = useTranslation();
