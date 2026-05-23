@@ -39,23 +39,63 @@ const Onboarding = () => {
   }, [setUser]);
 
   useEffect(() => {
-    getActiveMakes()
-      .then((res) => {
-        if (res.success) {
-          setMakes(
-            res.data.map((m) => ({
-              id: m.id,
-              brand: m.name,
-              name: "",
-              logo: getMakeLogoUrl(m.logoUrl),
-            })),
-          );
+    let isCancelled = false;
+    (async () => {
+      const toCarModels = (items: Array<{ id: string; name: string; logoUrl: string | null }>) =>
+        items.map((m) => ({
+          id: m.id,
+          brand: m.name,
+          name: "",
+          logo: getMakeLogoUrl(m.logoUrl),
+        }));
+
+      try {
+        const firstRes = await getActiveMakes({
+          pageIndex: 1,
+          pageSize: 10,
+          sort: "name",
+          sortDirection: "asc",
+        });
+        if (!firstRes.success) {
+          if (!isCancelled) setMakes([]);
+          return;
         }
-      })
-      .catch(() => {
+
+        const firstPageItems = firstRes.data?.data ?? [];
+        const totalCount = firstRes.data?.count ?? firstPageItems.length;
+        const effectivePageSize = firstRes.data?.pageSize ?? 10;
+        const totalPages = Math.ceil(totalCount / effectivePageSize);
+
+        const remainingPages =
+          totalPages > 1
+            ? await Promise.all(
+                Array.from({ length: totalPages - 1 }, (_, index) =>
+                  getActiveMakes({
+                    pageIndex: index + 2,
+                    pageSize: effectivePageSize,
+                    sort: "name",
+                    sortDirection: "asc",
+                  }),
+                ),
+              )
+            : [];
+
+        const accumulated = [
+          ...firstPageItems,
+          ...remainingPages.flatMap((res) => (res.success ? res.data?.data ?? [] : [])),
+        ];
+
+        if (!isCancelled) setMakes(toCarModels(accumulated));
+      } catch {
         // Falls back to empty list — user can still skip onboarding
-      })
-      .finally(() => setIsLoading(false));
+      } finally {
+        if (!isCancelled) setIsLoading(false);
+      }
+    })();
+
+    return () => {
+      isCancelled = true;
+    };
   }, []);
 
   const handleFavoritesSubmit = (selectedIds: string[]) => {

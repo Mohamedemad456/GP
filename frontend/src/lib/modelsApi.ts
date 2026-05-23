@@ -36,7 +36,12 @@ export type ModelSpecParams = {
  * Backend returns ApiResponse<Pagination<T>>; unwrapped to a flat array here.
  * The Active endpoint accepts PaginationSpecParams (no makeId/isActive filter).
  */
-export const getActiveModels = (params?: Pick<ModelSpecParams, "pageIndex" | "pageSize" | "search">) =>
+export const getActiveModels = (
+  params?: Pick<
+    ModelSpecParams,
+    "pageIndex" | "pageSize" | "search" | "sort" | "sortDirection"
+  >,
+) =>
   api
     .get<ApiResponse<PaginatedResponse<ModelDto>>>("/api/Models/Active", { params })
     .then((r) => ({

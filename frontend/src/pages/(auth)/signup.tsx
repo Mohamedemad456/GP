@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button, Input } from "@gp/design-system";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -18,7 +18,6 @@ import { registerUser } from "@/lib/authApi";
 import axios from "axios";
 
 const Signup = () => {
-  const navigate = useNavigate();
   const { error, success } = useToast();
   const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
@@ -61,11 +60,9 @@ const Signup = () => {
       success(t("auth.signupToastTitle"), {
         description: t("auth.signupToastDescription"),
       });
-      // Navigate BEFORE setting auth state so GuestRoute never sees an
-      // authenticated user while still on /signup (which would cause it to
-      // redirect to /feed and swallow the onboarding navigation).
-      // The onboarding page fetches the profile itself to establish the session.
-      navigate("/onboarding", { replace: true });
+      // Use a direct URL transition to avoid GuestRoute timing races
+      // right after cookies are set by registration.
+      window.location.replace("/onboarding");
     } catch (err) {
       const message = axios.isAxiosError(err)
         ? (err.response?.data?.message ?? err.message)
