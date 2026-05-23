@@ -18,9 +18,11 @@ To clear the in-memory chat history without restarting the server:
 
 The chat service now uses this default fallback order:
 
-1. Groq with `llama-3.3-70b-versatile`
-2. SambaNova with `Meta-Llama-3.3-70B-Instruct`
-3. Gemini with `gemini-3-flash-preview`
+1. Cerebras with `qwen-3-235b-a22b-instruct-2507`
+2. DeepInfra with `Qwen/Qwen3-235B-A22B-Instruct-2507`
+3. Groq with `llama-3.3-70b-versatile`
+4. SambaNova with `Meta-Llama-3.3-70B-Instruct`
+5. Gemini with `gemini-3-flash-preview`
 
 ## Explicit Model Selection
 
@@ -29,9 +31,9 @@ For testing, the `/api/v1/chat` request accepts an optional `model` field:
 ```json
 {
 	"message": "What should I look for when buying a used car?",
-	"model": "Llama_samba"
+	"model": "deepinfra"
 }
 ```
 
-Supported values are `auto`, `Llama_groq`, `Llama_samba`, and `gemini`.
+Supported values are `auto`, `cerebras`, `qwen`, `deepinfra`, `qwen_deepinfra`, `Llama_groq`, `Llama_samba`, and `gemini`.
 

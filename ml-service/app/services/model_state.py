@@ -154,11 +154,14 @@ def _model_diagnostics_candidate_paths(info: dict | None = None) -> list:
             "model_diagnostics_csv",
             "per_make_model_mape_csv",
             "make_model_mape_csv",
+            "make_model_mape_cv_csv",
         ):
             if artifacts.get(key):
                 paths.append(resolve_registry_path(artifacts[key]))
 
     paths.extend([
+        settings.model_metrics_dir / "make_model_mape_cv.csv",
+        settings.model_metrics_dir / "make_model_mape.csv",
         settings.model_metadata_dir / "make_model_mape.csv",
         settings.model_metadata_dir / "model_diagnostics_make_model.csv",
         settings.model_pickles_dir / "make_model_mape.csv",
@@ -310,6 +313,19 @@ def load_active_model():
         ACTIVE_IS_QUANTILE = True
         logger.info(f"Loaded quantile model ({ACTIVE_FRAMEWORK}): "
                     f"keys={list(loaded.keys())}")
+    elif isinstance(loaded, dict) and 'base_models' in loaded:
+        # Ensemble model: dict with 'base_models' containing sub-models
+        ACTIVE_MODELS = loaded
+        # Ensemble is quantile if any base model is quantile
+        base = loaded.get('base_models', {})
+        ACTIVE_IS_QUANTILE = any(
+            isinstance(v, dict) and 'median' in v for v in base.values()
+        )
+        logger.info(
+            f"Loaded ensemble model ({ACTIVE_FRAMEWORK}): "
+            f"method={loaded.get('method')}, weights={loaded.get('weights')}, "
+            f"base_keys={list(base.keys())}, is_quantile={ACTIVE_IS_QUANTILE}"
+        )
     else:
         ACTIVE_MODELS = loaded
         ACTIVE_IS_QUANTILE = False

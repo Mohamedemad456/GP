@@ -139,6 +139,10 @@ class Settings(BaseSettings):
         return self.models_dir / "metadata"
 
     @property
+    def model_metrics_dir(self) -> Path:
+        return self.models_dir / "metrics"
+
+    @property
     def model_preprocessors_dir(self) -> Path:
         return self.models_dir / "preprocessors"
 

@@ -11,7 +11,7 @@ import time
 
 from fastapi import APIRouter, HTTPException
 from app.core.logging_config import log_prediction_audit
-from app.core.metrics import record_prediction, record_prediction_error, record_batch_request
+from app.core.metrics import record_prediction, record_prediction_error, record_batch_request, record_prediction_by_endpoint
 
 from app.schemas.prediction import (
     PredictionRequest, PredictionResponse, NegotiationRange, PriceFactor,
@@ -164,6 +164,7 @@ def predict_endpoint(request: PredictionRequest):
 
     duration = time.monotonic() - start
     record_prediction(confidence=result["confidence"], duration_s=duration)
+    record_prediction_by_endpoint("single")
     _audit_prediction(
         request,
         duration_ms=duration * 1000,
@@ -181,6 +182,7 @@ def predict_endpoint(request: PredictionRequest):
 def predict_batch_endpoint(request: BatchPredictionRequest):
     """Best-effort batch prediction. Returns partial results on individual failures."""
     record_batch_request()
+    record_prediction_by_endpoint("batch")
     results: list[BatchPredictionItem] = []
     successful = 0
     failed = 0

@@ -14,3 +14,7 @@ _extract_make_model.py
 dockerfileml
 docker-compose-ml.yml
 
+# *.ok
+
+# *.ubj
+# pickles
