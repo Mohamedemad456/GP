@@ -1,0 +1,110 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    working_dir: /app/frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app/frontend:Z
+      - ./packages/design-system:/app/packages/design-system:Z
+      - frontend_node_modules:/app/frontend/node_modules
+      - design_system_node_modules:/app/packages/design-system/node_modules
+    command: sh -c "cd /app/packages/design-system && npm install && cd /app/frontend && npm install && npm run dev -- --host 0.0.0.0"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+      - VITE_API_BASE_URL=http://localhost:9090
+
+
+  design-system-storybook:
+    build:
+      context: .
+      dockerfile: packages/design-system/Dockerfile
+    working_dir: /app/packages/design-system
+    ports:
+      - "6006:6006"
+    volumes:
+      - ./packages/design-system:/app/packages/design-system:Z
+      - design_system_node_modules:/app/packages/design-system/node_modules
+    command: sh -c "npm install && npm run storybook -- --host 0.0.0.0 --no-open"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+
+      
+  # =======================
+  # AI Service (FastAPI)
+  # =======================
+  ai-service:
+    container_name: karna_ai_service
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./ai-service/logs:/app/logs:Z,U
+    env_file:
+      - .env
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+
+  # =======================
+  # Backend (.NET API)
+  # =======================
+  backend:
+    container_name: karna_backend
+    build:
+      context: ./backend/KARNA
+      dockerfile: Karna.APIs/Dockerfile
+    ports:
+      - "9090:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: 8080
+      ConnectionStrings__DefaultConnection: Server=db;Database=KarnaDb;User=sa;Password=Karna@Pass123;TrustServerCertificate=True
+      Urls__ApiBaseUrl: http://localhost:9090
+
+    depends_on:
+      - db
+
+  # =======================
+  # ML Service (FastAPI)
+  # =======================
+  ml-service:
+    container_name: karna_ml_service
+    build:
+      context: ./ml-service
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./ml-service:/app:Z,U
+    env_file:
+      - .env
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+
+  # =======================
+  # Database (SQL Server)
+  # =======================
+  db:
+    container_name: karna_db
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "Karna@Pass123"
+    ports:
+      - "1433:1433"
+    volumes:
+      - karna_db_data:/var/opt/mssql
+
+volumes:
+  karna_db_data:
+  frontend_node_modules:
+  design_system_node_modules:
+

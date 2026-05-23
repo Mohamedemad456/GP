@@ -1,8 +1,8 @@
 {
   "schema_version": "2.0",
-  "active_model_id": "xgboost_quantile_v1.1.0",
-  "active_version": "v1.1.0",
-  "promoted_at": "2026-05-13T02:50:00+00:00",
+  "active_model_id": "ensemble_robust_average_v1.1.0",
+  "active_version": "v1.2.0",
+  "promoted_at": "2026-05-23T21:51:00+00:00",
   "models": {
     "huber_baseline_v1.0.0": {
       "model_id": "huber_baseline_v1.0.0",
@@ -29,7 +29,7 @@
       "model_id": "xgboost_quantile_v1.1.0",
       "framework": "XGBoost",
       "version": "v1.1.0",
-      "stage": "production",
+      "stage": "archived",
       "pkl_path": "models/pickles/xgb_quantile_models.joblib",
       "meta_path": "models/metadata/XGBoost_quantile_v1.0.0.json",
       "metrics": {
@@ -52,7 +52,7 @@
       "model_id": "ensemble_robust_average_v1.1.0",
       "framework": "ensemble",
       "version": "v1.2.0",
-      "stage": "candidate",
+      "stage": "production",
       "pkl_path": "models/pickles/ensemble_v1.1.0.joblib",
       "meta_path": "models/metadata/ensemble_robust_average_v1.1.0.json",
       "metrics": {
