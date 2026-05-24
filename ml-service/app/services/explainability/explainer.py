@@ -7,7 +7,7 @@ import logging
 
 import numpy as np
 
-import app.services.model_state as _ms
+import app.services.model.model_state as _ms
 
 logger = logging.getLogger(__name__)
 
@@ -77,7 +77,7 @@ def warm_up_shap() -> bool:
     Startup should call this synchronously.  If it fails, log warning
     and continue — do NOT crash the server.
     """
-    from app.services.feature_builder import build_features, prepare_for_xgboost, prepare_for_lightgbm
+    from app.services.prediction.feature_builder import build_features, prepare_for_xgboost, prepare_for_lightgbm
 
     explainer = _get_or_build_shap_explainer()
     if explainer is None:
@@ -124,8 +124,8 @@ def compute_price_factors(
     Returns list of dicts: {factor, direction, description}.
     Only supported for tree models (XGBoost/LightGBM). Returns None on failure.
     """
-    from app.services.feature_builder import build_features, prepare_for_xgboost, prepare_for_lightgbm
-    from app.services.factor_expert import explain_factor
+    from app.services.prediction.feature_builder import build_features, prepare_for_xgboost, prepare_for_lightgbm
+    from app.services.explainability.factor_expert import explain_factor
 
     explainer = _get_or_build_shap_explainer()
     if explainer is None:

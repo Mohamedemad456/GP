@@ -18,7 +18,7 @@ from datetime import datetime
 
 import numpy as np
 
-from app.services.market_stats import bucket_against_quantiles, get_market_stats
+from app.services.explainability.market_stats import bucket_against_quantiles, get_market_stats
 
 
 @dataclass(frozen=True)

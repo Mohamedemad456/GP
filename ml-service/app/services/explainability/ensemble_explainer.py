@@ -31,7 +31,7 @@ from typing import Any
 
 import numpy as np
 
-import app.services.model_state as _ms
+import app.services.model.model_state as _ms
 from app.core.model_registry import resolve_registry_path
 
 logger = logging.getLogger(__name__)
@@ -290,10 +290,10 @@ def compute_ensemble_price_factors(
     Returns:
         list of dicts {factor, direction, description} or None on failure.
     """
-    from app.services.feature_builder import (
+    from app.services.prediction.feature_builder import (
         build_features, prepare_for_xgboost, prepare_for_lightgbm,
     )
-    from app.services.factor_expert import explain_factor
+    from app.services.explainability.factor_expert import explain_factor
 
     if not _ENSEMBLE_EXPLAINER_READY or not _ENSEMBLE_EXPLAINERS:
         return None

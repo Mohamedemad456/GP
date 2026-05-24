@@ -28,9 +28,9 @@ from app.core.logging_config import setup_logging
 from app.core.middleware import RequestLoggingMiddleware
 from app.core.metrics import MetricsMiddleware, metrics_endpoint
 from app.api import predict, health
-from app.services.model_state import load_valid_cars, load_active_model, load_model_diagnostics
-from app.services.explainer import warm_up_shap
-from app.services.ensemble_explainer import init_ensemble_explainer, warm_up_ensemble_shap
+from app.services.model.model_state import load_valid_cars, load_active_model, load_model_diagnostics
+from app.services.explainability.explainer import warm_up_shap
+from app.services.explainability.ensemble_explainer import init_ensemble_explainer, warm_up_ensemble_shap
 
 logger = logging.getLogger(__name__)
 

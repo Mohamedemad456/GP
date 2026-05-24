@@ -15,12 +15,12 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-import app.services.model_state as _ms
-from app.services.confidence import compute_confidence_label, car_mape_pct
-from app.services.intervals import compute_negotiation_range
-from app.services.explainer import compute_price_factors
-from app.services.ensemble_explainer import compute_ensemble_price_factors
-from app.services.feature_builder import (
+import app.services.model.model_state as _ms
+from app.services.model.confidence import compute_confidence_label, car_mape_pct
+from app.services.model.intervals import compute_negotiation_range
+from app.services.explainability.explainer import compute_price_factors
+from app.services.explainability.ensemble_explainer import compute_ensemble_price_factors
+from app.services.prediction.feature_builder import (
     build_features, prepare_for_xgboost, prepare_for_lightgbm,
 )
 
@@ -196,7 +196,7 @@ def _predict_ensemble(df_features: pd.DataFrame) -> dict:
     """
     import joblib as _joblib
     from app.core.model_registry import resolve_registry_path as _resolve
-    from app.services.ensemble_explainer import _ENSEMBLE_SUB_MODELS, _ENSEMBLE_WEIGHT_NAMES, _ENSEMBLE_WEIGHTS, _ENSEMBLE_METHOD
+    from app.services.explainability.ensemble_explainer import _ENSEMBLE_SUB_MODELS, _ENSEMBLE_WEIGHT_NAMES, _ENSEMBLE_WEIGHTS, _ENSEMBLE_METHOD
 
     artifact = _ms.ACTIVE_MODELS
     base_models_raw = artifact.get("base_models", {})

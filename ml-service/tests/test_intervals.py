@@ -1,6 +1,6 @@
 import pytest
 
-from app.services.intervals import compute_negotiation_range
+from app.services.model.intervals import compute_negotiation_range
 
 
 def test_high_confidence_band():

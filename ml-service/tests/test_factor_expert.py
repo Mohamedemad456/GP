@@ -1,6 +1,6 @@
 import re
 
-from app.services.factor_expert import explain_factor
+from app.services.explainability.factor_expert import explain_factor
 
 
 def _base_row(**overrides):
