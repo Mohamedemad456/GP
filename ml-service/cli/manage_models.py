@@ -10,12 +10,12 @@ Versioning scheme:
   - Minor auto-increments for each new model within the same major version
 
 Usage:
-  python manage_models.py                  # Interactive menu
-  python manage_models.py status           # Show current status
-  python manage_models.py activate         # Choose model to activate
-  python manage_models.py bump-major       # Bump to next major version
-  python manage_models.py register         # Register a new model
-  python manage_models.py history          # Show version history
+  python cli/manage_models.py                  # Interactive menu
+  python cli/manage_models.py status           # Show current status
+  python cli/manage_models.py activate         # Choose model to activate
+  python cli/manage_models.py bump-major       # Bump to next major version
+  python cli/manage_models.py register         # Register a new model
+  python cli/manage_models.py history          # Show version history
 """
 
 import json
