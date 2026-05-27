@@ -13,7 +13,8 @@ namespace Karna.Core.Application.Services
 	internal class AdminService(
 		IUnitOfWork _unitOfWork,
 		ICurrentUserService _currentUserService,
-		ILocalizationService _localizer
+		ILocalizationService _localizer,
+		IAdminActivityLogService _activityLogService
 	) : IAdminService
 	{
 		public async Task<ApiResponse<Pagination<PendingListingDto>>> GetPendingListingsAsync(PendingListingSpecParams specParams)
@@ -64,7 +65,7 @@ namespace Karna.Core.Application.Services
 			await RecordStatusChangeAsync(listing.Id, oldStatus, listing.Status, adminUser.Id, null);
 
 			// 6. Log admin activity
-			await LogAdminActivityAsync(adminUser.Id, "ApproveListing", "Listing", listing.Id, null);
+			await _activityLogService.LogAsync(adminUser.Id, "ApproveListing", "Listing", listing.Id, null);
 
 			// 7. Save
 			await _unitOfWork.CompleteAsync();
@@ -107,7 +108,7 @@ namespace Karna.Core.Application.Services
 			await RecordStatusChangeAsync(listing.Id, oldStatus, listing.Status, adminUser.Id, dto.Reason);
 
 			// 7. Log admin activity (with reason as details)
-			await LogAdminActivityAsync(adminUser.Id, "RejectListing", "Listing", listing.Id, dto.Reason);
+			await _activityLogService.LogAsync(adminUser.Id, "RejectListing", "Listing", listing.Id, dto.Reason);
 
 			// 8. Save
 			await _unitOfWork.CompleteAsync();
@@ -142,21 +143,6 @@ namespace Karna.Core.Application.Services
 				ChangedByUserId = changedByUserId,
 				Reason = reason,
 				ChangedAt = DateTime.UtcNow
-			});
-		}
-
-
-		private async Task LogAdminActivityAsync(Guid adminId, string action, string entityType, Guid entityId, string? details)
-		{
-			var logRepo = _unitOfWork.GetRepository<AdminActivityLog>();
-			await logRepo.AddAsync(new AdminActivityLog
-			{
-				AdminId = adminId,
-				Action = action,
-				EntityType = entityType,
-				EntityId = entityId,
-				Details = details,
-				PerformedAt = DateTime.UtcNow
 			});
 		}
 

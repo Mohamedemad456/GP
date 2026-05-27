@@ -1,4 +1,5 @@
 using Karna.APIs.Controllers.Controllers._Base;
+using Karna.Core.Application.Abstraction.DTOs.Admin;
 using Karna.Core.Application.Abstraction.DTOs.Listing;
 using Karna.Core.Application.Abstraction.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -8,7 +9,10 @@ namespace Karna.APIs.Controllers.Controllers
 {
 	[Authorize(Roles = "Admin")]
 	[Route("api/admin")]
-	public class AdminController(IAdminService _adminService) : ApiControllerBase
+	public class AdminController(
+		IAdminService _adminService,
+		IAdminActivityLogService _activityLogService
+	) : ApiControllerBase
 	{
 		[HttpGet("listings/pending")]
 		public async Task<IActionResult> GetPendingListings([FromQuery] PendingListingSpecParams specParams)
@@ -32,6 +36,13 @@ namespace Karna.APIs.Controllers.Controllers
 			var result = await _adminService.RejectListingAsync(id, dto);
 			if (!result.Success)
 				return BadRequest(result);
+			return Ok(result);
+		}
+
+		[HttpGet("logs")]
+		public async Task<IActionResult> GetAdminLogs([FromQuery] AdminActivityLogSpecParams specParams)
+		{
+			var result = await _activityLogService.GetLogsAsync(specParams);
 			return Ok(result);
 		}
 	}
