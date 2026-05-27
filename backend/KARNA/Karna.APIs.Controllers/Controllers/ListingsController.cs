@@ -68,6 +68,16 @@ namespace Karna.APIs.Controllers.Controllers
 			return Ok(result);
 		}
 
+		[HttpGet("{id}/pricing-history")]
+		[Authorize(Roles = "User,Admin")]
+		public async Task<IActionResult> GetPricingHistory(Guid id)
+		{
+			var result = await _listingService.GetPricingHistoryAsync(id);
+			if (!result.Success)
+				return BadRequest(result);
+			return Ok(result);
+		}
+
         [HttpDelete("{id}")]
         [Authorize(Roles = "User")]
         public async Task<IActionResult> Delete(Guid id)

@@ -486,7 +486,12 @@ namespace Karna.Core.Application.Services
 
 			var prediction = mlResult.Data;
 
-			// 8. Map response to listing entity fields
+			// 8. Record pricing history (ML update)
+			var oldFairPrice = listing.FairPrice;
+			if (oldFairPrice != prediction.FairPrice)
+				await RecordPricingChangeAsync(listing.Id, listing.Price, listing.Price, oldFairPrice, prediction.FairPrice, null, "ML price prediction");
+
+			// 9. Map response to listing entity fields
 			listing.FairPrice = prediction.FairPrice;
 			listing.NegotiationRangeLower = prediction.NegotiationRangeLower;
 			listing.NegotiationRangeUpper = prediction.NegotiationRangeUpper;
@@ -494,7 +499,7 @@ namespace Karna.Core.Application.Services
 			listing.ModelVersion = prediction.ModelVersion;
 			listing.PredictedAt = prediction.PredictedAt;
 
-			// 9. Save changes
+			// 10. Save changes
 			await _unitOfWork.CompleteAsync();
 
 			return new ApiResponse<GeneratePriceResponseDto>
@@ -565,6 +570,7 @@ namespace Karna.Core.Application.Services
 				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotInValidStateForPricing") };
 
 			// 5. Set price
+			var oldPrice = listing.Price;
 			if (dto.AcceptFairPrice)
 			{
 				if (listing.FairPrice is null)
@@ -580,7 +586,11 @@ namespace Karna.Core.Application.Services
 				listing.Price = dto.Price;
 			}
 
-			// 6. Save
+			// 6. Record pricing history (seller update)
+			if (oldPrice != listing.Price)
+				await RecordPricingChangeAsync(listing.Id, oldPrice, listing.Price, listing.FairPrice, listing.FairPrice, currentUser.Id, dto.AcceptFairPrice ? "Accepted fair price" : "Custom price set");
+
+			// 7. Save
 			await _unitOfWork.CompleteAsync();
 
 			return new ApiResponse<ListingDto>
@@ -604,6 +614,54 @@ namespace Karna.Core.Application.Services
 				ChangedAt = DateTime.UtcNow
 			};
 			await historyRepo.AddAsync(record);
+		}
+
+		private async Task RecordPricingChangeAsync(Guid listingId, decimal? oldPrice, decimal? newPrice, decimal? oldFairPrice, decimal? newFairPrice, Guid? changedByUserId, string? changeReason)
+		{
+			var pricingRepo = _unitOfWork.GetRepository<PricingHistory>();
+			await pricingRepo.AddAsync(new PricingHistory
+			{
+				ListingId = listingId,
+				OldPrice = oldPrice,
+				NewPrice = newPrice,
+				OldFairPrice = oldFairPrice,
+				NewFairPrice = newFairPrice,
+				ChangedByUserId = changedByUserId,
+				ChangeReason = changeReason,
+				ChangedAt = DateTime.UtcNow
+			});
+		}
+
+		public async Task<ApiResponse<IEnumerable<PricingHistoryDto>>> GetPricingHistoryAsync(Guid listingId)
+		{
+			if (!_currentUserService.IsAuthenticated || _currentUserService.UserId == Guid.Empty)
+				return new ApiResponse<IEnumerable<PricingHistoryDto>> { Success = false, Message = _localizer.GetErrorMessage("Unauthorized") };
+
+			var userRepo = _unitOfWork.GetRepository<User>();
+			var currentUser = await userRepo.GetAsync(u => u.IdentityUserId == _currentUserService.UserId);
+			if (currentUser is null)
+				return new ApiResponse<IEnumerable<PricingHistoryDto>> { Success = false, Message = _localizer.GetErrorMessage("UserNotFound") };
+
+			var listingRepo = _unitOfWork.GetRepository<Listing>();
+			var listing = await listingRepo.GetAsync(listingId);
+			if (listing is null)
+				return new ApiResponse<IEnumerable<PricingHistoryDto>> { Success = false, Message = _localizer.GetErrorMessage("ListingNotFound") };
+
+			// Only listing owner or admin can view pricing history
+			if (listing.SellerId != currentUser.Id && !_currentUserService.IsInRole("Admin"))
+				return new ApiResponse<IEnumerable<PricingHistoryDto>> { Success = false, Message = _localizer.GetErrorMessage("Unauthorized") };
+
+			var pricingRepo = _unitOfWork.GetRepository<PricingHistory>();
+			var history = (await pricingRepo.FindAsync(
+				h => h.ListingId == listingId, withTracking: false))
+				.OrderByDescending(h => h.ChangedAt)
+				.ToList();
+
+			return new ApiResponse<IEnumerable<PricingHistoryDto>>
+			{
+				Success = true,
+				Data = history.ToDto()
+			};
 		}
 
         public async Task<ApiResponseDto> DeleteAsync(Guid id)
