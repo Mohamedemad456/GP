@@ -82,5 +82,38 @@ namespace Karna.Core.Application.Mapping
 
 		public static IEnumerable<PendingListingDto> ToPendingDto(this IEnumerable<Listing> source)
 			=> source.Select(l => l.ToPendingDto());
+
+		public static BuyerListingDto ToBuyerDto(this Listing source) => new()
+		{
+			Id = source.Id,
+			MakeName = source.Make?.Name ?? string.Empty,
+			ModelName = source.Model?.Name ?? string.Empty,
+			Year = source.Year,
+			Mileage = source.Mileage,
+			FuelType = source.FuelType.ToString(),
+			Transmission = source.Transmission.ToString(),
+			Color = source.Color,
+			ListingPrice = source.Price,
+			PrimaryPhotoUrl = source.Photos?.FirstOrDefault(p => p.IsPrimary)?.PhotoUrl,
+			CreatedAt = source.CreatedAt,
+			IsGoodDeal = CalculateIsGoodDeal(source)
+		};
+
+		public static IEnumerable<BuyerListingDto> ToBuyerDto(this IEnumerable<Listing> source)
+			=> source.Select(l => l.ToBuyerDto());
+
+		private static bool CalculateIsGoodDeal(Listing listing)
+		{
+			if (listing.Price is null)
+				return false;
+
+			var isBelowFairPrice = listing.FairPrice.HasValue
+				&& listing.Price < listing.FairPrice;
+
+			var isAtOrBelowLowerRange = listing.NegotiationRangeLower.HasValue
+				&& listing.Price <= listing.NegotiationRangeLower;
+
+			return isBelowFairPrice || isAtOrBelowLowerRange;
+		}
 	}
 }

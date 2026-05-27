@@ -18,5 +18,7 @@ namespace Karna.Core.Application.Abstraction.Services
 
 		Task<ApiResponse<GeneratePriceResponseDto>> GeneratePriceAsync(Guid listingId);
 		Task<ApiResponse<ListingDto>> SetPriceAsync(Guid listingId, SetListingPriceDto dto);
+
+		Task<ApiResponse<Pagination<BuyerListingDto>>> GetApprovedListingsAsync(BuyerListingSpecParams specParams);
 	}
 }

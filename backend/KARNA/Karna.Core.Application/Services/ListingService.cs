@@ -5,6 +5,7 @@ using Karna.Core.Application.Abstraction.External;
 using Karna.Core.Application.Abstraction.Persistence;
 using Karna.Core.Application.Abstraction.Services;
 using Karna.Core.Application.Mapping;
+using Karna.Core.Application.Specifications.Listings;
 using Karna.Core.Domain.Entities;
 using Karna.Core.Domain.Enums;
 
@@ -661,6 +662,26 @@ namespace Karna.Core.Application.Services
 			{
 				Success = true,
 				Data = history.ToDto()
+			};
+		}
+
+		public async Task<ApiResponse<Pagination<BuyerListingDto>>> GetApprovedListingsAsync(BuyerListingSpecParams specParams)
+		{
+			var repo = _unitOfWork.GetRepository<Listing>();
+
+			var dataSpec = new ActiveListingsSpecification(specParams, applyPaging: true);
+			var countSpec = new ActiveListingsSpecification(specParams, applyPaging: false);
+
+			var listings = await repo.GetAllWithSpecAsync(dataSpec);
+			var count = await repo.GetCountAsync(countSpec);
+
+			return new ApiResponse<Pagination<BuyerListingDto>>
+			{
+				Success = true,
+				Data = new Pagination<BuyerListingDto>(specParams.PageIndex, specParams.PageSize, count)
+				{
+					Data = listings.ToBuyerDto()
+				}
 			};
 		}
 

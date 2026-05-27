@@ -8,6 +8,14 @@ namespace Karna.APIs.Controllers.Controllers
 {
 	public class ListingsController(IListingService _listingService) : ApiControllerBase
 	{
+		[HttpGet("approved")]
+		[AllowAnonymous]
+		public async Task<IActionResult> GetApprovedListings([FromQuery] BuyerListingSpecParams specParams)
+		{
+			var result = await _listingService.GetApprovedListingsAsync(specParams);
+			return Ok(result);
+		}
+
 		[HttpPost]
 		[Authorize(Roles = "User")]
 		public async Task<IActionResult> Create([FromBody] CreateListingDto dto)
