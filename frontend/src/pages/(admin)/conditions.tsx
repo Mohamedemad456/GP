@@ -1,7 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   AlertTriangle,
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
   FolderTree,
   Info,
   Layers3,
@@ -76,6 +79,7 @@ type DefectFormState = {
   categoryId: string;
 };
 type StatusFilter = "all" | "true" | "false";
+type ConditionSortField = "name" | "createdAt";
 
 const EMPTY_CATEGORY_FORM: CategoryFormState = { name: "", nameAr: "" };
 const EMPTY_DEFECT_FORM: DefectFormState = {
@@ -86,7 +90,7 @@ const EMPTY_DEFECT_FORM: DefectFormState = {
   categoryId: "",
 };
 
-const PAGE_SIZE_OPTIONS = [5, 10, 20, 50] as const;
+const PAGE_SIZE_OPTIONS = [5, 10] as const;
 const arabicFontStyle = {
   fontFamily: "'Cairo', 'Tajawal', 'IBM Plex Arabic', sans-serif",
 } as const;
@@ -177,6 +181,8 @@ const Conditions = () => {
   const [categoryStatusFilter, setCategoryStatusFilter] = useState<StatusFilter>("all");
   const [categoryPage, setCategoryPage] = useState(1);
   const [categoryPageSize, setCategoryPageSize] = useState(5);
+  const [categorySort, setCategorySort] = useState<ConditionSortField>("createdAt");
+  const [categorySortDirection, setCategorySortDirection] = useState<"asc" | "desc">("desc");
 
   // ── Defect data ──────────────────────────────────────────────────────────
   const [defects, setDefects] = useState<AdminConditionDefectDto[]>([]);
@@ -190,6 +196,8 @@ const Conditions = () => {
   const [defectCategoryFilter, setDefectCategoryFilter] = useState("all");
   const [defectPage, setDefectPage] = useState(1);
   const [defectPageSize, setDefectPageSize] = useState(10);
+  const [defectSort, setDefectSort] = useState<ConditionSortField>("createdAt");
+  const [defectSortDirection, setDefectSortDirection] = useState<"asc" | "desc">("desc");
 
   // ── Category dialog state ─────────────────────────────────────────────────
   const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
@@ -214,16 +222,22 @@ const Conditions = () => {
   const defectsEmpty = !defectsLoading && defects.length === 0;
 
   // ── Localization helpers ──────────────────────────────────────────────────
-  const formatDate = useCallback(
-    (value: string | null) => {
-      if (!value) return "—";
-      return new Intl.DateTimeFormat(isArabic ? "ar-SA" : "en-GB", {
+  const dateFormatter = useMemo(
+    () =>
+      new Intl.DateTimeFormat(isArabic ? "ar-SA" : "en-GB", {
         day: "2-digit",
         month: "short",
         year: "numeric",
-      }).format(new Date(value));
-    },
+      }),
     [isArabic],
+  );
+
+  const formatDate = useCallback(
+    (value: string | null) => {
+      if (!value) return "—";
+      return dateFormatter.format(new Date(value));
+    },
+    [dateFormatter],
   );
 
   const getLocalizedCategoryName = useCallback(
@@ -249,6 +263,37 @@ const Conditions = () => {
       isArabic ? defect.descriptionAr ?? defect.description ?? "" : defect.description ?? defect.descriptionAr ?? "",
     [isArabic],
   );
+
+  const sortIcon = (
+    activeSort: ConditionSortField,
+    activeDirection: "asc" | "desc",
+    field: ConditionSortField,
+  ) => {
+    if (activeSort !== field) return <ArrowUpDown className="size-3 opacity-25" />;
+    return activeDirection === "asc"
+      ? <ArrowUp className="size-3 text-primary" />
+      : <ArrowDown className="size-3 text-primary" />;
+  };
+
+  const handleCategorySort = (field: ConditionSortField) => {
+    if (categorySort === field) {
+      setCategorySortDirection((direction) => (direction === "asc" ? "desc" : "asc"));
+    } else {
+      setCategorySort(field);
+      setCategorySortDirection("asc");
+    }
+    setCategoryPage(1);
+  };
+
+  const handleDefectSort = (field: ConditionSortField) => {
+    if (defectSort === field) {
+      setDefectSortDirection((direction) => (direction === "asc" ? "desc" : "asc"));
+    } else {
+      setDefectSort(field);
+      setDefectSortDirection("asc");
+    }
+    setDefectPage(1);
+  };
 
   // ── Search debounce ───────────────────────────────────────────────────────
   useEffect(() => {
@@ -293,6 +338,8 @@ const Conditions = () => {
       const res = await getAllConditionChecklistCategories({
         pageIndex: categoryPage,
         pageSize: categoryPageSize,
+        sort: categorySort,
+        sortDirection: categorySortDirection,
         ...(categorySearch ? { search: categorySearch } : {}),
         ...(categoryStatusFilter !== "all"
           ? { isActive: categoryStatusFilter === "true" }
@@ -309,7 +356,16 @@ const Conditions = () => {
     } finally {
       setCategoriesLoading(false);
     }
-  }, [categoryPage, categoryPageSize, categorySearch, categoryStatusFilter, error, t]);
+  }, [
+    categoryPage,
+    categoryPageSize,
+    categorySearch,
+    categorySort,
+    categorySortDirection,
+    categoryStatusFilter,
+    error,
+    t,
+  ]);
 
   // ── Fetch defects (server-side paginated) ─────────────────────────────────
   const fetchDefects = useCallback(async () => {
@@ -318,6 +374,8 @@ const Conditions = () => {
       const res = await getAllConditionDefects({
         pageIndex: defectPage,
         pageSize: defectPageSize,
+        sort: defectSort,
+        sortDirection: defectSortDirection,
         ...(defectSearch ? { search: defectSearch } : {}),
         ...(defectStatusFilter !== "all"
           ? { isActive: defectStatusFilter === "true" }
@@ -335,7 +393,17 @@ const Conditions = () => {
     } finally {
       setDefectsLoading(false);
     }
-  }, [defectPage, defectPageSize, defectSearch, defectStatusFilter, defectCategoryFilter, error, t]);
+  }, [
+    defectCategoryFilter,
+    defectPage,
+    defectPageSize,
+    defectSearch,
+    defectSort,
+    defectSortDirection,
+    defectStatusFilter,
+    error,
+    t,
+  ]);
 
   useEffect(() => { void fetchCategories(); }, [fetchCategories]);
   useEffect(() => { void fetchDefects(); }, [fetchDefects]);
@@ -351,11 +419,15 @@ const Conditions = () => {
   }, [defectPage, defectTotalPages]);
 
   // ── Combobox options (from all categories, not just current page) ─────────
-  const categoryOptions = categoriesForSelect.map((category) => ({
-    value: category.id,
-    label: getLocalizedCategoryName(category),
-    disabled: false,
-  }));
+  const categoryOptions = useMemo(
+    () =>
+      categoriesForSelect.map((category) => ({
+        value: category.id,
+        label: getLocalizedCategoryName(category),
+        disabled: false,
+      })),
+    [categoriesForSelect, getLocalizedCategoryName],
+  );
 
   // ── Dialog: open/close ────────────────────────────────────────────────────
   const openCreateCategory = () => {
@@ -738,13 +810,27 @@ const Conditions = () => {
           <TableHeader>
             <TableRow className="border-border/70 bg-muted/35 hover:bg-muted/35">
               <TableHead className="py-3 text-[11px] uppercase tracking-[0.18em] text-muted-foreground/80">
-                {t("admin.conditions.name")}
+                <button
+                  type="button"
+                  onClick={() => handleCategorySort("name")}
+                  className="inline-flex items-center gap-1.5 rounded-md transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                >
+                  {t("admin.conditions.name")}
+                  {sortIcon(categorySort, categorySortDirection, "name")}
+                </button>
               </TableHead>
               <TableHead className="py-3 text-[11px] uppercase tracking-[0.18em] text-muted-foreground/80">
                 {t("admin.conditions.status")}
               </TableHead>
               <TableHead className="py-3 text-[11px] uppercase tracking-[0.18em] text-muted-foreground/80">
-                {t("admin.conditions.lastUpdated")}
+                <button
+                  type="button"
+                  onClick={() => handleCategorySort("createdAt")}
+                  className="inline-flex items-center gap-1.5 rounded-md transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                >
+                  {t("admin.conditions.lastUpdated")}
+                  {sortIcon(categorySort, categorySortDirection, "createdAt")}
+                </button>
               </TableHead>
               <TableHead className="py-3 text-end text-[11px] uppercase tracking-[0.18em] text-muted-foreground/80">
                 {t("admin.conditions.actions")}
@@ -976,7 +1062,14 @@ const Conditions = () => {
           <TableHeader>
             <TableRow className="border-border/70 bg-muted/35 hover:bg-muted/35">
               <TableHead className="py-3 text-[11px] uppercase tracking-[0.18em] text-muted-foreground/80">
-                {t("admin.conditions.defect")}
+                <button
+                  type="button"
+                  onClick={() => handleDefectSort("name")}
+                  className="inline-flex items-center gap-1.5 rounded-md transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                >
+                  {t("admin.conditions.defect")}
+                  {sortIcon(defectSort, defectSortDirection, "name")}
+                </button>
               </TableHead>
               <TableHead className="py-3 text-[11px] uppercase tracking-[0.18em] text-muted-foreground/80">
                 {t("admin.conditions.category")}
@@ -988,7 +1081,14 @@ const Conditions = () => {
                 {t("admin.conditions.status")}
               </TableHead>
               <TableHead className="py-3 text-[11px] uppercase tracking-[0.18em] text-muted-foreground/80">
-                {t("admin.conditions.lastUpdated")}
+                <button
+                  type="button"
+                  onClick={() => handleDefectSort("createdAt")}
+                  className="inline-flex items-center gap-1.5 rounded-md transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                >
+                  {t("admin.conditions.lastUpdated")}
+                  {sortIcon(defectSort, defectSortDirection, "createdAt")}
+                </button>
               </TableHead>
               <TableHead className="py-3 text-end text-[11px] uppercase tracking-[0.18em] text-muted-foreground/80">
                 {t("admin.conditions.actions")}

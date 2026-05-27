@@ -9,8 +9,16 @@ data/processed/*.*
 data/processed/*.parquet
 data/lookups/*
 
-# Models
-models/v*/
+# # Models
+# *.pkl
+# *.joblib
+# *.ok
+# *.ubj
+
+# # Versioned model export folders (keep registries/metadata JSON tracked)
+# models/v*/
+# *.pkl
+# *.joblib
 
 # Python
 __pycache__/
@@ -37,3 +45,5 @@ _normalize_all_brands.py
 _extract_make_model.py
 
 archive
+
+preprocessors

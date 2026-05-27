@@ -62,7 +62,7 @@ class Settings(BaseSettings):
     # --- File Names ---
     raw_snapshot_file_stem: str = Field(default="cars_raw")
     model_registry_file: str = Field(default="model_registry.json")
-    lookup_file_name: str = Field(default="car_specs_lookup_full_cleaned.csv")
+    lookup_file_name: str = Field(default="car_specs_lookup_full_cleaned.fixed.csv")
     main_info_file_name: str = Field(default="car_main_info")
 
     def model_post_init(self, __context: Any) -> None:
@@ -78,9 +78,6 @@ class Settings(BaseSettings):
     def raw_data_dir(self) -> Path:
         return self.data_dir / "raw"
 
-    @property
-    def cleaned_data_dir(self) -> Path:
-        return self.data_dir / "cleaned"
 
     @property
     def processed_data_dir(self) -> Path:
@@ -104,9 +101,9 @@ class Settings(BaseSettings):
             raise ValueError("version must be greater than or equal to 1")
         return self.raw_data_dir / f"{self.raw_snapshot_file_stem}_v{version:03d}.parquet"
 
-    @property
-    def cleaned_data_path(self) -> Path:
-        return self.cleaned_data_dir / "cleaned_data.parquet"
+    # @property
+    # # def cleaned_data_path(self) -> Path:
+    # #     return self.cleaned_data_dir / "cleaned_data.parquet"
 
     @property
     def processed_data_path(self) -> Path:
@@ -132,6 +129,28 @@ class Settings(BaseSettings):
     @property
     def model_registry_path(self) -> Path:
         return self.models_dir / self.model_registry_file
+
+    @property
+    def model_pickles_dir(self) -> Path:
+        return self.models_dir / "pickles"
+
+    @property
+    def model_metadata_dir(self) -> Path:
+        return self.models_dir / "metadata"
+
+    @property
+    def model_metrics_dir(self) -> Path:
+        return self.models_dir / "metrics"
+
+    @property
+    def model_preprocessors_dir(self) -> Path:
+        return self.models_dir / "preprocessors"
+
+    def model_plots_dir(self, name: str) -> Path:
+        """Return (and create) a plots directory for a given notebook/model name."""
+        d = self.models_dir / f"plots_{name}"
+        d.mkdir(parents=True, exist_ok=True)
+        return d
 
     @property
     def lookup_candidates(self) -> tuple[Path, ...]:
@@ -179,7 +198,7 @@ class Settings(BaseSettings):
         # Dispatch map for direct paths
         paths = {
             "raw": self.raw_data_path,
-            "cleaned": self.cleaned_data_path,
+            # "cleaned": self.cleaned_data_path,
             "processed": self.processed_data_path,
         }
 
@@ -220,7 +239,6 @@ class Settings(BaseSettings):
         
         path_map = {
             "raw": self.raw_data_path,
-            "cleaned": self.cleaned_data_path,
             "processed": self.processed_data_path,
             "lookup": self.lookup_data_path,
             "main_info": self.main_info_data_path,
