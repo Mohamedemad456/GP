@@ -16,6 +16,12 @@ namespace Karna.Core.Application.Abstraction.DTOs.Listing
 		public string Color { get; set; } = string.Empty;
 		public string Description { get; set; } = string.Empty;
 		public EgyptLocation Location { get; set; }
+
+		// Seller Contact Information
+		public string ContactPhoneNumber { get; set; } = string.Empty;
+		public string? WhatsAppNumber { get; set; }
+		public ContactMethod PreferredContactMethod { get; set; }
+
 		public decimal? Price { get; set; }
 		public ListingStatus Status { get; set; }
 		public DateTime CreatedAt { get; set; }

@@ -22,6 +22,11 @@ namespace Karna.Core.Domain.Entities
 		public string Color { get; set; } = null!;
 		public string Description { get; set; } = null!;
 		public EgyptLocation Location { get; set; }
+
+		// Seller Contact Information
+		public string ContactPhoneNumber { get; set; } = null!;
+		public string? WhatsAppNumber { get; set; }
+		public ContactMethod PreferredContactMethod { get; set; } = ContactMethod.Phone;
 		public decimal? Price { get; set; }
 		public ListingStatus Status { get; set; } = ListingStatus.Draft;
         public DateTime? DeletedAt { get; set; }

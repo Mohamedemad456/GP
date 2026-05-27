@@ -84,6 +84,20 @@ namespace Karna.Infrastructure.Persistence._Data.Configurations
 				.IsRequired(false)
 				.HasMaxLength(500);
 
+			// Seller Contact Information
+			builder.Property(x => x.ContactPhoneNumber)
+				.IsRequired()
+				.HasMaxLength(20);
+
+			builder.Property(x => x.WhatsAppNumber)
+				.IsRequired(false)
+				.HasMaxLength(20);
+
+			builder.Property(x => x.PreferredContactMethod)
+				.IsRequired()
+				.HasConversion<string>()
+				.HasMaxLength(20);
+
 			builder.Property(x => x.Location);
 
 			builder.Property(x => x.Price)

@@ -19,6 +19,9 @@ namespace Karna.Core.Application.Mapping
 			Color = dto.Color,
 			Description = dto.Description,
 			Location = dto.Location,
+			ContactPhoneNumber = dto.ContactPhoneNumber,
+			WhatsAppNumber = dto.WhatsAppNumber,
+			PreferredContactMethod = dto.PreferredContactMethod,
 			Status = ListingStatus.Draft
 		};
 
@@ -36,6 +39,9 @@ namespace Karna.Core.Application.Mapping
 			Color = source.Color,
 			Description = source.Description,
 			Location = source.Location,
+			ContactPhoneNumber = source.ContactPhoneNumber,
+			WhatsAppNumber = source.WhatsAppNumber,
+			PreferredContactMethod = source.PreferredContactMethod,
 			Price = source.Price,
 			Status = source.Status,
 			CreatedAt = source.CreatedAt,
@@ -63,6 +69,9 @@ namespace Karna.Core.Application.Mapping
 			listing.Color = dto.Color;
 			listing.Description = dto.Description;
 			listing.Location = dto.Location;
+			listing.ContactPhoneNumber = dto.ContactPhoneNumber;
+			listing.WhatsAppNumber = dto.WhatsAppNumber;
+			listing.PreferredContactMethod = dto.PreferredContactMethod;
 		}
 
 		public static PendingListingDto ToPendingDto(this Listing source) => new()

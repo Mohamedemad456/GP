@@ -532,9 +532,10 @@ namespace Karna.Core.Application.Services
 				&& listing.EngineSize > 0
 				&& !string.IsNullOrWhiteSpace(listing.Color)
 				&& !string.IsNullOrWhiteSpace(listing.Description)
+				&& !string.IsNullOrWhiteSpace(listing.ContactPhoneNumber)
 				&& Enum.IsDefined(listing.FuelType)
 				&& Enum.IsDefined(listing.Transmission)
-				&& Enum.IsDefined(listing.Location);
+				&& Enum.IsDefined(listing.Location);;
 		}
 
 		private static bool HasRequiredPricing(Listing listing)
