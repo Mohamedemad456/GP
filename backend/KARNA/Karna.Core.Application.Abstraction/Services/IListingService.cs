@@ -13,6 +13,7 @@ namespace Karna.Core.Application.Abstraction.Services
 		Task<ApiResponse<ListingDto>> MarkAsSoldAsync(Guid listingId);
 
 		Task<ApiResponse<IEnumerable<ListingStatusHistoryDto>>> GetStatusHistoryAsync(Guid listingId);
+		Task<ApiResponse<IEnumerable<PricingHistoryDto>>> GetPricingHistoryAsync(Guid listingId);
         Task<ApiResponseDto> DeleteAsync(Guid id);
 
 		Task<ApiResponse<GeneratePriceResponseDto>> GeneratePriceAsync(Guid listingId);
