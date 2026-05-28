@@ -2,13 +2,17 @@
 """
 fix_lookups_make_model.py
 
-Canonicalizes make/model strings, applies wrong-pair fixes, quarantines
-flagged rows, enriches every row with a model_family column (solving the
-model-hierarchy problem), and validates spec ranges/enums across lookup CSVs.
+Reusable cleaning stage — part of the incremental data pipeline.
+Run whenever lookup CSVs are updated or new models are added.
 
-The model_family column resolves the hierarchy without destroying granularity:
-  - model stays intact   →  "BMW 318i"  (used for ML pricing features)
-  - model_family is added →  "3 Series"  (used for grouping, search, filtering)
+Canonicalizes make/model strings, applies wrong-pair fixes, quarantines
+flagged rows, collapses safe normalized duplicates, and validates spec
+ranges/enums across lookup CSVs.
+
+NOTE: `model_family` is a derived, optional grouping column.
+- It NEVER replaces `model` (so no granularity is lost).
+- It can be useful for UI grouping/search and backend seeding.
+- Training/inference code does not use it as a feature.
 
 Usage:
     python fix_lookups_make_model.py                   # report mode (no writes)
@@ -525,8 +529,10 @@ def run_report(args: argparse.Namespace) -> int:
         rows_processed[source.name] = len(df)
 
         fixed, changes, quarantine, counts = apply_rules(df, source.name, rules)
-        fixed, explicit_family = enrich_with_family(fixed, family_map, source.name)
-        family_assigned_count += explicit_family
+
+        # Optional enrichment: add model_family alongside model (no model changes)
+        fixed, explicit = enrich_with_family(fixed, family_map, source.name)
+        family_assigned_count += explicit
 
         collapsible, conflicts = detect_normalized_duplicates(
             fixed, source.name, key_cols=source.dedupe_key_cols
@@ -554,9 +560,9 @@ def run_report(args: argparse.Namespace) -> int:
     logger.info("Models canonicalized: %d", total_counts["models_canonicalized"])
     logger.info("Wrong-pair fixes applied: %d", total_counts["wrong_pair_fixes_applied"])
     logger.info("Rows quarantined: %d", total_counts["rows_quarantined"])
+    logger.info("Rows with explicit model_family mapping: %d", family_assigned_count)
     logger.info("Normalized duplicates (would collapse): %d", len(all_collapsible))
     logger.info("Merge conflicts (would keep as-is): %d", len(all_conflicts))
-    logger.info("Model family mappings to assign: %d rows", family_assigned_count)
     logger.info("==========================================")
     if args.log_file:
         logger.info("Log written: %s", args.log_file)
@@ -606,14 +612,14 @@ def run_apply(args: argparse.Namespace) -> int:
         # 1. Canonicalize + wrong-pair fixes + quarantine
         fixed, changes, quarantine, counts = apply_rules(df, source.name, rules)
 
-        # 2. Enrich with model_family column (hierarchy solution)
-        fixed, explicit_family = enrich_with_family(fixed, family_map, source.name)
-        family_assigned_count += explicit_family
-
-        # 3. Collapse safe duplicates; keep conflict groups as-is
+        # 2. Collapse safe duplicates; keep conflict groups as-is
         fixed, collapsible, conflicts = collapse_duplicates(
             fixed, key_cols=source.dedupe_key_cols
         )
+
+        # 3. Optional enrichment: add model_family alongside model (no model changes)
+        fixed, explicit = enrich_with_family(fixed, family_map, source.name)
+        family_assigned_count += explicit
 
         # 4. Validate ranges and enums
         validation_issues = validate_ranges(fixed, source.name)
@@ -673,9 +679,9 @@ def run_apply(args: argparse.Namespace) -> int:
     logger.info("Models canonicalized: %d", total_counts["models_canonicalized"])
     logger.info("Wrong-pair fixes applied: %d", total_counts["wrong_pair_fixes_applied"])
     logger.info("Rows quarantined: %d", total_counts["rows_quarantined"])
+    logger.info("Rows with explicit model_family mapping: %d", family_assigned_count)
     logger.info("Normalized duplicates collapsed: %d", total_counts["normalized_duplicates_collapsed"])
     logger.info("Merge conflicts detected: %d (kept as-is)", len(all_conflicts))
-    logger.info("Model family mappings assigned: %d rows", family_assigned_count)
     logger.info("==========================================")
     logger.info("Wrote: %s", args.output_dir / "car_specs_lookup_full_cleaned.fixed.csv")
     logger.info("Wrote: %s", args.output_dir / "AI_lookup.fixed.csv")

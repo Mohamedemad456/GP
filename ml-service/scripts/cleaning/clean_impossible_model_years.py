@@ -1,15 +1,28 @@
 #!/usr/bin/env python3
 """Remove or flag impossible (make, model, year) combinations.
 
-Use this to clean "data ghosts" that originate from seller input / scraping,
-where a listing year predates the model's real-world production.
+Reusable cleaning stage — part of the incremental data pipeline.
+Run on every new raw data snapshot to enforce model-year validity.
+
+"Data ghosts" originate from seller input / scraping errors where a listing
+year predates the model's real-world production or postdates its end.
+
+Rules:
+  - ModelYearRule: (make, model) → min_year / max_year bounds
+  - ConditionalDropRule: (make, model, fuel|transmission) → drop mislabeled rows
 
 Examples:
-- Audi Q4 E-Tron cannot exist before 2021.
-- Tesla Model Y cannot exist before 2020.
+  - Audi Q4 E-Tron cannot exist before 2021.
+  - Chevrolet Avalanche: 2002–2013 only; diesel or Manual = mislabeled → drop.
+  - Fiat 127 cannot exist after 1983.
 
-This script is conservative and rule-driven: it only acts on (make, model) pairs
-listed in `MIN_MODEL_YEAR`.
+This script is conservative and rule-driven: it only acts on (make, model)
+pairs listed in `MIN_MODEL_YEAR` and `CONDITIONAL_DROPS`.
+
+Usage:
+    python clean_impossible_model_years.py --input FILE --mode report   # read-only
+    python clean_impossible_model_years.py --input FILE --mode apply    # apply fixes
+    python clean_impossible_model_years.py --input FILE --action flag   # flag instead of drop
 """
 
 from __future__ import annotations
@@ -54,16 +67,48 @@ def parse_year(value: Any) -> int | None:
 class ModelYearRule:
     make: str
     model: str
-    min_year: int
+    min_year: int | None = None
+    max_year: int | None = None
 
     @property
     def key(self) -> tuple[str, str]:
         return (norm_text(self.make), norm_text(self.model))
 
 
-# Minimal authoritative rules based on your confirmed findings.
-# Extend as you validate more models.
+@dataclass(frozen=True)
+class ConditionalDropRule:
+    """Drop a row if make/model match AND a specific fuel or transmission matches."""
+    make: str
+    model: str
+    fuel: str | None = None
+    transmission: str | None = None
+
+    def matches(self, make_norm: str, model_norm: str, row: dict) -> bool:
+        if norm_text(self.make) != make_norm or norm_text(self.model) != model_norm:
+            return False
+        if self.fuel is not None and norm_text(str(row.get("fuel", ""))) != norm_text(self.fuel):
+            return False
+        if self.transmission is not None and norm_text(str(row.get("transmission", ""))) != norm_text(self.transmission):
+            return False
+        return True
+
+
+def _is_year_invalid(year: int | None, rule: "ModelYearRule | None") -> bool:
+    """Return True if year violates the rule's min/max bounds."""
+    if year is None or rule is None:
+        return False
+    if rule.min_year is not None and year < rule.min_year:
+        return True
+    if rule.max_year is not None and year > rule.max_year:
+        return True
+    return False
+
+
+# ── Priority 1: Confirmed dirty data (high-MAPE culprits) ──────────────────
+# ── Priority 2: Conditional drops (fuel/transmission mislabels) ────────────
+# ── Priority 3: EV/new models with clear production start years ────────────
 MIN_MODEL_YEAR: list[ModelYearRule] = [
+    # Original rules
     ModelYearRule(make="Audi", model="Q4 E-Tron", min_year=2021),
     ModelYearRule(make="Tesla", model="Model Y", min_year=2020),
     ModelYearRule(make="BMW", model="IX1", min_year=2022),
@@ -71,11 +116,47 @@ MIN_MODEL_YEAR: list[ModelYearRule] = [
     ModelYearRule(make="MG", model="Cyberster", min_year=2023),
     ModelYearRule(make="Chery", model="Tiggo 8 Pro Max", min_year=2024),
     ModelYearRule(make="Kia", model="Xceed", min_year=2020),
+
+    # Priority 1 — Confirmed 100% dirty (MAPE > 50%)
+    ModelYearRule(make="Chevrolet", model="Avalanche", min_year=2002, max_year=2013),
+    ModelYearRule(make="Ford", model="Bronco Raptor", min_year=2021),
+    ModelYearRule(make="Hyundai", model="Excel", max_year=1994),
+    ModelYearRule(make="Fiat", model="127", max_year=1983),
+    ModelYearRule(make="Fiat", model="128", max_year=1985),
+    ModelYearRule(make="Fiat", model="131", max_year=1984),
+
+    # Priority 3 — EV and new-generation models with confirmed min years
+    ModelYearRule(make="Tesla", model="Model 3", min_year=2017),
+    ModelYearRule(make="Tesla", model="Model S", min_year=2012),
+    ModelYearRule(make="Tesla", model="Model X", min_year=2015),
+    ModelYearRule(make="BYD", model="Seal", min_year=2022),
+    ModelYearRule(make="BYD", model="Han", min_year=2020),
+    ModelYearRule(make="BYD", model="Dolphin", min_year=2021),
+    ModelYearRule(make="BYD", model="Atto 3", min_year=2022),
+    ModelYearRule(make="BYD", model="Song Plus", min_year=2020),
+    ModelYearRule(make="Hyundai", model="Ioniq 5", min_year=2021),
+    ModelYearRule(make="Hyundai", model="Ioniq 6", min_year=2022),
+    ModelYearRule(make="Kia", model="EV6", min_year=2021),
+    ModelYearRule(make="Chery", model="Tiggo 9", min_year=2024),
+    ModelYearRule(make="Chery", model="Arrizo 5 Plus", min_year=2021),
+    ModelYearRule(make="MG", model="4", min_year=2022),
+    ModelYearRule(make="MG", model="Marvel R", min_year=2021),
+    ModelYearRule(make="Jetour", model="Dashing", min_year=2022),
+    ModelYearRule(make="Jetour", model="X70 Plus", min_year=2020),
+    ModelYearRule(make="Geely", model="Coolray", min_year=2019),
+    ModelYearRule(make="Geely", model="Starray", min_year=2022),
+    ModelYearRule(make="BAIC", model="X55", min_year=2019),
+]
+
+# Priority 2 — Conditional drops: valid year range but wrong fuel/transmission
+CONDITIONAL_DROPS: list[ConditionalDropRule] = [
+    ConditionalDropRule(make="Chevrolet", model="Avalanche", fuel="diesel"),
+    ConditionalDropRule(make="Chevrolet", model="Avalanche", transmission="Manual"),
 ]
 
 
-def rules_to_map(rules: list[ModelYearRule]) -> dict[tuple[str, str], int]:
-    return {r.key: r.min_year for r in rules}
+def rules_to_map(rules: list[ModelYearRule]) -> dict[tuple[str, str], "ModelYearRule"]:
+    return {r.key: r for r in rules}
 
 
 def load_extra_rules_json(path: Path) -> list[ModelYearRule]:
@@ -84,8 +165,11 @@ def load_extra_rules_json(path: Path) -> list[ModelYearRule]:
     Format:
     [
       {"make": "Audi", "model": "Q4 E-Tron", "min_year": 2021},
+      {"make": "Hyundai", "model": "Excel", "max_year": 1994},
+      {"make": "Chevrolet", "model": "Avalanche", "min_year": 2002, "max_year": 2013},
       ...
     ]
+    At least one of min_year or max_year must be provided.
     """
 
     data = json.loads(path.read_text(encoding="utf-8"))
@@ -99,9 +183,17 @@ def load_extra_rules_json(path: Path) -> list[ModelYearRule]:
         make = item.get("make")
         model = item.get("model")
         min_year = item.get("min_year")
-        if make is None or model is None or min_year is None:
+        max_year = item.get("max_year")
+        if make is None or model is None:
             continue
-        rules.append(ModelYearRule(make=str(make), model=str(model), min_year=int(min_year)))
+        if min_year is None and max_year is None:
+            continue
+        rules.append(ModelYearRule(
+            make=str(make),
+            model=str(model),
+            min_year=int(min_year) if min_year is not None else None,
+            max_year=int(max_year) if max_year is not None else None,
+        ))
 
     return rules
 
@@ -151,7 +243,8 @@ def clean_file(
     model_col: str | None = None,
     year_col: str | None = None,
     action: str = "drop",
-    rules: dict[tuple[str, str], int],
+    rules: dict[tuple[str, str], "ModelYearRule"],
+    conditional_drops: list["ConditionalDropRule"] | None = None,
 ) -> dict[str, Any]:
     fieldnames, rows = read_csv(input_path)
 
@@ -159,16 +252,24 @@ def clean_file(
     model_col = find_col(fieldnames, model_col, "model")
     year_col = find_col(fieldnames, year_col, "year")
 
+    cond_drops = conditional_drops or []
+
     out_rows: list[dict[str, str]] = []
     invalid: list[dict[str, str]] = []
+    cond_dropped: list[dict[str, str]] = []
 
     for row in rows:
         make = norm_text(row.get(make_col, ""))
         model = norm_text(row.get(model_col, ""))
         year = parse_year(row.get(year_col))
 
-        min_year = rules.get((make, model))
-        is_invalid = year is not None and min_year is not None and year < min_year
+        # Check conditional drops first (fuel/transmission mislabels)
+        if any(cd.matches(make, model, row) for cd in cond_drops):
+            cond_dropped.append(row)
+            continue
+
+        rule = rules.get((make, model))
+        is_invalid = _is_year_invalid(year, rule)
 
         if is_invalid:
             invalid.append(row)
@@ -176,13 +277,20 @@ def clean_file(
                 continue
             if action == "clamp":
                 row = dict(row)
-                row[year_col] = str(min_year)
+                clamp_to = rule.min_year if rule and rule.min_year is not None else (rule.max_year if rule else year)
+                row[year_col] = str(clamp_to)
             # action == "flag" handled below
 
         if action == "flag":
             row = dict(row)
             row["is_impossible_year"] = "1" if is_invalid else "0"
-            row["min_valid_year"] = "" if min_year is None else str(min_year)
+            # Report the active bound for the flag
+            if rule:
+                row["min_valid_year"] = str(rule.min_year) if rule.min_year is not None else ""
+                row["max_valid_year"] = str(rule.max_year) if rule.max_year is not None else ""
+            else:
+                row["min_valid_year"] = ""
+                row["max_valid_year"] = ""
 
         out_rows.append(row)
 
@@ -192,6 +300,8 @@ def clean_file(
             out_fieldnames.append("is_impossible_year")
         if "min_valid_year" not in out_fieldnames:
             out_fieldnames.append("min_valid_year")
+        if "max_valid_year" not in out_fieldnames:
+            out_fieldnames.append("max_valid_year")
 
     write_csv(output_path, out_fieldnames, out_rows)
 
@@ -207,7 +317,8 @@ def clean_file(
         "output": str(output_path),
         "rows_in": len(rows),
         "rows_out": len(out_rows),
-        "invalid": len(invalid),
+        "invalid_year": len(invalid),
+        "conditional_dropped": len(cond_dropped),
         "invalid_by_rule": {
             f"{k[0]} | {k[1]}": v for k, v in sorted(by_rule.items(), key=lambda x: (-x[1], x[0]))
         },
@@ -251,6 +362,7 @@ def main(argv: list[str]) -> int:
         rules.extend(load_extra_rules_json(args.extra_rules_json))
 
     rules_map = rules_to_map(rules)
+    cond_drops = list(CONDITIONAL_DROPS)
 
     output = args.output
     if output is None:
@@ -265,6 +377,7 @@ def main(argv: list[str]) -> int:
             year_col=args.year_col,
             action=args.action,
             rules=rules_map,
+            conditional_drops=cond_drops,
         )
         print(json.dumps(summary, indent=2, ensure_ascii=False))
         return 0
@@ -283,6 +396,7 @@ def main(argv: list[str]) -> int:
             year_col=args.year_col,
             action=args.action,
             rules=rules_map,
+            conditional_drops=cond_drops,
         )
         atomic_replace(tmp_out, args.input)
         print(f"Backup written: {backup_path}")
@@ -297,6 +411,7 @@ def main(argv: list[str]) -> int:
         year_col=args.year_col,
         action=args.action,
         rules=rules_map,
+        conditional_drops=cond_drops,
     )
     print(json.dumps(summary, indent=2, ensure_ascii=False))
     return 0

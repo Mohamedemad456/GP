@@ -1,15 +1,27 @@
 #!/usr/bin/env python3
-"""Fix EV fuel/transmission values in car_main_info.csv (and similar files).
+"""Fix EV/hybrid fuel and transmission values in car listing CSVs.
+
+Reusable cleaning stage — part of the incremental data pipeline.
+Run on every new raw data snapshot to enforce correct fuel/transmission.
 
 For confirmed pure EV models, enforce:
-- fuel = 'electric'
-- transmission = 'Automatic'
+  - fuel = 'electric'
+  - transmission = 'Automatic'
 
-This prevents noisy seller/scraper inputs from polluting lookup-derived features.
+For confirmed hybrid models, enforce:
+  - fuel = 'hybrid'
+  - transmission = 'Automatic'
+
+This prevents noisy seller/scraper inputs from polluting lookup-derived
+features and confusing the pricing model.
 
 Safe by default:
-- Writes to a new output file unless --in-place is provided.
-- --in-place creates a timestamped .bak copy.
+  - Writes to a new output file unless --in-place is provided.
+  - --in-place creates a timestamped .bak copy.
+
+Usage:
+    python fix_car_main_info_ev_fuel.py --input FILE                    # dry-run
+    python fix_car_main_info_ev_fuel.py --input FILE --in-place        # apply with backup
 """
 
 from __future__ import annotations
@@ -40,34 +52,66 @@ PURE_EV_MODELS: set[tuple[str, str]] = {
     # Tesla
     ("Tesla", "Model Y"),
     ("Tesla", "Model 3"),
+    ("Tesla", "Model S"),
+    ("Tesla", "Model X"),
     ("Tesla", "Cybertruck"),
     # Volkswagen
     ("Volkswagen", "ID4"),
     ("Volkswagen", "ID6"),
     # Audi
     ("Audi", "Q4 E-Tron"),
-    # BMW
+    # BMW — electric-only
     ("BMW", "I3"),
+    ("BMW", "I4"),
     ("BMW", "I7"),
+    ("BMW", "IX"),
     ("BMW", "IX1"),
     ("BMW", "IX3"),
-    # Mercedes (model names as used in your file)
+    # Mercedes EQ series
+    ("Mercedes", "EQS"),
     ("Mercedes", "EQS450"),
     ("Mercedes", "EQS580"),
+    ("Mercedes", "EQE"),
     ("Mercedes", "EQE350"),
     ("Mercedes", "EQE500"),
+    ("Mercedes", "EQA"),
     ("Mercedes", "EQA260"),
+    ("Mercedes", "EQB"),
+    ("Mercedes", "EQC"),
+    # BYD pure EV
+    ("BYD", "Seal"),
+    ("BYD", "Han"),
+    ("BYD", "Dolphin"),
+    ("BYD", "Atto 3"),
+    ("BYD", "Seagull"),
+    ("BYD", "Ocean"),
+    # Porsche
+    ("Porsche", "Taycan"),
     # GMC
     ("GMC", "Hummer EV"),
     # BAIC
     ("BAIC", "EU5 Plus"),
-    # MG
+    # MG electric
     ("MG", "Cyberster"),
     ("MG", "4"),
+    ("MG", "Marvel R"),
     # Avatr
     ("Avatr", "07"),
     ("Avatr", "11"),
     ("Avatr", "12"),
+    # Hyundai / Kia electric
+    ("Hyundai", "Ioniq 5"),
+    ("Hyundai", "Ioniq 6"),
+    ("Kia", "EV6"),
+    ("Kia", "EV9"),
+}
+
+# Hybrid models: enforce hybrid fuel + Automatic
+HYBRID_MODELS: set[tuple[str, str]] = {
+    ("BYD", "Song Plus DM-i"),
+    ("BYD", "Han DM-i"),
+    ("BYD", "Tang DM-i"),
+    ("BYD", "Song Pro DM-i"),
 }
 
 
@@ -121,32 +165,45 @@ def main(argv: list[str]) -> int:
         raise ValueError(f"Missing required columns {sorted(missing)} in {args.input}")
 
     normalized_ev = {(norm_text(m), norm_text(md)) for (m, md) in PURE_EV_MODELS}
+    normalized_hybrid = {(norm_text(m), norm_text(md)) for (m, md) in HYBRID_MODELS}
 
-    changed = 0
+    changed_ev = 0
+    changed_hybrid = 0
     changed_by_model: dict[str, int] = {}
 
     out_rows: list[dict[str, str]] = []
     for row in rows:
         make = norm_text(row.get("make", ""))
         model = norm_text(row.get("model", ""))
+
         if (make, model) in normalized_ev:
-            before_fuel = row.get("fuel", "")
-            before_trans = row.get("transmission", "")
-            needs = norm_text(before_fuel) != "electric" or norm_text(before_trans) != "automatic"
+            needs = norm_text(row.get("fuel", "")) != "electric" or norm_text(row.get("transmission", "")) != "automatic"
             if needs:
                 row = dict(row)
                 row["fuel"] = "electric"
                 row["transmission"] = "Automatic"
-                changed += 1
+                changed_ev += 1
                 key = f"{make} | {model}"
                 changed_by_model[key] = changed_by_model.get(key, 0) + 1
+
+        elif (make, model) in normalized_hybrid:
+            needs = norm_text(row.get("fuel", "")) != "hybrid" or norm_text(row.get("transmission", "")) != "automatic"
+            if needs:
+                row = dict(row)
+                row["fuel"] = "hybrid"
+                row["transmission"] = "Automatic"
+                changed_hybrid += 1
+                key = f"{make} | {model}"
+                changed_by_model[key] = changed_by_model.get(key, 0) + 1
+
         out_rows.append(row)
 
     summary = {
         "input": str(args.input),
         "rows_in": len(rows),
-        "ev_rows_changed": changed,
-        "ev_rows_changed_by_model": dict(sorted(changed_by_model.items(), key=lambda x: (-x[1], x[0]))),
+        "ev_rows_changed": changed_ev,
+        "hybrid_rows_changed": changed_hybrid,
+        "rows_changed_by_model": dict(sorted(changed_by_model.items(), key=lambda x: (-x[1], x[0]))),
     }
 
     if args.dry_run:
