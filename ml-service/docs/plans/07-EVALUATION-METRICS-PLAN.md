@@ -197,6 +197,75 @@ summary = {
 }
 ```
 
+### Step 7.10 — Feature Distribution Drift Monitoring
+
+**File**: `models/metrics/feature_distribution_baseline.json`
+
+Captures the training-time feature distribution so every new snapshot can be
+compared against it to detect data drift before retraining.
+
+**What to measure**:
+
+| Feature type | Statistics to record |
+|---|---|
+| Numeric (`year`, `mileage_km`, `engine_cc`, `horsepower`, `days_since_baseline`) | mean, std, min, max, p5, p25, p50, p75, p95, % NaN |
+| Categorical (`make`, `model`, `fuel`, `transmission`, `location`, `body_type`) | top-10 value counts + share, # unique values, % NaN |
+| Price (`price_egp`) | full percentile table (p5, p10, ..., p95) + mean, std |
+
+**Drift alerts** (run at each new snapshot before retraining):
+```python
+def check_drift(new_df, baseline_stats, thresholds):
+    """
+    Compare new snapshot feature distributions against baseline.
+    Returns list of DriftAlert with severity: 'warning' or 'critical'.
+    """
+    alerts = []
+
+    # Numeric: flag if mean shifts > K standard deviations from baseline
+    for col in NUMERIC_COLS:
+        z_shift = abs(new_df[col].mean() - baseline_stats[col]['mean']) / baseline_stats[col]['std']
+        if z_shift > thresholds['critical_z']:  # default: 2.0
+            alerts.append(DriftAlert(col, 'critical', f'mean shifted {z_shift:.1f} std dev'))
+        elif z_shift > thresholds['warning_z']:  # default: 1.0
+            alerts.append(DriftAlert(col, 'warning', f'mean shifted {z_shift:.1f} std dev'))
+
+    # Categorical: flag if top-1 value share changes by > 10 pct points
+    for col in CATEGORICAL_COLS:
+        baseline_top = baseline_stats[col]['top_value_share']
+        new_top = new_df[col].value_counts(normalize=True).iloc[0]
+        if abs(new_top - baseline_top) > thresholds['cat_share_delta']:  # default: 0.10
+            alerts.append(DriftAlert(col, 'warning', f'top value share changed by {abs(new_top-baseline_top):.1%}'))
+
+    # New categories not seen in training
+    for col in ['make', 'model', 'location']:
+        new_cats = set(new_df[col].unique()) - set(baseline_stats[col]['known_values'])
+        if new_cats:
+            alerts.append(DriftAlert(col, 'info', f'{len(new_cats)} new values: {list(new_cats)[:5]}'))
+
+    return alerts
+```
+
+**Baseline storage** (`models/metrics/feature_distribution_baseline.json`):
+```json
+{
+  "created_at": "2026-05-24",
+  "data_version": "2026-05-24",
+  "n_rows": 20214,
+  "features": {
+    "mileage_km": {"mean": 82450, "std": 55200, "p50": 72000, "p95": 210000},
+    "year":       {"mean": 2018.3, "std": 4.1, "p50": 2019, "p95": 2024},
+    "make":       {"top_value": "Toyota", "top_value_share": 0.187, "n_unique": 47, "known_values": [...]},
+    "price_egp":  {"mean": 650000, "std": 480000, "p25": 280000, "p50": 490000, "p75": 870000}
+  }
+}
+```
+
+**When to re-baseline**: After each model promotion. The baseline always reflects
+the distribution the current production model was trained on.
+
+**Output**: `models/metrics/drift_report_YYYY-MM-DD.json` — generated at each new snapshot,
+stored alongside the baseline for audit trail.
+
 ---
 
 ## GP Presentation Key Numbers
@@ -232,6 +301,8 @@ These are the numbers that should appear on your GP slides:
 | `models/metrics/per_brand_metrics_v2.csv` | Per-brand breakdown |
 | `models/metadata/make_model_mape.csv` | Production diagnostics |
 | `models/plots_08_v2_evaluation/` | All visualization PNGs |
+| `models/metrics/feature_distribution_baseline.json` | Training distribution for drift detection |
+| `models/metrics/drift_report_YYYY-MM-DD.json` | Per-snapshot drift report |
 
 ---
 
@@ -245,3 +316,6 @@ These are the numbers that should appear on your GP slides:
 - [ ] Summary JSON has all required fields
 - [ ] At least 5 publication-quality plots generated
 - [ ] Numbers are ready to copy-paste into GP presentation
+- [ ] `feature_distribution_baseline.json` created and covers all numeric + categorical features
+- [ ] `check_drift()` produces alerts for a deliberately distorted test snapshot
+- [ ] Drift report generated for the initial `2026-05-24` snapshot vs baseline

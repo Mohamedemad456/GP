@@ -89,6 +89,26 @@
 **Rationale**: Gives the model a "confidence" signal — it can learn to be more conservative for rare cars  
 **Expected Impact**: 0.3% MAPE reduction, but major improvement in per-brand fairness
 
+### Feature 2.6: `days_since_baseline`
+**Formula**: `(scraped_at - BASELINE_DATE).days` where `BASELINE_DATE = 2024-01-01`  
+**Type**: Numeric  
+**Source**: `scraped_at` column in raw data (date listing was pulled from the marketplace)  
+**Rationale**: We pull from active listing sites, so each snapshot captures market conditions
+at that point in time. This feature encodes:
+- EGP inflation / devaluation trends (nominal prices drift upward over time)
+- Seasonal demand patterns (Ramadan, summer, back-to-school buying cycles)
+- Supply shocks (new model year arrivals, import quota changes)
+
+**At inference time**: Pass today's date as `scraped_at` — the model predicts
+"what would this car sell for under current market conditions?"
+
+**Pipeline requirement**: `scraped_at` must be preserved through the cleaning pipeline
+and included in `processed_data.csv`. It is NOT dropped by `generate_processed_data.py`.
+
+**Expected Impact**: Likely 0.5-1.5% MAPE reduction, and more importantly captures EGP
+devaluation trends that are invisible to a static model.  
+**Data leakage risk**: None — `scraped_at` is when WE collected the data, not a price-derived field.
+
 ---
 
 ## What NOT to Add (and Why)
@@ -97,7 +117,7 @@
 |---------|---------|
 | `iso_anomaly_score` | Requires Isolation Forest training, adds pipeline complexity, marginal gain |
 | `is_vintage` | Too few cars (< 50) qualify, negligible statistical impact |
-| `listing_age_days` | No unique car ID to track across scrapes — cannot compute |
+| `listing_age_days` | How long a listing has been active — requires re-identifying the same car across pulls, which we cannot do without a stable listing ID. Different from `scraped_at` (market date) |
 | `price_reduced` | Same reason — no temporal tracking possible |
 | `brand_tier` | Redundant with `mm_price_tier` which is more granular |
 | `transmission_fuel_combo` | Already captured by interaction of both categorical features in tree models |
@@ -113,6 +133,9 @@
 Create/update the data processing logic to add the new features after the basic cleaning:
 
 ```python
+import datetime as dt
+BASELINE_DATE = dt.date(2024, 1, 1)
+
 # After basic processing produces df with existing columns...
 
 # Feature: log_mileage_km
@@ -125,11 +148,19 @@ df['mileage_ratio'] = (df['mileage_km'].fillna(0) / (car_age * 15000)).clip(0, 5
 # Feature: year_bucket
 df['year_bucket'] = ((df['year'] - 2000) // 5).astype(int)
 
+# Feature: days_since_baseline (from scraped_at column)
+df['scraped_at'] = pd.to_datetime(df['scraped_at'], errors='coerce')
+df['days_since_baseline'] = (df['scraped_at'].dt.date.apply(
+    lambda d: (d - BASELINE_DATE).days if pd.notna(d) else 0
+)).astype(int)
+
 # Feature: mm_price_tier (from training data only - computed during training)
 # Feature: make_model_count (from training data only - computed during training)
 ```
 
-**Important**: `mm_price_tier` and `make_model_count` are computed DURING TRAINING from the training split only, then applied to test/calibration via lookup. They should NOT be in `processed_data.csv` — they go directly into the training notebook.
+**Important**: `mm_price_tier` and `make_model_count` are computed DURING TRAINING from
+the training split only. `days_since_baseline` IS included in `processed_data.csv`
+(derived from `scraped_at`). At inference time, the API computes it from `datetime.date.today()`.
 
 ### Step 2.2 — Update Feature Column Lists
 
@@ -137,7 +168,8 @@ df['year_bucket'] = ((df['year'] - 2000) // 5).astype(int)
 ```python
 NUM_COLS = ['year', 'mileage_km', 'mileage_per_year', 'engine_cc',
             'horsepower', 'seating_capacity',
-            'log_mileage_km', 'mileage_ratio', 'year_bucket', 'make_model_count']
+            'log_mileage_km', 'mileage_ratio', 'year_bucket',
+            'make_model_count', 'days_since_baseline']
 CAT_COLS = ['make', 'model', 'transmission', 'fuel', 'location',
             'body_type', 'drivetrain', 'brand_origin', 'car_segment', 'mm_price_tier']
 FEATURE_COLS = NUM_COLS + CAT_COLS
@@ -208,7 +240,7 @@ After adding features, expected correlations:
 
 | File | Action |
 |------|--------|
-| `data/processed/processed_data.csv` | Add `log_mileage_km`, `mileage_ratio`, `year_bucket` columns |
+| `data/processed/processed_data.csv` | Add `log_mileage_km`, `mileage_ratio`, `year_bucket`, `days_since_baseline` columns |
 | `app/services/prediction/feature_builder.py` | Add new feature computation + lookups |
 | `models/metadata/mm_price_tier_lookup.csv` | NEW — created during training |
 | Training notebook (07) | Compute `mm_price_tier`, `make_model_count` from train split |
@@ -217,7 +249,7 @@ After adding features, expected correlations:
 
 ## Success Criteria
 
-- [ ] `processed_data.csv` has `log_mileage_km`, `mileage_ratio`, `year_bucket` columns
+- [ ] `processed_data.csv` has `log_mileage_km`, `mileage_ratio`, `year_bucket`, `days_since_baseline` columns
 - [ ] No NaN in new numeric features
 - [ ] `mm_price_tier_lookup.csv` exists with all make/model combos
 - [ ] `feature_builder.py` produces correct output for test inputs

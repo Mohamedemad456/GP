@@ -28,7 +28,7 @@ Each sub-plan contains: challenges, root causes, detailed approaches, verificati
 
 | # | Plan | File | Status |
 |---|------|------|--------|
-| 1 | Data Cleaning & Quality | [`plans/01-DATA-CLEANING-PLAN.md`](plans/01-DATA-CLEANING-PLAN.md) | Pending |
+| 1 | Data Cleaning & Quality | [`plans/01-DATA-CLEANING-PLAN.md`](plans/01-DATA-CLEANING-PLAN.md) | ✅ Done |
 | 2 | Feature Engineering V2 | [`plans/02-FEATURE-ENGINEERING-PLAN.md`](plans/02-FEATURE-ENGINEERING-PLAN.md) | Pending |
 | 3 | Model V2 Training | [`plans/03-MODEL-V2-TRAINING-PLAN.md`](plans/03-MODEL-V2-TRAINING-PLAN.md) | Pending |
 | 4 | CQR & Prediction Intervals | [`plans/04-CQR-CALIBRATION-PLAN.md`](plans/04-CQR-CALIBRATION-PLAN.md) | Pending |
@@ -80,7 +80,7 @@ Everything else improves quality and robustness but isn't blocking the defense.
 
 ## Current Progress
 
-- [ ] Plan 1 — Data Cleaning & Quality
+- [x] Plan 1 — Data Cleaning & Quality ✅ (completed 2026-05-24)
 - [ ] Plan 2 — Feature Engineering V2
 - [ ] Plan 3 — Model V2 Training
 - [ ] Plan 4 — CQR & Prediction Intervals
@@ -91,6 +91,6 @@ Everything else improves quality and robustness but isn't blocking the defense.
 
 ---
 
-**START WITH: Plan 1 — Data Cleaning & Quality**
+**NEXT UP: Plan 2 — Feature Engineering V2**
 
-When you're ready, tell me to implement Plan 1 and I'll execute it step by step.
+Plan 1 is complete. Data is cleaned, deduplicated, and processed. Plan 5 (versioned data + automated retraining) is fully specified but depends on Plans 3 & 4.
