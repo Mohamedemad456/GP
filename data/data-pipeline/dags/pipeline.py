@@ -28,10 +28,10 @@ def data_pipeline():
         retry_delay=timedelta(minutes=10)
     )
 
-    translate_dubizzle = BashOperator(
-        task_id='translate_dubizzle',
-        bash_command='python /opt/airflow/scripts/translate.py'
-    )
+    # translate_dubizzle = BashOperator(
+    #     task_id='translate_dubizzle',
+    #     bash_command='python /opt/airflow/scripts/translate.py'
+    # )
 
     @task
     def extract_htla2ee():
@@ -40,7 +40,7 @@ def data_pipeline():
 
     @task
     def extract_dubizzle():
-        dubizzleDF = pd.read_csv("/opt/airflow/data/dubizzle_cars_translated.csv")
+        dubizzleDF = pd.read_csv("/opt/airflow/data/dubizzle_cars.csv")
         return dubizzleDF
     
     @task
@@ -52,10 +52,8 @@ def data_pipeline():
 
     @task
     def clean_dubizzle(df):
-        df['title'] = df['title'].str.lower().str.replace('-', ' ')
-        df['english_title'] = df['english_title'].str.lower().str.replace('-', ' ')
-        df = df[df['english_title'] != df['title']] # To keep only translated rows (if any Arabic titles slipped through, we remove them)
-        df.drop(columns=['url', 'page', 'title'], inplace=True)
+        df['title'] = df['title'].str.lower()
+        df.drop(columns=['url', 'page'], inplace=True)
         df['price_egp'] = df['price_egp'].map(lambda x: x.replace('EGP', '').replace(',', '')).astype('Int64')
         df['year'] = df['year'].astype('Int64')
         df['mileage_km'] = (
@@ -66,13 +64,10 @@ def data_pipeline():
                                     errors='coerce'
                                 ).astype('Int64'))
         df['scraped_at'] = pd.to_datetime(df['scraped_at'])
-        df = df[~df['english_title'].str.contains(r'[\u0600-\u06FF]', na=False)] # To remove any remaining Arabic titles that were not translated (if any slipped through)
         return df
     
     @task
     def union_datasets(hatla2ee, dubizzle):
-        dubizzle = dubizzle.rename(columns={'english_title' : 'title'})
-
         cols_int = ["year", "mileage_km", "price_egp"]
         for col in cols_int:
             dubizzle[col] = dubizzle[col].astype("Int64")
@@ -116,6 +111,7 @@ def data_pipeline():
         df = df.drop_duplicates() # To remove any duplicates       
         df = df.dropna(subset=["title"]) # remove rows with missing title        
         df = df[df["title"].str.strip() != ""] # remove empty string titles
+        df['title'] = df['title'].str.lower()
         return df
     
     @task
@@ -141,12 +137,12 @@ def data_pipeline():
             f"postgresql://{os.getenv('DB_USER')}:{password}"
             f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
         )
-        df.to_sql("used_cars", engine, if_exists="append", index=False) # replace for testing, change to append for production
+        df.to_sql("test", engine, if_exists="append", index=False) # replace for testing, change to append for production
         print("Data loaded to database successfully.")
         print("Number of records loaded:", len(df))
 
     htla2eeData = scraping_htla2ee >> extract_htla2ee()
-    dubizzleData = scraping_dubizzle >> translate_dubizzle >> extract_dubizzle()
+    dubizzleData = scraping_dubizzle >> extract_dubizzle()
     cleaned_htla2eeData = clean_hatla2ee(htla2eeData)
     cleaned_dubizzleData = clean_dubizzle(dubizzleData)
     unioned_data = union_datasets(cleaned_htla2eeData, cleaned_dubizzleData)
