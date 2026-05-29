@@ -686,6 +686,48 @@ namespace Karna.Core.Application.Services
 			};
 		}
 
+		public async Task<ApiResponse<ListingDetailsDto>> GetByIdAsync(Guid id)
+		{
+			var repo = _unitOfWork.GetRepository<Listing>();
+
+			// 1. Load listing with specification (filters Active + !IsDeleted)
+			var spec = new ListingDetailsSpecification(id);
+			var listing = await repo.GetWithSpecAsync(spec);
+
+			if (listing is null)
+				return new ApiResponse<ListingDetailsDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotAvailable") };
+
+			// 2. Load deep navigation: ListingDefects → ConditionDefect → Category
+			//    (Spec pattern only supports first-level includes)
+			if (listing.ListingDefects.Any())
+			{
+				var defectRepo = _unitOfWork.GetRepository<ConditionDefect>();
+				var categoryRepo = _unitOfWork.GetRepository<ConditionChecklistCategory>();
+
+				var defectIds = listing.ListingDefects.Select(ld => ld.ConditionDefectId).ToList();
+				var conditionDefects = (await defectRepo.FindAsync(
+					d => defectIds.Contains(d.Id), withTracking: false)).ToList();
+
+				var categoryIds = conditionDefects.Select(d => d.CategoryId).Distinct().ToList();
+				var categories = (await categoryRepo.FindAsync(
+					c => categoryIds.Contains(c.Id), withTracking: false)).ToList();
+
+				// Attach navigation properties for mapping
+				foreach (var defect in conditionDefects)
+					defect.Category = categories.FirstOrDefault(c => c.Id == defect.CategoryId)!;
+
+				foreach (var ld in listing.ListingDefects)
+					ld.ConditionDefect = conditionDefects.FirstOrDefault(d => d.Id == ld.ConditionDefectId)!;
+			}
+
+			// 3. Map and return
+			return new ApiResponse<ListingDetailsDto>
+			{
+				Success = true,
+				Data = listing.ToDetailsDto()
+			};
+		}
+
         public async Task<ApiResponseDto> DeleteAsync(Guid id)
         {
             var listingRepo = _unitOfWork.GetRepository<Listing>();

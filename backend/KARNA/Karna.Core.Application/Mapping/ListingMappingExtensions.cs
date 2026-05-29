@@ -112,6 +112,82 @@ namespace Karna.Core.Application.Mapping
 		public static IEnumerable<BuyerListingDto> ToBuyerDto(this IEnumerable<Listing> source)
 			=> source.Select(l => l.ToBuyerDto());
 
+		public static ListingDetailsDto ToDetailsDto(this Listing source) => new()
+		{
+			Id = source.Id,
+			MakeName = source.Make?.Name ?? string.Empty,
+			ModelName = source.Model?.Name ?? string.Empty,
+			Year = source.Year,
+			Mileage = source.Mileage,
+			FuelType = source.FuelType.ToString(),
+			Transmission = source.Transmission.ToString(),
+			EngineSize = source.EngineSize,
+			Color = source.Color,
+			Description = source.Description,
+			Location = source.Location.ToDisplayString(),
+			ListingPrice = source.Price,
+			IsGoodDeal = CalculateIsGoodDeal(source),
+			Photos = MapPhotos(source.Photos),
+			ConditionGrade = CalculateConditionGrade(source.ListingDefects),
+			ChecklistCategories = MapChecklistCategories(source.ListingDefects),
+			SellerName = source.Seller?.Name ?? string.Empty,
+			ContactPhoneNumber = source.ContactPhoneNumber,
+			WhatsAppNumber = source.WhatsAppNumber,
+			PreferredContactMethod = source.PreferredContactMethod.ToString(),
+			CreatedAt = source.CreatedAt
+		};
+
+		private static List<ListingPhotoDto> MapPhotos(ICollection<ListingPhoto>? photos)
+		{
+			if (photos is null || !photos.Any())
+				return new List<ListingPhotoDto>();
+
+			return photos
+				.OrderByDescending(p => p.IsPrimary)
+				.ThenBy(p => p.DisplayOrder)
+				.Select(p => new ListingPhotoDto
+				{
+					Id = p.Id,
+					PhotoUrl = p.PhotoUrl,
+					IsPrimary = p.IsPrimary,
+					DisplayOrder = p.DisplayOrder
+				})
+				.ToList();
+		}
+
+		private static string CalculateConditionGrade(ICollection<ListingDefect>? defects)
+		{
+			var count = defects?.Count ?? 0;
+
+			return count switch
+			{
+				0 => "Excellent",
+				<= 3 => "Good",
+				<= 6 => "Fair",
+				_ => "Poor"
+			};
+		}
+
+		private static List<ConditionCategoryDetailDto> MapChecklistCategories(ICollection<ListingDefect>? defects)
+		{
+			if (defects is null || !defects.Any())
+				return new List<ConditionCategoryDetailDto>();
+
+			return defects
+				.Where(ld => ld.ConditionDefect?.Category is not null)
+				.GroupBy(ld => ld.ConditionDefect.Category.Name)
+				.Select(group => new ConditionCategoryDetailDto
+				{
+					CategoryName = group.Key,
+					Defects = group.Select(ld => new ConditionDefectItemDto
+					{
+						ItemName = ld.ConditionDefect.ItemName,
+						Description = ld.ConditionDefect.Description
+					}).ToList()
+				})
+				.ToList();
+		}
+
 		private static bool CalculateIsGoodDeal(Listing listing)
 		{
 			if (listing.Price is null)
