@@ -33,6 +33,7 @@ namespace Karna.Infrastructure.Persistence._Data.Configurations
 				.IsRequired();
 
 			builder.HasIndex(x => x.AdminId);
+			builder.HasIndex(x => x.EntityType);
 			builder.HasIndex(x => x.PerformedAt);
 
 			builder.HasOne(x => x.Admin)

@@ -5,6 +5,7 @@ using Karna.Core.Application.Abstraction.External;
 using Karna.Core.Application.Abstraction.Persistence;
 using Karna.Core.Application.Abstraction.Services;
 using Karna.Core.Application.Mapping;
+using Karna.Core.Application.Specifications.Listings;
 using Karna.Core.Domain.Entities;
 using Karna.Core.Domain.Enums;
 
@@ -486,7 +487,12 @@ namespace Karna.Core.Application.Services
 
 			var prediction = mlResult.Data;
 
-			// 8. Map response to listing entity fields
+			// 8. Record pricing history (ML update)
+			var oldFairPrice = listing.FairPrice;
+			if (oldFairPrice != prediction.FairPrice)
+				await RecordPricingChangeAsync(listing.Id, listing.Price, listing.Price, oldFairPrice, prediction.FairPrice, null, "ML price prediction");
+
+			// 9. Map response to listing entity fields
 			listing.FairPrice = prediction.FairPrice;
 			listing.NegotiationRangeLower = prediction.NegotiationRangeLower;
 			listing.NegotiationRangeUpper = prediction.NegotiationRangeUpper;
@@ -494,7 +500,7 @@ namespace Karna.Core.Application.Services
 			listing.ModelVersion = prediction.ModelVersion;
 			listing.PredictedAt = prediction.PredictedAt;
 
-			// 9. Save changes
+			// 10. Save changes
 			await _unitOfWork.CompleteAsync();
 
 			return new ApiResponse<GeneratePriceResponseDto>
@@ -526,9 +532,10 @@ namespace Karna.Core.Application.Services
 				&& listing.EngineSize > 0
 				&& !string.IsNullOrWhiteSpace(listing.Color)
 				&& !string.IsNullOrWhiteSpace(listing.Description)
+				&& !string.IsNullOrWhiteSpace(listing.ContactPhoneNumber)
 				&& Enum.IsDefined(listing.FuelType)
 				&& Enum.IsDefined(listing.Transmission)
-				&& Enum.IsDefined(listing.Location);
+				&& Enum.IsDefined(listing.Location);;
 		}
 
 		private static bool HasRequiredPricing(Listing listing)
@@ -565,6 +572,7 @@ namespace Karna.Core.Application.Services
 				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotInValidStateForPricing") };
 
 			// 5. Set price
+			var oldPrice = listing.Price;
 			if (dto.AcceptFairPrice)
 			{
 				if (listing.FairPrice is null)
@@ -580,7 +588,11 @@ namespace Karna.Core.Application.Services
 				listing.Price = dto.Price;
 			}
 
-			// 6. Save
+			// 6. Record pricing history (seller update)
+			if (oldPrice != listing.Price)
+				await RecordPricingChangeAsync(listing.Id, oldPrice, listing.Price, listing.FairPrice, listing.FairPrice, currentUser.Id, dto.AcceptFairPrice ? "Accepted fair price" : "Custom price set");
+
+			// 7. Save
 			await _unitOfWork.CompleteAsync();
 
 			return new ApiResponse<ListingDto>
@@ -604,6 +616,116 @@ namespace Karna.Core.Application.Services
 				ChangedAt = DateTime.UtcNow
 			};
 			await historyRepo.AddAsync(record);
+		}
+
+		private async Task RecordPricingChangeAsync(Guid listingId, decimal? oldPrice, decimal? newPrice, decimal? oldFairPrice, decimal? newFairPrice, Guid? changedByUserId, string? changeReason)
+		{
+			var pricingRepo = _unitOfWork.GetRepository<PricingHistory>();
+			await pricingRepo.AddAsync(new PricingHistory
+			{
+				ListingId = listingId,
+				OldPrice = oldPrice,
+				NewPrice = newPrice,
+				OldFairPrice = oldFairPrice,
+				NewFairPrice = newFairPrice,
+				ChangedByUserId = changedByUserId,
+				ChangeReason = changeReason,
+				ChangedAt = DateTime.UtcNow
+			});
+		}
+
+		public async Task<ApiResponse<IEnumerable<PricingHistoryDto>>> GetPricingHistoryAsync(Guid listingId)
+		{
+			if (!_currentUserService.IsAuthenticated || _currentUserService.UserId == Guid.Empty)
+				return new ApiResponse<IEnumerable<PricingHistoryDto>> { Success = false, Message = _localizer.GetErrorMessage("Unauthorized") };
+
+			var userRepo = _unitOfWork.GetRepository<User>();
+			var currentUser = await userRepo.GetAsync(u => u.IdentityUserId == _currentUserService.UserId);
+			if (currentUser is null)
+				return new ApiResponse<IEnumerable<PricingHistoryDto>> { Success = false, Message = _localizer.GetErrorMessage("UserNotFound") };
+
+			var listingRepo = _unitOfWork.GetRepository<Listing>();
+			var listing = await listingRepo.GetAsync(listingId);
+			if (listing is null)
+				return new ApiResponse<IEnumerable<PricingHistoryDto>> { Success = false, Message = _localizer.GetErrorMessage("ListingNotFound") };
+
+			// Only listing owner or admin can view pricing history
+			if (listing.SellerId != currentUser.Id && !_currentUserService.IsInRole("Admin"))
+				return new ApiResponse<IEnumerable<PricingHistoryDto>> { Success = false, Message = _localizer.GetErrorMessage("Unauthorized") };
+
+			var pricingRepo = _unitOfWork.GetRepository<PricingHistory>();
+			var history = (await pricingRepo.FindAsync(
+				h => h.ListingId == listingId, withTracking: false))
+				.OrderByDescending(h => h.ChangedAt)
+				.ToList();
+
+			return new ApiResponse<IEnumerable<PricingHistoryDto>>
+			{
+				Success = true,
+				Data = history.ToDto()
+			};
+		}
+
+		public async Task<ApiResponse<Pagination<BuyerListingDto>>> GetApprovedListingsAsync(BuyerListingSpecParams specParams)
+		{
+			var repo = _unitOfWork.GetRepository<Listing>();
+
+			var dataSpec = new ActiveListingsSpecification(specParams, applyPaging: true);
+			var countSpec = new ActiveListingsSpecification(specParams, applyPaging: false);
+
+			var listings = await repo.GetAllWithSpecAsync(dataSpec);
+			var count = await repo.GetCountAsync(countSpec);
+
+			return new ApiResponse<Pagination<BuyerListingDto>>
+			{
+				Success = true,
+				Data = new Pagination<BuyerListingDto>(specParams.PageIndex, specParams.PageSize, count)
+				{
+					Data = listings.ToBuyerDto()
+				}
+			};
+		}
+
+		public async Task<ApiResponse<ListingDetailsDto>> GetByIdAsync(Guid id)
+		{
+			var repo = _unitOfWork.GetRepository<Listing>();
+
+			// 1. Load listing with specification (filters Active + !IsDeleted)
+			var spec = new ListingDetailsSpecification(id);
+			var listing = await repo.GetWithSpecAsync(spec);
+
+			if (listing is null)
+				return new ApiResponse<ListingDetailsDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotAvailable") };
+
+			// 2. Load deep navigation: ListingDefects → ConditionDefect → Category
+			//    (Spec pattern only supports first-level includes)
+			if (listing.ListingDefects.Any())
+			{
+				var defectRepo = _unitOfWork.GetRepository<ConditionDefect>();
+				var categoryRepo = _unitOfWork.GetRepository<ConditionChecklistCategory>();
+
+				var defectIds = listing.ListingDefects.Select(ld => ld.ConditionDefectId).ToList();
+				var conditionDefects = (await defectRepo.FindAsync(
+					d => defectIds.Contains(d.Id), withTracking: false)).ToList();
+
+				var categoryIds = conditionDefects.Select(d => d.CategoryId).Distinct().ToList();
+				var categories = (await categoryRepo.FindAsync(
+					c => categoryIds.Contains(c.Id), withTracking: false)).ToList();
+
+				// Attach navigation properties for mapping
+				foreach (var defect in conditionDefects)
+					defect.Category = categories.FirstOrDefault(c => c.Id == defect.CategoryId)!;
+
+				foreach (var ld in listing.ListingDefects)
+					ld.ConditionDefect = conditionDefects.FirstOrDefault(d => d.Id == ld.ConditionDefectId)!;
+			}
+
+			// 3. Map and return
+			return new ApiResponse<ListingDetailsDto>
+			{
+				Success = true,
+				Data = listing.ToDetailsDto()
+			};
 		}
 
         public async Task<ApiResponseDto> DeleteAsync(Guid id)
