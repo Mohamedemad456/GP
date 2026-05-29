@@ -225,4 +225,7 @@
   <data name="ListingNotInValidStateForUpdate" xml:space="preserve">
     <value>Listing cannot be updated in its current state.</value>
   </data>
+  <data name="ListingNotAvailable" xml:space="preserve">
+    <value>This listing is no longer available.</value>
+  </data>
 </root>

@@ -225,4 +225,7 @@
   <data name="ListingNotInValidStateForUpdate" xml:space="preserve">
     <value>لا يمكن تعديل الإعلان في حالته الحالية.</value>
   </data>
+  <data name="ListingNotAvailable" xml:space="preserve">
+    <value>هذا الإعلان لم يعد متاحاً.</value>
+  </data>
 </root>

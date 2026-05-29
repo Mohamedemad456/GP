@@ -16,6 +16,16 @@ namespace Karna.APIs.Controllers.Controllers
 			return Ok(result);
 		}
 
+		[HttpGet("{id}")]
+		[AllowAnonymous]
+		public async Task<IActionResult> GetById(Guid id)
+		{
+			var result = await _listingService.GetByIdAsync(id);
+			if (!result.Success)
+				return NotFound(result);
+			return Ok(result);
+		}
+
 		[HttpPost]
 		[Authorize(Roles = "User")]
 		public async Task<IActionResult> Create([FromBody] CreateListingDto dto)
