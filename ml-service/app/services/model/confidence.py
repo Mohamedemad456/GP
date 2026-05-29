@@ -4,7 +4,7 @@ Uses model MAPE, make+model support count, and interval width to classify
 predictions as high / medium / low confidence.
 """
 import logging
-import app.services.model_state as _ms
+import app.services.model.model_state as _ms
 logger = logging.getLogger(__name__)
 
 

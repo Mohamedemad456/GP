@@ -1,8 +1,8 @@
 from fastapi import APIRouter
 from app.schemas.health import HealthResponse
-import app.services.model_state as _ms
-from app.services.explainer import ACTIVE_SHAP_EXPLAINER
-from app.services.ensemble_explainer import is_ensemble_explainer_ready
+import app.services.model.model_state as _ms
+from app.services.explainability.explainer import ACTIVE_SHAP_EXPLAINER
+from app.services.explainability.ensemble_explainer import is_ensemble_explainer_ready
 import datetime
 
 router = APIRouter()

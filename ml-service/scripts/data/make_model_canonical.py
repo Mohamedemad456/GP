@@ -9,8 +9,8 @@ from typing import Any
 
 import yaml
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_RULES_PATH = PROJECT_ROOT / "src" / "config" / "canonical_rules.yaml"
+PROJECT_ROOT = Path(__file__).resolve().parents[2]  # scripts/data/ -> ml-service/
+DEFAULT_RULES_PATH = PROJECT_ROOT / "scripts" / "config" / "canonical_rules.yaml"
 
 _SPACE_RE = re.compile(r"\s+")
 _REMOVE_CHARS = str.maketrans("", "", string.punctuation + " ")

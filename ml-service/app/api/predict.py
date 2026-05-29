@@ -18,7 +18,7 @@ from app.schemas.prediction import (
     BatchPredictionRequest, BatchPredictionResponse, BatchPredictionItem,
 )
 from app.services import predictor
-import app.services.model_state as _ms
+import app.services.model.model_state as _ms
 from app.core.price_rounding import round_egp_market_price
 
 logger = logging.getLogger(__name__)

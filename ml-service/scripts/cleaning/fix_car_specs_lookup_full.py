@@ -544,8 +544,8 @@ def atomic_replace(src: Path, dst: Path) -> None:
 
 
 def default_paths() -> tuple[Path, Path]:
-    # This script lives in ml-service/src; derive the ml-service root reliably.
-    ml_service_root = Path(__file__).resolve().parents[1]
+    # This script lives in ml-service/scripts/cleaning; derive the ml-service root reliably.
+    ml_service_root = Path(__file__).resolve().parents[2]
 
     # FIX: reads the fixed file produced by fix_lookups_make_model.py --apply,
     # NOT the original car_specs_lookup_full_cleaned.csv.

@@ -1,6 +1,6 @@
 import pytest
 
-from app.services.confidence import confidence_label_from_signals
+from app.services.model.confidence import confidence_label_from_signals
 
 
 @pytest.mark.parametrize(

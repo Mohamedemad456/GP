@@ -1,6 +1,6 @@
 import pytest
 
-from app.services.feature_builder import (
+from app.services.prediction.feature_builder import (
     _canonicalize,
     _normalize_transmission,
     _normalize_fuel,

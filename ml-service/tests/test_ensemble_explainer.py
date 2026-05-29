@@ -8,7 +8,7 @@ The SHAP-dependent paths are tested via the running service instead.
 import numpy as np
 import pytest
 
-from app.services.ensemble_explainer import (
+from app.services.explainability.ensemble_explainer import (
     _map_weights_to_names,
     _robust_trim_index,
     is_ensemble_explainer_ready,
@@ -93,7 +93,7 @@ class TestEnsembleExplainerReadiness:
 
 class TestEnsemblePriceFactorsFallback:
     def test_returns_none_when_not_ready(self):
-        from app.services.ensemble_explainer import compute_ensemble_price_factors
+        from app.services.explainability.ensemble_explainer import compute_ensemble_price_factors
         # Without init, should return None gracefully
         result = compute_ensemble_price_factors(
             make="Toyota", model="Corolla", year=2020,

@@ -1,0 +1,770 @@
+# canonical_rules.yaml
+# NOTE: We preserve model granularity by default, but we DO collapse a few
+# common listing-name variants when they are used interchangeably in our data
+# (e.g., BMW 318 vs 318i) to avoid duplicate models in lookups.
+
+make_aliases:
+  chana: Changan
+  kgm: SsangYong
+  ssangyong: SsangYong
+  ssang yong: SsangYong
+  bmw: BMW
+  vw: Volkswagen
+  byd: BYD
+  mg: MG
+  baic: BAIC
+  gac: GAC
+  jac: JAC
+  gmc: GMC
+  ds: DS
+  faw: FAW
+  jmc: JMC
+  kyc: KYC
+  dfsk: DFSK
+  xpeng: XPeng
+  lynkco: Lynk & Co
+  citroen: Citroën
+  citroën: Citroën
+  alfa romeo: Alfa Romeo
+  land rover: Land Rover
+  rolls royce: Rolls Royce
+  aston martin: Aston Martin
+  great wall: Great Wall
+  chery tiggo: Chery
+  daewoo: Daewoo
+  skoda: Skoda
+
+model_aliases_by_make:
+
+  # ── Mercedes (~2,500 rows recovered) ────────────────────────────────────────
+  Mercedes:
+    c 180: C180
+    c 200: C200
+    c 250: C250
+    c 280: C280
+    c 30: C30
+    c 300: C300
+    c180 amg: C180
+    c 200 amg: C200
+    c 250 amg: C250
+    e 180: E180
+    e 200: E200
+    e 200 amg: E200
+    e 230: E230
+    e 240: E240
+    e 250: E250
+    e 280: E280
+    e 300: E300
+    e 350: E350
+    a 180: A180
+    a 200: A200
+    a 35: A35
+    b 150: B150
+    b 180: B180
+    b 200: B200
+    cla 180: CLA180
+    cla 200: CLA200
+    cle 200: CLE200
+    cle 300: CLE300
+    gla 200: GLA200
+    gla: GLA
+    glc 200: GLC200
+    glc 300: GLC300
+    glc 43: GLC43
+    glc: GLC
+    gle 450: GLE450
+    gle: GLE
+    glk 300: GLK300
+    gls 580: GLS580
+    gls: GLS
+    cls 350: CLS350
+    cls: CLS
+    s 4: S4
+    s 400: S400
+    s 450: S450
+    s 500: S500
+    s 580: S580
+    v 250: V250
+    eqa 260: EQA260
+    eqe 350: EQE350
+    eqe 500: EQE500
+    eqs 450: EQS450
+    eqs 580: EQS580
+    gt 43: GT43
+    g 63: G63
+    amg: AMG
+
+  # ── Hyundai (~1,000 rows recovered) ─────────────────────────────────────────
+  Hyundai:
+    tucson turbo gdi: Tucson
+    tucson gdi: Tucson
+    new tucson: Tucson
+    accent rb: Accent RB
+    accent hci: Accent HCI
+    elantra hd: Elantra HD
+    elantra ad: Elantra AD
+    elantra cn7: Elantra CN7
+    elantra md: Elantra MD
+    ix 35: IX35
+    ix35: IX35
+    grand i10: Grand i10
+    grand i 10: Grand i10
+    i 10: I10
+    i10: I10
+    i 20: I20
+    i20: I20
+    i 30: I30
+    i30: I30
+    xd: XD
+    santa fe: Santa Fe
+
+  # ── BMW (~300 rows recovered) ───────────────────────────────────────────────
+  BMW:
+    116: "116"
+    118: "118"
+    218: 218i
+    218i: 218i
+    218 i: 218i
+    3 series: 3 Series
+    316: "316"
+    318: 318i
+    318i: 318i
+    318 i: 318i
+    320: 320i
+    320i: 320i
+    320 i: 320i
+    330: "330"
+    340: "340"
+    418: "418"
+    420: "420"
+    518: "518"
+    520: 520i
+    520i: 520i
+    520 i: 520i
+    523: "523"
+    525: "525"
+    528: "528"
+    530: "530"
+    730: "730"
+    740: "740"
+    x 1: X1
+    x 2: X2
+    x 3: X3
+    x 4: X4
+    x 5: X5
+    x 6: X6
+    x 7: X7
+    x3 m: X3 M
+    x5 m: X5 M
+    x6 m: X6 M
+    i 3: I3
+    i3: I3
+    i 7: I7
+    i7: I7
+    ix 1: IX1
+    ix1: IX1
+    ix 3: IX3
+    ix3: IX3
+    m 4: M4
+    m4: M4
+    z 4: Z4
+    z4: Z4
+
+  # ── MG (~250 rows recovered) ────────────────────────────────────────────────
+  MG:
+    rx5: RX5
+    rx 5: RX5
+    zs: ZS
+    hs: HS
+    gt: GT
+    "5": "5"
+    "6": "6"
+    "7": "7"
+    x 5: X5
+
+  # ── Chery — models from "Chery Tiggo" make alias (~250 rows recovered) ─────
+  Chery:
+    "3": Tiggo 3
+    "4": Tiggo 4
+    4 pro: Tiggo 4 Pro
+    "7": Tiggo 7
+    7 pro: Tiggo 7 Pro
+    7 pro max: Tiggo 7 Pro Max
+    "8": Tiggo 8
+    8 pro: Tiggo 8 Pro
+    8 pro max: Tiggo 8 Pro Max
+    "9": Tiggo
+    qq: QQ
+    a 11: A11
+    a 15: A15
+    a 5: A5
+    arrizo5: Arrizo 5
+    arrizo 5 pro: Arrizo 5 Pro
+
+  # ── Speranza (~180 rows recovered) ──────────────────────────────────────────
+  Speranza:
+    "516": A516
+    "113": A113
+    "213": A213
+    "620": A620
+    "11": A11
+    chery qq: Chery QQ
+    m 11: M11
+    m 12: M12
+
+  # ── Land Rover (~90 rows recovered) ─────────────────────────────────────────
+  Land Rover:
+    velar: Range Rover Velar
+    evoque: Range Rover Evoque
+    sport: Range Rover Sport
+    vogue: Range Rover Vogue
+    range rover evoque: Range Rover Evoque
+    range rover sport: Range Rover Sport
+    range rover velar: Range Rover Velar
+    range rover vogue: Range Rover Vogue
+    discovery sport: Discovery Sport
+    discovery: Discovery
+
+  # ── Changan (~60 rows recovered) ────────────────────────────────────────────
+  Changan:
+    cs 35: CS35
+    cs 55: CS55
+    cs55 plus: CS55 Plus
+    cs 55 plus: CS55 Plus
+    cs 75: CS75
+    cs75 plus: CS75 Plus
+    cs 75 plus: CS75 Plus
+    uni t: UNI-T
+    uni v: UNI-V
+    benni mini: Benni Mini
+
+  # ── Soueast (~60 rows recovered) ────────────────────────────────────────────
+  Soueast:
+    s 05: S05
+    s 06: S06
+    s 07: S07
+    s 09: S09
+
+  # ── Jaguar (~30 rows recovered) ─────────────────────────────────────────────
+  Jaguar:
+    f pace: F-Pace
+    f type: F-Type
+    xe: XE
+
+  # ── Subaru (~50 rows recovered) ─────────────────────────────────────────────
+  Subaru:
+    xv: XV
+
+  # ── Brilliance (~100 rows recovered) ────────────────────────────────────────
+  Brilliance:
+    frv: FRV
+    fsv: FSV
+    frv cross: FRV Cross
+    v 5: V5
+    v 6: V6
+
+  # ── Volvo (~50 rows recovered) ──────────────────────────────────────────────
+  Volvo:
+    xc 40: XC40
+    xc40: XC40
+    xc 60: XC60
+    xc60: XC60
+    xc 90: XC90
+    xc90: XC90
+    s 60: S60
+    s60: S60
+
+  # ── Volkswagen (~50 rows recovered) ─────────────────────────────────────────
+  Volkswagen:
+    t roc: T-Roc
+    t-roc: T-Roc
+    id 4: ID4
+    id 6: ID6
+    e golf: E-Golf
+    golf: Golf
+    golf 2: Golf 2
+    golf 3: Golf 3
+    golf 4: Golf 4
+    golf 5: Golf 5
+    golf 6: Golf 6
+    golf 7: Golf 7
+    golf 8: Golf 8
+    golf r: Golf R
+
+  # ── Fiat (~30 rows recovered) ───────────────────────────────────────────────
+  Fiat:
+    500 x: 500X
+    grand punto: Grand Punto
+
+  # ── Peugeot (~50 rows recovered) ────────────────────────────────────────────
+  Peugeot:
+    307 sw: 307 SW
+    308 sw: 308 SW
+
+  # ── Renault (~150 rows recovered) ───────────────────────────────────────────
+  Renault:
+    sandero step way: Sandero Stepway
+    sandero stepway: Sandero Stepway
+
+  # ── Ford (~25 rows recovered) ───────────────────────────────────────────────
+  Ford:
+    ecosport: EcoSport
+    eco sport: EcoSport
+
+  # ── Proton (~60 rows recovered) ─────────────────────────────────────────────
+  Proton:
+    gen 2: Gen-2
+    gen2: Gen-2
+    "2": Gen-2
+
+  # ── Mini (~60 rows recovered) ───────────────────────────────────────────────
+  Mini:
+    country man: Countryman
+    countryman s: Countryman S
+    cooper paceman: Paceman
+
+  # ── Jeep (~30 rows recovered) ───────────────────────────────────────────────
+  Jeep:
+    grand cherokee 4xe: Grand Cherokee 4xe
+
+  # ── Xiaomi (~20 rows recovered) ─────────────────────────────────────────────
+  Xiaomi:
+    su7: SU7
+    su 7: SU7
+    yu7: Yu7
+
+  # ── Kia (~110 rows recovered) ───────────────────────────────────────────────
+  Kia:
+    carnival mpv: Carnival MPV
+    grand cerato: Grand Cerato
+    cerato koup: Cerato Koup
+
+  # ── Mitsubishi (~25 rows recovered) ─────────────────────────────────────────
+  Mitsubishi:
+    lancer ex shark: Lancer EX Shark
+    lancer crystala: Lancer Crystala
+    lancer puma: Lancer Puma
+    eclipse cross: Eclipse Cross
+    xpander cross: Xpander Cross
+
+  # ── Honda ───────────────────────────────────────────────────────────────────
+  Honda:
+    cr v: CRV
+    crv: CRV
+    zrv: ZRV
+    z rv: ZRV
+
+  # ── Nissan ──────────────────────────────────────────────────────────────────
+  Nissan:
+    xtrail: X-Trail
+    x trail: X-Trail
+
+  # ── Suzuki ──────────────────────────────────────────────────────────────────
+  Suzuki:
+    grand vitara: Grand Vitara
+    s presso: S-Presso
+    swift dzire: Swift Dzire
+
+  # ── Isuzu ──────────────────────────────────────────────────────────────────
+  Isuzu:
+    d max: D-Max
+
+  # ── DS ──────────────────────────────────────────────────────────────────────
+  DS:
+    ds4: DS4
+    ds7: DS7
+
+  # ── BAIC ────────────────────────────────────────────────────────────────────
+  BAIC:
+    u5 plus: U5 Plus
+    eu5 plus: EU5 Plus
+    bj 30: BJ30
+    bj30: BJ30
+    x 3: X3
+    x 55: X55
+    x 7: X7
+
+  # ── Geely ──────────────────────────────────────────────────────────────────
+  Geely:
+    cool ray: Coolray
+    coolray: Coolray
+    emgrand 7: Emgrand 7
+    emgrand x7: Emgrand X7
+    gx3 pro: GX3 Pro
+
+  # ── SsangYong (~15 rows) ────────────────────────────────────────────────────
+  SsangYong:
+    tivoli xlv: Tivoli XLV
+
+  # ── GMC (~9 rows) ──────────────────────────────────────────────────────────
+  GMC:
+    hummer ev: Hummer EV
+
+  # ── DFSK (~9 rows) ─────────────────────────────────────────────────────────
+  DFSK:
+    eagle 580: EAGLE 580
+
+  # ── Audi (~7 rows) ─────────────────────────────────────────────────────────
+  Audi:
+    q4 e: Q4 E-Tron
+    q4 e tron: Q4 E-Tron
+    q 2: Q2
+    q 3: Q3
+    q 7: Q7
+    q 8: Q8
+
+  # ── Porsche (~7 rows) ──────────────────────────────────────────────────────
+  Porsche:
+    boxter 718: Boxster
+    boxter: Boxster
+
+  # ── Skoda (~6 rows) ────────────────────────────────────────────────────────
+  Skoda:
+    octavia: Octavia
+    octavia combi: Octavia Combi
+    octavia a4: Octavia A4
+    octavia a5: Octavia A5
+    octavia a7: Octavia A7
+    octavia a8: Octavia A8
+    felicia: Felicia
+    felecia: Felicia
+
+  Daewoo:
+    nubira: Nubira
+    nubira 1: Nubira 1
+    nubira 2: Nubira 2
+    lanos: Lanos
+    lanos 2: Lanos 2
+
+wrong_pair_fixes:
+  - wrong_make: Toyota
+    wrong_model: Cruze
+    correct_make: Chevrolet
+    correct_model: Cruze
+  - wrong_make: Volkswagen
+    wrong_model: Tiggo
+    correct_make: Chery
+    correct_model: Tiggo
+  - wrong_make: Ford
+    wrong_model: Echo
+    correct_make: Toyota
+    correct_model: Echo
+  - wrong_make: Fiat
+    wrong_model: Polo
+    correct_make: Volkswagen
+    correct_model: Polo
+  - wrong_make: Fiat
+    wrong_model: Jetta
+    correct_make: Volkswagen
+    correct_model: Jetta
+  - wrong_make: Suzuki
+    wrong_model: Fit
+    correct_make: Honda
+    correct_model: Fit
+  - wrong_make: Mini
+    wrong_model: Benni
+    correct_make: Changan
+    correct_model: Benni
+  - wrong_make: Renault
+    wrong_model: Model Y
+    correct_make: Tesla
+    correct_model: Model Y
+
+flag_for_deletion:
+  - make: Hyundai
+    model: X3
+    reason: "X3 is a BMW model. No Hyundai X3 exists."
+  - make: Mercedes
+    model: A1
+    reason: "A1 is not a Mercedes model label."
+  - make: Mercedes
+    model: S4
+    reason: "S4 is an Audi model label; Mercedes S4 rows are likely misparsed/mislabeled."
+  - make: Hyundai
+    model: A1
+    reason: "A1 is not a Hyundai model label."
+  - make: Chevrolet
+    model: "300"
+    reason: "300 is a Chrysler model. No Chevrolet 300 target."
+  - make: Kia
+    model: Saipa
+    reason: "Saipa is a car manufacturer, not a Kia model."
+  - make: Suzuki
+    model: Maruti
+    reason: "Maruti is a brand (Maruti Suzuki India), not a model."
+  - make: Renault
+    model: Rainbow
+    reason: "No known Renault Rainbow exists globally or in Egyptian market."
+  - make: Skoda
+    model: Fantasia
+    reason: "No known Skoda Fantasia. Possibly meant Skoda Fabia."
+  - make: Suzuki
+    model: Rio
+    reason: "Rio is a Kia model. Likely wrong make assignment."
+  - make: Daihatsu
+    model: Rio
+    reason: "Rio is a Kia model. Likely wrong make assignment."
+
+valid_exceptions:
+  - make: Chevrolet
+    model: Lanos
+    note: "Valid Egypt-market rebadge of Daewoo Lanos."
+  - make: Daewoo
+    model: Lanos
+    note: "Valid original."
+  - make: Seat
+    model: Leon
+    note: "Valid. Cupra spun off from Seat."
+  - make: Cupra
+    model: Leon
+    note: "Valid post-spinoff brand."
+  - make: SsangYong
+    model: Torres
+    note: "Valid. KGM alias collapses to SsangYong."
+  - make: Fiat
+    model: Shahin
+    note: "Egypt-market Nasr/Fiat/Tofas lineage. Keep."
+  - make: Fiat
+    model: Dogan
+    note: "Tofas/Fiat lineage. Keep."
+  - make: Fiat
+    model: Petra
+    note: "Tofas/Fiat lineage. Keep."
+  - make: Speranza
+    model: Chery QQ
+    note: "Egypt-market Speranza assembled Chery QQ. Valid."
+  - make: Dodge
+    model: Ram
+    note: "Pre-brand-split listing. Valid for Egyptian used car market."
+
+
+
+# ============================================================
+# ADD THIS ENTIRE SECTION to the bottom of canonical_rules.yaml
+# ============================================================
+#
+# model_family_map
+# ----------------
+# Maps (make, model variant) → model family name.
+#
+# Design decisions:
+#   - The `model` column is NEVER changed. BMW 318i stays "318i".
+#   - A new `model_family` column is ADDED alongside it: "3 Series".
+#   - model is used for ML pricing features (granularity preserved).
+#   - model_family is used for grouping, search, and filtering.
+#   - If a (make, model) has no entry here, model_family = model.
+#
+# NOTE: Model variants that are already normalized to the same string
+# by model_aliases_by_make (e.g., Honda CRV / Cr V → CRV) do NOT need
+# entries here — they are a single model after canonicalization.
+#
+# NOTE: BMW X1, X2, X3, X4, X5, X6, X7 are kept as separate families
+# because they are distinct vehicle lines at different size/price points.
+# Only performance variants (X3 M, X5 M, X6 M) share a family with
+# their base model.
+# ============================================================
+
+model_family_map:
+
+  # ---------- BMW ----------
+  BMW:
+    # 1 Series
+    "116": "1 Series"
+    "118": "1 Series"
+    # 2 Series
+    "218":  "2 Series"
+    "218i": "2 Series"
+    # 3 Series
+    "3 Series": "3 Series"
+    "316":  "3 Series"
+    "318":  "3 Series"
+    "318i": "3 Series"
+    "320":  "3 Series"
+    "320i": "3 Series"
+    "330":  "3 Series"
+    "340":  "3 Series"
+    # 4 Series
+    "418": "4 Series"
+    "420": "4 Series"
+    # 5 Series
+    "520":  "5 Series"
+    "520i": "5 Series"
+    "523":  "5 Series"
+    "525":  "5 Series"
+    "528":  "5 Series"
+    "530":  "5 Series"
+    # 7 Series
+    "740": "7 Series"
+    # X families — performance variants share base family
+    "X3":   "X3"
+    "X3 M": "X3"
+    "X5":   "X5"
+    "X5 M": "X5"
+    "X6":   "X6"
+    "X6 M": "X6"
+
+  # ---------- Mercedes ----------
+  Mercedes:
+    # A-Class
+    "A180": "A-Class"
+    "A200": "A-Class"
+    "A35":  "A-Class"
+    # B-Class
+    "B150": "B-Class"
+    "B180": "B-Class"
+    "B200": "B-Class"
+    # C-Class
+    "C180": "C-Class"
+    "C200": "C-Class"
+    "C250": "C-Class"
+    "C300": "C-Class"
+    # E-Class
+    "E180": "E-Class"
+    "E200": "E-Class"
+    "E230": "E-Class"
+    "E240": "E-Class"
+    "E250": "E-Class"
+    "E280": "E-Class"
+    "E300": "E-Class"
+    "E350": "E-Class"
+    # S-Class
+    "S450": "S-Class"
+    "S500": "S-Class"
+    # CLA
+    "CLA180": "CLA"
+    "CLA200": "CLA"
+    # CLE
+    "CLE200": "CLE"
+    "CLE300": "CLE"
+    # GLA
+    "GLA":    "GLA"
+    "GLA200": "GLA"
+    # GLC
+    "GLC":    "GLC"
+    "GLC200": "GLC"
+    "GLC300": "GLC"
+    "GLC43":  "GLC"
+    # GLE
+    "GLE":    "GLE"
+    "GLE450": "GLE"
+    # GLS
+    "GLS":    "GLS"
+    "GLS580": "GLS"
+    # CLS
+    "CLS":    "CLS"
+    "CLS350": "CLS"
+    # EQ electric family
+    "EQA260": "EQ"
+    "EQE350": "EQ"
+    "EQE500": "EQ"
+    "EQS450": "EQ"
+    "EQS580": "EQ"
+
+  # ---------- Hyundai ----------
+  Hyundai:
+    # Elantra generations
+    "Elantra":     "Elantra"
+    "Elantra AD":  "Elantra"
+    "Elantra HD":  "Elantra"
+    "Elantra MD":  "Elantra"
+    "Elantra CN7": "Elantra"
+    # Accent generations
+    "Accent":     "Accent"
+    "Accent RB":  "Accent"
+    "Accent HCI": "Accent"
+
+  # ---------- Daewoo ----------
+  Daewoo:
+    "Nubira":   "Nubira"
+    "Nubira 1": "Nubira"
+    "Nubira 2": "Nubira"
+    "Lanos":    "Lanos"
+    "Lanos 2":  "Lanos"
+
+  # ---------- Skoda ----------
+  Skoda:
+    "Octavia":       "Octavia"
+    "Octavia Combi": "Octavia"
+    "Octavia A4":    "Octavia"
+    "Octavia A5":    "Octavia"
+    "Octavia A7":    "Octavia"
+    "Octavia A8":    "Octavia"
+
+  # ---------- Mitsubishi ----------
+  Mitsubishi:
+    "Lancer":             "Lancer"
+    "Lancer EX Shark":    "Lancer"
+    "Lancer Crystala":    "Lancer"
+    "Lancer Puma":        "Lancer"
+
+  # ---------- Kia ----------
+  Kia:
+    "Carnival":     "Carnival"
+    "Carnival MPV": "Carnival"
+    "Cerato":       "Cerato"
+    "Cerato Koup":  "Cerato"
+    "Grand Cerato": "Cerato"
+
+  # ---------- Chery ----------
+  Chery:
+    "Arrizo 5":       "Arrizo 5"
+    "Arrizo 5 Pro":   "Arrizo 5"
+    "Tiggo 4":        "Tiggo 4"
+    "Tiggo 4 Pro":    "Tiggo 4"
+    "Tiggo 7":        "Tiggo 7"
+    "Tiggo 7 Pro":    "Tiggo 7"
+    "Tiggo 7 Pro Max": "Tiggo 7"
+    "Tiggo 8":        "Tiggo 8"
+    "Tiggo 8 Pro":    "Tiggo 8"
+    "Tiggo 8 Pro Max": "Tiggo 8"
+
+  # ---------- Volkswagen ----------
+  Volkswagen:
+    "Golf":   "Golf"
+    "Golf 2": "Golf"
+    "Golf 3": "Golf"
+    "Golf 4": "Golf"
+    "Golf 5": "Golf"
+    "Golf 6": "Golf"
+    "Golf 7": "Golf"
+    "Golf 8": "Golf"
+    "Golf R": "Golf"
+    "E-Golf": "Golf"
+
+  # ---------- Land Rover ----------
+  Land Rover:
+    "Range Rover":        "Range Rover"
+    "Range Rover Sport":  "Range Rover"
+    "Range Rover Velar":  "Range Rover"
+    "Range Rover Vogue":  "Range Rover"
+    "Range Rover Evoque": "Range Rover"
+
+  # ---------- Porsche ----------
+  Porsche:
+    "Cayenne":   "Cayenne"
+    "Cayenne S": "Cayenne"
+
+  # ---------- Jeep ----------
+  Jeep:
+    "Grand Cherokee":     "Grand Cherokee"
+    "Grand Cherokee 4xe": "Grand Cherokee"
+
+  # ---------- SsangYong (KGM is aliased here via make_aliases) ----------
+  SsangYong:
+    "Tivoli":     "Tivoli"
+    "Tivoli XLV": "Tivoli"
+
+  # ---------- Renault ----------
+  Renault:
+    "Sandero":         "Sandero"
+    "Sandero Stepway": "Sandero"
+
+  # ---------- Mini ----------
+  Mini:
+    "Countryman":   "Countryman"
+    "Countryman S": "Countryman"
+
+  # ---------- Daihatsu ----------
+  Daihatsu:
+    "Terios":       "Terios"
+    "Grand Terios": "Terios"
