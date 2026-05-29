@@ -18,12 +18,12 @@ To clear the in-memory chat history without restarting the server:
 
 The chat service uses this default fallback order:
 
-1. **DeepInfra** — `anthropic/claude-sonnet-4-6` (highest quality)
-2. **DeepInfra** — `anthropic/claude-opus-4-7`
-3. **DeepInfra** — `google/gemini-3.1-pro`
+1. **Gemini** — `gemini-3-flash-preview` (fastest, most reliable)
+2. **DeepInfra** — `anthropic/claude-sonnet-4-6` (highest quality)
+3. **DeepInfra** — `anthropic/claude-opus-4-7`
 4. **DeepInfra** — `Qwen/Qwen3-235B-A22B-Instruct-2507`
-5. **SambaNova** — `Meta-Llama-3.3-70B-Instruct`
-6. **Gemini** — `gemini-3-flash-preview` (final fallback)
+5. **DeepInfra** — `google/gemini-3.1-pro`
+6. **SambaNova** — `Meta-Llama-3.3-70B-Instruct` (final fallback)
 
 > **Note:** Cerebras and Groq are temporarily disabled (API keys expired / model not available). They remain in the codebase commented out for easy re-enablement.
 

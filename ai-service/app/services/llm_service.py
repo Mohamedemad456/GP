@@ -29,6 +29,9 @@ _CJK_CHAR_RE = re.compile(
 
 _ARABIC_LETTER_RE = re.compile(r"[\u0600-\u06FF]")
 
+# Strips <think>…</think> reasoning blocks some models emit (case-insensitive, multiline, non-greedy).
+_THINKING_BLOCK_RE = re.compile(r"<think>.*?</think>", re.IGNORECASE | re.DOTALL)
+
 
 def _is_ascii_allowed(cp: int) -> bool:
     return cp in (0x09, 0x0A, 0x0D) or 0x20 <= cp <= 0x7E
@@ -77,14 +80,14 @@ class LLMService:
     Service for generating AI responses with automatic provider fallback.
 
     Providers (priority order):
-    1. DeepInfra — anthropic/claude-sonnet-4-6
-    2. DeepInfra — anthropic/claude-opus-4-7
-    3. DeepInfra — google/gemini-3.1-pro
+    1. DeepInfra — google/gemini-3.1-pro
+    2. DeepInfra — anthropic/claude-sonnet-4-6
+    3. DeepInfra — anthropic/claude-opus-4-7
     4. DeepInfra — Qwen/Qwen3-235B-A22B-Instruct-2507
     # 5. Cerebras — qwen-3-235b-a22b-instruct-2507 (DISABLED)
     # 6. Groq — llama-3.3-70b-versatile (DISABLED)
     5. SambaNova — Meta-Llama-3.3-70B-Instruct
-    6. Gemini — gemini-3-flash-preview
+    6. Gemini — gemini-3-flash-preview (last resort)
 
     Loads system prompts and parameters from YAML configuration.
     """
@@ -223,7 +226,9 @@ class LLMService:
         if not text:
             return text
 
-        cleaned = _CJK_CHAR_RE.sub("", text)
+        # Remove model reasoning/thinking blocks before any other cleanup.
+        cleaned = _THINKING_BLOCK_RE.sub("", text)
+        cleaned = _CJK_CHAR_RE.sub("", cleaned)
         cleaned = _strip_latin_diacritics(cleaned)
         cleaned = (
             cleaned.replace("•", "-")
@@ -475,15 +480,15 @@ class LLMService:
         temperature: float,
         max_tokens: int,
     ) -> Optional[str]:
-        """Try DeepInfra models in priority order: Sonnet → Opus → Gemini Pro → Qwen."""
+        """Try DeepInfra models in priority order: Gemini Pro → Sonnet → Opus → Qwen."""
 
         if not self.deepinfra_client:
             return None
 
         models = [
+            ("DeepInfra Gemini Pro", settings.deepinfra_gemini_pro_model),
             ("DeepInfra Sonnet", settings.deepinfra_sonnet_model),
             ("DeepInfra Opus", settings.deepinfra_opus_model),
-            ("DeepInfra Gemini Pro", settings.deepinfra_gemini_pro_model),
             ("DeepInfra Qwen", settings.deepinfra_model),
         ]
 
@@ -543,7 +548,7 @@ class LLMService:
         user_message: str,
         temperature: float,
         max_tokens: int,
-    ) -> str:
+    ) -> Optional[str]:
         """
         Get response from Gemini (fallback provider).
         Uses the NEW Google Gen AI SDK with async support.
@@ -554,10 +559,7 @@ class LLMService:
             max_tokens: Maximum response length
 
         Returns:
-            str: Response text
-
-        Raises:
-            Exception: If Gemini also fails
+            Optional[str]: Response text or None if Gemini fails
         """
         try:
             history = await self._get_history(conversation_key)
@@ -580,16 +582,16 @@ class LLMService:
 
         except Exception as e:
             logger.error("Gemini also failed: %s", e)
-            raise
+            return None
 
     async def generate_response(self, user_message: str, model_choice: ModelChoice = "qwen") -> str:
         """
         Generate AI response with automatic fallback or a selected provider.
 
         When model_choice is omitted or set to auto, the fallback pattern is:
-        1. Try DeepInfra models (Sonnet → Opus → Gemini Pro → Qwen)
+        1. Try DeepInfra models (Gemini Pro → Sonnet → Opus → Qwen)
         2. If all fail → Try SambaNova Llama
-        3. If fails → Try Gemini
+        3. If fails → Try Gemini Flash (last resort)
         4. If all fail → Raise exception
 
         When model_choice is provided, the matching provider is used directly.
@@ -690,12 +692,14 @@ class LLMService:
             gemini_text = await self._try_gemini(conversation_key, user_message, temp, max_tok)
             return await _finalize(gemini_text)
 
-        # Try DeepInfra models first (Sonnet → Opus → Gemini Pro → Qwen)
+        # Try DeepInfra models first (Gemini Pro → Sonnet → Opus → Qwen)
         if self.deepinfra_client:
+            logger.info("Trying DeepInfra models...")
             deepinfra_response = await self._try_deepinfra_models(
                 conversation_key, user_message, temp, max_tok
             )
             if deepinfra_response:
+                logger.info("DeepInfra succeeded")
                 return await _finalize(deepinfra_response)
 
         # # DISABLED: Cerebras and Groq fallback blocks.
@@ -716,7 +720,7 @@ class LLMService:
         #     logger.info("Groq succeeded")
         #     return await _finalize(groq_response)
 
-        # Fallback to SambaNova (secondary provider)
+        # Fallback to SambaNova
         logger.info("Falling back to SambaNova...")
         sambanova_response = await self._try_sambanova(conversation_key, user_message, temp, max_tok)
 
@@ -724,12 +728,14 @@ class LLMService:
             logger.info("SambaNova succeeded")
             return await _finalize(sambanova_response)
 
-        # Fallback to Gemini (tertiary provider)
-        logger.info("Falling back to Gemini...")
+        # Last resort: Gemini Flash
+        logger.info("Falling back to Gemini Flash...")
         gemini_response = await self._try_gemini(conversation_key, user_message, temp, max_tok)
-        logger.info("Gemini succeeded")
+        if gemini_response:
+            logger.info("Gemini succeeded")
+            return await _finalize(gemini_response)
 
-        return await _finalize(gemini_response)
+        raise RuntimeError("All providers failed to generate a response")
 
 
 llm_service = LLMService()

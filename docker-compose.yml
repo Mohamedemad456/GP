@@ -41,10 +41,14 @@ services:
       - "8000:8000"
     volumes:
       - ./ai-service/logs:/app/logs:Z
+      - ./ai-service/app:/app/app:Z
+      - ./ai-service/data:/app/data:Z
     env_file:
       - .env
     environment:
       - PYTHONUNBUFFERED=1
+      - TZ=Africa/Cairo
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
     restart: unless-stopped
 
   # =======================
