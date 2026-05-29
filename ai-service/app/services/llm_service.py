@@ -7,6 +7,7 @@ from pathlib import Path
 from google import genai
 from google.genai import types
 from typing import Optional
+import openai
 from openai import AsyncOpenAI  # type: ignore
 from sambanova import SambaNova
 
@@ -27,6 +28,9 @@ _CJK_CHAR_RE = re.compile(
 )
 
 _ARABIC_LETTER_RE = re.compile(r"[\u0600-\u06FF]")
+
+# Strips <think>…</think> reasoning blocks some models emit (case-insensitive, multiline, non-greedy).
+_THINKING_BLOCK_RE = re.compile(r"<think>.*?</think>", re.IGNORECASE | re.DOTALL)
 
 
 def _is_ascii_allowed(cp: int) -> bool:
@@ -74,17 +78,16 @@ ModelChoice = Optional[str]
 class LLMService:
     """
     Service for generating AI responses with automatic provider fallback.
-    Uses Cerebras first (Qwen), then DeepInfra (Qwen), then Groq, then SambaNova, then Gemini.
 
-    Providers:
-    - Primary: Cerebras (Qwen 3 235B)
-    - Secondary: DeepInfra (Qwen 3 235B)
-    - Tertiary: Groq (Llama 3.3 70B)
-    - Quaternary: SambaNova (Meta-Llama-3.3-70B-Instruct)
-    - Quinary: Google (Gemini-3-preview)
-
-    Flow:
-    User message → Try Cerebras → If fails → Try DeepInfra → If fails → Try Groq → If fails → Try SambaNova → If fails → Try Gemini → Return response
+    Providers (priority order):
+    1. DeepInfra — google/gemini-3.1-pro
+    2. DeepInfra — anthropic/claude-sonnet-4-6
+    3. DeepInfra — anthropic/claude-opus-4-7
+    4. DeepInfra — Qwen/Qwen3-235B-A22B-Instruct-2507
+    # 5. Cerebras — qwen-3-235b-a22b-instruct-2507 (DISABLED)
+    # 6. Groq — llama-3.3-70b-versatile (DISABLED)
+    5. SambaNova — Meta-Llama-3.3-70B-Instruct
+    6. Gemini — gemini-3-flash-preview (last resort)
 
     Loads system prompts and parameters from YAML configuration.
     """
@@ -92,24 +95,29 @@ class LLMService:
     def __init__(self):
         """Initialize the LLM service with API client and load prompts."""
 
-        self.cerebras_client: AsyncOpenAI | None = None
-        if settings.cerebras_api_key:
-            self.cerebras_client = AsyncOpenAI(
-                base_url=settings.cerebras_base_url,
-                api_key=settings.cerebras_api_key,
-            )
+        # # DISABLED: Cerebras API key expired / model not available.
+        # self.cerebras_client: AsyncOpenAI | None = None
+        # if settings.cerebras_api_key:
+        #     self.cerebras_client = AsyncOpenAI(
+        #         base_url=settings.cerebras_base_url,
+        #         api_key=settings.cerebras_api_key,
+        #     )
+        self.cerebras_client: AsyncOpenAI | None = None  # stub for re-enablement
 
         self.deepinfra_client: AsyncOpenAI | None = None
         if settings.deepinfra_api_key:
             self.deepinfra_client = AsyncOpenAI(
                 base_url=settings.deepinfra_base_url,
                 api_key=settings.deepinfra_api_key,
+                max_retries=0,  # prevent SDK retries from burning the 10s timeout budget
             )
 
-        self.groq_client = AsyncOpenAI(
-            base_url=settings.groq_base_url,
-            api_key=settings.groq_api_key,
-        )
+        # # DISABLED: Groq API key expired.
+        # self.groq_client = AsyncOpenAI(
+        #     base_url=settings.groq_base_url,
+        #     api_key=settings.groq_api_key,
+        # )
+        self.groq_client: AsyncOpenAI | None = None  # stub for re-enablement
 
         self.sambanova_client = SambaNova(
             api_key=settings.sambanova_api_key,
@@ -218,7 +226,9 @@ class LLMService:
         if not text:
             return text
 
-        cleaned = _CJK_CHAR_RE.sub("", text)
+        # Remove model reasoning/thinking blocks before any other cleanup.
+        cleaned = _THINKING_BLOCK_RE.sub("", text)
+        cleaned = _CJK_CHAR_RE.sub("", cleaned)
         cleaned = _strip_latin_diacritics(cleaned)
         cleaned = (
             cleaned.replace("•", "-")
@@ -304,22 +314,34 @@ class LLMService:
         aliases = {
             "auto": "auto",
             "default": "auto",
-            # Cerebras (Qwen)
-            "cerebras": "cerebras",
-            "qwen": "cerebras",
-            "qwen_cerebras": "cerebras",
-            "cerebras_qwen": "cerebras",
+
+            # DeepInfra paid models (highest priority)
+            "sonnet": "sonnet",
+            "claude_sonnet": "sonnet",
+            "deepinfra_sonnet": "sonnet",
+            "opus": "opus",
+            "claude_opus": "opus",
+            "deepinfra_opus": "opus",
+            "gemini_pro": "gemini_pro",
+            "deepinfra_gemini": "gemini_pro",
+            "google_gemini_pro": "gemini_pro",
+
+            # # Cerebras (Qwen) — DISABLED
+            # "cerebras": "cerebras",
+            # "qwen": "cerebras",
+            # "qwen_cerebras": "cerebras",
+            # "cerebras_qwen": "cerebras",
 
             # DeepInfra (Qwen)
             "deepinfra": "deepinfra",
             "qwen_deepinfra": "deepinfra",
             "deepinfra_qwen": "deepinfra",
 
-            # Groq (Llama)
-            "groq": "groq_primary",
-            "llama_groq": "groq_primary",
-            "groq_llama": "groq_primary",
-            "llama": "groq_primary",
+            # # Groq (Llama) — DISABLED
+            # "groq": "groq_primary",
+            # "llama_groq": "groq_primary",
+            # "groq_llama": "groq_primary",
+            # "llama": "groq_primary",
             "llama_samba": "sambanova",
             "llama_sambanova": "sambanova",
             "samba": "sambanova",
@@ -329,18 +351,18 @@ class LLMService:
 
         if normalized not in aliases:
             raise ValueError(
-                "Unknown model choice. Use auto, cerebras/qwen, deepinfra/qwen_deepinfra, groq/llama_groq, llama_samba, or gemini."
+                "Unknown model choice. Use auto, sonnet/claude_sonnet, opus/claude_opus, gemini_pro, "
+                "deepinfra/qwen_deepinfra, llama_samba, or gemini."
             )
 
         return aliases[normalized]
 
-    def _get_effective_groq_model(self) -> str:
-        """Return the Groq model ID to use (env override first, then default)."""
-
-        model = (settings.groq_model or settings.groq_primary_model or "").strip()
-        if not model:
-            raise RuntimeError("No Groq model is configured")
-        return model
+    # def _get_effective_groq_model(self) -> str:
+    #     """Return the Groq model ID to use (env override first, then default)."""
+    #     model = (settings.groq_model or settings.groq_primary_model or "").strip()
+    #     if not model:
+    #         raise RuntimeError("No Groq model is configured")
+    #     return model
 
     def _load_config(self) -> dict:
         """Load chatbot configuration from YAML file."""
@@ -353,74 +375,66 @@ class LLMService:
 
         return config
 
-    async def _try_groq(
-        self,
-        conversation_key: str,
-        user_message: str,
-        temperature: float,
-        max_tokens: int,
-        *,
-        model: str,
-    ) -> Optional[str]:
-        """
-        Try to get response from Groq.
+    # async def _try_groq(
+    #     self,
+    #     conversation_key: str,
+    #     user_message: str,
+    #     temperature: float,
+    #     max_tokens: int,
+    #     *,
+    #     model: str,
+    # ) -> Optional[str]:
+    #     """
+    #     Try to get response from Groq.
+    #     Args:
+    #         user_message: User's input text
+    #         temperature: Response creativity
+    #         max_tokens: Maximum response length
+    #     Returns:
+    #         str: Response text if successful
+    #         None: If Groq fails for any reason
+    #     """
+    #     try:
+    #         history = await self._get_history(conversation_key)
+    #         messages = self._format_openai_messages(history, user_message)
+    #         response = await self.groq_client.chat.completions.create(
+    #             model=model,
+    #             messages=messages,
+    #             temperature=temperature,
+    #             max_tokens=max_tokens,
+    #             top_p=self.model_params.get("top_p", 0.85),
+    #             timeout=self.timeout,
+    #         )
+    #         return response.choices[0].message.content
+    #     except Exception as e:
+    #         logger.warning("Groq failed: %s", e)
+    #         return None
 
-        Args:
-            user_message: User's input text
-            temperature: Response creativity
-            max_tokens: Maximum response length
-
-        Returns:
-            str: Response text if successful
-            None: If Groq fails for any reason
-        """
-        try:
-            history = await self._get_history(conversation_key)
-            messages = self._format_openai_messages(history, user_message)
-
-            response = await self.groq_client.chat.completions.create(
-                model=model,
-                messages=messages,
-                temperature=temperature,
-                max_tokens=max_tokens,
-                top_p=self.model_params.get("top_p", 0.85),
-                timeout=self.timeout,
-            )
-            return response.choices[0].message.content
-
-        except Exception as e:
-            logger.warning("Groq failed: %s", e)
-            return None
-
-    async def _try_cerebras(
-        self,
-        conversation_key: str,
-        user_message: str,
-        temperature: float,
-        max_tokens: int,
-    ) -> Optional[str]:
-        """Try to get a response from Cerebras (primary provider)."""
-
-        if not self.cerebras_client:
-            return None
-
-        try:
-            history = await self._get_history(conversation_key)
-            messages = self._format_openai_messages(history, user_message)
-
-            response = await self.cerebras_client.chat.completions.create(
-                model=settings.cerebras_model,
-                messages=messages,
-                temperature=temperature,
-                max_tokens=max_tokens,
-                top_p=self.model_params.get("top_p", 0.85),
-                timeout=self.timeout,
-            )
-            return response.choices[0].message.content
-
-        except Exception as e:
-            logger.warning("Cerebras failed: %s", e)
-            return None
+    # async def _try_cerebras(
+    #     self,
+    #     conversation_key: str,
+    #     user_message: str,
+    #     temperature: float,
+    #     max_tokens: int,
+    # ) -> Optional[str]:
+    #     """Try to get a response from Cerebras (primary provider)."""
+    #     if not self.cerebras_client:
+    #         return None
+    #     try:
+    #         history = await self._get_history(conversation_key)
+    #         messages = self._format_openai_messages(history, user_message)
+    #         response = await self.cerebras_client.chat.completions.create(
+    #             model=settings.cerebras_model,
+    #             messages=messages,
+    #             temperature=temperature,
+    #             max_tokens=max_tokens,
+    #             top_p=self.model_params.get("top_p", 0.85),
+    #             timeout=self.timeout,
+    #         )
+    #         return response.choices[0].message.content
+    #     except Exception as e:
+    #         logger.warning("Cerebras failed: %s", e)
+    #         return None
 
     async def _try_deepinfra(
         self,
@@ -428,18 +442,22 @@ class LLMService:
         user_message: str,
         temperature: float,
         max_tokens: int,
+        *,
+        model: str | None = None,
     ) -> Optional[str]:
-        """Try to get a response from DeepInfra (secondary Qwen provider)."""
+        """Try to get a response from DeepInfra."""
 
         if not self.deepinfra_client:
             return None
+
+        model_id = model or settings.deepinfra_model
 
         try:
             history = await self._get_history(conversation_key)
             messages = self._format_openai_messages(history, user_message)
 
             response = await self.deepinfra_client.chat.completions.create(
-                model=settings.deepinfra_model,
+                model=model_id,
                 messages=messages,
                 temperature=temperature,
                 max_tokens=max_tokens,
@@ -448,9 +466,42 @@ class LLMService:
             )
             return response.choices[0].message.content
 
-        except Exception as e:
-            logger.warning("DeepInfra failed: %s", e)
+        except openai.RateLimitError as e:
+            logger.warning("DeepInfra rate-limited (429) for %s: %s", model_id, e)
             return None
+        except Exception as e:
+            logger.warning("DeepInfra failed for %s: %s", model_id, e)
+            return None
+
+    async def _try_deepinfra_models(
+        self,
+        conversation_key: str,
+        user_message: str,
+        temperature: float,
+        max_tokens: int,
+    ) -> Optional[str]:
+        """Try DeepInfra models in priority order: Gemini Pro → Sonnet → Opus → Qwen."""
+
+        if not self.deepinfra_client:
+            return None
+
+        models = [
+            ("DeepInfra Gemini Pro", settings.deepinfra_gemini_pro_model),
+            ("DeepInfra Sonnet", settings.deepinfra_sonnet_model),
+            ("DeepInfra Opus", settings.deepinfra_opus_model),
+            ("DeepInfra Qwen", settings.deepinfra_model),
+        ]
+
+        for label, model_id in models:
+            logger.info("Trying %s: %s", label, model_id)
+            response = await self._try_deepinfra(
+                conversation_key, user_message, temperature, max_tokens, model=model_id
+            )
+            if response:
+                logger.info("%s succeeded", label)
+                return response
+
+        return None
 
     async def _try_sambanova(
         self,
@@ -497,7 +548,7 @@ class LLMService:
         user_message: str,
         temperature: float,
         max_tokens: int,
-    ) -> str:
+    ) -> Optional[str]:
         """
         Get response from Gemini (fallback provider).
         Uses the NEW Google Gen AI SDK with async support.
@@ -508,10 +559,7 @@ class LLMService:
             max_tokens: Maximum response length
 
         Returns:
-            str: Response text
-
-        Raises:
-            Exception: If Gemini also fails
+            Optional[str]: Response text or None if Gemini fails
         """
         try:
             history = await self._get_history(conversation_key)
@@ -534,26 +582,25 @@ class LLMService:
 
         except Exception as e:
             logger.error("Gemini also failed: %s", e)
-            raise
+            return None
 
     async def generate_response(self, user_message: str, model_choice: ModelChoice = "qwen") -> str:
         """
         Generate AI response with automatic fallback or a selected provider.
 
         When model_choice is omitted or set to auto, the fallback pattern is:
-        1. Try Cerebras Qwen first
-        2. If fails → Try DeepInfra Qwen
-        3. If fails → Try Groq Llama
-        4. If fails → Try SambaNova Llama
-        5. If fails → Try Gemini
-        6. If all fail → Raise exception
+        1. Try DeepInfra models (Gemini Pro → Sonnet → Opus → Qwen)
+        2. If all fail → Try SambaNova Llama
+        3. If fails → Try Gemini Flash (last resort)
+        4. If all fail → Raise exception
 
         When model_choice is provided, the matching provider is used directly.
 
         Args:
             user_message: The user's input text
-            model_choice: Optional provider alias for testing (auto, qwen/cerebras,
-                deepinfra/qwen_deepinfra, groq/llama_groq, Llama_samba, or gemini)
+            model_choice: Optional provider alias for testing (auto, sonnet/claude_sonnet,
+                opus/claude_opus, gemini_pro, deepinfra/qwen_deepinfra,
+                llama_samba, or gemini)
 
         Returns:
             str: AI-generated response text
@@ -580,12 +627,40 @@ class LLMService:
 
         selected_model = self._normalize_model_choice(model_choice)
 
-        if selected_model == "cerebras":
-            logger.info("Using Cerebras explicitly: %s", settings.cerebras_model)
-            cerebras_response = await self._try_cerebras(conversation_key, user_message, temp, max_tok)
-            if cerebras_response:
-                return await _finalize(cerebras_response)
-            raise RuntimeError("Cerebras failed to generate a response")
+        if selected_model == "sonnet":
+            logger.info("Using DeepInfra Sonnet explicitly: %s", settings.deepinfra_sonnet_model)
+            response = await self._try_deepinfra(
+                conversation_key, user_message, temp, max_tok, model=settings.deepinfra_sonnet_model
+            )
+            if response:
+                return await _finalize(response)
+            raise RuntimeError("DeepInfra Sonnet failed to generate a response")
+
+        if selected_model == "opus":
+            logger.info("Using DeepInfra Opus explicitly: %s", settings.deepinfra_opus_model)
+            response = await self._try_deepinfra(
+                conversation_key, user_message, temp, max_tok, model=settings.deepinfra_opus_model
+            )
+            if response:
+                return await _finalize(response)
+            raise RuntimeError("DeepInfra Opus failed to generate a response")
+
+        if selected_model == "gemini_pro":
+            logger.info("Using DeepInfra Gemini Pro explicitly: %s", settings.deepinfra_gemini_pro_model)
+            response = await self._try_deepinfra(
+                conversation_key, user_message, temp, max_tok, model=settings.deepinfra_gemini_pro_model
+            )
+            if response:
+                return await _finalize(response)
+            raise RuntimeError("DeepInfra Gemini Pro failed to generate a response")
+
+        # # DISABLED: Cerebras API key expired / model not available.
+        # if selected_model == "cerebras":
+        #     logger.info("Using Cerebras explicitly: %s", settings.cerebras_model)
+        #     cerebras_response = await self._try_cerebras(conversation_key, user_message, temp, max_tok)
+        #     if cerebras_response:
+        #         return await _finalize(cerebras_response)
+        #     raise RuntimeError("Cerebras failed to generate a response")
 
         if selected_model == "deepinfra":
             logger.info("Using DeepInfra explicitly: %s", settings.deepinfra_model)
@@ -594,20 +669,16 @@ class LLMService:
                 return await _finalize(deepinfra_response)
             raise RuntimeError("DeepInfra failed to generate a response")
 
-        if selected_model == "groq_primary":
-            chosen = self._get_effective_groq_model()
-            logger.info("Using Groq explicitly: %s", chosen)
-
-            groq_response = await self._try_groq(
-                conversation_key,
-                user_message,
-                temp,
-                max_tok,
-                model=chosen,
-            )
-            if groq_response:
-                return await _finalize(groq_response)
-            raise RuntimeError("Groq failed to generate a response")
+        # # DISABLED: Groq API key expired.
+        # if selected_model == "groq_primary":
+        #     chosen = self._get_effective_groq_model()
+        #     logger.info("Using Groq explicitly: %s", chosen)
+        #     groq_response = await self._try_groq(
+        #         conversation_key, user_message, temp, max_tok, model=chosen,
+        #     )
+        #     if groq_response:
+        #         return await _finalize(groq_response)
+        #     raise RuntimeError("Groq failed to generate a response")
 
         if selected_model == "sambanova":
             logger.info("Using SambaNova explicitly...")
@@ -621,39 +692,35 @@ class LLMService:
             gemini_text = await self._try_gemini(conversation_key, user_message, temp, max_tok)
             return await _finalize(gemini_text)
 
-        # Try Cerebras first (Qwen)
-        if self.cerebras_client:
-            logger.info("Trying Cerebras (Primary): %s", settings.cerebras_model)
-            cerebras_response = await self._try_cerebras(conversation_key, user_message, temp, max_tok)
-            if cerebras_response:
-                logger.info("Cerebras succeeded")
-                return await _finalize(cerebras_response)
-
-        # Then try DeepInfra
+        # Try DeepInfra models first (Gemini Pro → Sonnet → Opus → Qwen)
         if self.deepinfra_client:
-            logger.info("Trying DeepInfra (Secondary): %s", settings.deepinfra_model)
-            deepinfra_response = await self._try_deepinfra(conversation_key, user_message, temp, max_tok)
+            logger.info("Trying DeepInfra models...")
+            deepinfra_response = await self._try_deepinfra_models(
+                conversation_key, user_message, temp, max_tok
+            )
             if deepinfra_response:
                 logger.info("DeepInfra succeeded")
                 return await _finalize(deepinfra_response)
 
-        # Then try Groq
-        groq_model = self._get_effective_groq_model()
-        logger.info("Trying Groq: %s", groq_model)
+        # # DISABLED: Cerebras and Groq fallback blocks.
+        # # Then try Cerebras
+        # if self.cerebras_client:
+        #     logger.info("Trying Cerebras: %s", settings.cerebras_model)
+        #     cerebras_response = await self._try_cerebras(conversation_key, user_message, temp, max_tok)
+        #     if cerebras_response:
+        #         logger.info("Cerebras succeeded")
+        #         return await _finalize(cerebras_response)
+        # # Then try Groq
+        # groq_model = self._get_effective_groq_model()
+        # logger.info("Trying Groq: %s", groq_model)
+        # groq_response = await self._try_groq(
+        #     conversation_key, user_message, temp, max_tok, model=groq_model,
+        # )
+        # if groq_response:
+        #     logger.info("Groq succeeded")
+        #     return await _finalize(groq_response)
 
-        groq_response = await self._try_groq(
-            conversation_key,
-            user_message,
-            temp,
-            max_tok,
-            model=groq_model,
-        )
-
-        if groq_response:
-            logger.info("Groq succeeded")
-            return await _finalize(groq_response)
-
-        # Fallback to SambaNova (secondary provider)
+        # Fallback to SambaNova
         logger.info("Falling back to SambaNova...")
         sambanova_response = await self._try_sambanova(conversation_key, user_message, temp, max_tok)
 
@@ -661,12 +728,14 @@ class LLMService:
             logger.info("SambaNova succeeded")
             return await _finalize(sambanova_response)
 
-        # Fallback to Gemini (tertiary provider)
-        logger.info("Falling back to Gemini...")
+        # Last resort: Gemini Flash
+        logger.info("Falling back to Gemini Flash...")
         gemini_response = await self._try_gemini(conversation_key, user_message, temp, max_tok)
-        logger.info("Gemini succeeded")
+        if gemini_response:
+            logger.info("Gemini succeeded")
+            return await _finalize(gemini_response)
 
-        return await _finalize(gemini_response)
+        raise RuntimeError("All providers failed to generate a response")
 
 
 llm_service = LLMService()

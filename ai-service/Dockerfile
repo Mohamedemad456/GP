@@ -26,6 +26,11 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # ================================================================
 FROM python:3.13-slim AS runtime
 
+# Install tzdata so TZ environment variable is respected
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends tzdata && \
+    rm -rf /var/lib/apt/lists/*
+
 # ── Environment ──────────────────────────────────────────────────
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
