@@ -11,20 +11,27 @@ REPO_ENV = SERVICE_DIR.parent / ".env"
 
 
 class Settings(BaseSettings):
-    # ── Cerebras (primary provider) ─────────────────────────────
-    # Optional: if missing, service will skip Cerebras and fall back.
-    cerebras_api_key: str | None = None
-    cerebras_base_url: str = "https://api.cerebras.ai/v1"
-    cerebras_model: str = "qwen-3-235b-a22b-instruct-2507"
+    # # ── Cerebras (primary provider) ─────────────────────────────
+    # # Optional: if missing, service will skip Cerebras and fall back.
+    # # DISABLED: API key expired / model not available.
+    # cerebras_api_key: str | None = None
+    # cerebras_base_url: str = "https://api.cerebras.ai/v1"
+    # cerebras_model: str = "qwen-3-235b-a22b-instruct-2507"
 
     deepinfra_api_key: str | None = None
     deepinfra_base_url: str = "https://api.deepinfra.com/v1/openai"
     deepinfra_model: str = "Qwen/Qwen3-235B-A22B-Instruct-2507"
 
-    # ── Groq (fallback provider) ────────────────────────────────
-    groq_api_key: str
-    groq_base_url: str
-    groq_model: str = "llama-3.3-70b-versatile"
+    # ── DeepInfra paid models (higher priority) ─────────────────
+    deepinfra_sonnet_model: str = "anthropic/claude-sonnet-4-6"
+    deepinfra_opus_model: str = "anthropic/claude-opus-4-7"
+    deepinfra_gemini_pro_model: str = "google/gemini-3.1-pro"
+
+    # # ── Groq (fallback provider) ────────────────────────────────
+    # # DISABLED: API key expired.
+    # groq_api_key: str
+    # groq_base_url: str
+    # groq_model: str = "llama-3.3-70b-versatile"
 
     # ── SambaNova (secondary provider) ──────────────────────────
     sambanova_api_key: str
@@ -85,16 +92,19 @@ if settings.egypt_market_notes_yaml:
 
 if __name__ == "__main__":
     print("✅ Configuration loaded successfully!")
-    print(f"Cerebras Enabled: {bool(settings.cerebras_api_key)}")
-    print(f"Cerebras Base URL: {settings.cerebras_base_url}")
-    print(f"Cerebras Model: {settings.cerebras_model}")
+    # print(f"Cerebras Enabled: {bool(settings.cerebras_api_key)}")
+    # print(f"Cerebras Base URL: {settings.cerebras_base_url}")
+    # print(f"Cerebras Model: {settings.cerebras_model}")
     print(f"DeepInfra Enabled: {bool(settings.deepinfra_api_key)}")
     print(f"DeepInfra Base URL: {settings.deepinfra_base_url}")
     print(f"DeepInfra Model: {settings.deepinfra_model}")
-    print(f"Groq API Key: ****{settings.groq_api_key[-4:]}")
-    print(f"Groq Base URL: {settings.groq_base_url}")
-    effective_groq_primary = settings.groq_model
-    print(f"Groq Primary Model: {effective_groq_primary}")
+    print(f"DeepInfra Sonnet Model: {settings.deepinfra_sonnet_model}")
+    print(f"DeepInfra Opus Model: {settings.deepinfra_opus_model}")
+    print(f"DeepInfra Gemini Pro Model: {settings.deepinfra_gemini_pro_model}")
+    # print(f"Groq API Key: ****{settings.groq_api_key[-4:]}")
+    # print(f"Groq Base URL: {settings.groq_base_url}")
+    # effective_groq_primary = settings.groq_model
+    # print(f"Groq Primary Model: {effective_groq_primary}")
     print(f"SambaNova API Key: ****{settings.sambanova_api_key[-4:]}")
     print(f"SambaNova Base URL: {settings.sambanova_base_url}")
     print(f"SambaNova Model: {settings.sambanova_model}")
