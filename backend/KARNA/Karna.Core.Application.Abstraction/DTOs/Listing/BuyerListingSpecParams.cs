@@ -10,5 +10,7 @@ namespace Karna.Core.Application.Abstraction.DTOs.Listing
 		public int? YearTo { get; set; }
 		public decimal? PriceMin { get; set; }
 		public decimal? PriceMax { get; set; }
+		public int? MileageMin { get; set; }
+		public int? MileageMax { get; set; }
 	}
 }

@@ -22,13 +22,41 @@ namespace Karna.Core.Application.Specifications.Listings
 				&&
 				(!specParams.PriceMin.HasValue || l.Price >= specParams.PriceMin.Value)
 				&&
-				(!specParams.PriceMax.HasValue || l.Price <= specParams.PriceMax.Value))
+				(!specParams.PriceMax.HasValue || l.Price <= specParams.PriceMax.Value)
+				&&
+				(!specParams.MileageMin.HasValue || l.Mileage >= specParams.MileageMin.Value)
+				&&
+				(!specParams.MileageMax.HasValue || l.Mileage <= specParams.MileageMax.Value))
 		{
 			AddInclude(l => l.Make);
 			AddInclude(l => l.Model);
 			AddInclude(l => l.Photos);
 
-			AddOrderByDescending(l => l.CreatedAt);
+			// Dynamic sorting — fallback to newest (CreatedAt DESC)
+			var isAsc = string.Equals(specParams.SortDirection, "asc", StringComparison.OrdinalIgnoreCase);
+
+			switch (specParams.Sort?.ToLowerInvariant())
+			{
+				case "price":
+					if (isAsc) AddOrderBy(l => l.Price!);
+					else AddOrderByDescending(l => l.Price!);
+					break;
+
+				case "year":
+					if (isAsc) AddOrderBy(l => l.Year);
+					else AddOrderByDescending(l => l.Year);
+					break;
+
+				case "mileage":
+					if (isAsc) AddOrderBy(l => l.Mileage);
+					else AddOrderByDescending(l => l.Mileage);
+					break;
+
+				default: // "createdAt" or anything else → newest first
+					if (isAsc) AddOrderBy(l => l.CreatedAt);
+					else AddOrderByDescending(l => l.CreatedAt);
+					break;
+			}
 
 			if (applyPaging)
 				ApplyPaging((specParams.PageIndex - 1) * specParams.PageSize, specParams.PageSize);

@@ -103,6 +103,7 @@ namespace Karna.Core.Application.Mapping
 			Transmission = source.Transmission.ToString(),
 			Color = source.Color,
 			ListingPrice = source.Price,
+			Location = source.Location.ToDisplayString(),
 			PrimaryPhotoUrl = source.Photos?.FirstOrDefault(p => p.IsPrimary)?.PhotoUrl,
 			CreatedAt = source.CreatedAt,
 			IsGoodDeal = CalculateIsGoodDeal(source)

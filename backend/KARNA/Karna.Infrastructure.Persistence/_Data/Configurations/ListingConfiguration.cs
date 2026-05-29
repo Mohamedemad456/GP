@@ -51,6 +51,7 @@ namespace Karna.Infrastructure.Persistence._Data.Configurations
             builder.HasIndex(x => x.MakeId);
 			builder.HasIndex(x => x.ModelId);
 			builder.HasIndex(x => x.SellerId);
+			builder.HasIndex(x => x.Price);
 
 			builder.HasOne(x => x.Seller)
 				.WithMany()

@@ -11,6 +11,7 @@ namespace Karna.Core.Application.Abstraction.DTOs.Listing
 		public string Transmission { get; set; } = string.Empty;
 		public string Color { get; set; } = string.Empty;
 		public decimal? ListingPrice { get; set; }
+		public string Location { get; set; } = string.Empty;
 		public string? PrimaryPhotoUrl { get; set; }
 		public DateTime CreatedAt { get; set; }
 		public bool IsGoodDeal { get; set; }
