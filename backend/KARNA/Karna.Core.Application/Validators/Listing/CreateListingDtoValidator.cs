@@ -42,6 +42,19 @@ namespace Karna.Core.Application.Validators.Listing
 
 			RuleFor(x => x.Location)
 				.IsInEnum().WithMessage(localizer.GetValidationMessage("InvalidLocation"));
+
+			// Seller Contact Information
+			RuleFor(x => x.ContactPhoneNumber)
+				.NotEmpty().WithMessage(localizer.GetValidationMessage("RequiredField"))
+				.Matches(@"^\+?\d{7,15}$").WithMessage(localizer.GetValidationMessage("InvalidPhoneNumber"));
+
+			RuleFor(x => x.WhatsAppNumber)
+				.Matches(@"^\+?\d{7,15}$")
+				.When(x => !string.IsNullOrEmpty(x.WhatsAppNumber))
+				.WithMessage(localizer.GetValidationMessage("InvalidPhoneNumber"));
+
+			RuleFor(x => x.PreferredContactMethod)
+				.IsInEnum().WithMessage(localizer.GetValidationMessage("InvalidContactMethod"));
 		}
 	}
 }

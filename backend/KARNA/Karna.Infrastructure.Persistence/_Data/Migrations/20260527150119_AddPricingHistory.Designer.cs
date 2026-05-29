@@ -4,6 +4,7 @@ using Karna.Infrastructure.Persistence._Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Karna.Infrastructure.Persistence._Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260527150119_AddPricingHistory")]
+    partial class AddPricingHistory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -166,11 +169,6 @@ namespace Karna.Infrastructure.Persistence._Data.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<string>("ContactPhoneNumber")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -227,11 +225,6 @@ namespace Karna.Infrastructure.Persistence._Data.Migrations
                     b.Property<DateTime?>("PredictedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("PreferredContactMethod")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
                     b.Property<decimal?>("Price")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
@@ -259,10 +252,6 @@ namespace Karna.Infrastructure.Persistence._Data.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("WhatsAppNumber")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
                     b.Property<int>("Year")
                         .HasColumnType("int");
 
@@ -273,8 +262,6 @@ namespace Karna.Infrastructure.Persistence._Data.Migrations
                     b.HasIndex("MakeId");
 
                     b.HasIndex("ModelId");
-
-                    b.HasIndex("Price");
 
                     b.HasIndex("SellerId");
 

@@ -51,6 +51,7 @@ namespace Karna.Infrastructure.Persistence._Data.Configurations
             builder.HasIndex(x => x.MakeId);
 			builder.HasIndex(x => x.ModelId);
 			builder.HasIndex(x => x.SellerId);
+			builder.HasIndex(x => x.Price);
 
 			builder.HasOne(x => x.Seller)
 				.WithMany()
@@ -83,6 +84,20 @@ namespace Karna.Infrastructure.Persistence._Data.Configurations
 			builder.Property(x => x.RejectionReason)
 				.IsRequired(false)
 				.HasMaxLength(500);
+
+			// Seller Contact Information
+			builder.Property(x => x.ContactPhoneNumber)
+				.IsRequired()
+				.HasMaxLength(20);
+
+			builder.Property(x => x.WhatsAppNumber)
+				.IsRequired(false)
+				.HasMaxLength(20);
+
+			builder.Property(x => x.PreferredContactMethod)
+				.IsRequired()
+				.HasConversion<string>()
+				.HasMaxLength(20);
 
 			builder.Property(x => x.Location);
 

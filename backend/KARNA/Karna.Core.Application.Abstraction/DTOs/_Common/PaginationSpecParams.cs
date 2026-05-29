@@ -1,18 +1,18 @@
-﻿using System;
+using System;
 
 namespace Karna.Core.Application.Abstraction.DTOs._Common
 {
 	public class PaginationSpecParams
 	{
-		private const int MaxPageSize = 10;
-		private int pageSize = 5;
+		private const int MaxPageSize = 20;
+		private int pageSize = 10;
 
 		public int PageIndex { get; set; } = 1;
 
 		public int PageSize
 		{
 			get => pageSize;
-			set => pageSize = value > MaxPageSize ? MaxPageSize : value < 1 ? 5 : value;
+			set => pageSize = value > MaxPageSize ? MaxPageSize : value < 1 ? 10 : value;
 		}
 
 		public string? Search { get; set; }

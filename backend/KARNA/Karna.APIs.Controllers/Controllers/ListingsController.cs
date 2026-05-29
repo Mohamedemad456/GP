@@ -8,6 +8,24 @@ namespace Karna.APIs.Controllers.Controllers
 {
 	public class ListingsController(IListingService _listingService) : ApiControllerBase
 	{
+		[HttpGet("approved")]
+		[AllowAnonymous]
+		public async Task<IActionResult> GetApprovedListings([FromQuery] BuyerListingSpecParams specParams)
+		{
+			var result = await _listingService.GetApprovedListingsAsync(specParams);
+			return Ok(result);
+		}
+
+		[HttpGet("{id}")]
+		[AllowAnonymous]
+		public async Task<IActionResult> GetById(Guid id)
+		{
+			var result = await _listingService.GetByIdAsync(id);
+			if (!result.Success)
+				return NotFound(result);
+			return Ok(result);
+		}
+
 		[HttpPost]
 		[Authorize(Roles = "User")]
 		public async Task<IActionResult> Create([FromBody] CreateListingDto dto)
@@ -63,6 +81,16 @@ namespace Karna.APIs.Controllers.Controllers
 		public async Task<IActionResult> GetStatusHistory(Guid id)
 		{
 			var result = await _listingService.GetStatusHistoryAsync(id);
+			if (!result.Success)
+				return BadRequest(result);
+			return Ok(result);
+		}
+
+		[HttpGet("{id}/pricing-history")]
+		[Authorize(Roles = "User,Admin")]
+		public async Task<IActionResult> GetPricingHistory(Guid id)
+		{
+			var result = await _listingService.GetPricingHistoryAsync(id);
 			if (!result.Success)
 				return BadRequest(result);
 			return Ok(result);

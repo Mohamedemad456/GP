@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -10,8 +10,6 @@ namespace Karna.Core.Application.Abstraction.DTOs._Common
 		public int PageIndex { get; set; } = pageIndex;
 		public int PageSize { get; set; } = pageSize;
 		public int Count { get; set; } = count;
-
-
-
+		public int TotalPages => (int)Math.Ceiling((double)Count / PageSize);
 	}
 }
