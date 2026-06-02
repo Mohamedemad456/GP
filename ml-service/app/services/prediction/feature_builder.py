@@ -248,14 +248,47 @@ def build_features(
     return df
 
 
+def _resolve_label_encoders_path(label_encoders_path: Path | None = None) -> Path | None:
+    """Resolve the best available label encoders artifact for XGBoost inference."""
+    candidates: list[Path] = []
+
+    if label_encoders_path is not None:
+        direct = Path(label_encoders_path)
+        if direct.exists():
+            return direct
+        candidates.append(direct)
+
+    candidates.extend([
+        settings.model_preprocessors_dir / 'label_encoders.joblib',
+        settings.model_pickles_dir / 'label_encoders.joblib',
+    ])
+
+    seen: set[Path] = set()
+    for candidate in candidates:
+        if candidate in seen:
+            continue
+        seen.add(candidate)
+        if candidate.exists():
+            return candidate
+
+    versioned_matches: list[Path] = []
+    for base_dir in (settings.model_preprocessors_dir, settings.model_pickles_dir):
+        if base_dir.exists():
+            versioned_matches.extend(base_dir.glob('label_encoders*.joblib'))
+
+    versioned_matches = sorted(
+        versioned_matches,
+        key=lambda path: (path.stat().st_mtime, path.name),
+        reverse=True,
+    )
+    return versioned_matches[0] if versioned_matches else None
+
+
 def prepare_for_xgboost(df: pd.DataFrame, label_encoders_path: Path | None = None) -> pd.DataFrame:
     """Apply label encoding to categorical columns for XGBoost inference."""
-    if label_encoders_path is None:
-        label_encoders_path = settings.model_preprocessors_dir / 'label_encoders.joblib'
-        if not label_encoders_path.exists():
-            label_encoders_path = settings.model_pickles_dir / 'label_encoders.joblib'
+    label_encoders_path = _resolve_label_encoders_path(label_encoders_path)
 
-    if label_encoders_path.exists():
+    if label_encoders_path is not None and label_encoders_path.exists():
         encoders = joblib.load(label_encoders_path)
         df = df.copy()
         for c in CAT_COLS:
