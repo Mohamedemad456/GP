@@ -59,10 +59,11 @@ class ChatRequest(BaseModel):
     model: str | None = Field(
         default=None,
         description=(
-            "Optional provider/model selector for testing: auto, cerebras/qwen (primary), "
-            "deepinfra/qwen_deepinfra (secondary), groq/llama_groq, Llama_samba, or gemini"
+            "Optional provider/model selector for testing: auto, sonnet/claude_sonnet, "
+            "opus/claude_opus, gemini_pro, deepinfra/qwen_deepinfra, "
+            "llama_samba, or gemini"
         ),
-        examples=["auto", "cerebras", "qwen", "deepinfra", "qwen_deepinfra", "groq", "llama_groq", "Llama_samba", "gemini"],
+        examples=["auto", "sonnet", "opus", "gemini_pro", "deepinfra", "qwen_deepinfra", "llama_samba", "gemini"],
     )
 
 
