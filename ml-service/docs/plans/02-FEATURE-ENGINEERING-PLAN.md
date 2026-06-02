@@ -2,7 +2,7 @@
 
 > **Recommended Model**: **Opus 4.6** (critical — wrong features damage the model permanently)  
 > **Dependencies**: Plan 1 (Data Cleaning) must be complete  
-> **Blocks**: Plan 3 (Model Training), Plan 6 (API Updates)
+> **Blocks**: Plan 04 (Model V2 Training), Plan 07 (API Updates)
 
 ---
 

@@ -1,7 +1,7 @@
 {
   "schema_version": "2.0",
   "active_model_id": "ensemble_robust_average_v1.1.0",
-  "active_version": "v1.2.0",
+  "active_version": "v1.1.0",
   "promoted_at": "2026-05-23T21:51:00+00:00",
   "models": {
     "huber_baseline_v1.0.0": {
@@ -30,7 +30,7 @@
       "framework": "XGBoost",
       "version": "v1.1.0",
       "stage": "archived",
-      "pkl_path": "models/pickles/xgb_quantile_models.joblib",
+      "pkl_path": "models/pickles/xgb_quantile_v1.1.0.joblib",
       "meta_path": "models/metadata/XGBoost_quantile_v1.0.0.json",
       "metrics": {
         "MAPE_pct": 13.534,
@@ -51,7 +51,7 @@
     "ensemble_robust_average_v1.1.0": {
       "model_id": "ensemble_robust_average_v1.1.0",
       "framework": "ensemble",
-      "version": "v1.2.0",
+      "version": "v1.1.0",
       "stage": "production",
       "pkl_path": "models/pickles/ensemble_v1.1.0.joblib",
       "meta_path": "models/metadata/ensemble_robust_average_v1.1.0.json",
@@ -66,9 +66,8 @@
         "Mean_width_pct": 77.266
       },
       "artifacts": {
-        "xgb_models": "models/pickles/xgb_quantile_models.joblib",
-        "lgbm_models": "models/pickles/lgbm_quantile_models.joblib",
-        "huber_model": "models/pickles/Baseline1__huberregressortuned.pkl"
+        "xgb_models": "models/pickles/xgb_quantile_v1.1.0.joblib",
+        "lgbm_models": "models/pickles/lgbm_quantile_v1.1.0.joblib"
       },
       "source_notebook": "notebooks/06_ensemble_experiments.ipynb",
       "registered_at": "2026-05-12T12:42:55.359397+00:00"

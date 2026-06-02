@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "entries": [
+    {
+      "attempt_id": "retrain_2026-05-12",
+      "timestamp": "2026-05-12T12:42:55Z",
+      "data_file": "data/processed/training_data.csv",
+      "data_rows": 20214,
+      "data_version_tag": "baseline",
+      "config_used": "models/configs/train_config_v1.1.0.json",
+      "result": "promoted",
+      "model_id": "ensemble_robust_average_v1.1.0",
+      "global_metrics": {
+        "MAPE_pct": 12.775,
+        "R2": 0.888,
+        "Within_15pct": 76.577,
+        "MAE": 133592.676,
+        "RMSE": 473138.304,
+        "Coverage_80_pct": 86.792,
+        "Mean_width_pct": 77.266
+      },
+      "cv_metrics": {
+        "CV_MAPE_pct": 14.54,
+        "CV_MAPE_std": 0.96
+      },
+      "combo_metrics": {
+        "total_combos": 531,
+        "well_supported_combos": 361,
+        "pct_well_supported_mape_gt30": 11.6,
+        "pct_well_supported_mape_gt50": 3.6
+      },
+      "gate_result": "auto_promote",
+      "gate_violations": []
+    }
+  ]
+}
