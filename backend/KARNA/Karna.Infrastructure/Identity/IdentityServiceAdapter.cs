@@ -1,4 +1,4 @@
-﻿using Karna.Core.Application.Abstraction.DTOs.Identity;
+using Karna.Core.Application.Abstraction.DTOs.Identity;
 using Karna.Core.Application.Abstraction.DTOs.User;
 using Karna.Core.Application.Abstraction.External;
 using Microsoft.AspNetCore.Identity;
@@ -190,5 +190,25 @@ namespace Karna.Infrastructure.Identity
 				result.Errors.Select(e => e.Description)
 			);
 		}
+
+		public Task<IDictionary<Guid, UserIdentityDto>> GetUsersIdentityByIdsAsync(IEnumerable<Guid> userIds)
+		{
+			var idSet = userIds.ToHashSet();
+
+			var result = _userManager.Users
+				.Where(u => idSet.Contains(u.Id))
+				.Select(u => new UserIdentityDto
+				{
+					Found = true,
+					UserId = u.Id,
+					Email = u.Email ?? string.Empty,
+					UserName = u.UserName ?? string.Empty,
+					PhoneNumber = u.PhoneNumber ?? string.Empty,
+					IsActive = u.IsActive
+				})
+				.ToDictionary(u => u.UserId);
+
+			return Task.FromResult<IDictionary<Guid, UserIdentityDto>>(result);
+		}
 	}
-}
+}
