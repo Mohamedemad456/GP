@@ -1,9 +1,11 @@
 using Karna.Core.Application.Abstraction.DTOs._Common;
+using Karna.Core.Application.Abstraction.DTOs.Admin;
 using Karna.Core.Application.Abstraction.DTOs.Listing;
 using Karna.Core.Application.Abstraction.External;
 using Karna.Core.Application.Abstraction.Persistence;
 using Karna.Core.Application.Abstraction.Services;
 using Karna.Core.Application.Mapping;
+using Karna.Core.Application.Specifications.Admin;
 using Karna.Core.Application.Specifications.Listings;
 using Karna.Core.Domain.Entities;
 using Karna.Core.Domain.Enums;
@@ -14,9 +16,48 @@ namespace Karna.Core.Application.Services
 		IUnitOfWork _unitOfWork,
 		ICurrentUserService _currentUserService,
 		ILocalizationService _localizer,
-		IAdminActivityLogService _activityLogService
+		IAdminActivityLogService _activityLogService,
+		IIdentityService _identityService
 	) : IAdminService
 	{
+		public async Task<ApiResponse<Pagination<UserListDto>>> GetUsersAsync(UserListSpecParams specParams)
+		{
+			var repo = _unitOfWork.GetRepository<User>();
+
+			var dataSpec = new AllUsersSpecification(specParams, applyPaging: true);
+			var countSpec = new AllUsersSpecification(specParams, applyPaging: false);
+
+			var users = await repo.GetAllWithSpecAsync(dataSpec);
+			var count = await repo.GetCountAsync(countSpec);
+
+			// Batch-fetch identity data (email, phone) for the paginated users
+			var identityMap = await _identityService.GetUsersIdentityByIdsAsync(
+				users.Select(u => u.IdentityUserId));
+
+			var dtos = users.Select(u =>
+			{
+				identityMap.TryGetValue(u.IdentityUserId, out var identity);
+				return new UserListDto
+				{
+					UserId = u.Id,
+					Name = u.Name,
+					Email = identity?.Email ?? string.Empty,
+					PhoneNumber = identity?.PhoneNumber,
+					IsActive = u.IsActive,
+					CreatedAt = u.CreatedAt
+				};
+			});
+
+			return new ApiResponse<Pagination<UserListDto>>
+			{
+				Success = true,
+				Data = new Pagination<UserListDto>(specParams.PageIndex, specParams.PageSize, count)
+				{
+					Data = dtos
+				}
+			};
+		}
+
 		public async Task<ApiResponse<Pagination<PendingListingDto>>> GetPendingListingsAsync(PendingListingSpecParams specParams)
 		{
 			var repo = _unitOfWork.GetRepository<Listing>();
