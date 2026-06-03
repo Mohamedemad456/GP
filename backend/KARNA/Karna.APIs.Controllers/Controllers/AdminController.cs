@@ -21,6 +21,15 @@ namespace Karna.APIs.Controllers.Controllers
 			return Ok(result);
 		}
 
+		[HttpPatch("users/{id:guid}/toggle-status")]
+		public async Task<IActionResult> ToggleUserStatus(Guid id)
+		{
+			var result = await _adminService.ToggleUserStatusAsync(id);
+			if (!result.Success)
+				return BadRequest(result);
+			return Ok(result);
+		}
+
 		[HttpGet("listings/pending")]
 		public async Task<IActionResult> GetPendingListings([FromQuery] PendingListingSpecParams specParams)
 		{

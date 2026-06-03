@@ -27,6 +27,7 @@ namespace Karna.Core.Application.Abstraction.External
 																			string oldPass, 
 																			string newPass);
 		Task<IDictionary<Guid, UserIdentityDto>> GetUsersIdentityByIdsAsync(IEnumerable<Guid> userIds);
+		Task<bool> SetUserActiveStatusAsync(Guid userId, bool isActive);
 
 	}
 }
