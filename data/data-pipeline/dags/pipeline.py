@@ -122,7 +122,7 @@ def data_pipeline():
             f"postgresql://{os.getenv('DB_USER')}:{password}"
             f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
         )
-        query = "SELECT MAX(scraping_num) FROM used_cars"
+        query = "SELECT MAX(scraping_num) FROM used_cars_new;"
         x = pd.read_sql(query, engine)
         max_scraping_num = x.iloc[0, 0]
         next_scraping_num = (max_scraping_num + 1) if pd.notnull(max_scraping_num) else 1
@@ -137,7 +137,7 @@ def data_pipeline():
             f"postgresql://{os.getenv('DB_USER')}:{password}"
             f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
         )
-        df.to_sql("test", engine, if_exists="append", index=False) # replace for testing, change to append for production
+        df.to_sql("used_cars_new", engine, if_exists="append", index=False) # replace for testing, change to append for production
         print("Data loaded to database successfully.")
         print("Number of records loaded:", len(df))
 

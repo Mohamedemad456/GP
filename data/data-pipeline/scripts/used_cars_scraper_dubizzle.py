@@ -12,8 +12,9 @@ import random
 
 
 class DubizzleCarScraper:
-    def __init__(self, headless=True, max_pages_before_restart=100):
+    def __init__(self, headless=True, max_pages_before_restart=50):
         self.headless = headless
+        # FIX 1: Reduced from 100 → 50 to recycle more aggressively
         self.max_pages_before_restart = max_pages_before_restart
         self.pages_scraped = 0
         self.driver = None
@@ -48,6 +49,14 @@ class DubizzleCarScraper:
         chrome_options.add_argument('--disable-popup-blocking')
         chrome_options.add_argument('--disable-translate')
         chrome_options.add_argument('--blink-settings=imagesEnabled=false')
+        # FIX 2: Cap shared memory usage to prevent OOM tab crashes
+        chrome_options.add_argument('--shm-size=512m')
+        # FIX 3: Limit renderer processes to reduce memory pressure
+        chrome_options.add_argument('--renderer-process-limit=2')
+        # FIX 4: Disable background throttling / features that leak memory
+        chrome_options.add_argument('--disable-background-networking')
+        chrome_options.add_argument('--disable-default-apps')
+        chrome_options.add_argument('--mute-audio')
 
         prefs = {
             'profile.managed_default_content_settings.images': 2,
@@ -68,17 +77,35 @@ class DubizzleCarScraper:
         self.pages_scraped = 0
         print("[✓] Browser initialized")
 
-    def _check_and_recycle_browser(self):
-        """Recycle browser to free memory"""
+    def _is_tab_crashed(self):
+        """Check if the current browser session is still alive"""
+        try:
+            _ = self.driver.current_url
+            return False
+        except Exception:
+            return True
+
+    def _check_and_recycle_browser(self, force=False):
+        """
+        Recycle browser to free memory.
+        FIX 5: Accept a `force` flag so crash handlers can always recycle.
+        """
         self.pages_scraped += 1
-        if self.pages_scraped >= self.max_pages_before_restart:
-            print(f"[↻] Recycling browser after {self.pages_scraped} pages")
+        if force or self.pages_scraped >= self.max_pages_before_restart:
+            reason = "forced (crash)" if force else f"after {self.pages_scraped} pages"
+            print(f"[↻] Recycling browser ({reason})")
             self._init_browser()
 
     def scrape_page(self, url, page_num, retry_count=3):
-        """Optimized page scraping with better waiting"""
+        """Optimized page scraping with crash-aware retry logic"""
         for attempt in range(retry_count):
             try:
+                # FIX 6: Before each attempt, check if the session is dead
+                # and proactively reinitialize instead of hitting a guaranteed failure.
+                if self._is_tab_crashed():
+                    print(f"[↻] Dead session detected before page {page_num}, reinitializing...")
+                    self._init_browser()
+
                 time.sleep(random.uniform(0.5, 1.2))
 
                 self.driver.get(url)
@@ -89,7 +116,6 @@ class DubizzleCarScraper:
                         EC.presence_of_all_elements_located((By.XPATH, "//li[contains(., 'EGP')]"))
                     )
                 except Exception:
-                    # Fallback: wait for any li elements
                     try:
                         self.wait.until(
                             EC.presence_of_all_elements_located((By.TAG_NAME, "li"))
@@ -98,7 +124,7 @@ class DubizzleCarScraper:
                         pass
 
                 time.sleep(0.5)
-                
+
                 # Scroll to load lazy content
                 for _ in range(3):
                     try:
@@ -145,12 +171,23 @@ class DubizzleCarScraper:
                         return False
 
             except Exception as e:
+                err_str = str(e)[:50]
+                is_crash = 'tab crashed' in err_str.lower() or 'session' in err_str.lower()
+
                 if attempt < retry_count - 1:
-                    print(f"[⟳] Page {page_num:3d} | Retry {attempt + 1}/{retry_count - 1} - {str(e)[:30]}")
-                    time.sleep(2)
+                    print(f"[⟳] Page {page_num:3d} | Retry {attempt + 1}/{retry_count - 1} - {err_str}")
+                    # FIX 7: On a tab crash, always reinitialize before retrying.
+                    # Previously the dead session was reused, guaranteeing further crashes.
+                    if is_crash:
+                        print(f"[↻] Tab crash detected — reinitializing browser before retry...")
+                        self._init_browser()
+                    else:
+                        time.sleep(2)
                 else:
-                    print(f"[✗] Page {page_num:3d} | Error: {str(e)[:40]}")
-                    self._check_and_recycle_browser()
+                    print(f"[✗] Page {page_num:3d} | Error: {err_str}")
+                    # FIX 8: Force-recycle on any final failure so the next page
+                    # always starts with a fresh session.
+                    self._check_and_recycle_browser(force=is_crash)
                     return False
 
         return False
@@ -167,8 +204,8 @@ class DubizzleCarScraper:
                 return None
             raw_link = link_elem['href']
             car['url'] = (
-                'https://www.dubizzle.com.eg' + raw_link 
-                if not raw_link.startswith('http') 
+                'https://www.dubizzle.com.eg' + raw_link
+                if not raw_link.startswith('http')
                 else raw_link
             )
 
@@ -199,8 +236,8 @@ class DubizzleCarScraper:
 
             title = ' '.join(title_parts) if title_parts else "N/A"
             car['title'] = (
-                f"{title} {car['year']}" 
-                if car['year'] != "N/A" and title != "N/A" 
+                f"{title} {car['year']}"
+                if car['year'] != "N/A" and title != "N/A"
                 else title
             )
 
@@ -253,7 +290,8 @@ def scrape_all_pages(total_pages, base_url, headless=True):
     print(f"  Estimated Time: ~{total_pages * 3.5 / 60:.1f} minutes")
     print(f"{'='*60}\n")
 
-    scraper = DubizzleCarScraper(headless=headless, max_pages_before_restart=100)
+    # FIX 9: Recycle every 50 pages instead of 100 to stay ahead of memory buildup
+    scraper = DubizzleCarScraper(headless=headless, max_pages_before_restart=50)
 
     try:
         start_time = time.time()
@@ -314,7 +352,7 @@ def save_to_csv(cars_data, filename='/opt/airflow/data/dubizzle_cars.csv'):
 
 if __name__ == "__main__":
 
-    TOTAL_PAGES = 5 # 200 after testing
+    TOTAL_PAGES = 200
     HEADLESS_MODE = True
     BASE_URL = "https://www.dubizzle.com.eg/en/vehicles/cars-for-sale/used/"
 

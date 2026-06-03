@@ -7,7 +7,7 @@ from datetime import datetime
 
 # --- CONFIGURATION ---
 BASE_URL = "https://eg.hatla2ee.com/en/car/page/"
-PAGES_TO_SCRAPE = 5 # 696 pages total, but we can adjust this for testing (e.g., set to 5 or 10)
+PAGES_TO_SCRAPE = 696 # 696 pages total, but we can adjust this for testing (e.g., set to 5 or 10)
 
 def clean_text(text):
     if not text: return None
