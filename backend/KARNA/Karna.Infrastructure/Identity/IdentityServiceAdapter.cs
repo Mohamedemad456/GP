@@ -210,5 +210,16 @@ namespace Karna.Infrastructure.Identity
 
 			return Task.FromResult<IDictionary<Guid, UserIdentityDto>>(result);
 		}
+
+		public async Task<bool> SetUserActiveStatusAsync(Guid userId, bool isActive)
+		{
+			var user = await _userManager.FindByIdAsync(userId.ToString());
+			if (user is null) return false;
+
+			user.IsActive = isActive;
+			var result = await _userManager.UpdateAsync(user);
+			return result.Succeeded;
+		}
 	}
-}
+}
+

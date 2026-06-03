@@ -240,4 +240,10 @@
   <data name="ListingMarkedAsSold" xml:space="preserve">
     <value>Listing marked as sold successfully.</value>
   </data>
+  <data name="UserActivated" xml:space="preserve">
+    <value>User activated successfully.</value>
+  </data>
+  <data name="UserDeactivated" xml:space="preserve">
+    <value>User deactivated successfully.</value>
+  </data>
 </root>

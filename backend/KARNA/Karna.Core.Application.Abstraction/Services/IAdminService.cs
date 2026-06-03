@@ -7,6 +7,7 @@ namespace Karna.Core.Application.Abstraction.Services
 	public interface IAdminService
 	{
 		Task<ApiResponse<Pagination<UserListDto>>> GetUsersAsync(UserListSpecParams specParams);
+		Task<ApiResponse<ToggleUserStatusDto>> ToggleUserStatusAsync(Guid userId);
 		Task<ApiResponse<Pagination<PendingListingDto>>> GetPendingListingsAsync(PendingListingSpecParams specParams);
 		Task<ApiResponse<ListingDto>> ApproveListingAsync(Guid listingId);
 		Task<ApiResponse<ListingDto>> RejectListingAsync(Guid listingId, RejectListingDto dto);

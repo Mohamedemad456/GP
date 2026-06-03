@@ -58,6 +58,66 @@ namespace Karna.Core.Application.Services
 			};
 		}
 
+		public async Task<ApiResponse<ToggleUserStatusDto>> ToggleUserStatusAsync(Guid userId)
+		{
+			// 1. Resolve current admin
+			var adminUser = await ResolveCurrentAdminAsync();
+			if (adminUser is null)
+				return new ApiResponse<ToggleUserStatusDto> { Success = false, Message = _localizer.GetErrorMessage("Unauthorized") };
+
+			// 2. Get target user
+			var userRepo = _unitOfWork.GetRepository<User>();
+			var targetUser = await userRepo.GetAsync(userId);
+			if (targetUser is null)
+				return new ApiResponse<ToggleUserStatusDto> { Success = false, Message = _localizer.GetErrorMessage("UserNotFound") };
+
+			// 3. Admin cannot deactivate himself
+			if (targetUser.Id == adminUser.Id)
+				return new ApiResponse<ToggleUserStatusDto> { Success = false, Message = _localizer.GetErrorMessage("CannotDeactivateSelf") };
+
+			// 4. Toggle status
+			var oldStatus = targetUser.IsActive;
+			targetUser.IsActive = !targetUser.IsActive;
+			userRepo.Update(targetUser);
+
+			// 5. If deactivating → revoke all refresh tokens (force logout)
+			if (!targetUser.IsActive)
+			{
+				var refreshTokenRepo = _unitOfWork.GetRepository<RefreshToken>();
+				var activeTokens = await refreshTokenRepo.FindAsync(
+					rt => rt.IdentityUserId == targetUser.IdentityUserId && !rt.IsRevoked);
+
+				foreach (var token in activeTokens)
+				{
+					token.IsRevoked = true;
+					refreshTokenRepo.Update(token);
+				}
+			}
+
+			// 6. Sync IsActive to Identity (AspNetUsers) — login checks this
+			await _identityService.SetUserActiveStatusAsync(targetUser.IdentityUserId, targetUser.IsActive);
+
+			// 7. Log admin activity
+			var details = $"IsActive: {oldStatus} → {targetUser.IsActive}";
+			await _activityLogService.LogAsync(adminUser.Id, "ToggleUserStatus", "User", targetUser.Id, details);
+
+			// 8. Save
+			await _unitOfWork.CompleteAsync();
+
+			return new ApiResponse<ToggleUserStatusDto>
+			{
+				Success = true,
+				Message = targetUser.IsActive
+					? _localizer.GetMessage("UserActivated")
+					: _localizer.GetMessage("UserDeactivated"),
+				Data = new ToggleUserStatusDto
+				{
+					UserId = targetUser.Id,
+					IsActive = targetUser.IsActive
+				}
+			};
+		}
+
 		public async Task<ApiResponse<Pagination<PendingListingDto>>> GetPendingListingsAsync(PendingListingSpecParams specParams)
 		{
 			var repo = _unitOfWork.GetRepository<Listing>();
