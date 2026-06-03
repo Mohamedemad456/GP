@@ -240,4 +240,7 @@
   <data name="ListingMarkedAsSold" xml:space="preserve">
     <value>تم تحديد الإعلان كمباع بنجاح.</value>
   </data>
+  <data name="AlreadyInFavorites" xml:space="preserve">
+    <value>هذا الإعلان موجود بالفعل في المفضلة</value>
+  </data>
 </root>
