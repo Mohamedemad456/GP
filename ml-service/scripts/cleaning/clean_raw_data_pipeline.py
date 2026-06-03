@@ -542,7 +542,8 @@ def run_apply(args: argparse.Namespace) -> int:
     backup_path = args.input.with_suffix(args.input.suffix + f".{timestamp}.bak")
     tmp_path = args.input.with_suffix(args.input.suffix + ".tmp")
 
-    log_file = args.log_file or args.input.parent / f"clean_raw_data_{timestamp}.log"
+    log_file = args.log_file or PROJECT_ROOT / "data" / "logs" / f"clean_raw_data_{timestamp}.log"
+    log_file.parent.mkdir(parents=True, exist_ok=True)
     logger = configure_logging(log_file)
 
     if not args.input.exists():

@@ -1,7 +1,8 @@
 # Data Pipeline — Full Audit Report
 
-> Last updated: 2026-05-25  
-> Covers scraping rounds 1 (2026-05-24) and 2 (2026-05-25).
+> Last updated: 2026-06-03  
+> Covers scraping rounds 1 (2026-05-24) and 2 (2026-05-25).  
+> Added: Training data versioning, run summaries, and `make combine TAG=...` support.
 
 ---
 
@@ -22,12 +23,26 @@ data/cleaned/  cars_cleaned_YYYY-MM-DD_NNN.csv
     ▼  generate_processed_data.py
 data/processed/versions/  processed_YYYY-MM-DD_NNN.csv
     │
-    ▼  data_manifest.json            ← single source of truth
+    ▼  combine_versions.py
+    │
+    ├── data/processed/training_versions/  training_YYYY-MM-DD_NNN.csv  ← immutable training dataset
+    │
+    ├── data/processed/training_data.csv   ← alias to latest training version (backward compat)
+    │
+    ├── data/training_manifest.json        ← training version metadata
+    │
+    └── data/logs/runs/combine_*.json      ← structured run summaries
+    │
+    ▼  data_manifest.json                  ← single source of truth (raw/cleaned/processed)
 ```
 
-**Fixed-path aliases** (`cars_with_make_model.csv`, `processed_data.csv`) are
+**Fixed-path aliases** (`cars_with_make_model.csv`, `processed_data.csv`, `training_data.csv`) are
 always kept in sync with the latest registered version — backward compat for
 notebooks and the API.
+
+**Training data is now versioned** (2026-06-03). Every `combine` run creates an immutable
+training dataset in `training_versions/` and tracks it in `training_manifest.json`.
+The alias `training_data.csv` always points to the latest version.
 
 ---
 
@@ -58,6 +73,155 @@ which Supabase round a version came from.
 > deleted — it incorrectly claimed scraping_num = 1 while its raw data was
 > actually round 2. The true round 1 file is the unversioned
 > `data/raw/cars_raw.csv` (26,896 rows) produced before the pipeline existed.
+
+---
+
+## 3b. Training Data Versions
+
+Each `combine_versions.py` run produces an immutable training dataset and a structured run summary.
+
+### Training Manifest (`data/training_manifest.json`)
+
+```json
+{
+  "current_training_version": "2026-06-03_001",
+  "versions": {
+    "2026-06-03_001": {
+      "tag": "2026-06-03_001",
+      "created_at": "2026-06-03T00:20:22",
+      "path": "data/processed/training_versions/training_2026-06-03_001.csv",
+      "rows": 29656,
+      "fingerprint": "sha256:820a2fa8d39c563a462a36572eaf66cff7a25acf97aea0e7fe2db62a41a6562e",
+      "source_processed_tags": ["2026-05-25_002", "2026-05-28_001"],
+      "excluded_tags": [],
+      "pre_dedup_rows": 32261,
+      "post_dedup_rows": 30186,
+      "duplicates_removed": 2075,
+      "post_rare_filter_rows": 29656,
+      "rare_dropped": 530,
+      "make_model_combos": 431
+    }
+  }
+}
+```
+
+**Fields tracked per training version:**
+- `tag` / `created_at` — version identity and timestamp
+- `path` — relative path to the immutable CSV
+- `rows` / `fingerprint` — integrity verification
+- `source_processed_tags` — which processed versions were merged
+- `excluded_tags` — versions intentionally skipped (e.g. `snapshot_one`)
+- `pre_dedup_rows` / `post_dedup_rows` / `duplicates_removed` — deduplication stats
+- `post_rare_filter_rows` / `rare_dropped` / `make_model_combos` — rare-filter stats
+
+### Run Summaries (`data/logs/runs/combine_YYYYMMDD_HHMMSS.json`)
+
+Every `combine` run writes a machine-readable summary for auditing and programmatic analysis:
+
+```json
+{
+  "run_id": "20260603_002020",
+  "kind": "combine_versions",
+  "status": "applied",
+  "created_at": "2026-06-03T00:20:22",
+  "log_path": "data/logs/combine_20260603_002020.log",
+  "training_tag": "2026-06-03_001",
+  "source_processed_tags": ["2026-05-25_002", "2026-05-28_001"],
+  "excluded_tags": [],
+  "pre_dedup": 32261,
+  "post_dedup": 30186,
+  "duplicates_removed": 2075,
+  "post_rare_filter": 29656,
+  "rare_dropped": 530,
+  "make_model_combos": 431,
+  "output_cols": ["make", "model", "year", ...],
+  "versioned_output_path": "data/processed/training_versions/training_2026-06-03_001.csv",
+  "latest_alias_path": "data/processed/training_data.csv",
+  "training_manifest_path": "data/training_manifest.json"
+}
+```
+
+### Why version training data?
+
+| Concern | Before | After |
+|---------|--------|-------|
+| Overwrite risk | `training_data.csv` overwritten every combine | Immutable versions + alias |
+| Reproducibility | No record of what was trained on | Manifest + fingerprint |
+| Rollback | Manual file copy | Point alias to any past version |
+| Audit | Text logs only | Structured JSON per run |
+
+### CLI usage
+
+```bash
+# Auto-tag (YYYY-MM-DD_NNN)
+python scripts/cleaning/combine_versions.py --apply
+
+# Explicit tag
+python scripts/cleaning/combine_versions.py --apply --tag 2026-06-03_001
+
+# Exclude historical versions
+python scripts/cleaning/combine_versions.py --apply --exclude snapshot_one
+
+# Via Makefile
+make combine
+make combine TAG=2026-06-03_001
+make combine EXCLUDE=snapshot_one
+```
+
+---
+
+## 3c. Pipeline Run Summaries
+
+Both `data_pipeline.py` and `combine_versions.py` write structured JSON run summaries to `data/logs/runs/` on every execution — success, failure, dry-run, or skipped.
+
+### Pipeline Run Summary (`data/logs/runs/pipeline_YYYYMMDD_HHMMSS.json`)
+
+```json
+{
+  "run_id": "20260603_003305",
+  "kind": "data_pipeline",
+  "status": "skipped",
+  "created_at": "2026-06-03T00:33:05",
+  "log_path": "data/logs/pipeline_20260603_003305.log",
+  "tag": "2026-06-03_001",
+  "raw_path": "data/raw/snapshots/cars_raw_2026-05-28_001.csv",
+  "scraping_num": null,
+  "skip_clean": false,
+  "skip_process": false,
+  "force": false,
+  "fingerprint_unchanged": true,
+  "stages": {},
+  "error": null,
+  "last_version_tag": "2026-05-28_001",
+  "exit_code": 0
+}
+```
+
+**Status values:** `success` | `failed` | `dry_run` | `skipped`
+
+**Tracked per run:**
+- `run_id`, `kind`, `status`, `created_at` — run identity
+- `log_path` — path to the companion text log
+- `tag`, `raw_path`, `scraping_num` — pipeline inputs
+- `skip_clean`, `skip_process`, `force` — flags used
+- `fingerprint_unchanged` — whether the raw data was already processed
+- `stages` — per-stage results:
+  - `raw_snapshot`: path, rows, skipped_copy
+  - `clean`: exit_code, skipped, rows
+  - `process`: exit_code, skipped, rows
+- `error` — error message on failure
+- `manifest_registered`, `fixed_paths_updated` — completion flags
+- `row_counts` — {raw, cleaned, processed}
+- `exit_code` — shell exit code
+
+### Why structured summaries?
+
+| Use case | Before | After |
+|---|---|---|
+| Audit every run | Text logs only | JSON + text for every exit path |
+| Detect failures programmatically | Parse text | Read `status` == `"failed"` |
+| Track row counts over time | Manual | `row_counts` in every summary |
+| Monitor pipeline health | Ad-hoc | Query `data/logs/runs/*.json` |
 
 ---
 
@@ -465,8 +629,15 @@ make version-current
 # Step 4: Check consistency against all previous versions
 make consistency-check
 
-# Step 5: Combine all versions → training_data.csv (dedup + t=10 rare filter)
+# Step 5: Combine all versions → versioned training_data.csv (dedup + t=10 rare filter)
 make combine
+# Optional: label the training version explicitly
+make combine TAG=2026-06-03_001
+# Optional: exclude historical versions
+make combine EXCLUDE=snapshot_one
+
+# Step 6: Review the latest run summary
+# data/logs/runs/combine_YYYYMMDD_HHMMSS.json
 ```
 
 **`cars_raw_v{scraping_num:03d}` naming guarantee:**
@@ -485,6 +656,7 @@ Logs are written to `data/logs/pipeline_YYYYMMDD_HHMMSS.log` automatically.
 | ✅ Done | Expand lookup (aliases): spec-drop reduced 64%, 12,812 training rows |
 | ✅ Done | Re-process R1 + R2 with full pipeline (mileage, imputation, metadata) |
 | ✅ Done | `combine_versions.py` — dedup + t=10 rare filter → `training_data.csv` |
+| ✅ Done | **Training data versioning** — immutable versions in `training_versions/`, manifest in `training_manifest.json`, alias `training_data.csv`, structured run summaries in `data/logs/runs/` |
 | 🔴 **Next** | **Plan 2 — Feature Engineering V2** (log_mileage, mileage_ratio, year_bucket, days_since_baseline, mm_price_tier, make_model_count) |
 | 🟡 Medium | Train Model V2 on `training_data.csv` with new features (Plan 3) |
 | 🟡 Medium | CQR calibration on V2 predictions (Plan 4) |

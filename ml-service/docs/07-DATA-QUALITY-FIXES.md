@@ -87,7 +87,7 @@ Tooling:
 
 **Current production file summary:**
 
-- Rows in lookup (after ghost-year drops): `4190`
+- Rows in lookup (after ghost-year drops + round-8 additions): `4302`
 
 **Corrections applied (high level):**
 

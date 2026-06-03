@@ -42,9 +42,12 @@ _FORCE_FLAG := $(if $(FORCE),--force,)
 .PHONY: pull pipeline pipeline-skip-clean pipeline-skip-process \
         versions version-current version-verify rollback next-tag \
         clean-report consistency-check consistency-check-save \
-        combine help
+        combine lookup-coverage help
 
 ## ── Data loading (Supabase pull) ──────────────────────────────────────────────
+# Table is resolved internally by scraping_num:
+#   scraping_num >= 8  →  used_cars_new
+#   scraping_num <  8  →  used_cars
 
 pull: ## Pull raw data from Supabase: make pull SCRAPING_NUM=2
 ifndef SCRAPING_NUM
@@ -74,8 +77,14 @@ consistency-check: ## Check all registered versions are combinable
 consistency-check-save: ## Check versions and write consistency_report.csv
 	$(PYTHON) scripts/cleaning/check_version_consistency.py --save
 
-combine: ## Combine processed versions → training_data.csv (EXCLUDE=snapshot_one to skip)
-	$(PYTHON) scripts/cleaning/combine_versions.py --apply $(if $(EXCLUDE),--exclude $(EXCLUDE),)
+combine: ## Combine processed versions → training_data.csv (EXCLUDE=tag to skip, TAG=name to label)
+	$(PYTHON) scripts/cleaning/combine_versions.py --apply $(if $(EXCLUDE),--exclude $(EXCLUDE),) $(_TAG_FLAG)
+
+lookup-coverage: ## Check (make,model) coverage vs lookup: make lookup-coverage RAW=data/raw/cars_raw_v008.csv
+ifndef RAW
+	$(error RAW is required. Usage: make lookup-coverage RAW=data/raw/cars_raw_v008.csv)
+endif
+	$(PYTHON) scripts/cleaning/check_lookup_coverage.py --input $(RAW)
 
 ## ── Version management ────────────────────────────────────────────────────────
 
@@ -112,6 +121,7 @@ help: ## Show this help message
 	@echo "    APPLY=1             Execute — without this flag, commands are dry-run"
 	@echo "    FORCE=1             Re-run even if raw data fingerprint is unchanged"
 	@echo "    SCRAPING_NUM=<N>    Supabase scraping round (required for pull, optional for pipeline)"
+	@echo "    RAW=<path>          Input CSV for lookup-coverage check (make lookup-coverage)"
 	@echo ""
 
 .DEFAULT_GOAL := help
