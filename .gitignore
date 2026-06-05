@@ -7,13 +7,10 @@ logs/
 *.jsonl
 
 .vscode
-*.csv
 _normalize_all_brands.py
 _extract_make_model.py
-
+*.bak
 dockerfileml
-docker-compose-ml.yml
-
 # *.ok
 
 # *.ubj
