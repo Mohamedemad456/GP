@@ -3,12 +3,12 @@
 .env.example
 # Data
 
-data/raw/*.*
-data/cleaned/*.*
-data/processed/*.*
-!data/processed/processed_data.csv
-data/processed/*.parquet
-data/lookups/*
+# data/raw/*.*
+# data/cleaned/*.*
+# data/processed/*.*
+# !data/processed/processed_data.csv
+# data/processed/*.parquet
+# data/lookups/*
 
 # # Models
 # *.pkl
