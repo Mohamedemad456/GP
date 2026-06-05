@@ -360,16 +360,17 @@ same tag, overwriting the manifest entry.
 
 ---
 
-### 5.9 `generate_processed_data.py` — `scraping_date` index misalignment *(data corruption)*
+### 5.9 `generate_processed_data.py` — metadata columns leaked into processed output
 
-**Bug:** After step 8 (column selection) and step 9 (rare filter), `result.index`
-was reset to `[0, 1, 2, ...]`. But the code then did
-`merged.loc[result.index, "scraping_date"]`, which looked up the **first N rows
-of merged** (different rows than those in `result`). This silently assigned the
-wrong scraping dates to processed output.
+**Bug:** `version_tag`, `scraping_num`, and `scraping_date` were appended to
+`processed_data.csv` at the end of `build_processed()`. These are **not model
+features** — they are pipeline metadata that belongs in the manifest only.
+Training notebooks had to "drop them before fitting," which was fragile and
+error-prone.
 
-**Fix:** Include `scraping_date` in the initial column selection alongside feature
-columns, so it stays row-aligned through all subsequent filters.
+**Fix (2026-06-03):** Removed all metadata column appends from `generate_processed_data.py`.
+`processed_data.csv` now contains **only model features**. Version tracking stays
+in `data_manifest.json` where it belongs.
 
 ---
 
@@ -553,7 +554,6 @@ make combine EXCLUDE=snapshot_one
 import pandas as pd
 
 DEDUP_KEY  = ["make", "model", "year", "mileage_km", "price_egp"]
-META_COLS  = ["scraping_date", "version_tag", "scraping_num"]
 RARE_THRESHOLD = 10
 
 combined = (
@@ -563,29 +563,25 @@ combined = (
 )
 counts = combined.groupby(["make", "model"])["make"].transform("count")
 training = combined[counts >= RARE_THRESHOLD].reset_index(drop=True)
-# Drop metadata before training
-X = training.drop(columns=[c for c in META_COLS if c in training.columns])
 ```
 
 ---
 
-## 7. `scraped_at` Date — Recommendation
+## 7. `scraped_at` Date — Status
 
-**Options considered:**
+**Decision (2026-06-03): Dropped from processed output entirely.**
 
-| Option | Pros | Cons |
-|--------|------|------|
-| Keep raw timestamp | Full precision | Storage overhead; time component useless for training |
-| Date only (`YYYY-MM-DD`) | Compact; enables temporal analysis | ✓ **Chosen** |
-| Month+year only | Very compact | Loses intra-month ordering |
-| Drop entirely | Minimal schema | Loses provenance and temporal split capability |
+`scraped_at` is extracted in `data_pipeline.py` and stored in the manifest
+(`data_manifest.json`), but is **not carried forward** into `processed_data.csv`.
+Rationale:
+- We train on single snapshots (one scraping round at a time), so all rows
+  share the same scraping date → no variance to learn from
+- Temporal features like `days_since_baseline` are deferred until we switch to
+  multi-round merged training
+- `processed_data.csv` should contain **only model features**
 
-**Decision: Keep as `scraping_date` (date string, `YYYY-MM-DD`), stored as a
-metadata column in processed output.** It is NOT a model feature — drop it
-before training. Use it for:
-- Time-based train/test splits
-- Detecting listing-date seasonality
-- Data drift monitoring between rounds
+If temporal analysis is needed later, the manifest retains `scraped_at` per
+version, and raw snapshots preserve the original data.
 
 ---
 

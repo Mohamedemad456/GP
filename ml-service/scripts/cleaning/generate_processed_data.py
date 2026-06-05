@@ -274,27 +274,13 @@ def build_processed(
 ) -> tuple[pd.DataFrame, dict]:
     """Build processed_data DataFrame from cleaned raw + lookup files.
 
-    version_tag and scraping_num are written as metadata columns
-    (scraping_date, version_tag, scraping_num) at the end of the output.
-    They are not used as model features — drop them before training.
-
-    Returns (df, stats_dict).
+    Returns (df, stats_dict). Output contains only model features.
     """
     stats: dict = {}
 
     # ── 1. Load raw data ──────────────────────────────────────────────────────
     raw = pd.read_csv(raw_path)
     stats["raw_rows"] = len(raw)
-
-    # Extract scraping_date (date only, no time) before any row drops
-    if "scraped_at" in raw.columns:
-        raw["scraping_date"] = (
-            pd.to_datetime(raw["scraped_at"], errors="coerce")
-            .dt.date.astype(str)
-            .replace("NaT", None)
-        )
-    else:
-        raw["scraping_date"] = None
 
     # Drop model_family if still present
     for col in ["model_family", "brand_market_share"]:
@@ -457,11 +443,9 @@ def build_processed(
     )
 
     # ── 8. Final column selection ─────────────────────────────────────────────
-    # Include scraping_date alongside feature cols so it stays row-aligned
-    # through the filters below (prevents index misalignment bug).
+    # Only model features — no metadata columns. Version tracking is in the manifest.
     present_cols = [c for c in OUTPUT_COLS if c in merged.columns]
-    meta_carry = [c for c in ["scraping_date"] if c in merged.columns]
-    result = merged[present_cols + meta_carry].copy()
+    result = merged[present_cols].copy()
 
     # Drop rows with NaN in price_egp_log (price was zero/missing after conversion)
     before_final = len(result)
@@ -475,17 +459,6 @@ def build_processed(
     stats["dropped_rare_make_model"] = before_rare - len(result)
 
     stats["final_rows"] = len(result)
-
-    # ── 10. Append data-lineage metadata columns (not model features) ─────────
-    # scraping_date: date the listing was scraped (YYYY-MM-DD string) — already carried
-    # version_tag:   pipeline version tag (e.g. 2026-05-25_001)
-    # scraping_num:  Supabase scraping round (integer)
-    # Training notebooks should drop these three before fitting a model.
-    if "scraping_date" not in result.columns:
-        result["scraping_date"] = None
-
-    result["version_tag"] = version_tag
-    result["scraping_num"] = scraping_num
 
     return result, stats
 

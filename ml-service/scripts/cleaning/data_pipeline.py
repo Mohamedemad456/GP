@@ -188,7 +188,7 @@ def run_pipeline(
     _pipeline_log.info("  Raw snapshot:  %s", version.raw_path)
     _pipeline_log.info("  Cleaned:       %s", version.cleaned_path)
     _pipeline_log.info("  Processed:     %s", version.processed_path)
-    _pipeline_log.info("  Manifest:      %s", vm.manifest_path)
+    _pipeline_log.info("  Manifest:      %s", _rel(vm.manifest_path))
     _pipeline_log.info("=" * 60)
 
     if not raw_path.exists():
@@ -204,7 +204,7 @@ def run_pipeline(
     latest = vm.latest()
     if latest and latest.raw_fingerprint == new_fp and not force:
         _pipeline_log.info("Raw data unchanged since version %s. Nothing to do.", latest.tag)
-        _pipeline_log.info("  (Use --force to re-run the pipeline anyway.)")
+        _pipeline_log.info("  (Use --force or FORCE=1 with make to re-run anyway.)")
         summary["status"] = "skipped"
         summary["fingerprint_unchanged"] = True
         summary["last_version_tag"] = latest.tag
@@ -225,17 +225,13 @@ def run_pipeline(
 
     # ── 2. Copy raw to immutable snapshot ─────────────────────────────────────
     raw_dest = _resolve_path(version.raw_path)
-    if raw_dest.exists():
-        _pipeline_log.info("Raw snapshot already exists — skipping copy: %s", raw_dest)
-    else:
-        shutil.copy2(raw_path, raw_dest)
-        _pipeline_log.info("Copied raw snapshot → %s", raw_dest)
+    shutil.copy2(raw_path, raw_dest)
+    _pipeline_log.info("Copied raw snapshot → %s", raw_dest)
 
     raw_rows = vm.count_rows(raw_dest)
     summary["stages"]["raw_snapshot"] = {
         "path": _rel(raw_dest),
         "rows": raw_rows,
-        "skipped_copy": raw_dest.exists(),
     }
 
     # ── 3. Copy raw to cleaned (this copy will be modified in-place) ───────────
