@@ -17,7 +17,7 @@ Scraping → Canonicalization → Data Cleansing → Feature Engineering → Mod
 | **Features** | 6 numeric + 9 categorical = 15 |
 | **Target** | `price_egp` (22K–20M EGP) |
 | **Price tiers** | Budget (<300K), Mid-Range (300K–700K), Premium (700K–1.5M), Luxury (1.5M+) |
-| **Data sources** | `car_specs_lookup` (4,110 rows), `AI_lookup` (5,680 rows) |
+| **Data sources** | `car_specs_lookup` (4,302 rows), `AI_lookup` (5,680 rows) |
 | **Test split** | 4,043 rows (20%), stratified by price range |
 
 ---

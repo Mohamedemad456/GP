@@ -2,7 +2,7 @@
 
 > **Recommended Model**: **Opus 4.6** (critical — wrong features damage the model permanently)  
 > **Dependencies**: Plan 1 (Data Cleaning) must be complete  
-> **Blocks**: Plan 3 (Model Training), Plan 6 (API Updates)
+> **Blocks**: Plan 04 (Model V2 Training), Plan 07 (API Updates)
 
 ---
 
@@ -89,25 +89,18 @@
 **Rationale**: Gives the model a "confidence" signal — it can learn to be more conservative for rare cars  
 **Expected Impact**: 0.3% MAPE reduction, but major improvement in per-brand fairness
 
-### Feature 2.6: `days_since_baseline`
-**Formula**: `(scraped_at - BASELINE_DATE).days` where `BASELINE_DATE = 2024-01-01`  
-**Type**: Numeric  
-**Source**: `scraped_at` column in raw data (date listing was pulled from the marketplace)  
-**Rationale**: We pull from active listing sites, so each snapshot captures market conditions
-at that point in time. This feature encodes:
-- EGP inflation / devaluation trends (nominal prices drift upward over time)
-- Seasonal demand patterns (Ramadan, summer, back-to-school buying cycles)
-- Supply shocks (new model year arrivals, import quota changes)
+### Feature 2.6: ~~`days_since_baseline`~~ — DEFERRED
 
-**At inference time**: Pass today's date as `scraped_at` — the model predicts
-"what would this car sell for under current market conditions?"
+**Status**: **Not implemented.** We train on single snapshots (one scraping round at a time),
+not merged multi-round data, so temporal drift is not a concern for the current pipeline.
 
-**Pipeline requirement**: `scraped_at` must be preserved through the cleaning pipeline
-and included in `processed_data.csv`. It is NOT dropped by `generate_processed_data.py`.
+**Rationale for deferral**:
+- With single-snapshot training, all rows share the same scraping date → no variance to learn from
+- The inflation/seasonality signal only appears when combining multiple rounds
+- Revisit if we switch to multi-round merged training in the future
 
-**Expected Impact**: Likely 0.5-1.5% MAPE reduction, and more importantly captures EGP
-devaluation trends that are invisible to a static model.  
-**Data leakage risk**: None — `scraped_at` is when WE collected the data, not a price-derived field.
+**If revisited later**: Would require preserving `scraped_at` through the pipeline and
+computing `(scraped_at - baseline).days` per row.
 
 ---
 
@@ -133,9 +126,6 @@ devaluation trends that are invisible to a static model.
 Create/update the data processing logic to add the new features after the basic cleaning:
 
 ```python
-import datetime as dt
-BASELINE_DATE = dt.date(2024, 1, 1)
-
 # After basic processing produces df with existing columns...
 
 # Feature: log_mileage_km
@@ -148,19 +138,12 @@ df['mileage_ratio'] = (df['mileage_km'].fillna(0) / (car_age * 15000)).clip(0, 5
 # Feature: year_bucket
 df['year_bucket'] = ((df['year'] - 2000) // 5).astype(int)
 
-# Feature: days_since_baseline (from scraped_at column)
-df['scraped_at'] = pd.to_datetime(df['scraped_at'], errors='coerce')
-df['days_since_baseline'] = (df['scraped_at'].dt.date.apply(
-    lambda d: (d - BASELINE_DATE).days if pd.notna(d) else 0
-)).astype(int)
-
 # Feature: mm_price_tier (from training data only - computed during training)
 # Feature: make_model_count (from training data only - computed during training)
 ```
 
 **Important**: `mm_price_tier` and `make_model_count` are computed DURING TRAINING from
-the training split only. `days_since_baseline` IS included in `processed_data.csv`
-(derived from `scraped_at`). At inference time, the API computes it from `datetime.date.today()`.
+the training split only.
 
 ### Step 2.2 — Update Feature Column Lists
 
@@ -169,7 +152,7 @@ the training split only. `days_since_baseline` IS included in `processed_data.cs
 NUM_COLS = ['year', 'mileage_km', 'mileage_per_year', 'engine_cc',
             'horsepower', 'seating_capacity',
             'log_mileage_km', 'mileage_ratio', 'year_bucket',
-            'make_model_count', 'days_since_baseline']
+            'make_model_count']
 CAT_COLS = ['make', 'model', 'transmission', 'fuel', 'location',
             'body_type', 'drivetrain', 'brand_origin', 'car_segment', 'mm_price_tier']
 FEATURE_COLS = NUM_COLS + CAT_COLS
@@ -215,7 +198,7 @@ When training V2, the label encoders must include the new `mm_price_tier` catego
 | Challenge | Risk | Mitigation |
 |-----------|------|-----------|
 | `mm_price_tier` leakage | Using test data prices to assign tiers | Strictly compute from train split only |
-| New features increase dimensionality | Possible overfitting | Only 5 new features, all theoretically motivated |
+| New features increase dimensionality | Possible overfitting | Only 4 new features, all theoretically motivated |
 | `mileage_ratio` undefined when `mileage_km` is NaN | NaN propagation | Fill with 1.0 (average usage) when mileage is unknown |
 | `make_model_count` is 0 for unseen cars at inference | Division-by-zero or meaningless value | Default to 1 (minimum), which signals "rare" |
 | Feature builder drift from training | Predictions are garbage | Single source of truth for feature column lists |
@@ -240,7 +223,7 @@ After adding features, expected correlations:
 
 | File | Action |
 |------|--------|
-| `data/processed/processed_data.csv` | Add `log_mileage_km`, `mileage_ratio`, `year_bucket`, `days_since_baseline` columns |
+| `data/processed/processed_data.csv` | Add `log_mileage_km`, `mileage_ratio`, `year_bucket` columns |
 | `app/services/prediction/feature_builder.py` | Add new feature computation + lookups |
 | `models/metadata/mm_price_tier_lookup.csv` | NEW — created during training |
 | Training notebook (07) | Compute `mm_price_tier`, `make_model_count` from train split |
@@ -249,7 +232,7 @@ After adding features, expected correlations:
 
 ## Success Criteria
 
-- [ ] `processed_data.csv` has `log_mileage_km`, `mileage_ratio`, `year_bucket`, `days_since_baseline` columns
+- [ ] `processed_data.csv` has `log_mileage_km`, `mileage_ratio`, `year_bucket` columns
 - [ ] No NaN in new numeric features
 - [ ] `mm_price_tier_lookup.csv` exists with all make/model combos
 - [ ] `feature_builder.py` produces correct output for test inputs

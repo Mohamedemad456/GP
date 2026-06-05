@@ -104,6 +104,6 @@
   "cv_lgbm_mape_std": 0.8764547568976936,
   "cv_xgb_mape_mean": 14.54044847605534,
   "cv_xgb_mape_std": 0.955919861523151,
-  "plot_dir": "/home/mo-seif/Documents/GP/ml-service/models/plots_05_xgboost_lgbm_quantile",
+  "plot_dir": "models/plots/v1.1.0",
   "source_notebook": "05_xgboost_lgbm_quantile"
 }

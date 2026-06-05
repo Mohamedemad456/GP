@@ -49,6 +49,17 @@ log = logging.getLogger(__name__)
 
 DEFAULT_OUT = settings.raw_snapshot_base_path
 
+TABLE_OLD = "used_cars"
+TABLE_NEW = "used_cars_new"
+NEW_TABLE_MIN_SCRAPING_NUM = 8
+
+
+def _resolve_table(scraping_num: int | None) -> str:
+    """Internal routing: scraping_num >= 8 uses used_cars_new, else used_cars."""
+    if scraping_num is not None and scraping_num >= NEW_TABLE_MIN_SCRAPING_NUM:
+        return TABLE_NEW
+    return TABLE_OLD
+
 
 def _build_engine():
     """Build a SQLAlchemy engine from the shared Supabase settings."""
@@ -145,6 +156,10 @@ def load_raw(
     """
     Pull rows from Supabase, save as a versioned Parquet snapshot, and return the DataFrame.
 
+    Table is resolved internally:
+      scraping_num >= 8 → used_cars_new
+      scraping_num <  8 or None → used_cars
+
     If scraping_num is provided, the file is ALWAYS saved as cars_raw_v{scraping_num:03d}
     (overwriting any existing file).  If scraping_num is None, fingerprint dedup is used
     and existing identical snapshots are reused.
@@ -164,10 +179,14 @@ def load_raw(
     pd.DataFrame
         Raw listings exactly as stored in Supabase.
     """
-    table = settings.supabase_table
+    table = _resolve_table(scraping_num)
 
     log.info("Building engine...")
     engine = _build_engine()
+    log.info(
+        "Routing scraping_num=%s → table '%s' (threshold: scraping_num>=%d → %s)",
+        scraping_num, table, NEW_TABLE_MIN_SCRAPING_NUM, TABLE_NEW,
+    )
 
     try:
         with engine.connect() as conn:

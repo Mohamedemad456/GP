@@ -104,6 +104,32 @@ def _load_is_log_target_from_metadata(info: dict) -> bool | None:
     return None
 
 
+def _ensemble_is_quantile(loaded: dict, info: dict, metadata: dict | None = None) -> bool:
+    """Determine whether an ensemble artifact provides quantile predictions."""
+    if isinstance(metadata, dict):
+        quantiles = metadata.get("quantiles")
+        if isinstance(quantiles, dict) and "median" in quantiles:
+            return True
+
+    base = loaded.get("base_models", {})
+    if any(isinstance(v, dict) and "median" in v for v in base.values()):
+        return True
+
+    artifacts = info.get("artifacts", {}) if isinstance(info, dict) else {}
+    for key, path_str in artifacts.items():
+        if not path_str or not any(token in key for token in ("xgb", "lgbm", "quantile")):
+            continue
+        try:
+            sub_model = joblib.load(resolve_registry_path(path_str))
+        except Exception as e:
+            logger.warning("Failed to inspect ensemble sub-model artifact %s: %s", path_str, e)
+            continue
+        if isinstance(sub_model, dict) and "median" in sub_model:
+            return True
+
+    return False
+
+
 # ── Public API ────────────────────────────────────────────────────────────────
 
 def load_valid_cars():
@@ -270,6 +296,14 @@ def load_active_model():
     global ACTIVE_MODELS, ACTIVE_FRAMEWORK, ACTIVE_IS_QUANTILE, ACTIVE_PREPROCESSOR, ACTIVE_IS_LOG_TARGET
     global ACTIVE_METADATA, ACTIVE_MODEL_ID
 
+    ACTIVE_MODELS = None
+    ACTIVE_FRAMEWORK = None
+    ACTIVE_IS_QUANTILE = False
+    ACTIVE_PREPROCESSOR = None
+    ACTIVE_IS_LOG_TARGET = None
+    ACTIVE_METADATA = None
+    ACTIVE_MODEL_ID = None
+
     info = get_active_model_info()
     if info is None:
         logger.warning("No active model found in registry.")
@@ -316,11 +350,8 @@ def load_active_model():
     elif isinstance(loaded, dict) and 'base_models' in loaded:
         # Ensemble model: dict with 'base_models' containing sub-models
         ACTIVE_MODELS = loaded
-        # Ensemble is quantile if any base model is quantile
         base = loaded.get('base_models', {})
-        ACTIVE_IS_QUANTILE = any(
-            isinstance(v, dict) and 'median' in v for v in base.values()
-        )
+        ACTIVE_IS_QUANTILE = _ensemble_is_quantile(loaded, info, ACTIVE_METADATA)
         logger.info(
             f"Loaded ensemble model ({ACTIVE_FRAMEWORK}): "
             f"method={loaded.get('method')}, weights={loaded.get('weights')}, "

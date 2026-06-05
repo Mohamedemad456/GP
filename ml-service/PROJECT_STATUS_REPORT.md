@@ -243,9 +243,11 @@ After re-running with the fixed lookups, the output `processed_data.csv` will no
 
 | File | Rows | Key Columns |
 |------|------|-------------|
-| `car_specs_lookup_full_cleaned.fixed.csv` | 4,110 | make, model, model_family, year, engine_cc, horsepower, body_type, drivetrain, seating_capacity, brand_origin, car_segment, brand_market_share |
+| `car_specs_lookup_full_cleaned.fixed.csv` | 4,302 | make, model, model_family, year, engine_cc, horsepower, body_type, drivetrain, seating_capacity, brand_origin, car_segment, brand_market_share |
 | `AI_lookup.fixed.csv` | 5,680 | make, model, model_family, year, transmission, fuel, engine_cc, horsepower, body_type, drivetrain, seating_capacity, brand_origin, car_segment |
-| `cars_with_make_model.csv` | 26,361 | id, title, make, model, model_family, year, mileage_km, transmission, fuel, price_egp, location, scraped_at |
+| `cars_with_make_model.csv` (rounds 1+2) | 26,361 | id, title, make, model, model_family, year, mileage_km, transmission, fuel, price_egp, location, scraped_at |
+| `cars_cleaned_2026-06-03_008.csv` (round 8) | 18,192 | Canonicalized + deduped cleaned output for round 8 |
+| `processed_data.csv` (round 8) | 14,962 | Final processed data after lookup merge + filters |
 | `main_car_info_for_backend.csv` | 5,647 | make, model, year, fuel, transmission |
 | `quarantine.csv` | 54 | Invalid/fantasy entries removed from lookup |
 
@@ -253,6 +255,7 @@ After re-running with the fixed lookups, the output `processed_data.csv` will no
 - **0 model_family nulls** across all files
 - All wrong make-model pairs fixed
 - All canonical forms standardized
+- Round 8: +53 canonicalization aliases applied, +61 curated missing models added to lookup, 20 internal display-variant duplicates collapsed to 0
 
 ---
 
