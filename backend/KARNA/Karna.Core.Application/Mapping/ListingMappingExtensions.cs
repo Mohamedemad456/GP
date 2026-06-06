@@ -201,5 +201,70 @@ namespace Karna.Core.Application.Mapping
 
 			return isBelowFairPrice || isAtOrBelowLowerRange;
 		}
+
+		// ─── My Listings (Seller Dashboard) ───────────────────────────────
+
+		public static MyListingDto ToMyListingDto(this Listing source)
+		{
+			var completionPercentage = CalculateCompletionPercentage(source);
+			return new MyListingDto
+			{
+				Id = source.Id,
+				MakeName = source.Make?.Name ?? string.Empty,
+				ModelName = source.Model?.Name ?? string.Empty,
+				Year = source.Year,
+				ListingPrice = source.Price,
+				Status = source.Status.ToString(),
+				PrimaryPhotoUrl = source.Photos?.FirstOrDefault(p => p.IsPrimary)?.PhotoUrl,
+				CreatedAt = source.CreatedAt,
+				UpdatedAt = source.UpdatedAt,
+				CompletionPercentage = completionPercentage,
+				CanSubmit = completionPercentage == 100 && source.Status == ListingStatus.Draft
+			};
+		}
+
+		public static IEnumerable<MyListingDto> ToMyListingDto(this IEnumerable<Listing> source)
+			=> source.Select(l => l.ToMyListingDto());
+
+		private static int CalculateCompletionPercentage(Listing listing)
+		{
+			int percentage = 0;
+
+			// Step 1: Core data complete (20%)
+			bool coreDataComplete =
+				listing.MakeId != Guid.Empty
+				&& listing.ModelId != Guid.Empty
+				&& listing.Year > 0
+				&& listing.Mileage > 0
+				&& listing.EngineSize > 0
+				&& !string.IsNullOrWhiteSpace(listing.Color)
+				&& !string.IsNullOrWhiteSpace(listing.Description)
+				&& !string.IsNullOrWhiteSpace(listing.ContactPhoneNumber)
+				&& Enum.IsDefined(listing.FuelType)
+				&& Enum.IsDefined(listing.Transmission)
+				&& Enum.IsDefined(listing.Location);
+
+			if (coreDataComplete) percentage += 20;
+
+			// Step 2: Photos — at least 3 non-deleted (20%)
+			if (listing.Photos?.Count(p => !p.IsDeleted) >= 3) percentage += 20;
+
+			// Step 3: Condition checklist — at least 1 defect (20%)
+			if (listing.ListingDefects?.Any() == true) percentage += 20;
+
+			// Step 4: ML pricing generated (20%)
+			bool hasMlPricing =
+				listing.FairPrice is not null
+				&& listing.NegotiationRangeLower is not null
+				&& listing.NegotiationRangeUpper is not null
+				&& !string.IsNullOrWhiteSpace(listing.ConfidenceLevel);
+
+			if (hasMlPricing) percentage += 20;
+
+			// Step 5: Seller price set (20%)
+			if (listing.Price is not null) percentage += 20;
+
+			return percentage;
+		}
 	}
 }

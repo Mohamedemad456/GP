@@ -16,6 +16,16 @@ namespace Karna.APIs.Controllers.Controllers
 			return Ok(result);
 		}
 
+		[HttpGet("my-listings")]
+		[Authorize(Roles = "User")]
+		public async Task<IActionResult> GetMyListings([FromQuery] MyListingSpecParams specParams)
+		{
+			var result = await _listingService.GetMyListingsAsync(specParams);
+			if (!result.Success)
+				return Unauthorized(result);
+			return Ok(result);
+		}
+
 		[HttpGet("{id}")]
 		[AllowAnonymous]
 		public async Task<IActionResult> GetById(Guid id)
