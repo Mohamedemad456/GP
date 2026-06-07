@@ -19,13 +19,15 @@ const Onboarding = lazy(() => import("@/pages/(auth)/onboarding"));
 const AdminLayout = lazy(() => import("@/pages/(admin)/AdminLayout"));
 const Analytics = lazy(() => import("@/pages/(admin)/analytics"));
 const UsersPending = lazy(() => import("@/pages/(admin)/users-pending"));
+const AdminUsers = lazy(() => import("@/pages/(admin)/users"));
+const AdminActivityLogs = lazy(() => import("@/pages/(admin)/activity-logs"));
 const CarsPending = lazy(() => import("@/pages/(admin)/cars-pending"));
 const AdminMakes = lazy(() => import("@/pages/(admin)/makes"));
 const AdminModels = lazy(() => import("@/pages/(admin)/models"));
 const AdminConditions = lazy(() => import("@/pages/(admin)/conditions"));
 const SellerLayout = lazy(() => import("@/pages/(seller)/SellerLayout"));
 const SellerAnalytics = lazy(() => import("@/pages/(seller)/analytics"));
-const SellerListings = lazy(() => import("@/pages/(seller)/listings"));
+const SellerMyListings = lazy(() => import("@/pages/(seller)/my-listings"));
 const AddListing = lazy(() => import("@/pages/(seller)/add-listing"));
 const FeedPage = lazy(() => import("@/pages/(buyer)/feed"));
 const CarDetailsPage = lazy(() => import("@/pages/(buyer)/car-details"));
@@ -53,38 +55,40 @@ function App() {
       <AuthProvider>
         <Suspense fallback={<PageLoader />}>
           <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Home />} />
-            <Route path="about" element={<About />} />
-            <Route path="contact" element={<Contact />} />
-            <Route element={<PrivateRoute />}>
-              <Route path="profile" element={<ProfilePage />} />
-              <Route path="feed" element={<FeedPage />} />
-              <Route path="cars/:id" element={<CarDetailsPage />} />
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Home />} />
+              <Route path="about" element={<About />} />
+              <Route path="contact" element={<Contact />} />
+              <Route element={<PrivateRoute />}>
+                <Route path="profile" element={<ProfilePage />} />
+                <Route path="feed" element={<FeedPage />} />
+                <Route path="cars/:id" element={<CarDetailsPage />} />
+              </Route>
             </Route>
-          </Route>
-          <Route element={<GuestRoute />}>
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-          </Route>
-          <Route path="/onboarding" element={<Onboarding />} />
-          <Route element={<PrivateRoute allowedRoles={["admin"]} />}>
-            <Route path="/admin" element={<AdminLayout />}>
-              <Route index element={<Analytics />} />
-              <Route path="users-pending" element={<UsersPending />} />
-              <Route path="cars-pending" element={<CarsPending />} />
-              <Route path="makes" element={<AdminMakes />} />
-              <Route path="models" element={<AdminModels />} />
-              <Route path="conditions" element={<AdminConditions />} />
+            <Route element={<GuestRoute />}>
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
             </Route>
-          </Route>
-          <Route element={<PrivateRoute allowedRoles={["user"]} />}>
-            <Route path="/seller" element={<SellerLayout />}>
-              <Route index element={<SellerAnalytics />} />
-              <Route path="listings" element={<SellerListings />} />
-              <Route path="add-listing" element={<AddListing />} />
+            <Route path="/onboarding" element={<Onboarding />} />
+            <Route element={<PrivateRoute allowedRoles={["admin"]} />}>
+              <Route path="/admin" element={<AdminLayout />}>
+                <Route index element={<Analytics />} />
+                <Route path="users-pending" element={<UsersPending />} />
+                <Route path="users" element={<AdminUsers />} />
+                <Route path="activity-logs" element={<AdminActivityLogs />} />
+                <Route path="cars-pending" element={<CarsPending />} />
+                <Route path="makes" element={<AdminMakes />} />
+                <Route path="models" element={<AdminModels />} />
+                <Route path="conditions" element={<AdminConditions />} />
+              </Route>
             </Route>
-          </Route>
+            <Route element={<PrivateRoute allowedRoles={["user"]} />}>
+              <Route path="/seller" element={<SellerLayout />}>
+                <Route index element={<SellerAnalytics />} />
+                <Route path="my-listings" element={<SellerMyListings />} />
+                <Route path="add-listing" element={<AddListing />} />
+              </Route>
+            </Route>
           </Routes>
         </Suspense>
         <Toaster position={toasterPosition} richColors />

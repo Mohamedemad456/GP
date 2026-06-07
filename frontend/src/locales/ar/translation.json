@@ -353,6 +353,8 @@
       "dataManagement": "إدارة البيانات",
       "analytics": "التحليلات",
       "usersPending": "المستخدمون المعلقون",
+      "users": "المستخدمون",
+      "activityLogs": "سجل النشاط",
       "carsPostsPending": "إعلانات السيارات المعلقة",
       "makes": "ماركات السيارات",
       "models": "موديلات السيارات",
@@ -663,6 +665,61 @@
       "rejectDescription": "أضف ملاحظة اختيارية للبائع قبل رفض هذا الإعلان.",
       "rejectReason": "السبب",
       "rejectReasonPlaceholder": "اشرح ما الذي يحتاج إلى تصحيح..."
+    },
+    "activityLogs": {
+      "title": "سجلات النشاط",
+      "subtitle": "تتبع جميع الإجراءات الإدارية وأحداث النظام.",
+      "totalLogs": "سجل نشاط",
+      "filters": "الفلاتر",
+      "searchAdmin": "بحث",
+      "searchPlaceholder": "اسم المشرف أو التفاصيل...",
+      "action": "الإجراء",
+      "allActions": "كل الإجراءات",
+      "entityType": "نوع الكيان",
+      "allEntities": "كل الكيانات",
+      "dateFrom": "من",
+      "dateTo": "إلى",
+      "clearFilters": "مسح الفلاتر",
+      "caption": "نشاط النظام والأحداث الإدارية.",
+      "admin": "المشرف",
+      "performedAt": "وقت التنفيذ",
+      "details": "التفاصيل",
+      "entityId": "معرّف الكيان",
+      "empty": "لا توجد سجلات نشاط.",
+      "logDetail": "تفاصيل السجل",
+      "logDetailDesc": "التفاصيل الكاملة للإجراء الإداري",
+      "loadError": "فشل تحميل سجلات النشاط"
+    },
+    "users": {
+      "title": "المستخدمون",
+      "subtitle": "إدارة مستخدمي المنصة وصلاحياتهم.",
+      "totalUsers": "مستخدم في المجموع",
+      "search": "بحث",
+      "searchPlaceholder": "الاسم أو البريد الإلكتروني أو الهاتف...",
+      "status": "الحالة",
+      "allStatuses": "كل الحالات",
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "clearFilters": "مسح الفلاتر",
+      "caption": "مستخدمو المنصة وحالات حساباتهم.",
+      "name": "الاسم",
+      "email": "البريد الإلكتروني",
+      "phone": "الهاتف",
+      "statusCol": "الحالة",
+      "joined": "تاريخ الانضمام",
+      "actions": "الإجراءات",
+      "empty": "لا يوجد مستخدمون.",
+      "activate": "تفعيل",
+      "deactivate": "تعطيل",
+      "activateSuccess": "تم تفعيل المستخدم بنجاح.",
+      "deactivateSuccess": "تم تعطيل المستخدم بنجاح.",
+      "toggleError": "فشل تحديث حالة المستخدم.",
+      "confirmActivateTitle": "تفعيل المستخدم",
+      "confirmDeactivateTitle": "تعطيل المستخدم",
+      "confirmActivateDesc": "هل أنت متأكد من تفعيل {{name}}؟ سيستعيد الوصول إلى حسابه.",
+      "confirmDeactivateDesc": "هل أنت متأكد من تعطيل {{name}}؟ سيفقد الوصول إلى حسابه.",
+      "cancel": "إلغاء",
+      "loadError": "فشل تحميل المستخدمين"
     }
   },
   "seller": {
@@ -834,6 +891,10 @@
         "description": "اكتب وصفاً تفصيلياً لمركبتك لجذب المشترين",
         "helper": "اذكر تاريخ الصيانة والميزات البارزة وأي تفاصيل مهمة ينبغي للمشتري معرفتها."
       },
+      "contactInfo": {
+        "title": "معلومات الاتصال",
+        "description": "قدّم بيانات اتصالك حتى يتمكن المشترون من التواصل معك"
+      },
       "conditionChecklist": {
         "title": "قائمة الحالة",
         "description": "أضف أي ملاحظات أو عيوب ظاهرة باستخدام قوائم الفئات والعيوب أدناه.",
@@ -857,7 +918,10 @@
         "conditionCategory": "فئة الحالة",
         "conditionDefect": "العيب",
         "listingPrice": "سعر الإعلان",
-        "description": "الوصف"
+        "description": "الوصف",
+        "contactPhoneNumber": "رقم هاتف الاتصال",
+        "whatsAppNumber": "رقم WhatsApp",
+        "preferredContactMethod": "وسيلة الاتصال المفضلة"
       },
       "placeholders": {
         "make": "اختر الماركة",
@@ -880,7 +944,10 @@
         "conditionDefect": "اختر العيب",
         "selectConditionCategoryFirst": "اختر الفئة أولاً",
         "listingPrice": "مثال: 120000",
-        "description": "صف ميزات مركبتك وحالتها وتاريخها وأي جوانب ملحوظة..."
+        "description": "صف ميزات مركبتك وحالتها وتاريخها وأي جوانب ملحوظة...",
+        "contactPhoneNumber": "مثال: +966 5X XXX XXXX",
+        "whatsAppNumber": "مثال: +966 5X XXX XXXX",
+        "preferredContactMethod": "اختر وسيلة الاتصال المفضلة"
       },
       "minChars": "حد أدنى من الأحرف",
       "errors": {
@@ -902,10 +969,24 @@
         "invalidImageType": "يمكن رفع ملفات الصور فقط.",
         "imageTooLarge": "يجب ألا يتجاوز حجم كل صورة {{max}} ميغابايت."
       },
+      "contactMethods": {
+        "phone": "هاتف",
+        "whatsapp": "WhatsApp",
+        "both": "كليهما"
+      },
       "footerNote": "راجع التفاصيل ثم أرسل الإعلان عندما يصبح كل شيء جاهزاً.",
       "success": {
         "title": "تم إرسال الإعلان!",
         "description": "تم إرسال إعلانك للمراجعة. سيتم إعلامك عند الموافقة عليه."
+      }
+    },
+    "myListings": {
+      "title": "إعلاناتي",
+      "subtitle": "لديك {{count}} إعلان",
+      "loadError": "فشل تحميل الإعلانات",
+      "empty": {
+        "title": "لا توجد إعلانات بعد",
+        "subtitle": "أنشئ إعلانك الأول للبدء"
       }
     }
   },

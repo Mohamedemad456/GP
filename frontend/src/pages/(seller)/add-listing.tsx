@@ -103,6 +103,9 @@ interface FormState {
   engineSize: string;
   color: string;
   description: string;
+  contactPhoneNumber: string;
+  whatsAppNumber: string;
+  preferredContactMethod: string;
 }
 
 interface ConditionSelection {
@@ -123,6 +126,9 @@ const INITIAL_FORM: FormState = {
   engineSize: "",
   color: "",
   description: "",
+  contactPhoneNumber: "",
+  whatsAppNumber: "",
+  preferredContactMethod: "",
 };
 
 type AddListingStep = (typeof ADD_LISTING_STEPS)[number];
@@ -187,89 +193,32 @@ const AddListing = () => {
   const [selectedConditions, setSelectedConditions] = useState<
     ConditionSelection[]
   >([]);
+  
+const fetchAllActiveMakes = useCallback(async () => {
+  setIsLoadingMakes(true);
+  try {
+    const res = await getActiveMakes();
+    if (!res.success) throw new Error(res.message);
+    setMakes(res.data?.data ?? []);
+  } catch {
+    toast.error(t("seller.addListing.errors.loadMakesFailed"));
+  } finally {
+    setIsLoadingMakes(false);
+  }
+}, [t]);
 
-  const fetchAllActiveMakes = useCallback(async () => {
-    setIsLoadingMakes(true);
-    try {
-      const firstRes = await getActiveMakes({
-        pageIndex: 1,
-        pageSize: 10,
-        sort: "name",
-        sortDirection: "asc",
-      });
-      if (!firstRes.success) throw new Error(firstRes.message);
-
-      const firstPage = firstRes.data?.data ?? [];
-      const totalCount = firstRes.data?.count ?? firstPage.length;
-      const effectivePageSize = firstRes.data?.pageSize ?? 10;
-      const totalPages = Math.ceil(totalCount / effectivePageSize);
-
-      const remainingPages =
-        totalPages > 1
-          ? await Promise.all(
-              Array.from({ length: totalPages - 1 }, (_, index) =>
-                getActiveMakes({
-                  pageIndex: index + 2,
-                  pageSize: effectivePageSize,
-                  sort: "name",
-                  sortDirection: "asc",
-                }),
-              ),
-            )
-          : [];
-      if (remainingPages.some((res) => !res.success)) throw new Error("Failed to load makes");
-
-      setMakes([
-        ...firstPage,
-        ...remainingPages.flatMap((res) => (res.success ? res.data?.data ?? [] : [])),
-      ]);
-    } catch {
-      toast.error(t("seller.addListing.errors.loadMakesFailed"));
-    } finally {
-      setIsLoadingMakes(false);
-    }
-  }, [t]);
-
-  const fetchAllActiveModels = useCallback(async () => {
-    setIsLoadingModels(true);
-    try {
-      const pageSize = 10;
-      const firstRes = await getActiveModels({
-        pageIndex: 1,
-        pageSize,
-        sort: "name",
-        sortDirection: "asc",
-      });
-      if (!firstRes.success) throw new Error(firstRes.message);
-
-      const firstPage = firstRes.data ?? [];
-      const totalCount = firstRes.count ?? firstPage.length;
-      const totalPages = Math.ceil(totalCount / pageSize);
-      const remainingPages =
-        totalPages > 1
-          ? await Promise.all(
-              Array.from({ length: totalPages - 1 }, (_, index) =>
-                getActiveModels({
-                  pageIndex: index + 2,
-                  pageSize,
-                  sort: "name",
-                  sortDirection: "asc",
-                }),
-              ),
-            )
-          : [];
-      if (remainingPages.some((res) => !res.success)) throw new Error("Failed to load models");
-
-      setAllModels([
-        ...firstPage,
-        ...remainingPages.flatMap((res) => (res.success ? res.data ?? [] : [])),
-      ]);
-    } catch {
-      toast.error(t("seller.addListing.errors.loadModelsFailed"));
-    } finally {
-      setIsLoadingModels(false);
-    }
-  }, [t]);
+const fetchAllActiveModels = useCallback(async () => {
+  setIsLoadingModels(true);
+  try {
+    const res = await getActiveModels();
+    if (!res.success) throw new Error(res.message);
+    setAllModels(res.data ?? []);
+  } catch {
+    toast.error(t("seller.addListing.errors.loadModelsFailed"));
+  } finally {
+    setIsLoadingModels(false);
+  }
+}, [t]);
 
   useEffect(() => {
     fetchAllActiveMakes();
@@ -548,6 +497,12 @@ const AddListing = () => {
     } else if (form.description.trim().length < 20) {
       errs.description = t("seller.addListing.errors.descriptionTooShort");
     }
+    if (!form.contactPhoneNumber.trim()) {
+      errs.contactPhoneNumber = t("seller.addListing.errors.required");
+    }
+    if (!form.preferredContactMethod) {
+      errs.preferredContactMethod = t("seller.addListing.errors.required");
+    }
 
     return errs;
   }, [form, t]);
@@ -598,6 +553,9 @@ const AddListing = () => {
         engineSize: parseFloat(form.engineSize),
         color: form.color,
         description: form.description.trim(),
+        contactPhoneNumber: form.contactPhoneNumber.trim(),
+        whatsAppNumber: form.whatsAppNumber.trim(),
+        preferredContactMethod: parseInt(form.preferredContactMethod, 10),
       });
 
       if (!createResult.success || !createResult.data) {
@@ -1375,6 +1333,78 @@ const AddListing = () => {
               </p>
             </div>
           </FormField>
+        </CardContent>
+      </Card>
+      )}
+
+      {/* Contact Information */}
+      {currentStep === "listing" && (
+      <Card className={SECTION_CARD_CLASS}>
+        <CardHeader className={SECTION_HEADER_CLASS}>
+          <CardTitle className="flex items-center gap-3 text-base">
+            <span className="flex size-9 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <FileText className="size-4" />
+            </span>
+            {t("seller.addListing.contactInfo.title")}
+          </CardTitle>
+          <CardDescription>
+            {t("seller.addListing.contactInfo.description")}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+            <FormField
+              label={t("seller.addListing.fields.contactPhoneNumber")}
+              error={errors.contactPhoneNumber}
+              required
+            >
+              <Input
+                placeholder={t("seller.addListing.placeholders.contactPhoneNumber")}
+                value={form.contactPhoneNumber}
+                onChange={(e) => updateField("contactPhoneNumber", e.target.value)}
+                aria-invalid={!!errors.contactPhoneNumber}
+                className="h-11 rounded-xl bg-background/80"
+              />
+            </FormField>
+
+            <FormField
+              label={t("seller.addListing.fields.whatsAppNumber")}
+              error={errors.whatsAppNumber}
+            >
+              <Input
+                placeholder={t("seller.addListing.placeholders.whatsAppNumber")}
+                value={form.whatsAppNumber}
+                onChange={(e) => updateField("whatsAppNumber", e.target.value)}
+                aria-invalid={!!errors.whatsAppNumber}
+                className="h-11 rounded-xl bg-background/80"
+              />
+            </FormField>
+
+            <FormField
+              label={t("seller.addListing.fields.preferredContactMethod")}
+              error={errors.preferredContactMethod}
+              required
+            >
+              <Select
+                value={form.preferredContactMethod}
+                onValueChange={(v) => updateField("preferredContactMethod", v)}
+              >
+                <SelectTrigger
+                  aria-invalid={!!errors.preferredContactMethod}
+                  className="h-11 rounded-xl bg-background/80"
+                >
+                  <SelectValue
+                    placeholder={t("seller.addListing.placeholders.preferredContactMethod")}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">{t("seller.addListing.contactMethods.phone")}</SelectItem>
+                  <SelectItem value="2">{t("seller.addListing.contactMethods.whatsapp")}</SelectItem>
+                  <SelectItem value="3">{t("seller.addListing.contactMethods.both")}</SelectItem>
+                </SelectContent>
+              </Select>
+            </FormField>
+          </div>
         </CardContent>
       </Card>
       )}

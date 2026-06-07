@@ -11,6 +11,7 @@ import {
   LogOut,
   Languages,
   Database,
+  ActivitySquare,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
@@ -104,14 +105,19 @@ const AdminLayout = memo(() => {
               <SidebarMenu>
                 {[
                   {
-                    label: t("admin.sidebar.usersPending"),
+                    label: t("admin.sidebar.users"),
                     icon: Users,
-                    to: "/admin/users-pending",
+                    to: "/admin/users",
                   },
                   {
                     label: t("admin.sidebar.carsPostsPending"),
                     icon: Car,
                     to: "/admin/cars-pending",
+                  },
+                  {
+                    label: t("admin.sidebar.activityLogs"),
+                    icon: ActivitySquare,
+                    to: "/admin/activity-logs",
                   },
                 ].map((item) => (
                   <SidebarMenuItem key={item.to}>

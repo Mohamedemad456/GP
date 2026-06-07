@@ -354,6 +354,8 @@
       "analytics": "Analytics",
       "usersPending": "Users pending",
       "carsPostsPending": "Cars posts pending",
+      "activityLogs": "Activity Logs",
+      "users": "Users",
       "makes": "Car Makes",
       "models": "Car Models",
       "conditions": "Conditions",
@@ -663,6 +665,61 @@
       "rejectDescription": "Add an optional note for the seller before rejecting this listing.",
       "rejectReason": "Reason",
       "rejectReasonPlaceholder": "Explain what needs to be corrected..."
+    },
+    "activityLogs": {
+      "title": "Activity Logs",
+      "subtitle": "Track all administrative actions and system events.",
+      "totalLogs": "activity logs",
+      "filters": "Filters",
+      "searchAdmin": "Search",
+      "searchPlaceholder": "Admin name or details...",
+      "action": "Action",
+      "allActions": "All actions",
+      "entityType": "Entity Type",
+      "allEntities": "All entities",
+      "dateFrom": "From",
+      "dateTo": "To",
+      "clearFilters": "Clear filters",
+      "caption": "System activity and administrative events.",
+      "admin": "Admin",
+      "performedAt": "Performed at",
+      "details": "Details",
+      "entityId": "Entity ID",
+      "empty": "No activity logs found.",
+      "logDetail": "Log Details",
+      "logDetailDesc": "Full details of the administrative action",
+      "loadError": "Failed to load activity logs"
+    },
+    "users": {
+      "title": "Users",
+      "subtitle": "Manage platform users and their access.",
+      "totalUsers": "users in total",
+      "search": "Search",
+      "searchPlaceholder": "Name, email, or phone...",
+      "status": "Status",
+      "allStatuses": "All statuses",
+      "active": "Active",
+      "inactive": "Inactive",
+      "clearFilters": "Clear filters",
+      "caption": "Platform users and account statuses.",
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "statusCol": "Status",
+      "joined": "Joined",
+      "actions": "Actions",
+      "empty": "No users found.",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "activateSuccess": "User activated successfully.",
+      "deactivateSuccess": "User deactivated successfully.",
+      "toggleError": "Failed to update user status.",
+      "confirmActivateTitle": "Activate User",
+      "confirmDeactivateTitle": "Deactivate User",
+      "confirmActivateDesc": "Are you sure you want to activate {{name}}? They will regain access to their account.",
+      "confirmDeactivateDesc": "Are you sure you want to deactivate {{name}}? They will lose access to their account.",
+      "cancel": "Cancel",
+      "loadError": "Failed to load users"
     }
   },
   "seller": {
@@ -834,6 +891,10 @@
         "description": "Write a detailed description of your vehicle to attract buyers",
         "helper": "Highlight service history, notable features, and anything a buyer should know."
       },
+      "contactInfo": {
+        "title": "Contact Information",
+        "description": "Provide your contact details so buyers can reach you"
+      },
       "conditionChecklist": {
         "title": "Condition Checklist",
         "description": "Add any visible issues or notes using the category and defect lists below.",
@@ -857,7 +918,10 @@
         "conditionCategory": "Condition Category",
         "conditionDefect": "Condition Defect",
         "listingPrice": "Listing Price",
-        "description": "Description"
+        "description": "Description",
+        "contactPhoneNumber": "Contact Phone Number",
+        "whatsAppNumber": "WhatsApp Number",
+        "preferredContactMethod": "Preferred Contact Method"
       },
       "placeholders": {
         "make": "Select make",
@@ -880,7 +944,10 @@
         "conditionDefect": "Select defect",
         "selectConditionCategoryFirst": "Select a category first",
         "listingPrice": "e.g. 120000",
-        "description": "Describe your vehicle's features, condition, history, and any notable aspects..."
+        "description": "Describe your vehicle's features, condition, history, and any notable aspects...",
+        "contactPhoneNumber": "e.g. +966 5X XXX XXXX",
+        "whatsAppNumber": "e.g. +966 5X XXX XXXX",
+        "preferredContactMethod": "Select preferred contact method"
       },
       "minChars": "min characters",
       "errors": {
@@ -902,10 +969,24 @@
         "invalidImageType": "Only image files can be uploaded.",
         "imageTooLarge": "Each photo must be {{max}}MB or less."
       },
+      "contactMethods": {
+        "phone": "Phone",
+        "whatsapp": "WhatsApp",
+        "both": "Both"
+      },
       "footerNote": "Review your details and submit when everything looks right.",
       "success": {
         "title": "Listing submitted!",
         "description": "Your listing has been submitted for review. You will be notified once it is approved."
+      }
+    },
+    "myListings": {
+      "title": "My Listings",
+      "subtitle": "You have {{count}} listings",
+      "loadError": "Failed to load listings",
+      "empty": {
+        "title": "No Listings Yet",
+        "subtitle": "Create your first listing to get started"
       }
     }
   },

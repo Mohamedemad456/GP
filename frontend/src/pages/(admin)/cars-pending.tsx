@@ -45,7 +45,7 @@ import {
   type PendingListingDto,
   type PendingListingSpecParams,
 } from "@/lib/adminApi";
-import { approveListing, rejectListing } from "@/lib/listingsApi";
+import { approveListing, rejectListing } from "@/lib/adminApi";
 import { getAllMakes, type MakeDto } from "@/lib/makesApi";
 import { getAllModels, type ModelDto } from "@/lib/modelsApi";
 
@@ -88,7 +88,9 @@ function DetailRow({
       </div>
       <div className="min-w-0">
         <p className="text-xs font-medium text-muted-foreground">{label}</p>
-        <p className="wrap-break-word text-sm font-semibold text-foreground">{value}</p>
+        <p className="wrap-break-word text-sm font-semibold text-foreground">
+          {value}
+        </p>
       </div>
     </div>
   );
@@ -109,7 +111,10 @@ const CarsPending = () => {
       }),
     [locale],
   );
-  const numberFormatter = useMemo(() => new Intl.NumberFormat(locale), [locale]);
+  const numberFormatter = useMemo(
+    () => new Intl.NumberFormat(locale),
+    [locale],
+  );
   const dateFormatter = useMemo(
     () =>
       new Intl.DateTimeFormat(locale, {
@@ -134,10 +139,16 @@ const CarsPending = () => {
   const [modelFilter, setModelFilter] = useState("");
   const [sellerFilterInput, setSellerFilterInput] = useState("");
   const [sellerFilter, setSellerFilter] = useState("");
-  const [dateFilter, setDateFilter] = useState<DateFilter>({ from: "", to: "" });
+  const [dateFilter, setDateFilter] = useState<DateFilter>({
+    from: "",
+    to: "",
+  });
 
-  const [selectedListing, setSelectedListing] = useState<PendingListingDto | null>(null);
-  const [rejectTarget, setRejectTarget] = useState<PendingListingDto | null>(null);
+  const [selectedListing, setSelectedListing] =
+    useState<PendingListingDto | null>(null);
+  const [rejectTarget, setRejectTarget] = useState<PendingListingDto | null>(
+    null,
+  );
   const [rejectReason, setRejectReason] = useState("");
 
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
@@ -181,41 +192,13 @@ const CarsPending = () => {
 
   const fetchFilters = useCallback(async () => {
     try {
-      const allMakes: MakeDto[] = [];
-      const allModels: ModelDto[] = [];
-      let makePage = 1;
-      let modelPage = 1;
-      let makeTotal = 0;
-      let modelTotal = 0;
+      const [makesRes, modelsRes] = await Promise.all([
+        getAllMakes(),
+        getAllModels(),
+      ]);
 
-      do {
-        const response = await getAllMakes({
-          pageIndex: makePage,
-          pageSize: 10,
-          sort: "name",
-          sortDirection: "asc",
-        });
-        if (!response.success) break;
-        allMakes.push(...(response.data?.data ?? []));
-        makeTotal = response.data?.count ?? 0;
-        makePage++;
-      } while (allMakes.length < makeTotal);
-
-      do {
-        const response = await getAllModels({
-          pageIndex: modelPage,
-          pageSize: 10,
-          sort: "name",
-          sortDirection: "asc",
-        });
-        if (!response.success) break;
-        allModels.push(...(response.data?.data ?? []));
-        modelTotal = response.data?.count ?? 0;
-        modelPage++;
-      } while (allModels.length < modelTotal);
-
-      setMakes(allMakes);
-      setModels(allModels);
+      if (makesRes.success) setMakes(makesRes.data?.data ?? []);
+      if (modelsRes.success) setModels(modelsRes.data?.data ?? []);
     } catch {
       // Filter metadata is non-critical; the table can still load by itself.
     }
@@ -238,7 +221,9 @@ const CarsPending = () => {
         setListings(response.data.data);
         setTotalItems(response.data.count);
       } else {
-        error(t("admin.carsPending.loadError"), { description: response.message });
+        error(t("admin.carsPending.loadError"), {
+          description: response.message,
+        });
       }
     } catch {
       error(t("admin.carsPending.loadError"));
@@ -257,8 +242,12 @@ const CarsPending = () => {
     t,
   ]);
 
-  useEffect(() => { void fetchFilters(); }, [fetchFilters]);
-  useEffect(() => { void fetchPendingListings(); }, [fetchPendingListings]);
+  useEffect(() => {
+    void fetchFilters();
+  }, [fetchFilters]);
+  useEffect(() => {
+    void fetchPendingListings();
+  }, [fetchPendingListings]);
 
   useEffect(() => {
     if (page > totalPages) setPage(totalPages);
@@ -282,7 +271,9 @@ const CarsPending = () => {
         setSelectedListing(null);
         await fetchPendingListings();
       } else {
-        error(t("admin.carsPending.approveError"), { description: response.message });
+        error(t("admin.carsPending.approveError"), {
+          description: response.message,
+        });
       }
     } catch {
       error(t("admin.carsPending.approveError"));
@@ -305,7 +296,9 @@ const CarsPending = () => {
         setRejectReason("");
         await fetchPendingListings();
       } else {
-        error(t("admin.carsPending.rejectError"), { description: response.message });
+        error(t("admin.carsPending.rejectError"), {
+          description: response.message,
+        });
       }
     } catch {
       error(t("admin.carsPending.rejectError"));
@@ -333,7 +326,9 @@ const CarsPending = () => {
                 </h1>
                 <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">
                   {t("admin.carsPending.subtitle")}{" "}
-                  <span className="font-semibold text-foreground">{totalItems}</span>{" "}
+                  <span className="font-semibold text-foreground">
+                    {totalItems}
+                  </span>{" "}
                   {t("admin.carsPending.listingsAwaiting")}
                 </p>
               </div>
@@ -346,7 +341,10 @@ const CarsPending = () => {
               <SlidersHorizontal className="size-4" />
               {t("admin.carsPending.filters")}
               {activeFilterCount > 0 && (
-                <Badge variant="secondary" className="ms-1 rounded-full px-2 py-0.5">
+                <Badge
+                  variant="secondary"
+                  className="ms-1 rounded-full px-2 py-0.5"
+                >
                   {activeFilterCount}
                 </Badge>
               )}
@@ -356,7 +354,9 @@ const CarsPending = () => {
           {filtersOpen && (
             <div className="mt-5 grid gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_220px_160px_160px_auto]">
               <div className="space-y-1.5">
-                <Label className="text-xs font-medium">{t("admin.carsPending.make")}</Label>
+                <Label className="text-xs font-medium">
+                  {t("admin.carsPending.make")}
+                </Label>
                 <Combobox
                   options={makeOptions}
                   value={makeFilter}
@@ -372,7 +372,9 @@ const CarsPending = () => {
               </div>
 
               <div className="space-y-1.5">
-                <Label className="text-xs font-medium">{t("admin.carsPending.model")}</Label>
+                <Label className="text-xs font-medium">
+                  {t("admin.carsPending.model")}
+                </Label>
                 <Combobox
                   options={modelOptions}
                   value={modelFilter}
@@ -383,16 +385,21 @@ const CarsPending = () => {
                   placeholder={t("admin.carsPending.allModels")}
                   searchPlaceholder={t("admin.carsPending.searchModel")}
                   emptyText={t("admin.carsPending.noModelFound")}
+                  disabled={!makeFilter}
                 />
               </div>
 
               <div className="space-y-1.5">
-                <Label className="text-xs font-medium">{t("admin.carsPending.sellerId")}</Label>
+                <Label className="text-xs font-medium">
+                  {t("admin.carsPending.sellerId")}
+                </Label>
                 <div className="relative">
                   <Search className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground/60" />
                   <Input
                     value={sellerFilterInput}
-                    onChange={(event) => setSellerFilterInput(event.target.value)}
+                    onChange={(event) =>
+                      setSellerFilterInput(event.target.value)
+                    }
                     placeholder={t("admin.carsPending.sellerIdPlaceholder")}
                     className="h-10 ps-9"
                     dir="ltr"
@@ -401,12 +408,17 @@ const CarsPending = () => {
               </div>
 
               <div className="space-y-1.5">
-                <Label className="text-xs font-medium">{t("admin.carsPending.dateFrom")}</Label>
+                <Label className="text-xs font-medium">
+                  {t("admin.carsPending.dateFrom")}
+                </Label>
                 <Input
                   type="date"
                   value={dateFilter.from}
                   onChange={(event) => {
-                    setDateFilter((current) => ({ ...current, from: event.target.value }));
+                    setDateFilter((current) => ({
+                      ...current,
+                      from: event.target.value,
+                    }));
                     setPage(1);
                   }}
                   className="h-10"
@@ -415,12 +427,17 @@ const CarsPending = () => {
               </div>
 
               <div className="space-y-1.5">
-                <Label className="text-xs font-medium">{t("admin.carsPending.dateTo")}</Label>
+                <Label className="text-xs font-medium">
+                  {t("admin.carsPending.dateTo")}
+                </Label>
                 <Input
                   type="date"
                   value={dateFilter.to}
                   onChange={(event) => {
-                    setDateFilter((current) => ({ ...current, to: event.target.value }));
+                    setDateFilter((current) => ({
+                      ...current,
+                      to: event.target.value,
+                    }));
                     setPage(1);
                   }}
                   className="h-10"
@@ -517,11 +534,15 @@ const CarsPending = () => {
                         <p className="font-semibold text-foreground">
                           {listing.make} {listing.model}
                         </p>
-                        <p className="text-xs text-muted-foreground">#{listing.id.slice(0, 8)}</p>
+                        <p className="text-xs text-muted-foreground">
+                          #{listing.id.slice(0, 8)}
+                        </p>
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="py-4 text-muted-foreground">{listing.year}</TableCell>
+                  <TableCell className="py-4 text-muted-foreground">
+                    {listing.year}
+                  </TableCell>
                   <TableCell className="py-4 text-muted-foreground">
                     {formatMileage(listing.mileage, numberFormatter)}
                   </TableCell>
@@ -533,7 +554,9 @@ const CarsPending = () => {
                   </TableCell>
                   <TableCell className="py-4">
                     <div>
-                      <p className="font-medium text-foreground">{listing.sellerName || "—"}</p>
+                      <p className="font-medium text-foreground">
+                        {listing.sellerName || "—"}
+                      </p>
                       <p className="text-xs text-muted-foreground" dir="ltr">
                         {listing.sellerId}
                       </p>
@@ -543,7 +566,10 @@ const CarsPending = () => {
                     {formatDate(listing.createdAt, dateFormatter)}
                   </TableCell>
                   <TableCell className="py-4">
-                    <Badge variant="warning" className="rounded-full px-2.5 py-1">
+                    <Badge
+                      variant="warning"
+                      className="rounded-full px-2.5 py-1"
+                    >
                       {listing.status || t("admin.carsPending.pending")}
                     </Badge>
                   </TableCell>
@@ -606,11 +632,13 @@ const CarsPending = () => {
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 font-heading">
                 <Car className="size-5 text-primary" />
-                {selectedListing.year} {selectedListing.make} {selectedListing.model}
+                {selectedListing.year} {selectedListing.make}{" "}
+                {selectedListing.model}
               </DialogTitle>
               <DialogDescription>
                 {t("admin.carsPending.reviewDescription", {
-                  seller: selectedListing.sellerName || selectedListing.sellerId,
+                  seller:
+                    selectedListing.sellerName || selectedListing.sellerId,
                   date: formatDate(selectedListing.createdAt, dateFormatter),
                 })}
               </DialogDescription>
@@ -631,7 +659,10 @@ const CarsPending = () => {
                 <DetailRow
                   icon={Gauge}
                   label={t("admin.carsPending.mileage")}
-                  value={formatMileage(selectedListing.mileage, numberFormatter)}
+                  value={formatMileage(
+                    selectedListing.mileage,
+                    numberFormatter,
+                  )}
                 />
                 <DetailRow
                   icon={DollarSign}
@@ -641,7 +672,10 @@ const CarsPending = () => {
                 <DetailRow
                   icon={DollarSign}
                   label={t("admin.carsPending.fairPrice")}
-                  value={formatPrice(selectedListing.fairPrice, currencyFormatter)}
+                  value={formatPrice(
+                    selectedListing.fairPrice,
+                    currencyFormatter,
+                  )}
                 />
                 <DetailRow
                   icon={User}
@@ -682,7 +716,9 @@ const CarsPending = () => {
                 disabled={isActionLoading}
                 className="gap-2"
               >
-                {isActionLoading ? <Loader2 className="size-4 animate-spin" /> : null}
+                {isActionLoading ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : null}
                 {t("admin.carsPending.approve")}
               </Button>
             </DialogFooter>
@@ -707,7 +743,9 @@ const CarsPending = () => {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-2">
-            <Label htmlFor="reject-reason">{t("admin.carsPending.rejectReason")}</Label>
+            <Label htmlFor="reject-reason">
+              {t("admin.carsPending.rejectReason")}
+            </Label>
             <Textarea
               id="reject-reason"
               value={rejectReason}
@@ -733,7 +771,9 @@ const CarsPending = () => {
               disabled={isActionLoading}
               className="gap-2"
             >
-              {isActionLoading ? <Loader2 className="size-4 animate-spin" /> : null}
+              {isActionLoading ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : null}
               {t("admin.carsPending.reject")}
             </Button>
           </DialogFooter>
