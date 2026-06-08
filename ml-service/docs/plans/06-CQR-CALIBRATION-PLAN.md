@@ -85,7 +85,21 @@ q95_cal = ensemble_predict(X_cal, quantile='q95')
 y_cal = calibration_set['price_egp'].values
 ```
 
-### Step 6.3 — Compute Nonconformity Scores
+### Step 6.3 — Enforce Quantile Monotonicity
+
+Before computing nonconformity scores, ensure quantiles are monotonically ordered for each sample. This prevents crossing quantiles from distorting interval widths and coverage calculations.
+
+```python
+# Stack all quantile predictions: [q05, q10, q50, q90, q95]
+preds = np.column_stack([q05_cal, q10_cal, q50_cal, q90_cal, q95_cal])
+# Sort along the quantile axis so q05 <= q10 <= q50 <= q90 <= q95
+preds_sorted = np.sort(preds, axis=1)
+q05_cal, q10_cal, q50_cal, q90_cal, q95_cal = preds_sorted.T
+```
+
+This step was moved from Plan 04 into Plan 06 because monotonicity is most critical at the interval-calibration stage rather than during model experimentation.
+
+### Step 6.4 — Compute Nonconformity Scores
 
 For each coverage level (80% and 90%):
 
@@ -102,7 +116,7 @@ scores_90 = np.maximum(q05_cal - y_cal, y_cal - q95_cal)
 - Score > 0 → true value is OUTSIDE the raw interval (incorrect, score = how far outside)
 - Large positive score → the model was very wrong for this sample
 
-### Step 6.4 — Compute Correction Factors
+### Step 6.5 — Compute Correction Factors
 
 ```python
 n = len(scores_80)
@@ -119,7 +133,7 @@ q_hat_90 = np.quantile(scores_90, min(level_90, 1.0))
 
 **Correct formula**: The quantile level should be `ceil((n+1)(1-α)) / n` to ensure finite-sample marginal coverage ≥ 1-α.
 
-### Step 6.5 — Validate on Test Set
+### Step 6.6 — Validate on Test Set
 
 ```python
 # Apply corrections to test set predictions
@@ -137,7 +151,7 @@ assert 0.78 <= coverage_80 <= 0.84, f"80% coverage is {coverage_80:.3f}"
 assert 0.88 <= coverage_90 <= 0.94, f"90% coverage is {coverage_90:.3f}"
 ```
 
-### Step 6.6 — Export Calibration Artifacts
+### Step 6.7 — Export Calibration Artifacts
 
 ```python
 import json
@@ -160,18 +174,23 @@ with open('models/metadata/cqr_calibration.json', 'w') as f:
     json.dump(cqr_config, f, indent=2)
 ```
 
-### Step 6.7 — Integrate with Inference
+### Step 6.8 — Integrate with Inference
 
 At inference time, the predictor loads `cqr_calibration.json` and applies:
 ```python
 # Raw quantile predictions from model
-q10_raw, q50_raw, q90_raw = model.predict(x)
+q05_raw, q10_raw, q50_raw, q90_raw, q95_raw = model.predict(x)
+
+# Enforce monotonicity before calibration
+preds = np.column_stack([q05_raw, q10_raw, q50_raw, q90_raw, q95_raw])
+preds_sorted = np.sort(preds, axis=1)
+q05_raw, q10_raw, q50_raw, q90_raw, q95_raw = preds_sorted.T
 
 # CQR-calibrated 80% interval
 lower_80 = q10_raw - q_hat_80
 upper_80 = q90_raw + q_hat_80
 
-# CQR-calibrated 90% interval  
+# CQR-calibrated 90% interval
 lower_90 = q05_raw - q_hat_90
 upper_90 = q95_raw + q_hat_90
 
