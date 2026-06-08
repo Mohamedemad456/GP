@@ -1,0 +1,10 @@
+{
+  "winner_experiment_name": "ensemble_baseline_5q",
+  "framework": "WeightedEnsemble",
+  "use_weights": false,
+  "use_tuned": false,
+  "train_fit_rows": 7875,
+  "val_rows": 875,
+  "calibration_rows": 1248,
+  "test_rows": 2500
+}
