@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
@@ -16,9 +16,10 @@ import {
   SelectTrigger,
   SelectValue,
   Separator,
+  PageLoader,
 } from "@gp/design-system";
 import { Eye, Heart, Search, SlidersHorizontal, Car } from "lucide-react";
-import { MOCK_LISTINGS } from "@/data/mocks/listings";
+import { getApprovedListings, type BuyerListingDto } from "@/lib/listingsApi";
 
 export default function FeedPage() {
   const { t, i18n } = useTranslation();
@@ -35,55 +36,80 @@ export default function FeedPage() {
     () =>
       new Intl.NumberFormat(locale, {
         style: "currency",
-        currency: "SAR",
+        currency: "EGP",
         maximumFractionDigits: 0,
       }),
     [locale]
   );
   const numberFmt = useMemo(() => new Intl.NumberFormat(locale), [locale]);
 
+  const [apiListings, setApiListings] = useState<BuyerListingDto[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const BASE_URL: string =
+    import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5082";
+
+  function resolvePhotoUrl(url: string | null): string | null {
+    if (!url) return null;
+    if (url.startsWith("http") || url.startsWith("data:")) return url;
+    // Ensure proper URL concatenation with leading slash
+    const path = url.startsWith("/") ? url : `/${url}`;
+    return `${BASE_URL}${path}`;
+  }
+
+  useEffect(() => {
+    getApprovedListings({ pageSize: 100 })
+      .then((res) => {
+        if (res.success && res.data) {
+          setApiListings(res.data.data);
+        }
+      })
+      .finally(() => setIsLoading(false));
+  }, []);
+
   const makes = useMemo(
-    () => Array.from(new Set(MOCK_LISTINGS.map((listing) => listing.make))),
-    []
+    () => Array.from(new Set(apiListings.map((listing) => listing.makeName))),
+    [apiListings]
   );
   const fuelTypes = useMemo(
-    () => Array.from(new Set(MOCK_LISTINGS.map((listing) => listing.fuelType))),
-    []
+    () => Array.from(new Set(apiListings.map((listing) => listing.fuelType))),
+    [apiListings]
   );
 
   const listings = useMemo(() => {
-    const filtered = MOCK_LISTINGS.filter((listing) => {
+    const filtered = apiListings.filter((listing) => {
       const normalizedQuery = query.trim().toLowerCase();
       const matchesQuery =
         !normalizedQuery ||
-        `${listing.make} ${listing.model}`.toLowerCase().includes(normalizedQuery) ||
-        listing.description.toLowerCase().includes(normalizedQuery);
+        `${listing.makeName} ${listing.modelName}`.toLowerCase().includes(normalizedQuery);
 
-      const matchesMake = make === "all" || listing.make === make;
+      const matchesMake = make === "all" || listing.makeName === make;
       const matchesFuel = fuelType === "all" || listing.fuelType === fuelType;
-      const matchesCondition = condition === "all" || listing.conditionGrade.startsWith(condition);
+      // condition removed from API dto, skipping client-side condition filter.
+      const matchesCondition = condition === "all";
       const matchesMaxPrice =
-        !maxPrice || listing.listingPrice <= Number(maxPrice);
+        !maxPrice || (listing.listingPrice !== null && listing.listingPrice <= Number(maxPrice));
 
       return matchesQuery && matchesMake && matchesFuel && matchesCondition && matchesMaxPrice;
     });
 
     return filtered.sort((a, b) => {
+      const priceA = a.listingPrice ?? 0;
+      const priceB = b.listingPrice ?? 0;
       switch (sortBy) {
         case "priceAsc":
-          return a.listingPrice - b.listingPrice;
+          return priceA - priceB;
         case "priceDesc":
-          return b.listingPrice - a.listingPrice;
+          return priceB - priceA;
         case "mileageAsc":
           return a.mileage - b.mileage;
-        case "popular":
-          return b.viewCount - a.viewCount;
         case "newest":
+        case "popular":
         default:
           return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       }
     });
-  }, [condition, fuelType, make, maxPrice, query, sortBy]);
+  }, [condition, fuelType, make, maxPrice, query, sortBy, apiListings]);
 
   const toggleWishlist = useCallback((listingId: number) => {
     setWishlistedIds((prev) => {
@@ -96,6 +122,10 @@ export default function FeedPage() {
       return next;
     });
   }, []);
+
+  if (isLoading) {
+    return <PageLoader />;
+  }
 
   return (
     <div className="mx-auto w-full max-w-7xl space-y-6 px-4 pt-20 sm:px-6 lg:px-8">
@@ -218,7 +248,7 @@ export default function FeedPage() {
             <span className="text-muted-foreground">
               {t("buyer.feed.totalFavorites")}{" "}
               <span className="font-semibold text-foreground">
-                {numberFmt.format(listings.reduce((sum, item) => sum + item.favoriteCount, 0))}
+                {numberFmt.format(wishlistedIds.size)}
               </span>
             </span>
           </div>
@@ -247,84 +277,73 @@ export default function FeedPage() {
               </Button>
             </div>
           ) : (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {listings.map((listing) => {
-              const isWishlisted = wishlistedIds.has(listing.id);
-              const favoriteCount = listing.favoriteCount + (isWishlisted ? 1 : 0);
-              const imageUrl = listing.images[0];
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {listings.map((listing) => {
+                const isWishlisted = wishlistedIds.has(Number(listing.id));
+                const imageUrl = resolvePhotoUrl(listing.primaryPhotoUrl);
 
-              return (
-              <Card key={listing.id} className="group overflow-hidden">
-                <div className="overflow-hidden">
-                  {imageUrl ? (
-                  <img
-                    src={imageUrl}
-                    alt={`${listing.make} ${listing.model}`}
-                    className="aspect-video w-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
-                    loading="lazy"
-                  />
-                  ) : (
-                  <div className="flex aspect-video w-full items-center justify-center bg-muted">
-                    <Car className="h-12 w-12 text-muted-foreground/40" />
-                  </div>
-                  )}
-                </div>
-                <CardHeader className="space-y-2">
-                  <div className="flex items-start justify-between gap-2">
-                    <CardTitle className="text-lg">
-                      {listing.year} {listing.make} {listing.model}
-                    </CardTitle>
-                    <Badge variant={listing.conditionGrade.startsWith("A") ? "success" : "info"}>
-                      {listing.conditionGrade}
-                    </Badge>
-                  </div>
-                  <CardDescription>
-                    {listing.fuelType} • {listing.transmission} • {numberFmt.format(listing.mileage)} km
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-end justify-between">
-                    <div>
-                      <p className="text-xs text-muted-foreground">{t("buyer.feed.listingPrice")}</p>
-                      <p className="font-heading text-xl font-bold text-primary">
-                        {currency.format(listing.listingPrice)}
-                      </p>
+                return (
+                  <Card key={listing.id} className="group overflow-hidden">
+                    <div className="overflow-hidden">
+                      {imageUrl ? (
+                        <img
+                          src={imageUrl}
+                          alt={`${listing.makeName} ${listing.modelName}`}
+                          className="aspect-video w-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="flex aspect-video w-full items-center justify-center bg-muted">
+                          <Car className="h-12 w-12 text-muted-foreground/40" />
+                        </div>
+                      )}
                     </div>
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1">
-                        <Eye className="size-3.5" />
-                        {numberFmt.format(listing.viewCount)}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Heart className="size-3.5" />
-                        {numberFmt.format(favoriteCount)}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => toggleWishlist(listing.id)}
-                      className="gap-2"
-                    >
-                      <Heart
-                        className={`size-4 ${
-                          isWishlisted ? "fill-current text-destructive" : "text-muted-foreground"
-                        }`}
-                      />
-                      {isWishlisted
-                        ? t("buyer.feed.removeWishlist")
-                        : t("buyer.feed.addWishlist")}
-                    </Button>
-                    <Link to={`/cars/${listing.id}`}>
-                      <Button className="w-full">{t("buyer.feed.viewDetails")}</Button>
-                    </Link>
-                  </div>
-                </CardContent>
-              </Card>
-            )})}
-          </div>
+                    <CardHeader className="space-y-2">
+                      <div className="flex items-start justify-between gap-2">
+                        <CardTitle className="text-lg">
+                          {listing.year} {listing.makeName} {listing.modelName}
+                        </CardTitle>
+                        {listing.isGoodDeal && (
+                          <Badge variant="success">Good Deal</Badge>
+                        )}
+                      </div>
+                      <CardDescription>
+                        {listing.fuelType} • {listing.transmission} • {numberFmt.format(listing.mileage)} km
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="flex items-end justify-between">
+                        <div>
+                          <p className="text-xs text-muted-foreground">{t("buyer.feed.listingPrice")}</p>
+                          <p className="font-heading text-xl font-bold text-primary">
+                            {listing.listingPrice !== null ? currency.format(listing.listingPrice) : "N/A"}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => toggleWishlist(Number(listing.id))}
+                          className="gap-2"
+                        >
+                          <Heart
+                            className={`size-4 ${isWishlisted ? "fill-current text-destructive" : "text-muted-foreground"
+                              }`}
+                          />
+                          {isWishlisted
+                            ? t("buyer.feed.removeWishlist")
+                            : t("buyer.feed.addWishlist")}
+                        </Button>
+                        <Link to={`/cars/${listing.id}`}>
+                          <Button className="w-full">{t("buyer.feed.viewDetails")}</Button>
+                        </Link>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )
+              })}
+            </div>
           )}
         </section>
       </div>

@@ -1,5 +1,6 @@
 import { api } from "./api";
 import type { ApiResponse } from "./authApi";
+import type { PaginatedResponse } from "./makesApi";
 
 // ─── Enums (mirror backend Karna.Core.Domain.Enums) ────────────────────────
 
@@ -22,7 +23,8 @@ export const TransmissionType = {
   Manual: 1,
   Automatic: 2,
 } as const;
-export type TransmissionType = (typeof TransmissionType)[keyof typeof TransmissionType];
+export type TransmissionType =
+  (typeof TransmissionType)[keyof typeof TransmissionType];
 
 export const TransmissionTypeLabel: Record<TransmissionType, string> = {
   [TransmissionType.Manual]: "Manual",
@@ -115,6 +117,9 @@ export type CreateListingRequest = {
   color: string;
   description: string;
   location: EgyptLocation;
+  contactPhoneNumber: string;
+  whatsAppNumber: string;
+  preferredContactMethod: number;
 };
 
 /** Matches backend AddConditionChecklistDto */
@@ -180,16 +185,19 @@ export type GeneratePriceResponseDto = {
 export const createListing = (data: CreateListingRequest) =>
   api
     .post<ApiResponse<ListingDto>>("/api/Listings", {
-      MakeId: data.makeId,
-      ModelId: data.modelId,
-      Year: data.year,
-      Mileage: data.mileage,
-      FuelType: data.fuelType,
-      Transmission: data.transmission,
-      EngineSize: data.engineSize,
-      Color: data.color,
-      Description: data.description,
-      Location: data.location,
+      makeId: data.makeId,
+      modelId: data.modelId,
+      year: data.year,
+      mileage: data.mileage,
+      fuelType: data.fuelType,
+      transmission: data.transmission,
+      engineSize: data.engineSize,
+      color: data.color,
+      description: data.description,
+      location: data.location,
+      contactPhoneNumber: data.contactPhoneNumber,
+      whatsAppNumber: data.whatsAppNumber,
+      preferredContactMethod: data.preferredContactMethod,
     })
     .then((r) => r.data);
 
@@ -202,10 +210,9 @@ export const addListingChecklist = (
   data: AddConditionChecklistRequest,
 ) =>
   api
-    .post<ApiResponse<ListingDefectDto[]>>(
-      `/api/Listings/${listingId}/conditions`,
-      { ConditionDefectIds: data.conditionDefectIds },
-    )
+    .post<
+      ApiResponse<ListingDefectDto[]>
+    >(`/api/Listings/${listingId}/conditions`, { ConditionDefectIds: data.conditionDefectIds })
     .then((r) => r.data);
 
 /**
@@ -257,26 +264,6 @@ export const submitListing = (listingId: string) =>
     .then((r) => r.data);
 
 /**
- * PATCH /api/Listings/{id}/approve
- * Approves a Pending listing (Admin only).
- */
-export const approveListing = (listingId: string) =>
-  api
-    .patch<ApiResponse<ListingDto>>(`/api/Listings/${listingId}/approve`)
-    .then((r) => r.data);
-
-/**
- * PATCH /api/Listings/{id}/reject
- * Rejects a Pending listing with an admin reason (Admin only).
- */
-export const rejectListing = (listingId: string, data: RejectListingRequest) =>
-  api
-    .patch<ApiResponse<ListingDto>>(`/api/Listings/${listingId}/reject`, {
-      Reason: data.reason ?? null,
-    })
-    .then((r) => r.data);
-
-/**
  * PATCH /api/Listings/{id}/sold
  * Marks an Active listing as Sold.
  */
@@ -291,9 +278,9 @@ export const markListingAsSold = (listingId: string) =>
  */
 export const getListingStatusHistory = (listingId: string) =>
   api
-    .get<ApiResponse<ListingStatusHistoryDto[]>>(
-      `/api/Listings/${listingId}/status-history`,
-    )
+    .get<
+      ApiResponse<ListingStatusHistoryDto[]>
+    >(`/api/Listings/${listingId}/status-history`)
     .then((r) => r.data);
 
 /**
@@ -301,9 +288,7 @@ export const getListingStatusHistory = (listingId: string) =>
  * Archives (soft-deletes) a seller-owned listing.
  */
 export const deleteListing = (listingId: string) =>
-  api
-    .delete<ApiResponseDto>(`/api/Listings/${listingId}`)
-    .then((r) => r.data);
+  api.delete<ApiResponseDto>(`/api/Listings/${listingId}`).then((r) => r.data);
 
 /**
  * POST /api/Listings/{id}/generate-price
@@ -311,19 +296,240 @@ export const deleteListing = (listingId: string) =>
  */
 export const generateListingPrice = (listingId: string) =>
   api
-    .post<ApiResponse<GeneratePriceResponseDto>>(
-      `/api/Listings/${listingId}/generate-price`,
-    )
+    .post<
+      ApiResponse<GeneratePriceResponseDto>
+    >(`/api/Listings/${listingId}/generate-price`)
     .then((r) => r.data);
 
 /**
  * POST /api/Listings/{id}/set-price
  * Sets the final listing price using the generated fair price or a custom offer.
  */
-export const setListingPrice = (listingId: string, data: SetListingPriceRequest) =>
+export const setListingPrice = (
+  listingId: string,
+  data: SetListingPriceRequest,
+) =>
   api
     .post<ApiResponse<ListingDto>>(`/api/Listings/${listingId}/set-price`, {
       Price: data.price ?? null,
       AcceptFairPrice: data.acceptFairPrice,
     })
+    .then((r) => r.data);
+
+// ─── Buyer Listings & Details DTOs ──────────────────────────────────────────
+
+export type BuyerListingDto = {
+  id: string;
+  makeName: string;
+  modelName: string;
+  year: number;
+  mileage: number;
+  fuelType: string;
+  transmission: string;
+  color: string;
+  listingPrice: number | null;
+  location: string;
+  primaryPhotoUrl: string | null;
+  createdAt: string;
+  isGoodDeal: boolean;
+};
+
+export type BuyerListingSpecParams = {
+  pageIndex?: number;
+  pageSize?: number;
+  search?: string;
+  sort?: string;
+  sortDirection?: string;
+  makeId?: string;
+  modelId?: string;
+  yearFrom?: number;
+  yearTo?: number;
+  priceMin?: number;
+  priceMax?: number;
+  mileageMin?: number;
+  mileageMax?: number;
+};
+
+export type MyListingSpecParams = {
+  pageIndex?: number;
+  pageSize?: number;
+  status?: string;
+  makeId?: string;
+  modelId?: string;
+  sort?: string;
+  sortDirection?: string;
+};
+
+export type MyListingDto = {
+  id: string;
+  makeName: string;
+  modelName: string;
+  year: number;
+  listingPrice: number | null;
+  status: string;
+  primaryPhotoUrl: string | null;
+  createdAt: string;
+  updatedAt: string | null;
+  completionPercentage: number;
+  canSubmit: boolean;
+};
+
+export type ConditionDefectItemDto = {
+  itemName: string;
+  description: string | null;
+};
+
+export type ConditionCategoryDetailDto = {
+  categoryName: string;
+  defects: ConditionDefectItemDto[];
+};
+
+export type ListingDetailsDto = {
+  id: string;
+  makeName: string;
+  modelName: string;
+  year: number;
+  mileage: number;
+  fuelType: string;
+  transmission: string;
+  engineSize: number;
+  color: string;
+  description: string;
+  location: string;
+  listingPrice: number | null;
+  isGoodDeal: boolean;
+  photos: ListingPhotoDto[];
+  conditionGrade: string;
+  checklistCategories: ConditionCategoryDetailDto[];
+  sellerName: string;
+  contactPhoneNumber: string;
+  whatsAppNumber: string | null;
+  preferredContactMethod: string;
+  createdAt: string;
+};
+
+export type PricingHistoryDto = {
+  oldPrice: number | null;
+  newPrice: number | null;
+  oldFairPrice: number | null;
+  newFairPrice: number | null;
+  changeReason: string | null;
+  changedByUserId: string | null;
+  changedAt: string;
+};
+
+/** Matches backend MyListingDefectItemDto */
+export type MyListingDefectItemDto = {
+  id: string;
+  name: string;
+};
+
+/** Matches backend MyListingChecklistCategoryDto */
+export type MyListingChecklistCategoryDto = {
+  categoryId: string;
+  categoryName: string;
+  selectedItems: MyListingDefectItemDto[];
+};
+
+/** Matches backend ListingProgressDto */
+export type ListingProgressDto = {
+  hasBasicInfo: boolean;
+  hasPhotos: boolean;
+  hasConditionChecklist: boolean;
+  hasMLPricing: boolean;
+  canSubmit: boolean;
+  completionPercentage: number;
+};
+
+/** Matches backend MyListingDetailsDto — seller-only details including ML pricing, status, and progress */
+export type MyListingDetailsDto = {
+  id: string;
+  makeId: string;
+  makeName: string;
+  modelId: string;
+  modelName: string;
+  year: number;
+  mileage: number;
+  fuelType: string;
+  transmission: string;
+  engineSize: number;
+  color: string;
+  description: string;
+  locationId: number;
+  locationName: string;
+  contactPhoneNumber: string;
+  whatsAppNumber: string | null;
+  preferredContactMethod: string;
+  listingPrice: number | null;
+  // ML Pricing (owner only)
+  fairPrice: number | null;
+  negotiationRangeLower: number | null;
+  negotiationRangeUpper: number | null;
+  confidenceLevel: string | null;
+  modelVersion: string | null;
+  predictedAt: string | null;
+  photos: ListingPhotoDto[];
+  conditionGrade: string;
+  checklistCategories: MyListingChecklistCategoryDto[];
+  status: string;
+  createdAt: string;
+  updatedAt: string | null;
+  rejectionReason: string | null;
+  progress: ListingProgressDto;
+};
+
+// ─── Buyer Listings & Pricing History Functions ─────────────────────────────
+
+/**
+ * GET /api/Listings/approved
+ * Fetches public approved listings (allow anonymous).
+ */
+export const getApprovedListings = (params?: BuyerListingSpecParams) =>
+  api
+    .get<
+      ApiResponse<PaginatedResponse<BuyerListingDto>>
+    >("/api/Listings/approved", { params })
+    .then((r) => r.data);
+
+/**
+ * GET /api/Listings/my-listings
+ * Fetches seller's own listings. Requires authentication (User role).
+ */
+export const getMyListings = (params?: MyListingSpecParams) =>
+  api
+    .get<
+      ApiResponse<PaginatedResponse<MyListingDto>>
+    >("/api/Listings/my-listings", { params })
+    .then((r) => r.data);
+
+/**
+ * GET /api/Listings/{id}
+ * Fetches a single public approved listing detail (allow anonymous).
+ */
+export const getListingById = (listingId: string) =>
+  api
+    .get<ApiResponse<ListingDetailsDto>>(`/api/Listings/${listingId}`)
+    .then((r) => r.data);
+
+/**
+ * GET /api/Listings/my-listings/{id}
+ * Fetches detailed info for a seller-owned listing (requires authentication).
+ * Returns seller-specific data including ML pricing, status, rejection reason, and progress.
+ */
+export const getMyListingDetails = (listingId: string) =>
+  api
+    .get<ApiResponse<MyListingDetailsDto>>(
+      `/api/Listings/my-listings/${listingId}`,
+    )
+    .then((r) => r.data);
+
+/**
+ * GET /api/Listings/{id}/pricing-history
+ * Returns listing's pricing change history.
+ */
+export const getListingPricingHistory = (listingId: string) =>
+  api
+    .get<
+      ApiResponse<PricingHistoryDto[]>
+    >(`/api/Listings/${listingId}/pricing-history`)
     .then((r) => r.data);
