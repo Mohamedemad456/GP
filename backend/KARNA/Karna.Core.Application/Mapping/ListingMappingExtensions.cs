@@ -263,5 +263,101 @@ namespace Karna.Core.Application.Mapping
 
 			return percentage;
 		}
+
+		// ─── My Listing Details (Seller single-listing view) ───────────────
+
+		public static MyListingDetailsDto ToMyListingDetailsDto(this Listing source)
+		{
+			var completionPercentage = CalculateCompletionPercentage(source);
+
+			var hasBasicInfo =
+				source.MakeId != Guid.Empty
+				&& source.ModelId != Guid.Empty
+				&& source.Year > 0
+				&& source.Mileage > 0
+				&& source.EngineSize > 0
+				&& !string.IsNullOrWhiteSpace(source.Color)
+				&& !string.IsNullOrWhiteSpace(source.Description)
+				&& !string.IsNullOrWhiteSpace(source.ContactPhoneNumber)
+				&& Enum.IsDefined(source.FuelType)
+				&& Enum.IsDefined(source.Transmission)
+				&& Enum.IsDefined(source.Location);
+
+			var hasPhotos = source.Photos?.Count(p => !p.IsDeleted) >= 3;
+			var hasChecklist = source.ListingDefects?.Any() == true;
+			var hasMlPricing =
+				source.FairPrice is not null
+				&& source.NegotiationRangeLower is not null
+				&& source.NegotiationRangeUpper is not null
+				&& !string.IsNullOrWhiteSpace(source.ConfidenceLevel);
+
+			var canSubmit = hasBasicInfo && hasPhotos && hasMlPricing
+				&& source.Status == ListingStatus.Draft;
+
+			return new MyListingDetailsDto
+			{
+				Id = source.Id,
+				MakeId = source.MakeId,
+				MakeName = source.Make?.Name ?? string.Empty,
+				ModelId = source.ModelId,
+				ModelName = source.Model?.Name ?? string.Empty,
+				Year = source.Year,
+				Mileage = source.Mileage,
+				FuelType = source.FuelType.ToString(),
+				Transmission = source.Transmission.ToString(),
+				EngineSize = source.EngineSize,
+				Color = source.Color,
+				Description = source.Description,
+				LocationId = (int)source.Location,
+				LocationName = source.Location.ToDisplayString(),
+				ContactPhoneNumber = source.ContactPhoneNumber,
+				WhatsAppNumber = source.WhatsAppNumber,
+				PreferredContactMethod = source.PreferredContactMethod.ToString(),
+				ListingPrice = source.Price,
+				FairPrice = source.FairPrice,
+				NegotiationRangeLower = source.NegotiationRangeLower,
+				NegotiationRangeUpper = source.NegotiationRangeUpper,
+				ConfidenceLevel = source.ConfidenceLevel,
+				ModelVersion = source.ModelVersion,
+				PredictedAt = source.PredictedAt,
+				Photos = MapPhotos(source.Photos),
+				ConditionGrade = CalculateConditionGrade(source.ListingDefects),
+				ChecklistCategories = MapSellerChecklist(source.ListingDefects),
+				Status = source.Status.ToString(),
+				CreatedAt = source.CreatedAt,
+				UpdatedAt = source.UpdatedAt,
+				RejectionReason = source.Status == ListingStatus.Rejected ? source.RejectionReason : null,
+				Progress = new ListingProgressDto
+				{
+					HasBasicInfo = hasBasicInfo,
+					HasPhotos = hasPhotos,
+					HasConditionChecklist = hasChecklist,
+					HasMLPricing = hasMlPricing,
+					CanSubmit = canSubmit,
+					CompletionPercentage = completionPercentage
+				}
+			};
+		}
+
+		private static List<MyListingChecklistCategoryDto> MapSellerChecklist(ICollection<ListingDefect>? defects)
+		{
+			if (defects is null || !defects.Any())
+				return new List<MyListingChecklistCategoryDto>();
+
+			return defects
+				.Where(ld => ld.ConditionDefect?.Category is not null)
+				.GroupBy(ld => new { ld.ConditionDefect.CategoryId, ld.ConditionDefect.Category.Name })
+				.Select(group => new MyListingChecklistCategoryDto
+				{
+					CategoryId = group.Key.CategoryId,
+					CategoryName = group.Key.Name,
+					SelectedItems = group.Select(ld => new MyListingDefectItemDto
+					{
+						Id = ld.ConditionDefectId,
+						Name = ld.ConditionDefect.ItemName
+					}).ToList()
+				})
+				.ToList();
+		}
 	}
-}
+}

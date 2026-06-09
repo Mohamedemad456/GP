@@ -753,6 +753,54 @@ namespace Karna.Core.Application.Services
 			};
 		}
 
+		public async Task<ApiResponse<MyListingDetailsDto>> GetMyListingDetailsAsync(Guid listingId)
+		{
+			// 1. Auth & resolve domain user
+			if (!_currentUserService.IsAuthenticated || _currentUserService.UserId == Guid.Empty)
+				return new ApiResponse<MyListingDetailsDto> { Success = false, Message = _localizer.GetErrorMessage("Unauthorized") };
+
+			var userRepo = _unitOfWork.GetRepository<User>();
+			var currentUser = await userRepo.GetAsync(u => u.IdentityUserId == _currentUserService.UserId);
+			if (currentUser is null)
+				return new ApiResponse<MyListingDetailsDto> { Success = false, Message = _localizer.GetErrorMessage("UserNotFound") };
+
+			// 2. Load listing — owner-scoped, no status gate, includes Make/Model/Photos/ListingDefects
+			var listingRepo = _unitOfWork.GetRepository<Listing>();
+			var spec = new SellerListingDetailsSpecification(listingId, currentUser.Id);
+			var listing = await listingRepo.GetWithSpecAsync(spec);
+
+			if (listing is null)
+				return new ApiResponse<MyListingDetailsDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotFound") };
+
+			// 3. Load deep navigation: ListingDefects → ConditionDefect → Category
+			if (listing.ListingDefects.Any())
+			{
+				var defectRepo = _unitOfWork.GetRepository<ConditionDefect>();
+				var categoryRepo = _unitOfWork.GetRepository<ConditionChecklistCategory>();
+
+				var defectIds = listing.ListingDefects.Select(ld => ld.ConditionDefectId).ToList();
+				var conditionDefects = (await defectRepo.FindAsync(
+					d => defectIds.Contains(d.Id), withTracking: false)).ToList();
+
+				var categoryIds = conditionDefects.Select(d => d.CategoryId).Distinct().ToList();
+				var categories = (await categoryRepo.FindAsync(
+					c => categoryIds.Contains(c.Id), withTracking: false)).ToList();
+
+				foreach (var defect in conditionDefects)
+					defect.Category = categories.FirstOrDefault(c => c.Id == defect.CategoryId)!;
+
+				foreach (var ld in listing.ListingDefects)
+					ld.ConditionDefect = conditionDefects.FirstOrDefault(d => d.Id == ld.ConditionDefectId)!;
+			}
+
+			// 4. Map & return
+			return new ApiResponse<MyListingDetailsDto>
+			{
+				Success = true,
+				Data = listing.ToMyListingDetailsDto()
+			};
+		}
+
         public async Task<ApiResponseDto> DeleteAsync(Guid id)
         {
             // 1. Authenticate & resolve current user
