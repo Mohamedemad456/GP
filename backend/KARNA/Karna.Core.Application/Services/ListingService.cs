@@ -331,11 +331,7 @@ namespace Karna.Core.Application.Services
 			if (photos.Count() < 3)
 				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingInsufficientPhotos") };
 
-			// Validate condition checklist is added
-			var listingDefectRepo = _unitOfWork.GetRepository<ListingDefect>();
-			var defects = await listingDefectRepo.FindAsync(ld => ld.ListingId == listingId, withTracking: false);
-			if (!defects.Any())
-				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingMissingChecklist") };
+			// Condition checklist is optional — no validation needed
 
 			// Validate ML pricing has been generated
 			if (!HasRequiredPricing(listing))
@@ -517,7 +513,6 @@ namespace Karna.Core.Application.Services
 				&& listing.ModelId != Guid.Empty
 				&& listing.Year > 0
 				&& listing.Mileage > 0
-				&& listing.EngineSize > 0
 				&& Enum.IsDefined(listing.FuelType)
 				&& Enum.IsDefined(listing.Transmission)
 				&& Enum.IsDefined(listing.Location);
