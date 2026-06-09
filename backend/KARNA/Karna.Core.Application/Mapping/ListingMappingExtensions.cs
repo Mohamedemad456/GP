@@ -230,7 +230,7 @@ namespace Karna.Core.Application.Mapping
 		{
 			int percentage = 0;
 
-			// Step 1: Core data complete (20%)
+			// Step 1: Core data complete (25%)
 			bool coreDataComplete =
 				listing.MakeId != Guid.Empty
 				&& listing.ModelId != Guid.Empty
@@ -244,25 +244,22 @@ namespace Karna.Core.Application.Mapping
 				&& Enum.IsDefined(listing.Transmission)
 				&& Enum.IsDefined(listing.Location);
 
-			if (coreDataComplete) percentage += 20;
+			if (coreDataComplete) percentage += 25;
 
-			// Step 2: Photos — at least 3 non-deleted (20%)
-			if (listing.Photos?.Count(p => !p.IsDeleted) >= 3) percentage += 20;
+			// Step 2: Photos — at least 3 non-deleted (25%)
+			if (listing.Photos?.Count(p => !p.IsDeleted) >= 3) percentage += 25;
 
-			// Step 3: Condition checklist — at least 1 defect (20%)
-			if (listing.ListingDefects?.Any() == true) percentage += 20;
-
-			// Step 4: ML pricing generated (20%)
+			// Step 3: ML pricing generated (25%)
 			bool hasMlPricing =
 				listing.FairPrice is not null
 				&& listing.NegotiationRangeLower is not null
 				&& listing.NegotiationRangeUpper is not null
 				&& !string.IsNullOrWhiteSpace(listing.ConfidenceLevel);
 
-			if (hasMlPricing) percentage += 20;
+			if (hasMlPricing) percentage += 25;
 
-			// Step 5: Seller price set (20%)
-			if (listing.Price is not null) percentage += 20;
+			// Step 4: Seller price set (25%)
+			if (listing.Price is not null) percentage += 25;
 
 			return percentage;
 		}
