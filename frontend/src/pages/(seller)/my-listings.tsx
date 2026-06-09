@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, memo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { ImageIcon, Edit2, Trash2, RefreshCw, ArrowUpDown } from "lucide-react";
+import { ImageIcon, Edit2, Trash2, RefreshCw, ArrowUpDown, CheckCircle2, XCircle, AlertCircle, TrendingUp } from "lucide-react";
 
 import {
   Button,
@@ -28,11 +28,11 @@ import { useToast } from "@/hooks/use-toast";
 import type {
   MyListingDto,
   MyListingSpecParams,
-  ListingDetailsDto,
+  MyListingDetailsDto,
 } from "@/lib/listingsApi";
 import {
   getMyListings,
-  getListingById,
+  getMyListingDetails,
   deleteListing,
 } from "@/lib/listingsApi";
 import { getActiveMakes } from "@/lib/makesApi";
@@ -133,12 +133,13 @@ const ListingDetailModal = memo(
     onEdit: (id: string) => void;
     onDelete: (id: string) => Promise<void>;
   }) => {
+    const { t } = useTranslation();
     const { error } = useToast();
-    const [listing, setListing] = useState<ListingDetailsDto | null>(null);
+    const [listing, setListing] = useState<MyListingDetailsDto | null>(null);
     const [isLoadingDetails, setIsLoadingDetails] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
 
-    // Fetch listing details when modal opens
+    // Fetch seller-owned listing details when modal opens
     useEffect(() => {
       if (!listingId || !open) {
         setListing(null);
@@ -146,7 +147,7 @@ const ListingDetailModal = memo(
       }
 
       setIsLoadingDetails(true);
-      getListingById(listingId)
+      getMyListingDetails(listingId)
         .then((res) => {
           if (res.success && res.data) {
             setListing(res.data);
@@ -186,8 +187,8 @@ const ListingDetailModal = memo(
                   <span>
                     {listing.year} {listing.makeName} {listing.modelName}
                   </span>
-                  <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                    Active
+                  <Badge className={statusColors[listing.status] || statusColors.Draft}>
+                    {listing.status}
                   </Badge>
                 </div>
               ) : (
@@ -198,7 +199,7 @@ const ListingDetailModal = memo(
               {isLoadingDetails ? (
                 <Skeleton className="h-4 w-40 mt-1" />
               ) : (
-                listing && `${listing.location}`
+                listing && `${listing.locationName}`
               )}
             </DialogDescription>
           </DialogHeader>
@@ -215,54 +216,110 @@ const ListingDetailModal = memo(
               </div>
             ) : listing ? (
               <div className="space-y-5 p-3">
-                {/* Image */}
+                {/* Primary Photo */}
                 <ImageGallery photoUrl={listing.photos[0]?.photoUrl || null} />
 
                 <Separator />
 
-                {/* Details */}
+                {/* Rejection Banner */}
+                {listing.status === "Rejected" && listing.rejectionReason && (
+                  <div className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-950/30">
+                    <AlertCircle className="mt-0.5 size-4 shrink-0 text-red-600 dark:text-red-400" />
+                    <div>
+                      <p className="text-sm font-semibold text-red-700 dark:text-red-300">{t("seller.listings.detail.rejectionReason") || "Rejection Reason"}</p>
+                      <p className="text-sm text-red-600 dark:text-red-400">{listing.rejectionReason}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Listing Progress */}
                 <div className="space-y-3">
-                  <h3 className="text-sm font-semibold text-foreground">
-                    Vehicle Information
-                  </h3>
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                    <DetailItem label="Make" value={listing.makeName} />
-                    <DetailItem label="Model" value={listing.modelName} />
-                    <DetailItem label="Year" value={listing.year.toString()} />
-                    <DetailItem
-                      label="Mileage"
-                      value={`${listing.mileage.toLocaleString()} km`}
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-semibold text-foreground">{t("seller.listings.detail.listingProgress") || "Listing Progress"}</h3>
+                    <span className="text-sm font-bold text-primary">{listing.progress.completionPercentage}%</span>
+                  </div>
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                    <div
+                      className="h-full bg-primary transition-all"
+                      style={{ width: `${listing.progress.completionPercentage}%` }}
                     />
-                    <DetailItem label="Fuel Type" value={listing.fuelType} />
-                    <DetailItem
-                      label="Transmission"
-                      value={listing.transmission}
-                    />
-                    <DetailItem
-                      label="Engine Size"
-                      value={`${listing.engineSize}L`}
-                    />
-                    <DetailItem label="Color" value={listing.color} />
-                    <DetailItem
-                      label="Condition"
-                      value={listing.conditionGrade || "—"}
-                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                    <ProgressStep label={t("seller.listings.detail.basicInfo") || "Basic Info"} done={listing.progress.hasBasicInfo} />
+                    <ProgressStep label={t("seller.listings.detail.photos") || "Photos"} done={listing.progress.hasPhotos} />
+                    <ProgressStep label={t("seller.listings.detail.condition") || "Condition"} done={listing.progress.hasConditionChecklist} />
+                    <ProgressStep label={t("seller.listings.detail.mlPricing") || "ML Pricing"} done={listing.progress.hasMLPricing} />
                   </div>
                 </div>
 
                 <Separator />
 
-                {/* Pricing & Status */}
+                {/* Vehicle Information */}
                 <div className="space-y-3">
-                  <h3 className="text-sm font-semibold text-foreground">
-                    Listing Information
-                  </h3>
-                  <div className="grid grid-cols-2 gap-3">
+                  <h3 className="text-sm font-semibold text-foreground">{t("seller.listings.detail.vehicleDetails") || "Vehicle Details"}</h3>
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    <DetailItem label={t("seller.listings.detail.make") || "Make"} value={listing.makeName} />
+                    <DetailItem label={t("seller.listings.detail.model") || "Model"} value={listing.modelName} />
+                    <DetailItem label={t("seller.listings.detail.year") || "Year"} value={listing.year.toString()} />
+                    <DetailItem label={t("seller.listings.detail.mileage") || "Mileage"} value={`${listing.mileage.toLocaleString()} km`} />
+                    <DetailItem label={t("seller.listings.detail.fuelType") || "Fuel Type"} value={listing.fuelType} />
+                    <DetailItem label={t("seller.listings.detail.transmission") || "Transmission"} value={listing.transmission} />
+                    <DetailItem label={t("seller.listings.detail.engineSize") || "Engine Size"} value={`${listing.engineSize}L`} />
+                    <DetailItem label={t("seller.listings.detail.color") || "Color"} value={listing.color} />
+                    <DetailItem label={t("seller.listings.detail.conditionGrade") || "Condition Grade"} value={listing.conditionGrade || "—"} />
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Pricing */}
+                <div className="space-y-3">
+                  <h3 className="text-sm font-semibold text-foreground">{t("seller.listings.detail.pricing") || "Pricing"}</h3>
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                     <DetailItem
-                      label="Price"
+                      label={t("seller.listings.detail.listingPrice") || "Listing Price"}
                       value={fmtCurrency(listing.listingPrice)}
                       highlight={listing.listingPrice !== null}
                     />
+                    {listing.fairPrice != null && (
+                      <DetailItem
+                        label={t("seller.listings.detail.aiFairPrice") || "AI Fair Price"}
+                        value={fmtCurrency(listing.fairPrice)}
+                        highlight
+                      />
+                    )}
+                    {listing.negotiationRangeLower != null && listing.negotiationRangeUpper != null && (
+                      <DetailItem
+                        label={t("seller.listings.detail.negotiationRange") || "Negotiation Range"}
+                        value={`${fmtCurrency(listing.negotiationRangeLower)} – ${fmtCurrency(listing.negotiationRangeUpper)}`}
+                      />
+                    )}
+                    {listing.predictedAt && (
+                      <DetailItem label={t("seller.listings.detail.predictedAt") || "Predicted At"} value={fmtDate(listing.predictedAt)} />
+                    )}
+                  </div>
+                  {listing.fairPrice != null && (
+                    <div className="flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2">
+                      <TrendingUp className="size-4 shrink-0 text-primary" />
+                      <p className="text-xs text-muted-foreground">
+                        {t("seller.listings.detail.aiPricingNote") || "AI pricing powered by the KARNA ML model"}{listing.modelVersion ? ` (${listing.modelVersion})` : ""}.
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <Separator />
+
+                {/* Dates */}
+                {/* Dates */}
+                <div className="space-y-3">
+                  <h3 className="text-sm font-semibold text-foreground">{t("seller.listings.detail.listingDetails") || "Listing Details"}</h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    <DetailItem label={t("seller.listings.detail.createdAt") || "Created"} value={fmtDate(listing.createdAt)} />
+                    {listing.updatedAt && (
+                      <DetailItem label={t("seller.listings.detail.updatedAt") || "Last Updated"} value={fmtDate(listing.updatedAt)} />
+                    )}
+                    <DetailItem label={t("seller.listings.detail.location") || "Location"} value={listing.locationName} />
                   </div>
                 </div>
 
@@ -272,40 +329,52 @@ const ListingDetailModal = memo(
                 {listing.description && (
                   <>
                     <div className="space-y-3">
-                      <h3 className="text-sm font-semibold text-foreground">
-                        Description
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        {listing.description}
-                      </p>
+                      <h3 className="text-sm font-semibold text-foreground">{t("seller.listings.detail.description") || "Description"}</h3>
+                      <p className="text-sm text-muted-foreground">{listing.description}</p>
                     </div>
                     <Separator />
                   </>
                 )}
 
-                {/* Seller Contact */}
+                {/* Contact Info */}
                 <div className="space-y-3">
-                  <h3 className="text-sm font-semibold text-foreground">
-                    Seller Contact
-                  </h3>
+                  <h3 className="text-sm font-semibold text-foreground">{t("seller.listings.detail.contactInfo") || "Contact Information"}</h3>
                   <div className="grid grid-cols-2 gap-3">
-                    <DetailItem label="Name" value={listing.sellerName} />
-                    <DetailItem
-                      label="Phone"
-                      value={listing.contactPhoneNumber}
-                    />
+                    <DetailItem label={t("seller.listings.detail.phone") || "Phone"} value={listing.contactPhoneNumber} />
                     {listing.whatsAppNumber && (
-                      <DetailItem
-                        label="WhatsApp"
-                        value={listing.whatsAppNumber}
-                      />
+                      <DetailItem label={t("seller.listings.detail.whatsapp") || "WhatsApp"} value={listing.whatsAppNumber} />
                     )}
-                    <DetailItem
-                      label="Preferred Method"
-                      value={listing.preferredContactMethod}
-                    />
+                    <DetailItem label={t("seller.listings.detail.preferredMethod") || "Preferred Method"} value={listing.preferredContactMethod} />
                   </div>
                 </div>
+
+                {/* Condition Checklist */}
+                {listing.checklistCategories.length > 0 && (
+                  <>
+                    <Separator />
+                    <div className="space-y-3">
+                      <h3 className="text-sm font-semibold text-foreground">{t("seller.listings.detail.conditionChecklist") || "Condition Checklist"}</h3>
+                      <div className="space-y-3">
+                        {listing.checklistCategories.map((cat) => (
+                          <div key={cat.categoryId} className="rounded-lg border border-border/50 bg-muted/20 p-3">
+                            <p className="mb-2 text-xs font-semibold text-foreground">{cat.categoryName}</p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {cat.selectedItems.map((item) => (
+                                <span
+                                  key={item.id}
+                                  className="inline-flex items-center gap-1 rounded-full bg-destructive/10 px-2 py-0.5 text-[11px] text-destructive"
+                                >
+                                  <XCircle className="size-3" />
+                                  {item.name}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
 
                 <Separator />
 
@@ -341,6 +410,26 @@ const ListingDetailModal = memo(
   },
 );
 ListingDetailModal.displayName = "ListingDetailModal";
+
+// ─── Progress Step Helper ─────────────────────────────────────────────────────
+
+function ProgressStep({ label, done }: { label: string; done: boolean }) {
+  return (
+    <div
+      className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium ${done
+          ? "border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-950/30 dark:text-green-400"
+          : "border-border/50 bg-muted/20 text-muted-foreground"
+        }`}
+    >
+      {done ? (
+        <CheckCircle2 className="size-3.5 shrink-0 text-green-600 dark:text-green-400" />
+      ) : (
+        <XCircle className="size-3.5 shrink-0" />
+      )}
+      {label}
+    </div>
+  );
+}
 
 // ─── Detail Item Helper ────────────────────────────────────────────────────────
 

@@ -840,7 +840,24 @@
         "favorites": "Favorites",
         "createdAt": "Listed on",
         "updatedAt": "Updated on",
-        "rejectionReason": "Rejection Reason"
+        "rejectionReason": "Rejection Reason",
+        "listingProgress": "Listing Progress",
+        "basicInfo": "Basic Info",
+        "photos": "Photos",
+        "condition": "Condition",
+        "mlPricing": "ML Pricing",
+        "aiFairPrice": "AI Fair Price",
+        "negotiationRange": "Negotiation Range",
+        "predictedAt": "Predicted At",
+        "aiPricingNote": "AI pricing powered by the KARNA ML model",
+        "listingDetails": "Listing Details",
+        "location": "Location",
+        "description": "Description",
+        "contactInfo": "Contact Information",
+        "phone": "Phone",
+        "whatsapp": "WhatsApp",
+        "preferredMethod": "Preferred Method",
+        "conditionChecklist": "Condition Checklist"
       }
     },
     "addListing": {
@@ -884,7 +901,7 @@
       },
       "pricing": {
         "title": "Pricing",
-        "description": "Set your asking price in SAR"
+        "description": "Set your asking price in EGP"
       },
       "descriptionSection": {
         "title": "Description",
@@ -1007,7 +1024,7 @@
       "aRange": "A range",
       "bRange": "B range",
       "cRange": "C range",
-      "maxPrice": "Max price (SAR)",
+      "maxPrice": "Max price (EGP)",
       "maxPricePlaceholder": "e.g. 120000",
       "sortBy": "Sort by",
       "sort": {

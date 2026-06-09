@@ -840,7 +840,24 @@
         "favorites": "المفضلة",
         "createdAt": "تاريخ الإدراج",
         "updatedAt": "تاريخ التحديث",
-        "rejectionReason": "سبب الرفض"
+        "rejectionReason": "سبب الرفض",
+        "listingProgress": "تقدم الإعلان",
+        "basicInfo": "المعلومات الأساسية",
+        "photos": "الصور",
+        "condition": "الحالة",
+        "mlPricing": "تسعير الذكاء الاصطناعي",
+        "aiFairPrice": "السعر العادل (AI)",
+        "negotiationRange": "نطاق التفاوض",
+        "predictedAt": "تاريخ التنبؤ",
+        "aiPricingNote": "تسعير الذكاء الاصطناعي مدعوم بنموذج KARNA ML",
+        "listingDetails": "تفاصيل الإعلان",
+        "location": "الموقع",
+        "description": "الوصف",
+        "contactInfo": "معلومات الاتصال",
+        "phone": "الهاتف",
+        "whatsapp": "واتساب",
+        "preferredMethod": "طريقة التواصل المفضلة",
+        "conditionChecklist": "قائمة التحقق من الحالة"
       }
     },
     "addListing": {
@@ -884,7 +901,7 @@
       },
       "pricing": {
         "title": "التسعير",
-        "description": "حدد السعر المطلوب بالريال السعودي"
+        "description": "حدد السعر المطلوب بالجنيه المصري" 
       },
       "descriptionSection": {
         "title": "الوصف",
@@ -1007,7 +1024,7 @@
       "aRange": "فئة A",
       "bRange": "فئة B",
       "cRange": "فئة C",
-      "maxPrice": "أقصى سعر (ريال)",
+      "maxPrice": "أقصى سعر (جنيه)",
       "maxPricePlaceholder": "مثال: 120000",
       "sortBy": "ترتيب حسب",
       "sort": {

@@ -1,7 +1,7 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { Badge, Button } from "@gp/design-system";
+import { Badge, Button, PageLoader } from "@gp/design-system";
 import {
   Card,
   CardContent,
@@ -25,57 +25,17 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import heroCarImage from "@/assets/hero-car4.jpg";
-import { MOCK_LISTINGS } from "@/data/mocks/listings";
+import { getApprovedListings, type BuyerListingDto } from "@/lib/listingsApi";
 
-type HomeCarCard = {
-  id: number;
-  make: string;
-  model: string;
-  year: number;
-  price: number;
-  mileageKm: number;
-  fuel: string;
-  transmission: string;
-  bodyType: string;
-  location: string;
-  image: string;
-  featured?: boolean;
-};
+const BASE_URL: string =
+  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5082";
 
-const FALLBACK_LOCATIONS = [
-  "Dubai",
-  "Abu Dhabi",
-  "Riyadh",
-  "Jeddah",
-  "Doha",
-  "Kuwait City",
-  "Manama",
-  "Sharjah",
-];
-
-const BODY_TYPE_BY_MAKE: Record<string, string> = {
-  Toyota: "Sedan",
-  Honda: "Sedan",
-  BMW: "Sedan",
-  "Mercedes-Benz": "Sedan",
-  Nissan: "SUV",
-  Hyundai: "Sedan",
-};
-
-const DEMO_CARS: HomeCarCard[] = MOCK_LISTINGS.map((listing, index) => ({
-  id: listing.id,
-  make: listing.make,
-  model: listing.model,
-  year: listing.year,
-  price: listing.listingPrice,
-  mileageKm: listing.mileage,
-  fuel: listing.fuelType,
-  transmission: listing.transmission,
-  bodyType: BODY_TYPE_BY_MAKE[listing.make] ?? "Sedan",
-  location: FALLBACK_LOCATIONS[index % FALLBACK_LOCATIONS.length],
-  image: listing.images[0],
-  featured: index < 2,
-}));
+function resolvePhotoUrl(url: string | null): string | null {
+  if (!url) return null;
+  if (url.startsWith("http") || url.startsWith("data:")) return url;
+  const path = url.startsWith("/") ? url : `/${url}`;
+  return `${BASE_URL}${path}`;
+}
 
 const Home = () => {
   const { t, i18n } = useTranslation();
@@ -86,66 +46,72 @@ const Home = () => {
 
   const [query, setQuery] = useState("");
   const [make, setMake] = useState<string>("all");
-  const [bodyType, setBodyType] = useState<string>("all");
   const [minPrice, setMinPrice] = useState<string>("");
   const [maxPrice, setMaxPrice] = useState<string>("");
   const [sort, setSort] = useState<
     "featured" | "priceAsc" | "priceDesc" | "yearDesc"
   >("featured");
-  const [savedCarIds, setSavedCarIds] = useState<Set<number>>(new Set());
+  const [savedCarIds, setSavedCarIds] = useState<Set<string>>(new Set());
+  const [apiListings, setApiListings] = useState<BuyerListingDto[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    getApprovedListings({ pageSize: 100 })
+      .then((res) => {
+        if (res.success && res.data) {
+          setApiListings(res.data.data);
+        }
+      })
+      .finally(() => setIsLoading(false));
+  }, []);
 
   const makeOptions = useMemo(() => {
-    const set = new Set(DEMO_CARS.map((c) => c.make));
+    const set = new Set(apiListings.map((c) => c.makeName));
     return Array.from(set).sort((a, b) => a.localeCompare(b));
-  }, []);
-
-  const bodyTypeOptions = useMemo(() => {
-    const set = new Set(DEMO_CARS.map((c) => c.bodyType));
-    return Array.from(set).sort((a, b) => a.localeCompare(b));
-  }, []);
+  }, [apiListings]);
 
   const filteredCars = useMemo(() => {
     const q = query.trim().toLowerCase();
     const min = minPrice.trim() ? Number(minPrice) : null;
     const max = maxPrice.trim() ? Number(maxPrice) : null;
 
-    const withinPrice = (price: number) => {
+    const withinPrice = (price: number | null) => {
+      if (price === null) return true;
       if (Number.isFinite(min) && min !== null && price < min) return false;
       if (Number.isFinite(max) && max !== null && price > max) return false;
       return true;
     };
 
-    const matches = (car: HomeCarCard) => {
-      if (make !== "all" && car.make !== make) return false;
-      if (bodyType !== "all" && car.bodyType !== bodyType) return false;
-      if (!withinPrice(car.price)) return false;
+    const matches = (car: BuyerListingDto) => {
+      if (make !== "all" && car.makeName !== make) return false;
+      if (!withinPrice(car.listingPrice)) return false;
       if (!q) return true;
       const haystack =
-        `${car.make} ${car.model} ${car.year} ${car.bodyType} ${car.location}`.toLowerCase();
+        `${car.makeName} ${car.modelName} ${car.year} ${car.location}`.toLowerCase();
       return haystack.includes(q);
     };
 
-    const list = DEMO_CARS.filter(matches);
+    const list = apiListings.filter(matches);
 
     const sorters: Record<
       typeof sort,
-      (a: HomeCarCard, b: HomeCarCard) => number
+      (a: BuyerListingDto, b: BuyerListingDto) => number
     > = {
       featured: (a, b) => {
-        const af = a.featured ? 1 : 0;
-        const bf = b.featured ? 1 : 0;
+        const af = a.isGoodDeal ? 1 : 0;
+        const bf = b.isGoodDeal ? 1 : 0;
         if (bf !== af) return bf - af;
-        return a.price - b.price;
+        return (a.listingPrice ?? 0) - (b.listingPrice ?? 0);
       },
-      priceAsc: (a, b) => a.price - b.price,
-      priceDesc: (a, b) => b.price - a.price,
+      priceAsc: (a, b) => (a.listingPrice ?? 0) - (b.listingPrice ?? 0),
+      priceDesc: (a, b) => (b.listingPrice ?? 0) - (a.listingPrice ?? 0),
       yearDesc: (a, b) => b.year - a.year,
     };
 
     return list.sort(sorters[sort]);
-  }, [query, make, bodyType, minPrice, maxPrice, sort]);
+  }, [query, make, minPrice, maxPrice, sort, apiListings]);
 
-  const toggleSaved = (carId: number) => {
+  const toggleSaved = (carId: string) => {
     setSavedCarIds((prev) => {
       const next = new Set(prev);
       if (next.has(carId)) {
@@ -161,11 +127,15 @@ const Home = () => {
     () =>
       new Intl.NumberFormat(i18n.language || "en", {
         style: "currency",
-        currency: "USD",
+        currency: "EGP",
         maximumFractionDigits: 0,
       }),
     [i18n.language],
   );
+
+  if (isLoading) {
+    return <PageLoader />;
+  }
 
   return (
     <div className="relative min-h-screen overflow-x-hidden">
@@ -320,20 +290,6 @@ const Home = () => {
                     ))}
                   </select>
 
-                  <select
-                    value={bodyType}
-                    onChange={(e) => setBodyType(e.target.value)}
-                    className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
-                  >
-                    <option value="all">
-                      {t("home.browse.filters.bodyAll")}
-                    </option>
-                    {bodyTypeOptions.map((b) => (
-                      <option key={b} value={b}>
-                        {b}
-                      </option>
-                    ))}
-                  </select>
 
                   <select
                     value={sort}
@@ -383,7 +339,6 @@ const Home = () => {
                     onClick={() => {
                       setQuery("");
                       setMake("all");
-                      setBodyType("all");
                       setMinPrice("");
                       setMaxPrice("");
                       setSort("featured");
@@ -419,7 +374,9 @@ const Home = () => {
               </Card>
             ) : (
               <div className="grid auto-rows-fr gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {filteredCars.map((car, idx) => (
+                {filteredCars.map((car, idx) => {
+                  const imageUrl = resolvePhotoUrl(car.primaryPhotoUrl);
+                  return (
                   <motion.div
                     key={car.id}
                     initial={{ opacity: 0, y: 14 }}
@@ -431,27 +388,27 @@ const Home = () => {
                     <Card className="group h-full overflow-hidden border-border/60 hover:shadow-(--shadow-md) hover:border-border transition-all duration-200 flex flex-col min-w-0">
                       {/* Image */}
                       <div className="relative aspect-16/10 overflow-hidden">
-                        <img
-                          src={car.image}
-                          alt={`${car.make} ${car.model}`}
-                          className="h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
-                          loading="lazy"
-                        />
+                        {imageUrl ? (
+                          <img
+                            src={imageUrl}
+                            alt={`${car.makeName} ${car.modelName}`}
+                            className="h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-105"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="h-full w-full flex items-center justify-center bg-muted">
+                            <Gauge className="h-10 w-10 text-muted-foreground/40" />
+                          </div>
+                        )}
                         <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent" />
 
                         {/* Badges */}
                         <div className="absolute start-3 top-3 flex gap-1.5 flex-wrap">
-                          {car.featured && (
+                          {car.isGoodDeal && (
                             <Badge className="bg-primary text-primary-foreground text-xs px-2 py-0.5">
                               {t("home.browse.featured")}
                             </Badge>
                           )}
-                          <Badge
-                            variant="secondary"
-                            className="text-xs px-2 py-0.5"
-                          >
-                            {car.bodyType}
-                          </Badge>
                         </div>
 
                         {/* Save button — floats over the image */}
@@ -479,7 +436,7 @@ const Home = () => {
                               {car.location}
                             </p>
                             <h3 className="text-base font-bold font-heading truncate text-foreground leading-tight">
-                              {car.make} {car.model}
+                              {car.makeName} {car.modelName}
                             </h3>
                             <p className="text-xs text-muted-foreground mt-0.5">
                               <span dir="ltr">{car.year}</span>
@@ -491,7 +448,7 @@ const Home = () => {
                             </p>
                             <p className="text-base font-semibold text-primary whitespace-nowrap">
                               <span dir="ltr">
-                                {currency.format(car.price)}
+                                {car.listingPrice !== null ? currency.format(car.listingPrice) : "N/A"}
                               </span>
                             </p>
                           </div>
@@ -502,12 +459,12 @@ const Home = () => {
                           <span className="flex items-center gap-1">
                             <Gauge className="h-3.5 w-3.5 opacity-60 shrink-0" />
                             <span dir="ltr">
-                              {car.mileageKm.toLocaleString()} km
+                              {car.mileage.toLocaleString()} km
                             </span>
                           </span>
                           <span className="flex items-center gap-1">
                             <Fuel className="h-3.5 w-3.5 opacity-60 shrink-0" />
-                            {car.fuel}
+                            {car.fuelType}
                           </span>
                           <span className="truncate">{car.transmission}</span>
                         </div>
@@ -529,7 +486,8 @@ const Home = () => {
                       </CardContent>
                     </Card>
                   </motion.div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

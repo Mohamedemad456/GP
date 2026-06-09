@@ -418,6 +418,66 @@ export type PricingHistoryDto = {
   changedAt: string;
 };
 
+/** Matches backend MyListingDefectItemDto */
+export type MyListingDefectItemDto = {
+  id: string;
+  name: string;
+};
+
+/** Matches backend MyListingChecklistCategoryDto */
+export type MyListingChecklistCategoryDto = {
+  categoryId: string;
+  categoryName: string;
+  selectedItems: MyListingDefectItemDto[];
+};
+
+/** Matches backend ListingProgressDto */
+export type ListingProgressDto = {
+  hasBasicInfo: boolean;
+  hasPhotos: boolean;
+  hasConditionChecklist: boolean;
+  hasMLPricing: boolean;
+  canSubmit: boolean;
+  completionPercentage: number;
+};
+
+/** Matches backend MyListingDetailsDto — seller-only details including ML pricing, status, and progress */
+export type MyListingDetailsDto = {
+  id: string;
+  makeId: string;
+  makeName: string;
+  modelId: string;
+  modelName: string;
+  year: number;
+  mileage: number;
+  fuelType: string;
+  transmission: string;
+  engineSize: number;
+  color: string;
+  description: string;
+  locationId: number;
+  locationName: string;
+  contactPhoneNumber: string;
+  whatsAppNumber: string | null;
+  preferredContactMethod: string;
+  listingPrice: number | null;
+  // ML Pricing (owner only)
+  fairPrice: number | null;
+  negotiationRangeLower: number | null;
+  negotiationRangeUpper: number | null;
+  confidenceLevel: string | null;
+  modelVersion: string | null;
+  predictedAt: string | null;
+  photos: ListingPhotoDto[];
+  conditionGrade: string;
+  checklistCategories: MyListingChecklistCategoryDto[];
+  status: string;
+  createdAt: string;
+  updatedAt: string | null;
+  rejectionReason: string | null;
+  progress: ListingProgressDto;
+};
+
 // ─── Buyer Listings & Pricing History Functions ─────────────────────────────
 
 /**
@@ -449,6 +509,18 @@ export const getMyListings = (params?: MyListingSpecParams) =>
 export const getListingById = (listingId: string) =>
   api
     .get<ApiResponse<ListingDetailsDto>>(`/api/Listings/${listingId}`)
+    .then((r) => r.data);
+
+/**
+ * GET /api/Listings/my-listings/{id}
+ * Fetches detailed info for a seller-owned listing (requires authentication).
+ * Returns seller-specific data including ML pricing, status, rejection reason, and progress.
+ */
+export const getMyListingDetails = (listingId: string) =>
+  api
+    .get<ApiResponse<MyListingDetailsDto>>(
+      `/api/Listings/my-listings/${listingId}`,
+    )
     .then((r) => r.data);
 
 /**
