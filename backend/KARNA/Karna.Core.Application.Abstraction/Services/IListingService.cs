@@ -21,6 +21,7 @@ namespace Karna.Core.Application.Abstraction.Services
 
 		Task<ApiResponse<Pagination<BuyerListingDto>>> GetApprovedListingsAsync(BuyerListingSpecParams specParams);
 		Task<ApiResponse<Pagination<MyListingDto>>> GetMyListingsAsync(MyListingSpecParams specParams);
+		Task<ApiResponse<MyListingDetailsDto>> GetMyListingDetailsAsync(Guid listingId);
 		Task<ApiResponse<ListingDetailsDto>> GetByIdAsync(Guid id);
 	}
 }
