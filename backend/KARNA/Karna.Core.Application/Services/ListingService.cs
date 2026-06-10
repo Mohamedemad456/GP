@@ -331,11 +331,7 @@ namespace Karna.Core.Application.Services
 			if (photos.Count() < 3)
 				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingInsufficientPhotos") };
 
-			// Validate condition checklist is added
-			var listingDefectRepo = _unitOfWork.GetRepository<ListingDefect>();
-			var defects = await listingDefectRepo.FindAsync(ld => ld.ListingId == listingId, withTracking: false);
-			if (!defects.Any())
-				return new ApiResponse<ListingDto> { Success = false, Message = _localizer.GetErrorMessage("ListingMissingChecklist") };
+			// Condition checklist is optional — no validation needed
 
 			// Validate ML pricing has been generated
 			if (!HasRequiredPricing(listing))
@@ -517,7 +513,6 @@ namespace Karna.Core.Application.Services
 				&& listing.ModelId != Guid.Empty
 				&& listing.Year > 0
 				&& listing.Mileage > 0
-				&& listing.EngineSize > 0
 				&& Enum.IsDefined(listing.FuelType)
 				&& Enum.IsDefined(listing.Transmission)
 				&& Enum.IsDefined(listing.Location);
@@ -666,6 +661,36 @@ namespace Karna.Core.Application.Services
 			};
 		}
 
+		public async Task<ApiResponse<Pagination<MyListingDto>>> GetMyListingsAsync(MyListingSpecParams specParams)
+		{
+			// 1. Authenticate & resolve current user
+			if (!_currentUserService.IsAuthenticated || _currentUserService.UserId == Guid.Empty)
+				return new ApiResponse<Pagination<MyListingDto>> { Success = false, Message = _localizer.GetErrorMessage("Unauthorized") };
+
+			var userRepo = _unitOfWork.GetRepository<User>();
+			var currentUser = await userRepo.GetAsync(u => u.IdentityUserId == _currentUserService.UserId);
+			if (currentUser is null)
+				return new ApiResponse<Pagination<MyListingDto>> { Success = false, Message = _localizer.GetErrorMessage("UserNotFound") };
+
+			// 2. Build specification with seller's domain ID
+			var repo = _unitOfWork.GetRepository<Listing>();
+			var dataSpec = new SellerListingsSpecification(currentUser.Id, specParams, applyPaging: true);
+			var countSpec = new SellerListingsSpecification(currentUser.Id, specParams, applyPaging: false);
+
+			var listings = await repo.GetAllWithSpecAsync(dataSpec);
+			var count = await repo.GetCountAsync(countSpec);
+
+			// 3. Map and return
+			return new ApiResponse<Pagination<MyListingDto>>
+			{
+				Success = true,
+				Data = new Pagination<MyListingDto>(specParams.PageIndex, specParams.PageSize, count)
+				{
+					Data = listings.ToMyListingDto()
+				}
+			};
+		}
+
 		public async Task<ApiResponse<Pagination<BuyerListingDto>>> GetApprovedListingsAsync(BuyerListingSpecParams specParams)
 		{
 			var repo = _unitOfWork.GetRepository<Listing>();
@@ -728,51 +753,86 @@ namespace Karna.Core.Application.Services
 			};
 		}
 
+		public async Task<ApiResponse<MyListingDetailsDto>> GetMyListingDetailsAsync(Guid listingId)
+		{
+			// 1. Auth & resolve domain user
+			if (!_currentUserService.IsAuthenticated || _currentUserService.UserId == Guid.Empty)
+				return new ApiResponse<MyListingDetailsDto> { Success = false, Message = _localizer.GetErrorMessage("Unauthorized") };
+
+			var userRepo = _unitOfWork.GetRepository<User>();
+			var currentUser = await userRepo.GetAsync(u => u.IdentityUserId == _currentUserService.UserId);
+			if (currentUser is null)
+				return new ApiResponse<MyListingDetailsDto> { Success = false, Message = _localizer.GetErrorMessage("UserNotFound") };
+
+			// 2. Load listing — owner-scoped, no status gate, includes Make/Model/Photos/ListingDefects
+			var listingRepo = _unitOfWork.GetRepository<Listing>();
+			var spec = new SellerListingDetailsSpecification(listingId, currentUser.Id);
+			var listing = await listingRepo.GetWithSpecAsync(spec);
+
+			if (listing is null)
+				return new ApiResponse<MyListingDetailsDto> { Success = false, Message = _localizer.GetErrorMessage("ListingNotFound") };
+
+			// 3. Load deep navigation: ListingDefects → ConditionDefect → Category
+			if (listing.ListingDefects.Any())
+			{
+				var defectRepo = _unitOfWork.GetRepository<ConditionDefect>();
+				var categoryRepo = _unitOfWork.GetRepository<ConditionChecklistCategory>();
+
+				var defectIds = listing.ListingDefects.Select(ld => ld.ConditionDefectId).ToList();
+				var conditionDefects = (await defectRepo.FindAsync(
+					d => defectIds.Contains(d.Id), withTracking: false)).ToList();
+
+				var categoryIds = conditionDefects.Select(d => d.CategoryId).Distinct().ToList();
+				var categories = (await categoryRepo.FindAsync(
+					c => categoryIds.Contains(c.Id), withTracking: false)).ToList();
+
+				foreach (var defect in conditionDefects)
+					defect.Category = categories.FirstOrDefault(c => c.Id == defect.CategoryId)!;
+
+				foreach (var ld in listing.ListingDefects)
+					ld.ConditionDefect = conditionDefects.FirstOrDefault(d => d.Id == ld.ConditionDefectId)!;
+			}
+
+			// 4. Map & return
+			return new ApiResponse<MyListingDetailsDto>
+			{
+				Success = true,
+				Data = listing.ToMyListingDetailsDto()
+			};
+		}
+
         public async Task<ApiResponseDto> DeleteAsync(Guid id)
         {
+            // 1. Authenticate & resolve current user
+            if (!_currentUserService.IsAuthenticated || _currentUserService.UserId == Guid.Empty)
+                return new ApiResponseDto { Success = false, Message = _localizer.GetErrorMessage("Unauthorized") };
+
+            var userRepo = _unitOfWork.GetRepository<User>();
+            var currentUser = await userRepo.GetAsync(u => u.IdentityUserId == _currentUserService.UserId);
+            if (currentUser is null)
+                return new ApiResponseDto { Success = false, Message = _localizer.GetErrorMessage("UserNotFound") };
+
+            // 2. Get listing
             var listingRepo = _unitOfWork.GetRepository<Listing>();
             var historyRepo = _unitOfWork.GetRepository<ListingStatusHistory>();
 
             var listing = await listingRepo.GetAsync(id);
 
             if (listing is null)
-            {
-                return new ApiResponseDto
-                {
-                    Success = false,
-                    Message = _localizer.GetErrorMessage("ListingNotFound")
-                };
-            }
+                return new ApiResponseDto { Success = false, Message = _localizer.GetErrorMessage("ListingNotFound") };
 
             if (listing.IsDeleted)
-            {
-                return new ApiResponseDto
-                {
-                    Success = false,
-                    Message = _localizer.GetValidationMessage("ListingAlreadyDeleted")
-                };
-            }
+                return new ApiResponseDto { Success = false, Message = _localizer.GetValidationMessage("ListingAlreadyDeleted") };
 
-            var currentUserId = _currentUserService.UserId;
+            // 3. Validate ownership (using domain User.Id, not IdentityUserId)
+            if (listing.SellerId != currentUser.Id)
+                return new ApiResponseDto { Success = false, Message = _localizer.GetErrorMessage("ListingNotOwnedByUser") };
 
-            if (listing.SellerId != currentUserId)
-            {
-                return new ApiResponseDto
-                {
-                    Success = false,
-                    Message = _localizer.GetErrorMessage("InvalidListingOwner")
-                };
-            }
-
+            // 4. Block deletion of sold listings
             if (listing.Status == ListingStatus.Sold)
-            {
-                return new ApiResponseDto
-                {
-                    Success = false,
-                    Message = _localizer.GetValidationMessage("ListingCannotBeDeleted")
-                };
-            }
+                return new ApiResponseDto { Success = false, Message = _localizer.GetValidationMessage("ListingCannotBeDeleted") };
 
+            // 5. Soft delete + archive
             var now = DateTime.UtcNow;
 
             listing.IsDeleted = true;
@@ -786,7 +846,7 @@ namespace Karna.Core.Application.Services
                 ListingId = listing.Id,
                 OldStatus = oldStatus,
                 NewStatus = ListingStatus.Archived,
-                ChangedByUserId = currentUserId,
+                ChangedByUserId = currentUser.Id,
                 ChangedAt = now,
                 Reason = _localizer.GetMessage("ListingDeletedReason")
             };
@@ -799,7 +859,6 @@ namespace Karna.Core.Application.Services
                 Success = true,
                 Message = _localizer.GetMessage("ListingArchived")
             };
-
         }
     }
 }

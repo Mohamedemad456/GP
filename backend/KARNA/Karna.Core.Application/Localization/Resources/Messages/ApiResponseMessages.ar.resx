@@ -240,4 +240,10 @@
   <data name="ListingMarkedAsSold" xml:space="preserve">
     <value>تم تحديد الإعلان كمباع بنجاح.</value>
   </data>
+  <data name="UserActivated" xml:space="preserve">
+    <value>تم تفعيل المستخدم بنجاح.</value>
+  </data>
+  <data name="UserDeactivated" xml:space="preserve">
+    <value>تم تعطيل المستخدم بنجاح.</value>
+  </data>
 </root>

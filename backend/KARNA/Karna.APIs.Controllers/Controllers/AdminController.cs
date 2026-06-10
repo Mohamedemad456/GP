@@ -14,6 +14,22 @@ namespace Karna.APIs.Controllers.Controllers
 		IAdminActivityLogService _activityLogService
 	) : ApiControllerBase
 	{
+		[HttpGet("users")]
+		public async Task<IActionResult> GetUsers([FromQuery] UserListSpecParams specParams)
+		{
+			var result = await _adminService.GetUsersAsync(specParams);
+			return Ok(result);
+		}
+
+		[HttpPatch("users/{id:guid}/toggle-status")]
+		public async Task<IActionResult> ToggleUserStatus(Guid id)
+		{
+			var result = await _adminService.ToggleUserStatusAsync(id);
+			if (!result.Success)
+				return BadRequest(result);
+			return Ok(result);
+		}
+
 		[HttpGet("listings/pending")]
 		public async Task<IActionResult> GetPendingListings([FromQuery] PendingListingSpecParams specParams)
 		{
@@ -47,3 +63,4 @@ namespace Karna.APIs.Controllers.Controllers
 		}
 	}
 }
+
