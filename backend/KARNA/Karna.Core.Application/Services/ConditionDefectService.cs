@@ -70,7 +70,7 @@ namespace Karna.Core.Application.Services
 				IsActive = true
 			};
 
-			var dataSpec = new ConditionDefectListSpecification(defectSpecParams, activeOnly: true, applyPaging: true, includeCategory: true);
+			var dataSpec = new ConditionDefectListSpecification(defectSpecParams, activeOnly: true, applyPaging: specParams.IsPagingRequested, includeCategory: true);
 			var countSpec = new ConditionDefectListSpecification(defectSpecParams, activeOnly: true, applyPaging: false, includeCategory: false);
 
 			var defects = await repo.GetAllWithSpecAsync(dataSpec);

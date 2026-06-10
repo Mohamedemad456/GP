@@ -29,6 +29,7 @@ const SellerLayout = lazy(() => import("@/pages/(seller)/SellerLayout"));
 const SellerAnalytics = lazy(() => import("@/pages/(seller)/analytics"));
 const SellerMyListings = lazy(() => import("@/pages/(seller)/my-listings"));
 const AddListing = lazy(() => import("@/pages/(seller)/add-listing"));
+const EditListing = lazy(() => import("@/pages/(seller)/edit-listing"));
 const FeedPage = lazy(() => import("@/pages/(buyer)/feed"));
 const CarDetailsPage = lazy(() => import("@/pages/(buyer)/car-details"));
 const ProfilePage = lazy(() => import("@/pages/(buyer)/profile"));
@@ -82,11 +83,12 @@ function App() {
                 <Route path="conditions" element={<AdminConditions />} />
               </Route>
             </Route>
-            <Route element={<PrivateRoute allowedRoles={["user"]} />}>
+            <Route element={<PrivateRoute allowedRoles={["user", "admin"]} />}>
               <Route path="/seller" element={<SellerLayout />}>
                 <Route index element={<SellerAnalytics />} />
                 <Route path="my-listings" element={<SellerMyListings />} />
                 <Route path="add-listing" element={<AddListing />} />
+                <Route path="edit-listing/:id" element={<EditListing />} />
               </Route>
             </Route>
           </Routes>
