@@ -1,7 +1,6 @@
 # Plan 3: Retrain CLI
 
 > **This is the immediate priority — unblocks everything after it.**  
-> **Recommended Model**: Sonnet 4.6 (CLI architecture) + Opus 4.6 (training logic)  
 > **Dependencies**: None — this is the foundation  
 > **Blocks**: Plans 04 (V2 Training), 08 (Evaluation), all retrain runs
 
@@ -10,7 +9,7 @@
 ## Current State & Problems
 
 ### Problem 1: Training is Notebook-Only
-- All model training happens in Jupyter notebooks (05, 06)
+- All model training happens in Jupyter notebooks
 - Notebooks are great for experimentation but terrible for automation
 - Cannot schedule retraining, cannot trigger from CI/CD
 - **Impact**: Model gets stale as new data accumulates; manual effort to retrain

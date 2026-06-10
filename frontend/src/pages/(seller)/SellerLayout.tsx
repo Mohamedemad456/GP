@@ -109,9 +109,9 @@ const SellerLayout = memo(() => {
                   <SidebarMenuButton
                     asChild
                     tooltip={t("seller.sidebar.myListings")}
-                    isActive={location.pathname === "/seller/listings"}
+                    isActive={location.pathname === "/seller/my-listings"}
                   >
-                    <NavLink to="/seller/listings">
+                    <NavLink to="/seller/my-listings">
                       <List className="size-4" />
                       <span>{t("seller.sidebar.myListings")}</span>
                     </NavLink>
@@ -140,7 +140,11 @@ const SellerLayout = memo(() => {
               <SidebarMenuButton
                 tooltip={t("seller.sidebar.logout")}
                 onClick={async () => {
-                  try { await logoutUser(); } catch { /* proceed regardless */ }
+                  try {
+                    await logoutUser();
+                  } catch {
+                    /* proceed regardless */
+                  }
                   clearUser();
                   navigate("/login", { replace: true });
                 }}

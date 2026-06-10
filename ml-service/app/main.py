@@ -27,7 +27,7 @@ from app.core.config import settings
 from app.core.logging_config import setup_logging
 from app.core.middleware import RequestLoggingMiddleware
 from app.core.metrics import MetricsMiddleware, metrics_endpoint
-from app.api import predict, health
+from app.api import predict, health, admin
 from app.services.model.model_state import load_valid_cars, load_active_model, load_model_diagnostics
 from app.services.explainability.explainer import warm_up_shap
 from app.services.explainability.ensemble_explainer import init_ensemble_explainer, warm_up_ensemble_shap
@@ -65,6 +65,7 @@ app.add_middleware(RequestLoggingMiddleware)
 # Routers
 app.include_router(health.router)
 app.include_router(predict.router)
+app.include_router(admin.router)
 
 # Prometheus metrics endpoint
 app.add_api_route("/metrics", metrics_endpoint, methods=["GET"], include_in_schema=False)

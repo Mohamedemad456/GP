@@ -17,9 +17,11 @@ import {
   uploadListingPhotos,
   generateListingPrice,
   submitListing,
+  setListingPrice,
   type FuelType,
   type EgyptLocation,
   type TransmissionType,
+  type GeneratePriceResponseDto,
 } from "@/lib/listingsApi";
 import { getActiveMakes, type MakeDto } from "@/lib/makesApi";
 import { getActiveModels, type ModelDto } from "@/lib/modelsApi";
@@ -55,6 +57,9 @@ import {
   Loader2,
   CheckCircle2,
   Camera,
+  Calculator,
+  AlertTriangle,
+  Info,
 } from "lucide-react";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -103,6 +108,9 @@ interface FormState {
   engineSize: string;
   color: string;
   description: string;
+  contactPhoneNumber: string;
+  whatsAppNumber: string;
+  preferredContactMethod: string;
 }
 
 interface ConditionSelection {
@@ -123,6 +131,9 @@ const INITIAL_FORM: FormState = {
   engineSize: "",
   color: "",
   description: "",
+  contactPhoneNumber: "",
+  whatsAppNumber: "",
+  preferredContactMethod: "",
 };
 
 type AddListingStep = (typeof ADD_LISTING_STEPS)[number];
@@ -163,6 +174,12 @@ const AddListing = () => {
   const [createdListingId, setCreatedListingId] = useState<string | null>(null);
   const [isConditionStepComplete, setIsConditionStepComplete] = useState(false);
 
+  // Pricing states
+  const [priceData, setPriceData] = useState<GeneratePriceResponseDto | null>(null);
+  const [userPrice, setUserPrice] = useState<string>("");
+  const [isGeneratingPrice, setIsGeneratingPrice] = useState(false);
+  const [priceGenerated, setPriceGenerated] = useState(false);
+
   // Makes & models from API
   const [makes, setMakes] = useState<MakeDto[]>([]);
   const [allModels, setAllModels] = useState<ModelDto[]>([]);
@@ -187,89 +204,32 @@ const AddListing = () => {
   const [selectedConditions, setSelectedConditions] = useState<
     ConditionSelection[]
   >([]);
+  
+const fetchAllActiveMakes = useCallback(async () => {
+  setIsLoadingMakes(true);
+  try {
+    const res = await getActiveMakes();
+    if (!res.success) throw new Error(res.message);
+    setMakes(res.data?.data ?? []);
+  } catch {
+    toast.error(t("seller.addListing.errors.loadMakesFailed"));
+  } finally {
+    setIsLoadingMakes(false);
+  }
+}, [t]);
 
-  const fetchAllActiveMakes = useCallback(async () => {
-    setIsLoadingMakes(true);
-    try {
-      const firstRes = await getActiveMakes({
-        pageIndex: 1,
-        pageSize: 10,
-        sort: "name",
-        sortDirection: "asc",
-      });
-      if (!firstRes.success) throw new Error(firstRes.message);
-
-      const firstPage = firstRes.data?.data ?? [];
-      const totalCount = firstRes.data?.count ?? firstPage.length;
-      const effectivePageSize = firstRes.data?.pageSize ?? 10;
-      const totalPages = Math.ceil(totalCount / effectivePageSize);
-
-      const remainingPages =
-        totalPages > 1
-          ? await Promise.all(
-              Array.from({ length: totalPages - 1 }, (_, index) =>
-                getActiveMakes({
-                  pageIndex: index + 2,
-                  pageSize: effectivePageSize,
-                  sort: "name",
-                  sortDirection: "asc",
-                }),
-              ),
-            )
-          : [];
-      if (remainingPages.some((res) => !res.success)) throw new Error("Failed to load makes");
-
-      setMakes([
-        ...firstPage,
-        ...remainingPages.flatMap((res) => (res.success ? res.data?.data ?? [] : [])),
-      ]);
-    } catch {
-      toast.error(t("seller.addListing.errors.loadMakesFailed"));
-    } finally {
-      setIsLoadingMakes(false);
-    }
-  }, [t]);
-
-  const fetchAllActiveModels = useCallback(async () => {
-    setIsLoadingModels(true);
-    try {
-      const pageSize = 10;
-      const firstRes = await getActiveModels({
-        pageIndex: 1,
-        pageSize,
-        sort: "name",
-        sortDirection: "asc",
-      });
-      if (!firstRes.success) throw new Error(firstRes.message);
-
-      const firstPage = firstRes.data ?? [];
-      const totalCount = firstRes.count ?? firstPage.length;
-      const totalPages = Math.ceil(totalCount / pageSize);
-      const remainingPages =
-        totalPages > 1
-          ? await Promise.all(
-              Array.from({ length: totalPages - 1 }, (_, index) =>
-                getActiveModels({
-                  pageIndex: index + 2,
-                  pageSize,
-                  sort: "name",
-                  sortDirection: "asc",
-                }),
-              ),
-            )
-          : [];
-      if (remainingPages.some((res) => !res.success)) throw new Error("Failed to load models");
-
-      setAllModels([
-        ...firstPage,
-        ...remainingPages.flatMap((res) => (res.success ? res.data ?? [] : [])),
-      ]);
-    } catch {
-      toast.error(t("seller.addListing.errors.loadModelsFailed"));
-    } finally {
-      setIsLoadingModels(false);
-    }
-  }, [t]);
+const fetchAllActiveModels = useCallback(async () => {
+  setIsLoadingModels(true);
+  try {
+    const res = await getActiveModels();
+    if (!res.success) throw new Error(res.message);
+    setAllModels(res.data ?? []);
+  } catch {
+    toast.error(t("seller.addListing.errors.loadModelsFailed"));
+  } finally {
+    setIsLoadingModels(false);
+  }
+}, [t]);
 
   useEffect(() => {
     fetchAllActiveMakes();
@@ -548,6 +508,12 @@ const AddListing = () => {
     } else if (form.description.trim().length < 20) {
       errs.description = t("seller.addListing.errors.descriptionTooShort");
     }
+    if (!form.contactPhoneNumber.trim()) {
+      errs.contactPhoneNumber = t("seller.addListing.errors.required");
+    }
+    if (!form.preferredContactMethod) {
+      errs.preferredContactMethod = t("seller.addListing.errors.required");
+    }
 
     return errs;
   }, [form, t]);
@@ -598,6 +564,9 @@ const AddListing = () => {
         engineSize: parseFloat(form.engineSize),
         color: form.color,
         description: form.description.trim(),
+        contactPhoneNumber: form.contactPhoneNumber.trim(),
+        whatsAppNumber: form.whatsAppNumber.trim(),
+        preferredContactMethod: parseInt(form.preferredContactMethod, 10),
       });
 
       if (!createResult.success || !createResult.data) {
@@ -660,6 +629,84 @@ const AddListing = () => {
     }
   }, [createdListingId, selectedConditions, t]);
 
+  const handleSkipConditions = useCallback(async () => {
+    if (!createdListingId) {
+      toast.error(t("seller.addListing.errors.createListingFirst"));
+      setCurrentStep("listing");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const checklistResult = await addListingChecklist(createdListingId, {
+        conditionDefectIds: [],
+      });
+
+      if (!checklistResult.success) {
+        toast.error(t("seller.addListing.errors.checklistFailed"), {
+          description: checklistResult.message,
+        });
+        return;
+      }
+
+      setIsConditionStepComplete(true);
+      setSubmitted(false);
+      setCurrentStep("photos");
+    } catch (error) {
+      toast.error(t("seller.addListing.errors.checklistFailed"), {
+        description: getApiErrorMessage(error),
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [createdListingId, t]);
+
+  const handleGeneratePrice = useCallback(async () => {
+    if (!createdListingId) return;
+
+    setSubmitted(true);
+    const validationErrors = validatePhotosStep();
+    setErrors(validationErrors);
+
+    if (Object.keys(validationErrors).length > 0) {
+      toast.error(t("seller.addListing.errors.fixErrors"));
+      return;
+    }
+
+    setIsGeneratingPrice(true);
+
+    try {
+      // Upload photos before generating price
+      const photosResult = await uploadListingPhotos(createdListingId, images);
+      if (!photosResult.success) {
+        toast.error(t("seller.addListing.errors.photosFailed"), {
+          description: photosResult.message,
+        });
+        return;
+      }
+
+      const priceResult = await generateListingPrice(createdListingId);
+      if (!priceResult.success || !priceResult.data) {
+        toast.error(t("seller.addListing.errors.generatePriceFailed", "Failed to generate price"), {
+          description: priceResult.message,
+        });
+        return;
+      }
+
+      setPriceData(priceResult.data);
+      setUserPrice(priceResult.data.fairPrice.toString());
+      setPriceGenerated(true);
+      toast.success(t("seller.addListing.success.priceGenerated", "Price generated successfully"));
+    } catch (error) {
+      toast.error(t("seller.addListing.errors.generatePriceFailed", "Failed to generate price"), {
+        description: getApiErrorMessage(error),
+      });
+    } finally {
+      setIsGeneratingPrice(false);
+    }
+  }, [createdListingId, images, t, validatePhotosStep]);
+
   const handlePhotosStepSubmit = useCallback(async () => {
     if (!createdListingId) {
       toast.error(t("seller.addListing.errors.createListingFirst"));
@@ -667,9 +714,17 @@ const AddListing = () => {
       return;
     }
 
+    if (!priceGenerated || !userPrice) {
+      toast.error(t("seller.addListing.errors.generatePriceFirst", "Please generate and set a price first."));
+      return;
+    }
+
     setSubmitted(true);
 
     const validationErrors = validatePhotosStep();
+    if (!userPrice.trim() || isNaN(Number(userPrice)) || Number(userPrice) <= 0) {
+      validationErrors.price = t("seller.addListing.errors.invalidPrice", "Please enter a valid price");
+    }
     setErrors(validationErrors);
 
     if (Object.keys(validationErrors).length > 0) {
@@ -680,19 +735,15 @@ const AddListing = () => {
     setIsSubmitting(true);
 
     try {
-      const photosResult = await uploadListingPhotos(createdListingId, images);
+      const numericUserPrice = Number(userPrice);
+      const setPriceRes = await setListingPrice(createdListingId, {
+        price: numericUserPrice,
+        acceptFairPrice: numericUserPrice === priceData?.fairPrice,
+      });
 
-      if (!photosResult.success) {
-        toast.error(t("seller.addListing.errors.photosFailed"), {
-          description: photosResult.message,
-        });
-        return;
-      }
-
-      const priceResult = await generateListingPrice(createdListingId);
-      if (!priceResult.success) {
-        toast.error(t("seller.addListing.errors.submitFailed"), {
-          description: priceResult.message,
+      if (!setPriceRes.success) {
+        toast.error(t("seller.addListing.errors.setPriceFailed", "Failed to set price"), {
+          description: setPriceRes.message,
         });
         return;
       }
@@ -709,7 +760,7 @@ const AddListing = () => {
         description: t("seller.addListing.success.description"),
       });
 
-      navigate("/seller/listings");
+      navigate("/seller/my-listings");
     } catch (error) {
       toast.error(t("seller.addListing.errors.submitFailed"), {
         description: getApiErrorMessage(error),
@@ -717,7 +768,7 @@ const AddListing = () => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [createdListingId, images, navigate, t, validatePhotosStep]);
+  }, [createdListingId, priceGenerated, userPrice, priceData, navigate, t, validatePhotosStep]);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -944,6 +995,141 @@ const AddListing = () => {
           )}
         </CardContent>
       </Card>
+      )}
+
+      {/* Pricing Section (Shows only after photos/when currentStep is photos) */}
+      {currentStep === "photos" && (
+        <Card className={SECTION_CARD_CLASS}>
+          <CardHeader className={SECTION_HEADER_CLASS}>
+            <CardTitle className="flex items-center gap-3 text-base">
+              <span className="flex size-9 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                <Calculator className="size-4" />
+              </span>
+              {t("seller.addListing.pricing.title", "Pricing")}
+            </CardTitle>
+            <CardDescription>
+              {t("seller.addListing.pricing.description", "Generate a fair market price based on your vehicle's condition, mileage, and market data.")}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6 pt-6">
+            {!priceGenerated ? (
+              <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border/70 bg-muted/20 py-8 text-center">
+                <Calculator className="mb-4 size-10 text-muted-foreground/50" />
+                <h3 className="mb-2 font-medium">{t("seller.addListing.pricing.generateTitle", "Ready to price your vehicle?")}</h3>
+                <p className="mb-6 max-w-md text-sm text-muted-foreground">
+                  {t("seller.addListing.pricing.generateDesc", "Our AI model will analyze market data, vehicle condition, and specifications to suggest a fair competitive price.")}
+                </p>
+                <Button 
+                  type="button" 
+                  onClick={handleGeneratePrice} 
+                  disabled={isGeneratingPrice}
+                  className="gap-2 rounded-xl"
+                >
+                  {isGeneratingPrice ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <Calculator className="size-4" />
+                  )}
+                  {t("seller.addListing.pricing.generateBtn", "Generate Price")}
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {priceData && (
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                    <div className="rounded-2xl border border-border/60 bg-background/50 p-4 shadow-sm">
+                      <p className="text-sm font-medium text-muted-foreground">
+                        {t("seller.addListing.pricing.lowerRange", "Lower Range")}
+                      </p>
+                      <p className="mt-1 text-2xl font-bold">
+                        {new Intl.NumberFormat(i18n.language, { style: "currency", currency: "EGP", maximumFractionDigits: 0 }).format(priceData.negotiationRangeLower)}
+                      </p>
+                    </div>
+                    <div className="rounded-2xl border border-primary/30 bg-primary/5 p-4 shadow-sm">
+                      <p className="flex items-center gap-2 text-sm font-medium text-primary">
+                        <Sparkles className="size-4" />
+                        {t("seller.addListing.pricing.fairPrice", "Fair Price")}
+                      </p>
+                      <p className="mt-1 text-3xl font-bold text-primary">
+                        {new Intl.NumberFormat(i18n.language, { style: "currency", currency: "EGP", maximumFractionDigits: 0 }).format(priceData.fairPrice)}
+                      </p>
+                    </div>
+                    <div className="rounded-2xl border border-border/60 bg-background/50 p-4 shadow-sm">
+                      <p className="text-sm font-medium text-muted-foreground">
+                        {t("seller.addListing.pricing.upperRange", "Upper Range")}
+                      </p>
+                      <p className="mt-1 text-2xl font-bold">
+                        {new Intl.NumberFormat(i18n.language, { style: "currency", currency: "EGP", maximumFractionDigits: 0 }).format(priceData.negotiationRangeUpper)}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                <Separator />
+
+                <div className="space-y-4">
+                  <FormField 
+                    label={t("seller.addListing.fields.yourPrice", "Your Final Price")} 
+                    error={errors.price} 
+                    required
+                  >
+                    <div className="relative">
+                      <Input
+                        type="number"
+                        min={0}
+                        placeholder={t("seller.addListing.placeholders.price", "Enter your selling price")}
+                        value={userPrice}
+                        onChange={(e) => {
+                          setUserPrice(e.target.value);
+                          if (errors.price) {
+                            setErrors((prev) => {
+                              const next = { ...prev };
+                              delete next.price;
+                              return next;
+                            });
+                          }
+                        }}
+                        aria-invalid={!!errors.price}
+                        className="h-12 rounded-xl bg-background/80 pl-12 text-lg font-semibold"
+                      />
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 font-medium text-muted-foreground">
+                        EGP
+                      </span>
+                    </div>
+                  </FormField>
+
+                  {priceData && Number(userPrice) > priceData.negotiationRangeUpper && (
+                    <div className="flex gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-amber-600 dark:text-amber-400">
+                      <AlertTriangle className="mt-0.5 size-5 shrink-0" />
+                      <div className="space-y-1">
+                        <p className="font-medium">
+                          {t("seller.addListing.pricing.highPriceWarningTitle", "Price is above market range")}
+                        </p>
+                        <p className="text-sm opacity-90">
+                          {t("seller.addListing.pricing.highPriceWarningDesc", "Setting a price higher than the recommended upper range may significantly reduce buyer interest and make it harder to sell your vehicle.")}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {priceData && Number(userPrice) < priceData.negotiationRangeLower && Number(userPrice) > 0 && (
+                    <div className="flex gap-3 rounded-xl border border-blue-500/30 bg-blue-500/10 p-4 text-blue-600 dark:text-blue-400">
+                      <Info className="mt-0.5 size-5 shrink-0" />
+                      <div className="space-y-1">
+                        <p className="font-medium">
+                          {t("seller.addListing.pricing.lowPriceWarningTitle", "Price is below market range")}
+                        </p>
+                        <p className="text-sm opacity-90">
+                          {t("seller.addListing.pricing.lowPriceWarningDesc", "This is an excellent deal for buyers! Your vehicle should sell very quickly.")}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       )}
 
       {/* Vehicle Information */}
@@ -1379,6 +1565,78 @@ const AddListing = () => {
       </Card>
       )}
 
+      {/* Contact Information */}
+      {currentStep === "listing" && (
+      <Card className={SECTION_CARD_CLASS}>
+        <CardHeader className={SECTION_HEADER_CLASS}>
+          <CardTitle className="flex items-center gap-3 text-base">
+            <span className="flex size-9 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <FileText className="size-4" />
+            </span>
+            {t("seller.addListing.contactInfo.title")}
+          </CardTitle>
+          <CardDescription>
+            {t("seller.addListing.contactInfo.description")}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+            <FormField
+              label={t("seller.addListing.fields.contactPhoneNumber")}
+              error={errors.contactPhoneNumber}
+              required
+            >
+              <Input
+                placeholder={t("seller.addListing.placeholders.contactPhoneNumber")}
+                value={form.contactPhoneNumber}
+                onChange={(e) => updateField("contactPhoneNumber", e.target.value)}
+                aria-invalid={!!errors.contactPhoneNumber}
+                className="h-11 rounded-xl bg-background/80"
+              />
+            </FormField>
+
+            <FormField
+              label={t("seller.addListing.fields.whatsAppNumber")}
+              error={errors.whatsAppNumber}
+            >
+              <Input
+                placeholder={t("seller.addListing.placeholders.whatsAppNumber")}
+                value={form.whatsAppNumber}
+                onChange={(e) => updateField("whatsAppNumber", e.target.value)}
+                aria-invalid={!!errors.whatsAppNumber}
+                className="h-11 rounded-xl bg-background/80"
+              />
+            </FormField>
+
+            <FormField
+              label={t("seller.addListing.fields.preferredContactMethod")}
+              error={errors.preferredContactMethod}
+              required
+            >
+              <Select
+                value={form.preferredContactMethod}
+                onValueChange={(v) => updateField("preferredContactMethod", v)}
+              >
+                <SelectTrigger
+                  aria-invalid={!!errors.preferredContactMethod}
+                  className="h-11 rounded-xl bg-background/80"
+                >
+                  <SelectValue
+                    placeholder={t("seller.addListing.placeholders.preferredContactMethod")}
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">{t("seller.addListing.contactMethods.phone")}</SelectItem>
+                  <SelectItem value="2">{t("seller.addListing.contactMethods.whatsapp")}</SelectItem>
+                  <SelectItem value="3">{t("seller.addListing.contactMethods.both")}</SelectItem>
+                </SelectContent>
+              </Select>
+            </FormField>
+          </div>
+        </CardContent>
+      </Card>
+      )}
+
       <Separator className="opacity-60" />
 
       {/* Actions */}
@@ -1390,13 +1648,24 @@ const AddListing = () => {
           })}
         </p>
         <div className="flex items-center justify-end gap-3">
+          {currentStep === "conditions" && (
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={handleSkipConditions}
+              disabled={isSubmitting}
+              className="rounded-xl"
+            >
+              {t("seller.addListing.conditionChecklist.skip", "Skip (No defects)")}
+            </Button>
+          )}
           <Button
             type="button"
             variant="outline"
             onClick={() =>
               currentStep === "photos"
                 ? setCurrentStep("conditions")
-                : navigate("/seller/listings")
+                : navigate("/seller/my-listings")
             }
             disabled={isSubmitting}
             className="rounded-xl"

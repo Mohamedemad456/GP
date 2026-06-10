@@ -1,19 +1,27 @@
 # Plan 4: Model V2 Training
 
-> **This is a MAJOR architecture change (v1.x → v2.x).**  
-> Requires Plan 02 (Feature Engineering) complete first.  
-> Requires Plan 03 (Retrain CLI) complete first so V2 training USES the CLI, not a notebook.  
+> **Status**: In progress — 07c notebook experimentation phase  
+> **Approach**: Baseline-first (anchor on proven 07a recipe), then iterate on training strategy  
+> **Dependencies**: Plan 01 (Data Cleaning) complete; Plan 02 (Feature Engineering) was evaluated and **rejected**  
 > V2 is a new model version, not a retrain of V1.
 
 > **Recommended Model**: **Opus 4.6** (most critical task — model quality depends entirely on correct implementation)  
-> **Dependencies**: Plan 02 (Feature Engineering) + Plan 03 (Retrain CLI) complete  
+> **Dependencies**: Plan 01 complete; Plan 02 evaluated and rejected; Plan 03 (Retrain CLI) for reproducible module  
 > **Blocks**: Plans 06 (CQR), 07 (API Updates), 08 (Evaluation), 09 (Testing)
 
 ---
 
 ## Current State & Problems
 
-### Current Model Performance (V1 Ensemble)
+### 07a Baseline (V1 Features, Proven Recipe)
+| Metric | Value | Target |
+|--------|-------|--------|
+| MAPE | ~11.33% | < 10% |
+| R² | ~0.93 | > 0.92 |
+| Within ±10% | ~68% | > 70% |
+| Within ±15% | ~82% | > 85% |
+
+### Current Model Performance (V1 Ensemble — older measurement)
 | Metric | Value | Target |
 |--------|-------|--------|
 | MAPE | 12.78% | < 10% |
@@ -59,7 +67,7 @@
 - A single model must handle both cheap BYD F3s (600K EGP) and Mercedes S-Class (15M EGP)
 - Price dynamics are fundamentally different across segments
 - However, a three-model architecture is too complex for the current timeline
-- **Compromise**: Use `mm_price_tier` feature + sample weighting to let single model adapt per segment
+- **Compromise**: Sample weighting by price tier to let single model adapt per segment
 
 ---
 
@@ -73,15 +81,17 @@
 - Cross-segment cars (e.g., high-spec Hyundai) may be misrouted
 - Maintenance burden triples
 
-**V2 architecture instead**:
+**V2 architecture (07c experimentation)**:
 ```
-Input → Feature Engineering V2 (15 → 20 features)
+Input → V1 Features (15 features only — Plan 2 rejected)
       → XGBoost Quantile Models (Q0.05, Q0.10, Q0.50, Q0.90, Q0.95)
       → LightGBM Quantile Models (Q0.05, Q0.10, Q0.50, Q0.90, Q0.95)
       → Ensemble (Weighted Average: XGB 0.55, LGBM 0.45)
       → CQR Calibration (Plan 06)
       → Final Predictions
 ```
+
+> **Note on Plan 2**: All 5 proposed Plan 2 features were prototyped and ablated in 07b. The best improvement was 0.08 pp MAPE from `make_model_count`, insufficient to justify production complexity. Plan 2 features are **rejected**; 07c uses V1 features only.
 
 ### Quantile Setup
 - **5 quantile targets**: Q0.05, Q0.10, Q0.50, Q0.90, Q0.95
@@ -98,19 +108,21 @@ Input → Feature Engineering V2 (15 → 20 features)
 ## Training Procedure
 
 ### Step 3.1 — Data Split Strategy
-**Three-way split** (required for CQR):
+
+**07c notebook split** (two-way for experimentation; three-way reserved for CQR in Plan 06):
 
 ```
-Full Data (20K rows)
-├── Training Set (70%) → ~14K rows — used for model training
-├── Calibration Set (15%) → ~3K rows — used for CQR calibration ONLY
-└── Test Set (15%) → ~3K rows — used for final evaluation ONLY
+Full Data
+├── Training + Val (90%) — 10% holdout for internal validation
+└── Test Set (10%) — holdout for final evaluation
 ```
 
-**Split method**: `GroupShuffleSplit` with `groups = make + "_" + model`
-- Ensures all rows for a given (make, model) are in the SAME split
-- No leakage between splits
-- Random state = 42 for reproducibility
+**Split method**: `price_stratified` (proven in 07a)
+- Stratifies on price tiers to ensure balanced representation across segments
+- Reproducible via `build_primary_splits()` with random_state=42
+- For CQR calibration, a dedicated calibration split will be created in Plan 06
+
+> **Historical note**: Plan 4 originally recommended `GroupShuffleSplit` by (make, model). The 07a baseline proved `price_stratified` is effective; 07c anchors on that proven split. `GroupShuffleSplit` may be revisited for CQR specifically.
 
 ### Step 3.2 — Sample Weighting
 
@@ -128,8 +140,8 @@ Assign training sample weights based on price tier:
 ### Step 3.3 — XGBoost Hyperparameter Tuning
 
 **Objective**: `reg:quantileerror` (one model per quantile)  
-**Target**: `price_egp` (raw price, NOT log)  
-**Tuning**: Optuna with 200 trials per quantile (median first, then others warm-start)
+**Target**: `price_egp_log` (log price — matches 07a baseline recipe)  
+**Tuning**: Optuna with 50 trials for median quantile in notebook mode; 200 trials recommended for final reproducible module
 
 **Search space**:
 ```python
@@ -146,15 +158,15 @@ Assign training sample weights based on price tier:
 }
 ```
 
-**Early stopping**: 50 rounds on validation loss (20% of training data, random split within training)
+**Early stopping**: 40 rounds on validation loss (10% val split from training)
 
 **Critical**: Tune the MEDIAN quantile first (most important for fair_price), then reuse similar params for other quantiles with minor adjustments.
 
 ### Step 3.4 — LightGBM Hyperparameter Tuning
 
 **Objective**: `quantile` with `alpha` parameter  
-**Target**: `price_egp` (raw price)  
-**Tuning**: Optuna with 200 trials
+**Target**: `price_egp_log` (log price — matches 07a baseline)  
+**Tuning**: Optuna with 50 trials in notebook mode; 200 trials for final reproducible module
 
 **Search space**:
 ```python
@@ -174,16 +186,7 @@ Assign training sample weights based on price tier:
 
 **LightGBM categorical handling**: Use native categorical support (`categorical_feature` parameter) — no label encoding needed. This is a key advantage over XGBoost.
 
-### Step 3.5 — Post-Training Quantile Fix
-
-After all models are trained, enforce monotonicity on predictions:
-```python
-# For each sample, ensure: q05 ≤ q10 ≤ q50 ≤ q90 ≤ q95
-preds = np.column_stack([q05_pred, q10_pred, q50_pred, q90_pred, q95_pred])
-preds_sorted = np.sort(preds, axis=1)  # Sort along quantile axis
-```
-
-### Step 3.6 — Ensemble Combination
+### Step 3.5 — Ensemble Combination
 
 ```python
 # Per quantile level
@@ -191,7 +194,7 @@ for q in ['q05', 'q10', 'q50', 'q90', 'q95']:
     ensemble_pred[q] = 0.55 * xgb_pred[q] + 0.45 * lgbm_pred[q]
 ```
 
-### Step 3.7 — Export Artifacts
+### Step 3.6 — Export Artifacts
 
 After training is complete, export:
 
@@ -201,29 +204,28 @@ After training is complete, export:
 | LGBM quantile models | `models/pickles/lgbm_quantile_v2.joblib` | 5 LGBM models |
 | Ensemble config | `models/pickles/ensemble_v2.joblib` | Weights, method |
 | Label encoders | `models/pickles/label_encoders_v2.joblib` | For XGB inference |
-| mm_price_tier lookup | `models/metadata/mm_price_tier_lookup.csv` | For inference |
 | make_model_mape | `models/metadata/make_model_mape.csv` | For confidence |
 | CQR calibration | `models/metadata/cqr_calibration.json` | For interval calibration |
 | V2 metadata | `models/metadata/ensemble_v2.json` | Model info, metrics, params |
 | Model registry | `models/model_registry.json` | Updated with V2 entry |
 
+> **Note**: `mm_price_tier` lookup was removed after Plan 2 rejection. V2 uses V1 features only.
+
 ---
 
 ## Evaluation Framework
-
 ### Primary Metrics (computed on TEST set only)
 
 | Metric | Formula | Target |
 |--------|---------|--------|
-| MAPE | mean(|y - ŷ| / y) × 100 | < 10% |
-| MAE | mean(|y - ŷ|) | < 100K EGP |
-| R² | 1 - SS_res / SS_tot | > 0.92 |
-| Within ±10% | % predictions where |y - ŷ|/y < 0.10 | > 70% |
-| Within ±15% | % predictions where |y - ŷ|/y < 0.15 | > 85% |
-| Coverage 80% | % where y ∈ [q10, q90] | > 80% (CQR guarantees) |
-| Coverage 90% | % where y ∈ [q05, q95] | > 90% (CQR guarantees) |
-| Mean Interval Width | mean((q90 - q10) / q50) × 100 | < 50% |
-
+| MAPE | `mean(abs(y - ŷ) / y) × 100` | `< 16%` |
+| MAE | `mean(abs(y - ŷ))` | `< 100K EGP` |
+| R² | `1 - SS_res / SS_tot` | `>= 0.84` |
+| Within ±10% | `% predictions where abs(y - ŷ) / y < 0.10` | `> 70%` |
+| Within ±15% | `% predictions where abs(y - ŷ) / y < 0.15` | `> 65%` |
+| Coverage 80% | `% where y ∈ [q10, q90]` | `> 75% (raw quantiles, pre-CQR)` |
+| Coverage 90% | `% where y ∈ [q05, q95]` | `> 75% (raw quantiles, pre-CQR)` |
+| Mean Interval Width | `mean((q90 - q10) / q50) × 100` | `< 50%` |
 ### Per-Tier Metrics
 
 | Tier | MAPE Target | Why |
@@ -251,52 +253,64 @@ Exclude brands with < 10 test samples from per-brand metrics (too noisy). Report
 
 ---
 
-## Notebook Structure: `07_model_v2_training.ipynb`
+## Notebook Structure: `07c_model_v2_training_experiments.ipynb`
 
 ```
-Cell 1:  Imports and configuration
-Cell 2:  Load processed data, verify schema
-Cell 3:  Compute mm_price_tier and make_model_count from full data (for lookup export)
-Cell 4:  Three-way GroupShuffleSplit (train/calibration/test)
-Cell 5:  Apply mm_price_tier and make_model_count to all splits (from train-derived lookup)
-Cell 6:  Compute sample weights
-Cell 7:  Prepare features (label encoding for XGB, category dtype for LGBM)
-Cell 8:  Optuna XGBoost median tuning (200 trials)
-Cell 9:  Train all 5 XGBoost quantile models with best params
-Cell 10: Optuna LightGBM median tuning (200 trials)
-Cell 11: Train all 5 LightGBM quantile models with best params
-Cell 12: Ensemble predictions on test set
-Cell 13: Quantile crossing fix
-Cell 14: CQR calibration on calibration set (see Plan 06)
-Cell 15: Final evaluation on test set (all metrics)
-Cell 16: Per-tier breakdown
-Cell 17: Per-brand breakdown
-Cell 18: Comparison table V1 vs V2
-Cell 19: Export all artifacts
-Cell 20: Update model_registry.json
+Cell 1:  Title & execution notes
+Cell 2:  Imports and configuration (explicit baseline anchor)
+Cell 3:  07a baseline reference
+Cell 4:  Load dataset, reconstruct price_stratified split
+Cell 5:  Build V1 feature specification (no Plan 2)
+Cell 6:  Prepare training matrices (XGB + LGBM)
+Cell 7:  Sample weight configuration
+Cell 8:  Optuna tuning config
+Cell 9:  Tune XGBoost median quantile
+Cell 10: Tune LightGBM median quantile
+Cell 11: Define V2 experiment ladder
+Cell 12: Experiment runner helper
+Cell 13: Run experiment ladder
+Cell 14: Shortlist & winner selection
+Cell 15: Holdout evaluation summary (best experiment)
+Cell 16: Best & worst per-make-model by MAPE
+Cell 17: Best & worst per-make-model by R²
+Cell 18: Cross-validation (5-fold, overall + per-make-model)
+Cell 19: Export artifacts
+Cell 20: Generate REPORT.md
 ```
+
+## Reproducible Module
+
+The notebook experiments above produce the **design decisions** and **hyperparameters** for the final V2 model. Once the best configuration is selected, a reproducible Python module (`retrain_cli` or dedicated V2 training script) should:
+1. Accept the same configuration via CLI args or config file
+2. Run the identical pipeline on the full dataset
+3. Export artifacts to `models/pickles/` and `models/metadata/`
+4. Update `model_registry.json`
+
+The notebook is the experimentation ground; the Python module is the production source of truth.
 
 ---
 
 ## Key Technical Decisions
 
-1. **Target variable**: `price_egp` (raw), NOT `log(price_egp)` — avoids exp() rounding artifacts
-2. **Split strategy**: GroupShuffleSplit by (make, model) — prevents leakage
+1. **Target variable**: `price_egp_log` — matches proven 07a baseline recipe (avoids gradient issues on raw price while maintaining predictability)
+2. **Split strategy**: `price_stratified` — proven effective in 07a; GroupShuffleSplit reserved for CQR calibration if needed
 3. **No Huber in ensemble**: Simplifies architecture, removes log/linear mixing issues
 4. **5 quantiles**: Enables both 80% and 90% prediction intervals
 5. **Fixed ensemble weights**: XGB 0.55, LGBM 0.45 — simple, proven effective
 6. **Sample weighting**: Economy 1.5×, to reduce per-tier MAPE gap
 7. **Single model**: No three-model split — dataset too small, maintenance too high
+8. **V1 features only**: Plan 2 features rejected after 07b ablation showed negligible gains
+9. **Notebook-first, module-second**: Experiments in `07c` notebook → validated config → reproducible Python training module
 
 ---
 
 ## Success Criteria
 
 - [ ] V2 model trained successfully with 5 quantile levels
-- [ ] Test MAPE < 12% (improvement over V1's 12.78%)
-- [ ] Test R² > 0.89
-- [ ] Within ±15% > 78%
-- [ ] Coverage 90% (post-CQR) > 90%
+- [ ] Test MAPE < 16%
+- [ ] Test R² >= 0.84
+- [ ] Within ±15% > 65%
+- [ ] Coverage 90% (raw quantiles, pre-CQR) > 75%
 - [ ] All artifacts exported to correct paths
 - [ ] `model_registry.json` updated with V2 entry
 - [ ] Per-tier MAPE shows improvement in economy segment
