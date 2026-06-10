@@ -1,8 +1,8 @@
 {
   "schema_version": "2.0",
-  "active_model_id": "ensemble_robust_average_v1.1.0",
-  "active_version": "v1.1.0",
-  "promoted_at": "2026-06-10T00:51:03.604173+00:00",
+  "active_model_id": "v2_2026-06-03_008",
+  "active_version": "v2.1.0",
+  "promoted_at": "2026-06-10T06:16:52.486946+00:00",
   "models": {
     "huber_baseline_v1.0.0": {
       "model_id": "huber_baseline_v1.0.0",
@@ -52,7 +52,7 @@
       "model_id": "ensemble_robust_average_v1.1.0",
       "framework": "ensemble",
       "version": "v1.1.0",
-      "stage": "production",
+      "stage": "archived",
       "pkl_path": "models/pickles/ensemble_v1.1.0.joblib",
       "meta_path": "models/metadata/ensemble_robust_average_v1.1.0.json",
       "metrics": {
@@ -76,7 +76,7 @@
       "model_id": "v2_2026-06-03_008",
       "framework": "ensemble",
       "version": "v2.1.0",
-      "stage": "archived",
+      "stage": "production",
       "pkl_path": "models/pickles/ensemble_2026-06-03_008.joblib",
       "meta_path": "models/metadata/ensemble_2026-06-03_008.json",
       "metrics": {
