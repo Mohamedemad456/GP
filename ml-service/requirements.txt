@@ -34,3 +34,6 @@ jupyter>=1.0
 ipykernel>=6.29
 matplotlib>=3.8
 seaborn>=0.13
+
+# ── Admin dashboard ───────────────────────────────────────────────────────────
+streamlit>=1.32
