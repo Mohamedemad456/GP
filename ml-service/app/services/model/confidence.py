@@ -106,6 +106,10 @@ def confidence_label_from_signals(
         elif n_support < 20 and label == "high":
             if not excellent_mape:
                 label = "medium"
+    else:
+        # Combo never seen in training data — model is generalizing beyond
+        # its evidence. Degrade one step (high→medium, medium→low).
+        label = _degrade_label(label)
 
     if is_quantile and width_pct is not None:
         if excellent_mape:
@@ -123,7 +127,14 @@ def confidence_label_from_signals(
     return label
 
 
-def compute_confidence_label(*, make: str, model: str, prediction: dict) -> str:
+def compute_confidence_label(
+    *,
+    make: str,
+    model: str,
+    prediction: dict,
+    is_quantile: bool | None = None,
+    exact_combo_supported: bool = True,
+) -> str:
     """Compute a confidence label for a given request.
 
     Uses:
@@ -131,6 +142,13 @@ def compute_confidence_label(*, make: str, model: str, prediction: dict) -> str:
       - active model global test MAPE as fallback
       - make+model support count from processed dataset
       - interval width (when available)
+
+    ``is_quantile`` overrides the global default when a fallback model
+    context is being used.
+
+    When ``exact_combo_supported`` is ``False`` (known make, unknown model),
+    the final label is degraded one step because the model is generalizing
+    beyond its exact training combos.
     """
     mk, md = _ms._norm_make_model(make, model)
     n_support = _ms.SUPPORT_COUNTS_MM.get((mk, md))
@@ -141,9 +159,16 @@ def compute_confidence_label(*, make: str, model: str, prediction: dict) -> str:
     denom = max(fair, 1.0)
     width_pct = (upper - lower) / denom
 
-    return confidence_label_from_signals(
+    quantile_flag = is_quantile if is_quantile is not None else bool(_ms.ACTIVE_IS_QUANTILE)
+
+    label = confidence_label_from_signals(
         mape_pct=car_mape_pct(make, model),
         n_support=int(n_support) if n_support is not None else None,
         width_pct=float(width_pct) if width_pct is not None else None,
-        is_quantile=bool(_ms.ACTIVE_IS_QUANTILE),
+        is_quantile=quantile_flag,
     )
+
+    if not exact_combo_supported:
+        label = _degrade_label(label)
+
+    return label

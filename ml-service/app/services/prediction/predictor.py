@@ -16,6 +16,7 @@ import numpy as np
 import pandas as pd
 
 import app.services.model.model_state as _ms
+from app.services.model.model_state import ModelContext, _active_model_context
 from app.services.model.confidence import compute_confidence_label, car_mape_pct
 from app.services.model.intervals import compute_negotiation_range
 from app.services.explainability.explainer import compute_price_factors
@@ -37,14 +38,19 @@ def predict_price(
     transmission: str | None = None,
     fuel: str | None = None,
     location: str | None = None,
+    context: ModelContext | None = None,
 ) -> dict:
-    """Run the active model and return raw price predictions.
+    """Run a model and return raw price predictions.
+
+    If ``context`` is provided, the prediction uses that model context
+    instead of the global active model (useful for fallback routing).
 
     Returns dict with keys: fair_price, lower_price, upper_price,
     model_version, framework.
     """
-    if _ms.ACTIVE_MODELS is None:
-        raise RuntimeError("No active model loaded. Call load_active_model() first.")
+    ctx = context if context is not None else _active_model_context()
+    if ctx.models is None:
+        raise RuntimeError("No model loaded. Call load_active_model() first.")
 
     df_features = build_features(
         make=make, model=model, year=year,
@@ -52,12 +58,12 @@ def predict_price(
         fuel=fuel, location=location,
     )
 
-    if _ms.ACTIVE_FRAMEWORK == 'ensemble':
-        return _predict_ensemble(df_features)
-    elif _ms.ACTIVE_IS_QUANTILE:
-        return _predict_quantile(df_features)
+    if ctx.framework == 'ensemble':
+        return _predict_ensemble(df_features, ctx)
+    elif ctx.is_quantile:
+        return _predict_quantile(df_features, ctx)
     else:
-        return _predict_single(df_features)
+        return _predict_single(df_features, ctx)
 
 
 def predict_full(
@@ -69,21 +75,34 @@ def predict_full(
     fuel: str | None = None,
     location: str | None = None,
     include_factors: bool = False,
+    context: ModelContext | None = None,
+    exact_combo_supported: bool = True,
 ) -> dict:
     """Full prediction pipeline: price + confidence + negotiation range + optional factors.
+
+    If ``context`` is provided, the prediction uses that model context
+    instead of the global active model (useful for fallback routing).
+
+    ``exact_combo_supported`` should be ``False`` when the exact
+    (make, model) combo is not in the model's training coverage,
+    triggering one-step confidence degradation.
 
     Returns dict with keys:
       fair_price, negotiation_range, confidence, model_version, framework,
       raw_lower_price, raw_upper_price, price_factors (optional).
     """
+    ctx = context if context is not None else _active_model_context()
     raw = predict_price(
         make=make, model=model, year=year,
         mileage_km=mileage_km, transmission=transmission,
         fuel=fuel, location=location,
+        context=ctx,
     )
 
     confidence = compute_confidence_label(
         make=make, model=model, prediction=raw,
+        is_quantile=ctx.is_quantile,
+        exact_combo_supported=exact_combo_supported,
     )
 
     min_price, max_price = compute_negotiation_range(
@@ -93,7 +112,9 @@ def predict_full(
     )
 
     factors = None
-    if include_factors:
+    # Price factors via SHAP are only available for the active model;
+    # fallback contexts skip them to avoid explainer mismatch.
+    if include_factors and context is None:
         if _ms.ACTIVE_FRAMEWORK == 'ensemble':
             sub_preds = raw.get("sub_model_predictions")
             factors = compute_ensemble_price_factors(
@@ -108,6 +129,8 @@ def predict_full(
                 mileage_km=mileage_km, transmission=transmission,
                 fuel=fuel, location=location,
             )
+    elif include_factors and context is not None:
+        logger.debug("Skipping price factors for fallback model context.")
 
     return {
         "fair_price": raw["fair_price"],
@@ -126,29 +149,30 @@ def predict_full(
 
 # ── Internal prediction helpers ───────────────────────────────────────────────
 
-def _predict_quantile(df_features: pd.DataFrame) -> dict:
+def _predict_quantile(df_features: pd.DataFrame, ctx: ModelContext | None = None) -> dict:
     """Predict using a quantile model dict {lower, median, upper}."""
-    if _ms.ACTIVE_FRAMEWORK == 'XGBoost':
+    c = ctx if ctx is not None else _active_model_context()
+    if c.framework == 'XGBoost':
         df_prepared = prepare_for_xgboost(df_features)
         import xgboost as xgb
         dm = xgb.DMatrix(df_prepared)
-        preds = {q: float(m.predict(dm)[0]) for q, m in _ms.ACTIVE_MODELS.items()}
-    elif _ms.ACTIVE_FRAMEWORK == 'LightGBM':
+        preds = {q: float(m.predict(dm)[0]) for q, m in c.models.items()}
+    elif c.framework == 'LightGBM':
         df_prepared = prepare_for_lightgbm(df_features)
-        preds = {q: float(m.predict(df_prepared)[0]) for q, m in _ms.ACTIVE_MODELS.items()}
+        preds = {q: float(m.predict(df_prepared)[0]) for q, m in c.models.items()}
     else:
         try:
             df_prepared = prepare_for_xgboost(df_features)
             import xgboost as xgb
             dm = xgb.DMatrix(df_prepared)
-            preds = {q: float(m.predict(dm)[0]) for q, m in _ms.ACTIVE_MODELS.items()}
+            preds = {q: float(m.predict(dm)[0]) for q, m in c.models.items()}
         except Exception:
             df_prepared = prepare_for_lightgbm(df_features)
-            preds = {q: float(m.predict(df_prepared)[0]) for q, m in _ms.ACTIVE_MODELS.items()}
+            preds = {q: float(m.predict(df_prepared)[0]) for q, m in c.models.items()}
 
     logger.debug("Raw predictions: %s", preds)
 
-    if _ms.ACTIVE_IS_LOG_TARGET:
+    if c.is_log_target:
         logger.debug("Predictions are log-space; applying exp().")
         for key in preds:
             if preds[key] > 18:
@@ -174,18 +198,16 @@ def _predict_quantile(df_features: pd.DataFrame) -> dict:
     lower_price = min(lower_price, fair_price)
     upper_price = max(upper_price, fair_price)
 
-    model_version = _ms.get_active_model_version()
-
     return {
         'fair_price': fair_price,
         'lower_price': lower_price,
         'upper_price': upper_price,
-        'model_version': model_version,
-        'framework': _ms.ACTIVE_FRAMEWORK,
+        'model_version': c.model_version,
+        'framework': c.framework,
     }
 
 
-def _predict_ensemble(df_features: pd.DataFrame) -> dict:
+def _predict_ensemble(df_features: pd.DataFrame, ctx: ModelContext | None = None) -> dict:
     """Predict using an ensemble model (Robust Average / Weighted Average).
 
     The ensemble artifact stores base_models as path-strings.  We resolve
@@ -198,24 +220,37 @@ def _predict_ensemble(df_features: pd.DataFrame) -> dict:
     from app.core.model_registry import resolve_registry_path as _resolve
     from app.services.explainability.ensemble_explainer import _ENSEMBLE_SUB_MODELS, _ENSEMBLE_WEIGHT_NAMES, _ENSEMBLE_WEIGHTS, _ENSEMBLE_METHOD
 
-    artifact = _ms.ACTIVE_MODELS
+    c = ctx if ctx is not None else _active_model_context()
+    artifact = c.models
     base_models_raw = artifact.get("base_models", {})
     method = artifact.get("method", "Unknown")
     raw_weights = artifact.get("weights")
 
-    # Ensure sub-models are loaded (lazy init on first ensemble prediction)
-    sub_models: dict[str, Any] = dict(_ENSEMBLE_SUB_MODELS)
-    if not sub_models:
+    # For active model: use global lazy-loaded cache.
+    # For fallback context: load sub-models fresh into local dict.
+    use_global_cache = ctx is None
+    if use_global_cache:
+        sub_models: dict[str, Any] = dict(_ENSEMBLE_SUB_MODELS)
+        if not sub_models:
+            for name, path_str in base_models_raw.items():
+                p = _resolve(path_str)
+                if p.exists():
+                    try:
+                        sub_models[name] = _joblib.load(p)
+                        logger.info("Lazy-loaded ensemble sub-model '%s'", name)
+                    except Exception as e:
+                        logger.warning("Failed to lazy-load sub-model '%s': %s", name, e)
+            if sub_models:
+                _ENSEMBLE_SUB_MODELS.update(sub_models)
+    else:
+        sub_models = {}
         for name, path_str in base_models_raw.items():
             p = _resolve(path_str)
             if p.exists():
                 try:
                     sub_models[name] = _joblib.load(p)
-                    logger.info("Lazy-loaded ensemble sub-model '%s'", name)
                 except Exception as e:
-                    logger.warning("Failed to lazy-load sub-model '%s': %s", name, e)
-        if sub_models:
-            _ENSEMBLE_SUB_MODELS.update(sub_models)
+                    logger.warning("Failed to load fallback sub-model '%s': %s", name, e)
 
     # Run each sub-model and collect quantile predictions
     sub_preds: dict[str, dict[str, float]] = {}
@@ -264,8 +299,12 @@ def _predict_ensemble(df_features: pd.DataFrame) -> dict:
         raise RuntimeError("All ensemble sub-models failed to predict.")
 
     # Map weights to sub-model names
-    weight_names = list(_ENSEMBLE_WEIGHT_NAMES or [])
-    weights = list(_ENSEMBLE_WEIGHTS or [])
+    if use_global_cache:
+        weight_names = list(_ENSEMBLE_WEIGHT_NAMES or [])
+        weights = list(_ENSEMBLE_WEIGHTS or [])
+    else:
+        weight_names = []
+        weights = []
 
     # If weights/names not yet mapped, derive them
     if not weight_names or not weights:
@@ -304,7 +343,7 @@ def _predict_ensemble(df_features: pd.DataFrame) -> dict:
     upper_price = _aggregate("upper") if any("upper" in p for p in sub_preds.values()) else fair_price * 1.15
 
     # Handle log-target sub-models
-    if _ms.ACTIVE_IS_LOG_TARGET:
+    if c.is_log_target:
         fair_price = float(np.exp(fair_price)) if fair_price < 18 else fair_price
         lower_price = float(np.exp(lower_price)) if lower_price < 18 else lower_price
         upper_price = float(np.exp(upper_price)) if upper_price < 18 else upper_price
@@ -317,57 +356,54 @@ def _predict_ensemble(df_features: pd.DataFrame) -> dict:
     lower_price = min(lower_price, fair_price)
     upper_price = max(upper_price, fair_price)
 
-    model_version = _ms.get_active_model_version()
-
     return {
         'fair_price': fair_price,
         'lower_price': lower_price,
         'upper_price': upper_price,
-        'model_version': model_version,
-        'framework': _ms.ACTIVE_FRAMEWORK,
+        'model_version': c.model_version,
+        'framework': c.framework,
         'sub_model_predictions': sub_preds,
     }
 
 
-def _predict_single(df_features: pd.DataFrame) -> dict:
+def _predict_single(df_features: pd.DataFrame, ctx: ModelContext | None = None) -> dict:
     """Predict using a single sklearn-style model.
 
     Produces a point estimate and derives a ±15% negotiation range
     since there are no quantile bounds.
     """
-    if _ms.ACTIVE_FRAMEWORK == 'sklearn':
+    c = ctx if ctx is not None else _active_model_context()
+    if c.framework == 'sklearn':
         df_raw = df_features.copy()
         current_year = pd.Timestamp.now().year
         df_raw['car_age'] = current_year - df_raw['year']
-        pred_log = float(_ms.ACTIVE_MODELS.predict(df_raw)[0])
-    elif _ms.ACTIVE_FRAMEWORK == 'XGBoost':
+        pred_log = float(c.models.predict(df_raw)[0])
+    elif c.framework == 'XGBoost':
         df_prepared = prepare_for_xgboost(df_features)
         import xgboost as xgb
         dm = xgb.DMatrix(df_prepared)
-        pred_log = float(_ms.ACTIVE_MODELS.predict(dm)[0])
-    elif _ms.ACTIVE_FRAMEWORK == 'LightGBM':
+        pred_log = float(c.models.predict(dm)[0])
+    elif c.framework == 'LightGBM':
         df_prepared = prepare_for_lightgbm(df_features)
-        pred_log = float(_ms.ACTIVE_MODELS.predict(df_prepared)[0])
+        pred_log = float(c.models.predict(df_prepared)[0])
     else:
         try:
             df_raw = df_features.copy()
             current_year = pd.Timestamp.now().year
             df_raw['car_age'] = current_year - df_raw['year']
-            pred_log = float(_ms.ACTIVE_MODELS.predict(df_raw)[0])
+            pred_log = float(c.models.predict(df_raw)[0])
         except Exception:
             df_prepared = prepare_for_xgboost(df_features)
-            pred_log = float(_ms.ACTIVE_MODELS.predict(df_prepared)[0])
+            pred_log = float(c.models.predict(df_prepared)[0])
 
-    fair_price = float(np.exp(pred_log)) if _ms.ACTIVE_IS_LOG_TARGET else float(pred_log)
+    fair_price = float(np.exp(pred_log)) if c.is_log_target else float(pred_log)
     lower_price = fair_price * 0.85
     upper_price = fair_price * 1.15
-
-    model_version = _ms.get_active_model_version()
 
     return {
         'fair_price': fair_price,
         'lower_price': lower_price,
         'upper_price': upper_price,
-        'model_version': model_version,
-        'framework': _ms.ACTIVE_FRAMEWORK,
+        'model_version': c.model_version,
+        'framework': c.framework,
     }

@@ -1,6 +1,5 @@
 # Plan 2: Feature Engineering V2
 
-> **Recommended Model**: **Opus 4.6** (critical — wrong features damage the model permanently)  
 > **Dependencies**: Plan 1 (Data Cleaning) must be complete  
 > **Blocks**: Plan 04 (Model V2 Training), Plan 07 (API Updates)
 
@@ -118,12 +117,51 @@ computing `(scraped_at - baseline).days` per row.
 
 ---
 
+## Recommended Workflow
+
+### Phase A — Notebook-First Validation
+- Prototype all candidate features in the training notebook first
+- Run ablations against the V1 baseline before touching the running inference module
+- Keep the notebook as the experimentation surface only, not the long-term source of truth
+- Promote only features that show consistent improvement on validation and segment-level slices
+
+### Phase B — Promote Only Validated Features
+- After validation, move the winning feature logic into reusable Python modules
+- Update training and inference together in the same rollout to avoid drift
+- Export any inference-time lookup artifacts from training as versioned metadata
+
+### Promotion Gate
+A feature should only move beyond notebook experimentation if it satisfies all of the following:
+- Improves overall validation metrics or clearly improves an important business slice
+- Does not introduce train/test leakage
+- Can be reproduced deterministically in Python outside the notebook
+- Has a safe fallback behavior for unseen or missing values at inference
+
+### Source-of-Truth Rule
+The notebook is for testing and comparison. The final feature definitions, feature column lists,
+and lookup-loading behavior must live in reusable Python code so training and inference share one
+authoritative definition.
+
+---
+
 ## Implementation Steps
 
-### Step 2.1 — Add Features to Processing Script
+### Step 2.1 — Prototype Features in Notebook First
+
+Before modifying the processing script or inference module:
+
+1. Add the candidate features in the training notebook
+2. Compare baseline vs per-feature and combined ablations
+3. Review overall metrics plus economy/luxury and rare-make/model slices
+4. Freeze the final winning feature set
+
+Only after this notebook validation should the features be promoted into the reproducible Python pipeline.
+
+### Step 2.2 — Add Validated Features to Processing Script
+
 **Model**: Opus 4.6
 
-Create/update the data processing logic to add the new features after the basic cleaning:
+Create/update the data processing logic to add only the validated features after the basic cleaning:
 
 ```python
 # After basic processing produces df with existing columns...
@@ -133,7 +171,8 @@ df['log_mileage_km'] = np.log1p(df['mileage_km'].fillna(0))
 
 # Feature: mileage_ratio
 car_age = (current_year - df['year']).clip(lower=1)
-df['mileage_ratio'] = (df['mileage_km'].fillna(0) / (car_age * 15000)).clip(0, 5)
+df['mileage_ratio'] = (df['mileage_km'] / (car_age * 15000)).clip(0, 5)
+df['mileage_ratio'] = df['mileage_ratio'].fillna(1.0)
 
 # Feature: year_bucket
 df['year_bucket'] = ((df['year'] - 2000) // 5).astype(int)
@@ -145,9 +184,10 @@ df['year_bucket'] = ((df['year'] - 2000) // 5).astype(int)
 **Important**: `mm_price_tier` and `make_model_count` are computed DURING TRAINING from
 the training split only.
 
-### Step 2.2 — Update Feature Column Lists
+### Step 2.3 — Update Feature Column Lists
 
 **Training notebook** (`NUM_COLS` and `CAT_COLS`):
+
 ```python
 NUM_COLS = ['year', 'mileage_km', 'mileage_per_year', 'engine_cc',
             'horsepower', 'seating_capacity',
@@ -163,7 +203,10 @@ FEATURE_COLS = NUM_COLS + CAT_COLS
 # Same lists, with lookup-based computation for mm_price_tier and make_model_count
 ```
 
-### Step 2.3 — Create Tier Lookup Export
+**Recommendation**: Replace duplicated hardcoded lists with a shared Python feature-spec module
+before production rollout so training and inference cannot silently diverge.
+
+### Step 2.4 — Create Tier Lookup Export
 During training, after train/test split:
 ```python
 # Compute from training data only
@@ -178,17 +221,32 @@ tier_lookup = tier_lookup.merge(count_lookup, on=['make', 'model'])
 tier_lookup.to_csv('models/metadata/mm_price_tier_lookup.csv', index=False)
 ```
 
-### Step 2.4 — Update Inference Feature Builder
+**Validation rule**: If using cross-validation, recompute this lookup inside each fold using only
+that fold's training portion. Do not fit it once on the full dataset and then score on held-out rows.
+
+### Step 2.5 — Promote Validated Features to Shared Python Modules
+
+After notebook validation, move feature logic into reusable Python code and make it the single source
+of truth for:
+
+1. Derived feature formulas
+2. `NUM_COLS`, `CAT_COLS`, `FEATURE_COLS`
+3. Lookup artifact schema and load paths
+4. Default/fallback behavior for inference
+
+### Step 2.6 — Update Inference Feature Builder
+
 **Model**: Sonnet 4.6
 
 Update `app/services/prediction/feature_builder.py`:
+
 1. Load `mm_price_tier_lookup.csv` at startup (cached)
 2. Add `log_mileage_km`, `mileage_ratio`, `year_bucket` computation
 3. Look up `mm_price_tier` and `make_model_count` from the lookup
-4. Add defaults for new features (e.g., `mm_price_tier='standard'`, `make_model_count=50`)
+4. Add defaults for new features (e.g., `mm_price_tier='standard'`, `make_model_count=1`)
 5. Update `CAT_COLS`, `NUM_COLS`, `FEATURE_COLS`
 
-### Step 2.5 — Update Label Encoders
+### Step 2.7 — Update Label Encoders
 When training V2, the label encoders must include the new `mm_price_tier` category. The `prepare_for_xgboost` function must encode it alongside other categorical columns.
 
 ---
@@ -198,11 +256,12 @@ When training V2, the label encoders must include the new `mm_price_tier` catego
 | Challenge | Risk | Mitigation |
 |-----------|------|-----------|
 | `mm_price_tier` leakage | Using test data prices to assign tiers | Strictly compute from train split only |
-| New features increase dimensionality | Possible overfitting | Only 4 new features, all theoretically motivated |
-| `mileage_ratio` undefined when `mileage_km` is NaN | NaN propagation | Fill with 1.0 (average usage) when mileage is unknown |
-| `make_model_count` is 0 for unseen cars at inference | Division-by-zero or meaningless value | Default to 1 (minimum), which signals "rare" |
+| New features increase dimensionality | Possible overfitting | Only a small number of validated new features should be promoted |
+| `mileage_ratio` undefined when `mileage_km` is NaN | NaN propagation or misleading "low usage" signal | Fill with 1.0 (average usage) when mileage is unknown |
+| `make_model_count` is missing for unseen cars at inference | Model sees unsupported confidence signal | Default to 1 (minimum), which signals "rare" |
 | Feature builder drift from training | Predictions are garbage | Single source of truth for feature column lists |
 | `year_bucket` for future years (2027+) | Extrapolation | Clamp to max bucket seen in training |
+| Candidate feature adds complexity but no real gain | Unnecessary production risk | Require notebook ablation evidence before promotion |
 
 ---
 
@@ -223,16 +282,19 @@ After adding features, expected correlations:
 
 | File | Action |
 |------|--------|
-| `data/processed/processed_data.csv` | Add `log_mileage_km`, `mileage_ratio`, `year_bucket` columns |
-| `app/services/prediction/feature_builder.py` | Add new feature computation + lookups |
-| `models/metadata/mm_price_tier_lookup.csv` | NEW — created during training |
-| Training notebook (07) | Compute `mm_price_tier`, `make_model_count` from train split |
+| Training notebook (07) | Prototype candidate features, run ablations, and compute train-only lookups |
+| Reusable Python feature module | NEW — single source of truth for formulas and feature column lists after validation |
+| `data/processed/processed_data.csv` | Add only the validated derived columns selected from notebook testing |
+| `app/services/prediction/feature_builder.py` | Update only after validation to match the promoted Python feature logic |
+| `models/metadata/mm_price_tier_lookup.csv` | NEW — created during training from training data only |
 
 ---
 
 ## Success Criteria
 
-- [ ] `processed_data.csv` has `log_mileage_km`, `mileage_ratio`, `year_bucket` columns
+- [ ] Notebook ablation results identify the final winning feature set before production changes
+- [ ] Any target-derived lookup (`mm_price_tier`, `make_model_count`) is fit on training data only
+- [ ] `processed_data.csv` has only the validated derived columns selected for rollout
 - [ ] No NaN in new numeric features
 - [ ] `mm_price_tier_lookup.csv` exists with all make/model combos
 - [ ] `feature_builder.py` produces correct output for test inputs
