@@ -4,6 +4,8 @@ model_state.py — Global model state, loading, and validity checks.
 import logging
 import sys
 import json
+from dataclasses import dataclass
+from typing import Any
 
 import joblib
 import numpy as np
@@ -32,6 +34,35 @@ ACTIVE_PREPROCESSOR = None     # sklearn ColumnTransformer for baseline models
 ACTIVE_IS_LOG_TARGET: bool | None = None  # Whether the active model predicts log(price)
 ACTIVE_METADATA: dict | None = None       # Loaded metadata JSON for the active model
 ACTIVE_MODEL_ID: str | None = None
+
+
+# ── ModelContext ──────────────────────────────────────────────────────────────
+
+@dataclass
+class ModelContext:
+    """Request-scoped container for everything needed to run a prediction."""
+    models: Any = None
+    framework: str | None = None
+    is_quantile: bool = False
+    is_log_target: bool | None = None
+    preprocessor: Any = None
+    metadata: dict | None = None
+    model_id: str | None = None
+    model_version: str = "unknown"
+
+
+def _active_model_context() -> ModelContext:
+    """Build a ModelContext from current global active state."""
+    return ModelContext(
+        models=ACTIVE_MODELS,
+        framework=ACTIVE_FRAMEWORK,
+        is_quantile=ACTIVE_IS_QUANTILE,
+        is_log_target=ACTIVE_IS_LOG_TARGET,
+        preprocessor=ACTIVE_PREPROCESSOR,
+        metadata=ACTIVE_METADATA,
+        model_id=ACTIVE_MODEL_ID,
+        model_version=get_active_model_version(),
+    )
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -287,6 +318,42 @@ def load_model_diagnostics():
     _build_dispersion_mape_fallback()
 
 
+def reload_active_model() -> dict[str, Any]:
+    """Reload the active model and diagnostics after a registry change.
+
+    Safe to call at runtime (e.g. after activation) without restarting
+    the container. Returns a status dict for the caller.
+    """
+    logger.info("Reloading active model from registry...")
+    try:
+        load_active_model()
+    except Exception as e:
+        logger.error("Failed to reload active model: %s", e)
+        return {"success": False, "error": f"Model reload failed: {e}"}
+
+    try:
+        load_model_diagnostics()
+    except Exception as e:
+        logger.error("Failed to reload model diagnostics: %s", e)
+        return {"success": False, "error": f"Diagnostics reload failed: {e}"}
+
+    # Clear SHAP caches so they rebuild for the new model on next request
+    try:
+        from app.services.explainability.explainer import clear_shap_cache
+        clear_shap_cache()
+    except Exception as e:
+        logger.warning("Failed to clear SHAP cache during reload: %s", e)
+
+    try:
+        from app.services.explainability.ensemble_explainer import init_ensemble_explainer
+        init_ensemble_explainer()
+    except Exception as e:
+        logger.error("Failed to init ensemble explainer during reload: %s", e)
+
+    logger.info("Active model reload complete: %s", ACTIVE_MODEL_ID)
+    return {"success": True, "model_id": ACTIVE_MODEL_ID, "framework": ACTIVE_FRAMEWORK}
+
+
 def load_active_model():
     """Load the active model from the registry on startup.
 
@@ -386,6 +453,16 @@ def check_car_validity(brand: str, model: str) -> bool:
     return target in VALID_CARS
 
 
+def check_make_known(brand: str) -> bool:
+    """Check if the make (brand) exists in our processed data at all.
+
+    Used for fallback routing: unknown makes get a hard validation error,
+    while known makes with unsupported models are allowed to generalize.
+    """
+    make_norm = str(brand).strip().lower()
+    return make_norm in SUPPORT_COUNTS_MAKE
+
+
 def get_make_model_mape_pct(make: str, model: str) -> float | None:
     mk, md = _norm_make_model(make, model)
     if (mk, md) in MAKE_MODEL_MAPE:
@@ -406,3 +483,155 @@ def get_active_model_version() -> str:
     """Return the active model version string from the registry."""
     reg = load_registry()
     return reg.get('active_version', 'unknown')
+
+
+# ── Per-model coverage ────────────────────────────────────────────────────────
+
+_MODEL_COVERAGE_CACHE: dict[str, set[tuple[str, str]]] = {}
+
+
+def _load_coverage_from_artifacts(info: dict) -> set[tuple[str, str]]:
+    """Load supported (make, model) combos from a model's artifacts."""
+    artifacts = info.get("artifacts", {}) if isinstance(info, dict) else {}
+    combos: set[tuple[str, str]] = set()
+
+    # 1. Try dedicated combo_set_json artifact
+    combo_json = artifacts.get("combo_set_json")
+    if combo_json:
+        try:
+            path = resolve_registry_path(combo_json)
+            if path.exists():
+                with open(path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                for item in data.get("combos", []):
+                    mk = str(item.get("make", "")).strip().lower()
+                    md = str(item.get("model", "")).strip().lower()
+                    if mk and md:
+                        combos.add((mk, md))
+                return combos
+        except Exception:
+            pass
+
+    # 2. Fall back to make_model_mape_csv artifact
+    mape_csv = artifacts.get("make_model_mape_csv")
+    if mape_csv:
+        try:
+            path = resolve_registry_path(mape_csv)
+            if path.exists():
+                df = pd.read_csv(path)
+                if {"make", "model"}.issubset(df.columns):
+                    for _, row in df.iterrows():
+                        mk = str(row["make"]).strip().lower()
+                        md = str(row["model"]).strip().lower()
+                        if mk and md:
+                            combos.add((mk, md))
+                    return combos
+        except Exception:
+            pass
+
+    # 3. If no artifact available, return empty set (model coverage unknown)
+    return combos
+
+
+def get_model_coverage(model_id: str) -> set[tuple[str, str]]:
+    """Return the set of (make, model) combos a registered model supports.
+
+    Results are cached for the lifetime of the process.
+    """
+    if model_id in _MODEL_COVERAGE_CACHE:
+        return _MODEL_COVERAGE_CACHE[model_id]
+
+    reg = load_registry()
+    info = reg.get("models", {}).get(model_id)
+    if info is None:
+        return set()
+
+    combos = _load_coverage_from_artifacts(info)
+    _MODEL_COVERAGE_CACHE[model_id] = combos
+    return combos
+
+
+def clear_model_coverage_cache() -> None:
+    """Clear the per-model coverage cache (useful after registry changes)."""
+    _MODEL_COVERAGE_CACHE.clear()
+
+
+# ── Request-scoped model loading ──────────────────────────────────────────────
+
+def load_model_context(model_id: str) -> ModelContext | None:
+    """Load any registered model into a temporary ModelContext for prediction.
+
+    This does **not** mutate global active state, so it is safe for concurrent
+    fallback requests.
+    """
+    reg = load_registry()
+    info = reg.get("models", {}).get(model_id)
+    if info is None:
+        logger.warning("Model '%s' not found in registry.", model_id)
+        return None
+
+    pkl_path_str = info.get('pkl_path')
+    if pkl_path_str is None:
+        logger.warning("Model '%s' has no pkl_path in registry.", model_id)
+        return None
+
+    pkl_path = resolve_registry_path(pkl_path_str)
+    if not pkl_path.exists():
+        logger.warning("Model pickle not found: %s", pkl_path)
+        return None
+
+    _register_sparse_to_dense_for_unpickling()
+
+    # Load metadata
+    metadata = None
+    meta_path_str = info.get("meta_path")
+    if meta_path_str:
+        try:
+            meta_path = resolve_registry_path(meta_path_str)
+            if meta_path.exists():
+                with open(meta_path, "r", encoding="utf-8") as f:
+                    loaded_meta = json.load(f)
+                if isinstance(loaded_meta, dict):
+                    metadata = loaded_meta
+        except Exception as e:
+            logger.warning("Failed to load metadata for '%s': %s", model_id, e)
+
+    framework = _detect_framework(info)
+    is_log_target = _load_is_log_target_from_metadata(info)
+
+    try:
+        loaded = joblib.load(pkl_path)
+    except Exception as e:
+        logger.error("Failed to load model '%s' from %s: %s", model_id, pkl_path, e)
+        return None
+
+    is_quantile = False
+    preprocessor = None
+
+    if isinstance(loaded, dict) and 'median' in loaded:
+        is_quantile = True
+    elif isinstance(loaded, dict) and 'base_models' in loaded:
+        is_quantile = _ensemble_is_quantile(loaded, info, metadata)
+    else:
+        if framework == 'sklearn':
+            preprocessor_path_str = info.get('artifacts', {}).get('preprocessor_pkl')
+            if preprocessor_path_str:
+                pp_path = resolve_registry_path(preprocessor_path_str)
+                if pp_path.exists():
+                    preprocessor = joblib.load(pp_path)
+
+    if is_log_target is None:
+        is_log_target = False if is_quantile else True
+
+    version = info.get("version", "unknown")
+
+    return ModelContext(
+        models=loaded,
+        framework=framework,
+        is_quantile=is_quantile,
+        is_log_target=is_log_target,
+        preprocessor=preprocessor,
+        metadata=metadata,
+        model_id=model_id,
+        model_version=version,
+    )

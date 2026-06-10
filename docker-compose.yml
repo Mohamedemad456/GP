@@ -91,12 +91,14 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8001:8001"
+      - "8502:8501"
     volumes:
       - ./ml-service:/app:Z
     env_file:
       - .env
     environment:
       - PYTHONUNBUFFERED=1
+      - ADMIN_API_BASE=http://localhost:8001/admin
     restart: unless-stopped
 
   # =======================

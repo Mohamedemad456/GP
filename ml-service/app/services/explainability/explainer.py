@@ -65,6 +65,14 @@ def _get_or_build_shap_explainer():
         return None
 
 
+def clear_shap_cache() -> None:
+    """Clear cached SHAP state so the next request rebuilds for the new model."""
+    global ACTIVE_SHAP_EXPLAINER, ACTIVE_SHAP_MODEL_REF, ACTIVE_SHAP_FRAMEWORK
+    ACTIVE_SHAP_EXPLAINER = None
+    ACTIVE_SHAP_MODEL_REF = None
+    ACTIVE_SHAP_FRAMEWORK = None
+
+
 # ── Public API ────────────────────────────────────────────────────────────────
 
 def warm_up_shap() -> bool:
