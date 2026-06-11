@@ -1,0 +1,11 @@
+{
+  "job_id": "pipeline-1781135006",
+  "scraping_num": 7,
+  "tag": "2026-06-10_007",
+  "phase": "error",
+  "progress": 0.0,
+  "elapsed_sec": 120.6,
+  "completed": true,
+  "error": "Training failed (exit code 1). Check docker logs.",
+  "result": null
+}

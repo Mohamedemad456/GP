@@ -1,0 +1,59 @@
+{
+  "version": "2026-06-11_007",
+  "model_id": "v2_2026-06-11_007",
+  "framework": "ensemble",
+  "trained_at": "2026-06-11T01:41:06.154633+00:00",
+  "train_config": {
+    "target": "price_egp",
+    "is_log_target": true,
+    "split": "price_stratified",
+    "quantiles": {
+      "q05": 0.05,
+      "q10": 0.1,
+      "q50": 0.5,
+      "q90": 0.9,
+      "q95": 0.95,
+      "lower": 0.05,
+      "median": 0.5,
+      "upper": 0.95
+    }
+  },
+  "features": {
+    "all": [],
+    "categorical": []
+  },
+  "metrics": {},
+  "interval_metrics": {},
+  "hyperparams": {},
+  "artifacts": {
+    "make_model_mape_csv": "models/metadata/make_model_mape.csv"
+  },
+  "plot_dir": null,
+  "source_notebook": null,
+  "holdout_metrics": {
+    "MAE": 156428.92622912655,
+    "RMSE": 435805.80210986367,
+    "R2": 0.9465531761432112,
+    "MAPE_pct": 10.54812911902382,
+    "Within_10pct": 62.9535002554931,
+    "Within_15pct": 79.8160449667859,
+    "Coverage_80_pct": 73.37761880429228,
+    "Coverage_90_pct": 87.73633111905978,
+    "Mean_width_pct": 33.92374718534021
+  },
+  "cv_metrics": {
+    "MAE": 173404.3173413317,
+    "RMSE": 543994.1318083642,
+    "R2": 0.9185197930919864,
+    "MAPE_pct": 11.73002643662406,
+    "Within_10pct": 62.27379613536448,
+    "Within_15pct": 77.90614456599529
+  },
+  "training_date": "2026-06-11T01:41:06.154686+00:00",
+  "dataset_tag": "2026-06-11_007",
+  "model_family": "v2",
+  "quantile_models": {
+    "xgb": "models/pickles/xgb_quantile_2026-06-11_007.joblib",
+    "lgbm": "models/pickles/lgbm_quantile_2026-06-11_007.joblib"
+  }
+}
