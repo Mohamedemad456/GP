@@ -1,5 +1,5 @@
 {
-  "current_version": "2026-06-03_008",
+  "current_version": "2026-06-11_011",
   "versions": {
     "2026-05-25_002": {
       "tag": "2026-05-25_002",
@@ -38,6 +38,71 @@
       "cleaned_rows": 15257,
       "processed_rows": 12498,
       "scraping_num": 8,
+      "model_trained_on": null
+    },
+    "2026-06-10_007": {
+      "tag": "2026-06-10_007",
+      "created_at": "2026-06-10T23:43:49",
+      "raw_path": "data/raw/snapshots/cars_raw_2026-06-10_007.csv",
+      "cleaned_path": "data/cleaned/cars_cleaned_2026-06-10_007.csv",
+      "processed_path": "data/processed/versions/processed_2026-06-10_007.csv",
+      "raw_fingerprint": "sha256:185ef33564e0a698b450735b207df8e938fcaa21b14c3eeef0146f1fa70c7c13",
+      "raw_rows": 18099,
+      "cleaned_rows": 16739,
+      "processed_rows": 9781,
+      "scraping_num": 7,
+      "model_trained_on": null
+    },
+    "2026-06-11_008": {
+      "tag": "2026-06-11_008",
+      "created_at": "2026-06-11T02:54:13",
+      "raw_path": "data/raw/snapshots/cars_raw_2026-06-11_008.csv",
+      "cleaned_path": "data/cleaned/cars_cleaned_2026-06-11_008.csv",
+      "processed_path": "data/processed/versions/processed_2026-06-11_008.csv",
+      "raw_fingerprint": "sha256:d9aef2ead44848ee9d1afcb1ba65195e72b65f45c100d567915dd1a1c29f3362",
+      "raw_rows": 18917,
+      "cleaned_rows": 15257,
+      "processed_rows": 12498,
+      "scraping_num": 8,
+      "model_trained_on": null
+    },
+    "2026-06-11_007": {
+      "tag": "2026-06-11_007",
+      "created_at": "2026-06-11T02:56:45",
+      "raw_path": "data/raw/snapshots/cars_raw_2026-06-11_007.csv",
+      "cleaned_path": "data/cleaned/cars_cleaned_2026-06-11_007.csv",
+      "processed_path": "data/processed/versions/processed_2026-06-11_007.csv",
+      "raw_fingerprint": "sha256:185ef33564e0a698b450735b207df8e938fcaa21b14c3eeef0146f1fa70c7c13",
+      "raw_rows": 18099,
+      "cleaned_rows": 16739,
+      "processed_rows": 9781,
+      "scraping_num": 7,
+      "model_trained_on": null
+    },
+    "2026-06-11_010": {
+      "tag": "2026-06-11_010",
+      "created_at": "2026-06-11T03:01:58",
+      "raw_path": "data/raw/snapshots/cars_raw_2026-06-11_010.csv",
+      "cleaned_path": "data/cleaned/cars_cleaned_2026-06-11_010.csv",
+      "processed_path": "data/processed/versions/processed_2026-06-11_010.csv",
+      "raw_fingerprint": "sha256:257da183e1b8ca686eafa0bc74b91082126e2f08b704044b426436189792a452",
+      "raw_rows": 20651,
+      "cleaned_rows": 16989,
+      "processed_rows": 13897,
+      "scraping_num": 10,
+      "model_trained_on": null
+    },
+    "2026-06-11_011": {
+      "tag": "2026-06-11_011",
+      "created_at": "2026-06-11T04:46:33",
+      "raw_path": "data/raw/snapshots/cars_raw_2026-06-11_011.csv",
+      "cleaned_path": "data/cleaned/cars_cleaned_2026-06-11_011.csv",
+      "processed_path": "data/processed/versions/processed_2026-06-11_011.csv",
+      "raw_fingerprint": "sha256:fe7c51c77a2374d71bbd4b03ca782c47ecc004c92cde73198bcf68ad88bc30d3",
+      "raw_rows": 20428,
+      "cleaned_rows": 16850,
+      "processed_rows": 13813,
+      "scraping_num": 11,
       "model_trained_on": null
     }
   }

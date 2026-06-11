@@ -1,0 +1,84 @@
+{
+  "dataset_tag": "2026-06-11_010",
+  "target_col": "price_egp_log",
+  "split_name": "price_stratified",
+  "output_tag": "2026-06-11_010",
+  "model_family": "v2",
+  "holdout_metrics": {
+    "MAE": 145600.4602993924,
+    "RMSE": 409831.12470117095,
+    "R2": 0.9448592613595869,
+    "MAPE_pct": 11.81958633346889,
+    "Within_10pct": 61.187050359712224,
+    "Within_15pct": 76.43884892086331,
+    "Coverage_80_pct": 72.73381294964028,
+    "Coverage_90_pct": 85.86330935251797,
+    "Mean_width_pct": 34.531387027325884
+  },
+  "cv_metrics": {
+    "MAE": 145890.71425612108,
+    "RMSE": 485454.0038241434,
+    "R2": 0.9245786573594621,
+    "MAPE_pct": 12.12240874091804,
+    "Within_10pct": 62.24364970857019,
+    "Within_15pct": 77.21090882924372
+  },
+  "diagnostics": {
+    "n_total": 410,
+    "above_30pct": 30,
+    "pct_above_30pct": 7.32,
+    "above_50pct": 7,
+    "pct_above_50pct": 1.71,
+    "min_rows": 10,
+    "n_supported": 88,
+    "n_unsupported": 322,
+    "pct_supported": 21.46,
+    "supported_mape_mean": 11.1109,
+    "supported_mape_median": 9.85,
+    "supported_above_30pct": 2,
+    "supported_above_50pct": 0
+  },
+  "diagnostics_summary": {
+    "holdout_per_mm_total": 410,
+    "holdout_per_mm_supported": 88,
+    "holdout_per_mm_pct_under_15pct": 71.46,
+    "holdout_per_mm_pct_over_15pct": 28.54,
+    "holdout_per_mm_supported_pct_over_15pct": 14.77,
+    "holdout_per_mm_pct_under_20pct": 84.88,
+    "holdout_per_mm_pct_over_20pct": 15.12,
+    "holdout_per_mm_supported_pct_over_20pct": 3.41,
+    "holdout_per_mm_pct_under_30pct": 92.68,
+    "holdout_per_mm_pct_over_30pct": 7.32,
+    "holdout_per_mm_supported_pct_over_30pct": 2.27,
+    "holdout_per_mm_pct_under_50pct": 98.29,
+    "holdout_per_mm_pct_over_50pct": 1.71,
+    "holdout_per_mm_supported_pct_over_50pct": 0.0,
+    "cv_per_mm_total": 453,
+    "cv_per_mm_supported": 302,
+    "cv_per_mm_pct_under_15pct": 67.77,
+    "cv_per_mm_pct_over_15pct": 32.23,
+    "cv_per_mm_supported_pct_over_15pct": 22.52,
+    "cv_per_mm_pct_under_20pct": 82.34,
+    "cv_per_mm_pct_over_20pct": 17.66,
+    "cv_per_mm_supported_pct_over_20pct": 11.59,
+    "cv_per_mm_pct_under_30pct": 92.94,
+    "cv_per_mm_pct_over_30pct": 7.06,
+    "cv_per_mm_supported_pct_over_30pct": 3.64,
+    "cv_per_mm_pct_under_50pct": 98.23,
+    "cv_per_mm_pct_over_50pct": 1.77,
+    "cv_per_mm_supported_pct_over_50pct": 0.99
+  },
+  "gate": {
+    "outcome": "promote",
+    "passed": true,
+    "reasons": [
+      "All thresholds passed"
+    ]
+  },
+  "split_sizes": {
+    "train": 10006,
+    "val": 1111,
+    "test": 2780
+  },
+  "elapsed_sec": 760.51
+}
