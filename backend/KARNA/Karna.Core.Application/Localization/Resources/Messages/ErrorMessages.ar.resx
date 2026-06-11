@@ -228,6 +228,8 @@
   <data name="ListingNotAvailable" xml:space="preserve">
     <value>هذا الإعلان لم يعد متاحاً.</value>
   </data>
+  <data name="ListingDeleted" xml:space="preserve">
+    <value>هذا الإعلان لم يعد متاحًا</value>
   <data name="CannotDeactivateSelf" xml:space="preserve">
     <value>لا يمكنك تعطيل حسابك الخاص.</value>
   </data>
