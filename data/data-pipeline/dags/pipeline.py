@@ -114,7 +114,10 @@ def data_pipeline():
         df['title'] = df['title'].str.lower()
         return df
     
-    @task
+    @task(
+        retries=3,
+        retry_delay=timedelta(minutes=1)
+    )
     def add_scraping_num(df):
         load_dotenv()  # loads .env file
         password = quote_plus(os.getenv("DB_PASSWORD"))
@@ -129,7 +132,10 @@ def data_pipeline():
         df['scraping_num'] = next_scraping_num
         return df
 
-    @task
+    @task(
+        retries=3,
+        retry_delay=timedelta(minutes=1)
+    )
     def load_to_db(df):
         load_dotenv()  # loads .env file
         password = quote_plus(os.getenv("DB_PASSWORD"))
