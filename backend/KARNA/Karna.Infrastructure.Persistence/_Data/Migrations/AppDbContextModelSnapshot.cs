@@ -146,6 +146,35 @@ namespace Karna.Infrastructure.Persistence._Data.Migrations
                     b.ToTable("ConditionDefects");
                 });
 
+            modelBuilder.Entity("Karna.Core.Domain.Entities.Favorite", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("ListingId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ListingId");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("UserId", "ListingId")
+                        .IsUnique();
+
+                    b.ToTable("Favorites");
+                });
+
             modelBuilder.Entity("Karna.Core.Domain.Entities.Listing", b =>
                 {
                     b.Property<Guid>("Id")
@@ -618,6 +647,25 @@ namespace Karna.Infrastructure.Persistence._Data.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("Karna.Core.Domain.Entities.Favorite", b =>
+                {
+                    b.HasOne("Karna.Core.Domain.Entities.Listing", "Listing")
+                        .WithMany("Favorites")
+                        .HasForeignKey("ListingId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Karna.Core.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Listing");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Karna.Core.Domain.Entities.Listing", b =>
                 {
                     b.HasOne("Karna.Core.Domain.Entities.User", "ApprovedByAdmin")
@@ -741,6 +789,8 @@ namespace Karna.Infrastructure.Persistence._Data.Migrations
 
             modelBuilder.Entity("Karna.Core.Domain.Entities.Listing", b =>
                 {
+                    b.Navigation("Favorites");
+
                     b.Navigation("ListingDefects");
 
                     b.Navigation("Photos");
