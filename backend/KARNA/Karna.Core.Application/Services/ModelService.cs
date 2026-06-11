@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using FluentValidation;
@@ -85,7 +85,9 @@ namespace Karna.Core.Application.Services
 				IsActive = true
 			};
 
-			var dataSpec = new ModelListSpecification(modelSpecParams, activeOnly: true, applyPaging: true);
+			var applyPaging = specParams.IsPagingRequested;
+
+			var dataSpec = new ModelListSpecification(modelSpecParams, activeOnly: true, applyPaging: applyPaging);
 			var countSpec = new ModelListSpecification(modelSpecParams, activeOnly: true, applyPaging: false);
 
 			var models = await repo.GetAllWithSpecAsync(dataSpec);

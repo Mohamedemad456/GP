@@ -42,6 +42,7 @@ MULTI_WORD_MAKES: list[str] = [
     "Rolls Royce",
     "Great Wall",
     "Ssang Yong",
+    "Lynk & Co",
 ]
 
 # Multi-word prefixes that map to a different canonical make name

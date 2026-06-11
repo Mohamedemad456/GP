@@ -247,9 +247,6 @@ export default function ProfilePage() {
                 <User className="h-7 w-7 text-primary" />
               </div>
               <div className="flex flex-wrap gap-2">
-                <Badge variant="secondary" className="capitalize">
-                  {user?.role ?? "—"}
-                </Badge>
                 {details?.isActive && (
                   <Badge className="border-green-500/30 bg-green-500/15 text-green-600">
                     {t("profile.active")}
@@ -329,8 +326,6 @@ export default function ProfilePage() {
               <ProfileField icon={<Mail className="h-4 w-4" />} label={t("profile.fields.email")} value={details?.email} />
               <ProfileField icon={<Phone className="h-4 w-4" />} label={t("profile.fields.phone")} value={details?.phoneNumber} />
               <ProfileField icon={<MessageCircle className="h-4 w-4" />} label={t("profile.fields.whatsapp")} value={details?.whatsAppNumber} />
-              <ProfileField icon={<Shield className="h-4 w-4" />} label={t("profile.fields.roles")}
-                value={details?.roles.map((r) => r.toLowerCase()).join(", ")} />
               <ProfileField icon={<Calendar className="h-4 w-4" />} label={t("profile.fields.memberSince")} value={createdAt} />
             </dl>
           )}

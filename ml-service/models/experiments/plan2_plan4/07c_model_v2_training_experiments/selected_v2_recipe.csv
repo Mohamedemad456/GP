@@ -1,0 +1,2 @@
+dataset_tag,target_col,split_name,feature_list,best_experiment_name,best_framework,best_quantile_count,uses_sample_weights,uses_tuned_params
+2026-06-03_008,price_egp_log,price_stratified,"year,mileage_km,mileage_per_year,engine_cc,horsepower,seating_capacity,make,model,transmission,fuel,location,body_type,drivetrain,brand_origin,car_segment",ensemble_baseline_5q,WeightedEnsemble,5,False,False

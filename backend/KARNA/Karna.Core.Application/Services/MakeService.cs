@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using Karna.Core.Application.Abstraction.DTOs._Common;
 using Karna.Core.Application.Abstraction.DTOs.Make;
 using Karna.Core.Application.Abstraction.External;
@@ -67,7 +67,9 @@ namespace Karna.Core.Application.Services
 				IsActive = true
 			};
 
-			var dataSpec = new MakeListSpecification(makeSpecParams, activeOnly: true, applyPaging: true);
+			var applyPaging = specParams.IsPagingRequested;
+
+			var dataSpec = new MakeListSpecification(makeSpecParams, activeOnly: true, applyPaging: applyPaging);
 			var countSpec = new MakeListSpecification(makeSpecParams, activeOnly: true, applyPaging: false);
 
 			var makes = await repo.GetAllWithSpecAsync(dataSpec);

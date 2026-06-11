@@ -1,4 +1,4 @@
-﻿using Karna.Core.Application.Abstraction.DTOs.Identity;
+using Karna.Core.Application.Abstraction.DTOs.Identity;
 using Karna.Core.Application.Abstraction.DTOs.User;
 using Microsoft.AspNetCore.Identity;
 using System;
@@ -26,6 +26,8 @@ namespace Karna.Core.Application.Abstraction.External
 		Task<(bool Succeeded, IEnumerable<string> Errors)> ChangePassAsync(Guid userId, 
 																			string oldPass, 
 																			string newPass);
+		Task<IDictionary<Guid, UserIdentityDto>> GetUsersIdentityByIdsAsync(IEnumerable<Guid> userIds);
+		Task<bool> SetUserActiveStatusAsync(Guid userId, bool isActive);
 
 	}
 }

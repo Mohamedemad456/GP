@@ -82,8 +82,9 @@ Key conflicts:
 
 ### Results
 - **46 → 0 ambiguous groups** in the main lookup
-- Lookup reduced from ~4184 to 4110 rows
+- Lookup reduced from ~4184 to 4110 rows (Phase 2)
 - All Chery, Daewoo, Chevrolet, Changan conflicts fully resolved
+- Lookup subsequently expanded to **4302 rows** (round 8: +61 curated missing models)
 - Merge validation: joining raw data with lookup now produces 1:1 matches (no row inflation)
 
 ---
@@ -223,9 +224,11 @@ The scripts must run in this exact order:
 
 | File | Rows | Key Properties |
 |------|------|----------------|
-| `car_specs_lookup_full_cleaned.fixed.csv` | 4,110 | 0 ambiguous groups, model_family with 0 nulls |
+| `car_specs_lookup_full_cleaned.fixed.csv` | 4,302 | 0 ambiguous groups, model_family with 0 nulls |
 | `AI_lookup.fixed.csv` | 5,680 | model_family present, EV fuel/transmission correct |
-| `cars_with_make_model.csv` | 26,361 | model_family with 0 nulls, all wrong pairs fixed |
+| `cars_with_make_model.csv` (rounds 1+2) | 26,361 | model_family with 0 nulls, all wrong pairs fixed |
+| `cars_cleaned_2026-06-03_008.csv` (round 8) | 18,192 | Canonicalized + deduped cleaned output |
+| `processed_data.csv` (round 8) | 14,962 | Final processed after lookup merge + filters |
 | `main_car_info_for_backend.csv` | 5,647 | make, model, year, fuel, transmission |
 | `quarantine.csv` | 54 | Invalid/fantasy entries removed from lookup |
 

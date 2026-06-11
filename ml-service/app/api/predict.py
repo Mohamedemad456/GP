@@ -8,6 +8,7 @@ if run in an async handler.
 import datetime
 import logging
 import time
+from typing import Any
 
 from fastapi import APIRouter, HTTPException
 from app.core.logging_config import log_prediction_audit
@@ -19,6 +20,7 @@ from app.schemas.prediction import (
 )
 from app.services import predictor
 import app.services.model.model_state as _ms
+from app.services.model.router import resolve_model_for_prediction
 from app.core.price_rounding import round_egp_market_price
 
 logger = logging.getLogger(__name__)
@@ -95,24 +97,21 @@ def _build_response(result: dict) -> PredictionResponse:
 
 @router.post("/api/v1/predict", response_model=PredictionResponse)
 def predict_endpoint(request: PredictionRequest):
-    """Return price prediction using the active quantile model."""
+    """Return price prediction with automatic fallback to older models."""
     start = time.monotonic()
 
-    if not _ms.check_car_validity(request.brand, request.model):
+    # 1. Unknown make → hard validation error
+    if not _ms.check_make_known(request.brand):
+        msg = f"Make '{request.brand}' is not available in our current dataset."
         _audit_prediction(
             request,
             duration_ms=(time.monotonic() - start) * 1000,
             success=False,
             error_type="validation_error",
-            error_message=(
-                f"Make '{request.brand}', Model '{request.model}' combination is not available in our current dataset."
-            ),
+            error_message=msg,
             model_version=_ms.get_active_model_version(),
         )
-        raise HTTPException(
-            status_code=400,
-            detail=f"Make '{request.brand}', Model '{request.model}' combination is not available in our current dataset."
-        )
+        raise HTTPException(status_code=400, detail=msg)
 
     if not _ms.is_model_loaded():
         _audit_prediction(
@@ -128,7 +127,24 @@ def predict_endpoint(request: PredictionRequest):
             detail="Model not loaded. Please ensure a model is registered and the server has loaded it."
         )
 
+    # 2. Fallback routing decision
+    routing = resolve_model_for_prediction(request.brand, request.model)
+
+    if routing.coverage_mode == "unknown_make":
+        msg = f"Make '{request.brand}' is not available in our current dataset."
+        _audit_prediction(
+            request,
+            duration_ms=(time.monotonic() - start) * 1000,
+            success=False,
+            error_type="validation_error",
+            error_message=msg,
+            model_version=_ms.get_active_model_version(),
+        )
+        raise HTTPException(status_code=400, detail=msg)
+
+    # 3. Run prediction with active model (activation is now the sole source of truth)
     try:
+        exact_supported = routing.coverage_mode == "exact_match"
         result = predictor.predict_full(
             make=request.brand,
             model=request.model,
@@ -138,7 +154,17 @@ def predict_endpoint(request: PredictionRequest):
             fuel=request.fuel,
             location=request.location,
             include_factors=request.include_factors or False,
+            exact_combo_supported=exact_supported,
         )
+
+        # Log coverage mode for observability
+        logger.info(
+            "Prediction served: coverage_mode=%s, model=%s, fallback=%s",
+            routing.coverage_mode,
+            result.get("model_version"),
+            routing.fallback_used,
+        )
+
     except ValueError as e:
         _audit_prediction(
             request,
@@ -190,19 +216,18 @@ def predict_batch_endpoint(request: BatchPredictionRequest):
     for i, item in enumerate(request.items):
         item_start = time.monotonic()
         try:
-            if not _ms.check_car_validity(item.brand, item.model):
+            # 1. Unknown make → error for this item
+            if not _ms.check_make_known(item.brand):
+                msg = f"Make '{item.brand}' not in dataset."
                 _audit_prediction(
                     item,
                     duration_ms=(time.monotonic() - item_start) * 1000,
                     success=False,
                     error_type="validation_error",
-                    error_message=f"Make '{item.brand}', Model '{item.model}' not in dataset.",
+                    error_message=msg,
                     model_version=_ms.get_active_model_version(),
                 )
-                results.append(BatchPredictionItem(
-                    index=i, success=False,
-                    error=f"Make '{item.brand}', Model '{item.model}' not in dataset."
-                ))
+                results.append(BatchPredictionItem(index=i, success=False, error=msg))
                 failed += 1
                 continue
 
@@ -221,6 +246,24 @@ def predict_batch_endpoint(request: BatchPredictionRequest):
                 failed += 1
                 continue
 
+            # 2. Fallback routing
+            routing = resolve_model_for_prediction(item.brand, item.model)
+            if routing.coverage_mode == "unknown_make":
+                msg = f"Make '{item.brand}' not in dataset."
+                _audit_prediction(
+                    item,
+                    duration_ms=(time.monotonic() - item_start) * 1000,
+                    success=False,
+                    error_type="validation_error",
+                    error_message=msg,
+                    model_version=_ms.get_active_model_version(),
+                )
+                results.append(BatchPredictionItem(index=i, success=False, error=msg))
+                failed += 1
+                continue
+
+            # 3. Run prediction with active model
+            exact_supported = routing.coverage_mode == "exact_match"
             result = predictor.predict_full(
                 make=item.brand,
                 model=item.model,
@@ -230,7 +273,9 @@ def predict_batch_endpoint(request: BatchPredictionRequest):
                 fuel=item.fuel,
                 location=item.location,
                 include_factors=item.include_factors or False,
+                exact_combo_supported=exact_supported,
             )
+
             record_prediction(
                 confidence=result["confidence"],
                 duration_s=time.monotonic() - item_start,

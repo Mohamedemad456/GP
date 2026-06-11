@@ -217,5 +217,5 @@ Currently `generate_processed_data.py` does NOT preserve `scraped_at` in `proces
 Plan 2 Step 2.1 will add `days_since_baseline` derived from `scraped_at` to the output columns.
 
 ### Feature Distribution Baseline
-Plan 7 Step 7.10 will create `models/metrics/feature_distribution_baseline.json` at
+Plan 08 Step 8.10 will create `models/metrics/feature_distribution_baseline.json` at
 training time, and `check_drift()` will run against it at each new snapshot.

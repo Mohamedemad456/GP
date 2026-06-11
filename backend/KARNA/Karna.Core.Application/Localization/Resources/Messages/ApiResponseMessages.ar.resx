@@ -242,5 +242,10 @@
   </data>
   <data name="AlreadyInFavorites" xml:space="preserve">
     <value>هذا الإعلان موجود بالفعل في المفضلة</value>
+  <data name="UserActivated" xml:space="preserve">
+    <value>تم تفعيل المستخدم بنجاح.</value>
+  </data>
+  <data name="UserDeactivated" xml:space="preserve">
+    <value>تم تعطيل المستخدم بنجاح.</value>
   </data>
 </root>

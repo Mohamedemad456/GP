@@ -36,21 +36,16 @@ WORKDIR /app
 # Copy only the pre‑built venv
 COPY --from=builder /opt/venv /opt/venv
 
-# ── Non‑root user ───────────────────────────────────────────────
-RUN groupadd --gid 1000 appuser && \
-    useradd  --uid 1000 --gid appuser --shell /bin/bash --create-home appuser
-
 # ── Application code ────────────────────────────────────────────
 COPY . .
 
-RUN chown -R appuser:appuser /app
-USER appuser
+RUN chmod +x /app/entrypoint.sh
 
 # ── Port & health check ─────────────────────────────────────────
-EXPOSE 8001
+EXPOSE 8001 8501
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
     CMD ["python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health')"]
 
 # ── Start ────────────────────────────────────────────────────────
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8001"]
+CMD ["/app/entrypoint.sh"]

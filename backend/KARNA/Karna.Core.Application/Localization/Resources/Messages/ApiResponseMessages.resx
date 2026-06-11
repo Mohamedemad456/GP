@@ -242,5 +242,10 @@
   </data>
   <data name="AlreadyInFavorites" xml:space="preserve">
     <value>This listing is already in your favorites.</value>
+  <data name="UserActivated" xml:space="preserve">
+    <value>User activated successfully.</value>
+  </data>
+  <data name="UserDeactivated" xml:space="preserve">
+    <value>User deactivated successfully.</value>
   </data>
 </root>

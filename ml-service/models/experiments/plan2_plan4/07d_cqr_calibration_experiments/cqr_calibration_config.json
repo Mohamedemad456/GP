@@ -1,0 +1,37 @@
+{
+  "winner_experiment_name": "ensemble_baseline_5q",
+  "framework": "WeightedEnsemble",
+  "use_weights": false,
+  "use_tuned": false,
+  "dataset_tag": "2026-06-03_008",
+  "split_name": "price_stratified",
+  "target_col": "price_egp_log",
+  "calibration_fraction": 0.15,
+  "val_fraction": 0.1,
+  "split_sizes": {
+    "train_fit": 7875,
+    "val": 875,
+    "calibration": 1248,
+    "test": 2500
+  },
+  "coverage_targets": {
+    "80": 0.8,
+    "90": 0.9
+  },
+  "conformal_quantile_levels": {
+    "80": 0.8012820512820513,
+    "90": 0.9014423076923077
+  },
+  "q_hat_80": 67114.70162718807,
+  "q_hat_90": 85323.7730429921,
+  "raw_test_coverage_80_pct": 71.64,
+  "raw_test_coverage_90_pct": 85.92,
+  "calibrated_test_coverage_80_pct": 91.08000000000001,
+  "calibrated_test_coverage_90_pct": 96.32,
+  "raw_test_width_80_pct": 36.34410630095671,
+  "raw_test_width_90_pct": 61.32056871287336,
+  "calibrated_test_width_80_pct": 64.19405532630115,
+  "calibrated_test_width_90_pct": 96.38805803179926,
+  "method": "CQR",
+  "score_space": "price_egp"
+}

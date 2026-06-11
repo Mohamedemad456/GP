@@ -1,5 +1,5 @@
 import { Link, useParams } from "react-router-dom";
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import {
@@ -12,6 +12,7 @@ import {
   CardTitle,
   ImageCarousel,
   Separator,
+  PageLoader,
 } from "@gp/design-system";
 import {
   AlertCircle,
@@ -24,25 +25,50 @@ import {
   Heart,
   MessageCircle,
   Palette,
+  Phone,
   Settings2,
+  User,
   Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { MOCK_LISTINGS } from "@/data/mocks/listings";
+import { getListingById, type ListingDetailsDto } from "@/lib/listingsApi";
 
 export default function CarDetailsPage() {
   const { t, i18n } = useTranslation();
   const { id } = useParams();
   const isRTL = i18n.language?.startsWith("ar") ?? false;
-  const listingId = Number(id);
-  const listing = MOCK_LISTINGS.find((item) => item.id === listingId);
+
+  const [listing, setListing] = useState<ListingDetailsDto | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const BASE_URL: string =
+    import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5082";
+
+  function resolvePhotoUrl(url: string | null): string | null {
+    if (!url) return null;
+    if (url.startsWith("http") || url.startsWith("data:")) return url;
+    // Ensure proper URL concatenation with leading slash
+    const path = url.startsWith("/") ? url : `/${url}`;
+    return `${BASE_URL}${path}`;
+  }
+
+  useEffect(() => {
+    if (!id) return;
+    getListingById(id)
+      .then((res) => {
+        if (res.success && res.data) {
+          setListing(res.data);
+        }
+      })
+      .finally(() => setIsLoading(false));
+  }, [id]);
   const locale = i18n.language?.startsWith("ar") ? "ar-SA" : "en-US";
 
   const currency = useMemo(
     () =>
       new Intl.NumberFormat(locale, {
         style: "currency",
-        currency: "SAR",
+        currency: "EGP",
         maximumFractionDigits: 0,
       }),
     [locale],
@@ -57,6 +83,10 @@ export default function CarDetailsPage() {
     [locale],
   );
   const numberFmt = useMemo(() => new Intl.NumberFormat(locale), [locale]);
+
+  if (isLoading) {
+    return <PageLoader />;
+  }
 
   if (!listing) {
     return (
@@ -101,7 +131,7 @@ export default function CarDetailsPage() {
     {
       icon: Zap,
       label: t("buyer.details.engineSize"),
-      value: listing.engineSize,
+      value: `${listing.engineSize}L`,
     },
     { icon: Palette, label: t("buyer.details.color"), value: listing.color },
   ];
@@ -119,16 +149,6 @@ export default function CarDetailsPage() {
           />
           {t("buyer.details.backToFeed")}
         </Link>
-        <div className="flex items-center gap-3 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1.5">
-            <Eye className="size-3.5" />
-            <span dir="ltr">{numberFmt.format(listing.viewCount)}</span>
-          </span>
-          <span className="flex items-center gap-1.5">
-            <Heart className="size-3.5" />
-            <span dir="ltr">{numberFmt.format(listing.favoriteCount)}</span>
-          </span>
-        </div>
       </div>
 
       {/* Car title hero */}
@@ -139,12 +159,14 @@ export default function CarDetailsPage() {
         className="mb-8"
       >
         <div className="mb-2 flex flex-wrap items-center gap-2">
-          <Badge
-            variant="secondary"
-            className="text-xs uppercase tracking-wide"
-          >
-            {listing.status}
-          </Badge>
+          {listing.isGoodDeal && (
+            <Badge
+              variant="success"
+              className="text-xs uppercase tracking-wide"
+            >
+              Good Deal
+            </Badge>
+          )}
           <Badge
             variant={
               listing.conditionGrade.startsWith("A") ? "success" : "info"
@@ -157,19 +179,19 @@ export default function CarDetailsPage() {
         <div className="flex flex-wrap items-end justify-between gap-3">
           <h1 className="font-heading text-3xl font-bold sm:text-4xl">
             <span dir="ltr">
-              {listing.year} {listing.make} {listing.model}
+              {listing.year} {listing.makeName} {listing.modelName}
             </span>
           </h1>
           <p
             className="font-heading text-2xl font-bold text-primary sm:text-3xl"
             dir="ltr"
           >
-            {currency.format(listing.listingPrice)}
+            {listing.listingPrice !== null ? currency.format(listing.listingPrice) : "N/A"}
           </p>
         </div>
 
         <p className="mt-1.5 text-sm text-muted-foreground">
-          {listing.color} · {listing.engineSize} · {listing.transmission}
+          {listing.color} · {listing.engineSize}L · {listing.transmission}
         </p>
       </motion.div>
 
@@ -185,8 +207,8 @@ export default function CarDetailsPage() {
             <Card className="overflow-hidden border-border/60 pt-0">
               <CardContent className="p-0">
                 <ImageCarousel
-                  images={listing.images}
-                  altBase={`${listing.make} ${listing.model}`}
+                  images={listing.photos.map(p => resolvePhotoUrl(p.photoUrl)).filter((url): url is string => url !== null)}
+                  altBase={`${listing.makeName} ${listing.modelName}`}
                 />
               </CardContent>
             </Card>
@@ -271,45 +293,71 @@ export default function CarDetailsPage() {
                     className="font-heading text-2xl font-bold text-primary"
                     dir="ltr"
                   >
-                    {currency.format(listing.listingPrice)}
+                    {listing.listingPrice !== null ? currency.format(listing.listingPrice) : "N/A"}
                   </p>
                 </div>
 
                 <Separator />
 
-                <div className="space-y-2.5 text-sm">
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">
-                      {t("buyer.details.suggestedPrice")}
-                    </span>
-                    <span className="font-semibold" dir="ltr">
-                      {currency.format(listing.suggestedPrice)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">
-                      {t("buyer.details.basePrice")}
-                    </span>
-                    <span className="font-semibold" dir="ltr">
-                      {currency.format(listing.basePrice)}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">
-                      {t("buyer.details.deduction")}
-                    </span>
-                    <span className="font-semibold" dir="ltr">
-                      {listing.totalDeductionPercentage}%
-                    </span>
-                  </div>
+
+
+                <a href={`tel:${listing.contactPhoneNumber}`} className="block">
+                  <Button className="w-full gap-2 bg-primary text-primary-foreground hover:glow-primary">
+                    <Phone className="size-4 shrink-0" />
+                    {t("buyer.details.callSeller", "Call Seller")}
+                  </Button>
+                </a>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Contact Info */}
+          <motion.div
+            initial={{ opacity: 0, x: isRTL ? -24 : 24 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.20, ease: "easeOut" }}
+          >
+            <Card className="border-border/60">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <User className="size-3.5 text-muted-foreground" />
+                  {t("buyer.details.sellerInfo", "Seller Info")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex items-center gap-3 rounded-lg bg-muted/40 px-3 py-2.5">
+                  <User className="size-4 shrink-0 text-muted-foreground" />
+                  <span className="text-sm font-medium">{listing.sellerName}</span>
                 </div>
 
-                <Link to="/contact" className="block">
-                  <Button className="w-full gap-2 bg-primary text-primary-foreground hover:glow-primary">
-                    <MessageCircle className="size-4 shrink-0" />
-                    {t("buyer.details.contactSeller", "Contact Seller")}
-                  </Button>
-                </Link>
+                <a
+                  href={`tel:${listing.contactPhoneNumber}`}
+                  className="flex items-center gap-3 rounded-lg bg-muted/40 px-3 py-2.5 transition-colors hover:bg-muted/70"
+                >
+                  <Phone className="size-4 shrink-0 text-primary" />
+                  <span className="text-sm font-medium" dir="ltr">{listing.contactPhoneNumber}</span>
+                </a>
+
+                {listing.whatsAppNumber && (
+                  <a
+                    href={`https://wa.me/${listing.whatsAppNumber.replace(/[^\d]/g, "")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 rounded-lg bg-green-50 px-3 py-2.5 transition-colors hover:bg-green-100 dark:bg-green-950/30 dark:hover:bg-green-950/50"
+                  >
+                    <MessageCircle className="size-4 shrink-0 text-green-600 dark:text-green-400" />
+                    <span className="text-sm font-medium text-green-700 dark:text-green-300" dir="ltr">
+                      {listing.whatsAppNumber}
+                    </span>
+                  </a>
+                )}
+
+                {listing.preferredContactMethod && (
+                  <p className="text-center text-xs text-muted-foreground">
+                    {t("buyer.details.preferredContact", "Preferred:")}{" "}
+                    <span className="font-medium text-foreground">{listing.preferredContactMethod}</span>
+                  </p>
+                )}
               </CardContent>
             </Card>
           </motion.div>
@@ -331,18 +379,6 @@ export default function CarDetailsPage() {
                 <Detail
                   label={t("buyer.details.createdAt")}
                   value={dateFmt.format(new Date(listing.createdAt))}
-                />
-                <Detail
-                  label={t("buyer.details.updatedAt")}
-                  value={dateFmt.format(new Date(listing.updatedAt))}
-                />
-                <Detail
-                  label={t("buyer.details.soldAt")}
-                  value={
-                    listing.soldAt
-                      ? dateFmt.format(new Date(listing.soldAt))
-                      : "-"
-                  }
                 />
               </CardContent>
             </Card>

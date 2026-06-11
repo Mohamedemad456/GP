@@ -60,6 +60,8 @@ data/processed/processed_data.csv        ← model-ready data (versioned)
 | `drop_unwanted_columns.py` | Strips `model_family` and `brand_market_share` from CSVs. Guard rail — also applied inside the master pipeline and `generate_processed_data.py`. | Once per data version (or as guard) |
 | `version_manager.py` | **Version manager** — generates date-based tags, reads/writes `data/data_manifest.json`, resolves versioned paths, provides rollback. | When needed (CLI tool) |
 | `data_pipeline.py` | **Versioned pipeline orchestrator** — wraps clean + process into a single versioned run, registers in manifest. Use instead of running scripts manually. | Every new raw data snapshot |
+| `combine_versions.py` | **Training dataset builder** — combines all processed versions into a deduped, rare-filtered `training_data.csv`. Creates immutable versions in `training_versions/` and logs structured run summaries. | After adding new processed versions |
+| `check_version_consistency.py` | Verifies all registered versions are combinable (same columns, dtypes, casing). | Before `combine` or ad-hoc |
 | `data_cleaner.py` | Legacy placeholder (not yet implemented). Superseded by the master pipeline above. | — |
 
 ---
@@ -71,20 +73,36 @@ data/processed/processed_data.csv        ← model-ready data (versioned)
 ```
 data/
 ├── raw/
-│   ├── snapshots/cars_raw_2026-05-24.csv    ← immutable raw pull
-│   └── cars_with_make_model.csv             ← copy of latest (backward compat)
+│   ├── snapshots/cars_raw_YYYY-MM-DD_NNN.csv   ← immutable raw pull
+│   └── cars_with_make_model.csv                ← copy of latest (backward compat)
 ├── cleaned/
-│   └── cars_cleaned_2026-05-24.csv          ← immutable cleaned snapshot
+│   └── cars_cleaned_YYYY-MM-DD_NNN.csv         ← immutable cleaned snapshot
 ├── processed/
-│   ├── versions/processed_2026-05-24.csv    ← immutable processed snapshot
-│   └── processed_data.csv                   ← copy of latest (backward compat)
-└── data_manifest.json                       ← single source of truth
+│   ├── versions/processed_YYYY-MM-DD_NNN.csv   ← immutable processed snapshot
+│   ├── training_versions/                      ← immutable training datasets
+│   │   └── training_YYYY-MM-DD_NNN.csv
+│   ├── processed_data.csv                      ← copy of latest processed (backward compat)
+│   └── training_data.csv                     ← copy of latest training (backward compat)
+├── data_manifest.json                        ← raw/cleaned/processed versions
+├── training_manifest.json                    ← training dataset versions
+└── logs/
+    ├── pipeline_YYYYMMDD_HHMMSS.log
+    ├── combine_YYYYMMDD_HHMMSS.log
+    ├── clean_raw_data_YYYYMMDD_HHMMSS.log
+    ├── generate_YYYYMMDD_HHMMSS.log
+    └── runs/
+        ├── pipeline_YYYYMMDD_HHMMSS.json      ← structured pipeline run summaries
+        └── combine_YYYYMMDD_HHMMSS.json       ← structured combine run summaries
 ```
 
-**Version tags**: `YYYY-MM-DD`. Same-day re-pull appends `.2`, `.2.3`, etc.
+**Version tags**: `YYYY-MM-DD_NNN`. Same-day re-pull auto-increments `NNN` starting at `001`.
+
+**Training data versions**: Every `combine` run creates an immutable training dataset in `training_versions/` and updates the alias `training_data.csv`. Tags follow the same `YYYY-MM-DD_NNN` convention and are tracked in `training_manifest.json`.
 
 **Backward compatibility**: Fixed-path files are always a copy of the latest version.
 Existing scripts, notebooks, and the API service continue to read from fixed paths.
+
+**Structured run summaries**: Every `data_pipeline.py` and `combine_versions.py` run writes a machine-readable JSON summary to `data/logs/runs/`. These capture status, row counts, stage results, errors, and file paths for programmatic auditing.
 
 **Rollback**: `python scripts/cleaning/version_manager.py rollback <tag> --apply`
 
@@ -104,11 +122,20 @@ python scripts/cleaning/data_pipeline.py --apply     # execute
 python scripts/cleaning/version_manager.py list
 python scripts/cleaning/version_manager.py current
 
-# 4. (If needed) Rollback to a previous version
-python scripts/cleaning/version_manager.py rollback 2026-05-24 --apply
+# 4. Verify all versions are combinable
+python scripts/cleaning/check_version_consistency.py
 
-# 5. (Future) Trigger automated retraining
-# python cli/retrain.py
+# 5. Combine all processed versions → versioned training_data.csv
+python scripts/cleaning/combine_versions.py              # dry-run first
+python scripts/cleaning/combine_versions.py --apply       # execute
+# Optional: label the training version explicitly
+python scripts/cleaning/combine_versions.py --apply --tag 2026-06-03_001
+
+# 6. Inspect the latest run summary
+# data/logs/runs/combine_YYYYMMDD_HHMMSS.json
+
+# 7. (If needed) Rollback to a previous version
+python scripts/cleaning/version_manager.py rollback 2026-05-24 --apply
 ```
 
 ---
@@ -120,3 +147,4 @@ python scripts/cleaning/version_manager.py rollback 2026-05-24 --apply
 3. **Auditable** — every `--apply` creates a timestamped `.bak` backup and a `.log` file
 4. **Report-first** — always run `--mode report` or dry-run before applying changes
 5. **Guard-railed** — `drop_unwanted_columns` and `generate_processed_data` both strip `model_family`/`brand_market_share` even if they somehow reappear
+6. **Immutable training data** — `combine_versions.py` never overwrites a training version tag. Each run produces a new `training_YYYY-MM-DD_NNN.csv` in `training_versions/` and updates the alias `training_data.csv` for backward compatibility.
