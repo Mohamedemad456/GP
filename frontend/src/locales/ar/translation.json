@@ -997,6 +997,29 @@
         "description": "تم إرسال إعلانك للمراجعة. سيتم إعلامك عند الموافقة عليه."
       }
     },
+    "editListing": {
+      "title": "تعديل الإعلان",
+      "subtitle": "قم بتحديث معلومات ووصف سيارتك.",
+      "generatingPrice": "جاري تسعير الإعلان...",
+      "pricingSection": {
+        "title": "توصية السعر بالذكاء الاصطناعي",
+        "description": "قام نموذجنا بتحليل إعلانك ويقترح نطاق السعر التالي. اختر السعر العادل أو أدخل سعرك الخاص.",
+        "lowerRange": "الحد الأدنى",
+        "fairPrice": "السعر العادل",
+        "upperRange": "الحد الأعلى",
+        "confidence": "مستوى الثقة",
+        "acceptFairPrice": "استخدام السعر العادل",
+        "yourPrice": "سعرك (ج.م)",
+        "pricePlaceholder": "مثال 450000",
+        "rangeHint": "النطاق المقترح: {{lower}} – {{upper}}",
+        "settingPrice": "جاري تعيين السعر...",
+        "setPrice": "تعيين السعر"
+      },
+      "errors": {
+        "invalidPrice": "الرجاء إدخال سعر صحيح.",
+        "fixErrors": "يرجى ملء جميع القيم المفقودة قبل الحفظ."
+      }
+    },
     "myListings": {
       "title": "إعلاناتي",
       "subtitle": "لديك {{count}} إعلان",

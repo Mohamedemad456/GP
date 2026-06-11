@@ -26,6 +26,9 @@ import {
 import { Link } from "react-router-dom";
 import heroCarImage from "@/assets/hero-car4.jpg";
 import { getApprovedListings, type BuyerListingDto } from "@/lib/listingsApi";
+import { getFavorites, addFavorite, removeFavorite } from "@/lib/favoritesApi";
+import { toast } from "sonner";
+import { useAuth } from "@/context/AuthContext";
 
 const BASE_URL: string =
   import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5082";
@@ -54,16 +57,25 @@ const Home = () => {
   const [savedCarIds, setSavedCarIds] = useState<Set<string>>(new Set());
   const [apiListings, setApiListings] = useState<BuyerListingDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuth();
 
   useEffect(() => {
-    getApprovedListings({ pageSize: 100 })
-      .then((res) => {
-        if (res.success && res.data) {
-          setApiListings(res.data.data);
-        }
-      })
-      .finally(() => setIsLoading(false));
-  }, []);
+    const fetchListings = getApprovedListings({ pageSize: 100 }).then((res) => {
+      if (res.success && res.data) {
+        setApiListings(res.data.data);
+      }
+    });
+
+    const fetchFavs = user
+      ? getFavorites({ pageSize: 100 }).then((res) => {
+          if (res.success && res.data) {
+            setSavedCarIds(new Set(res.data.data.map((fav) => String(fav.id))));
+          }
+        }).catch(() => {})
+      : Promise.resolve();
+
+    Promise.all([fetchListings, fetchFavs]).finally(() => setIsLoading(false));
+  }, [user]);
 
   const makeOptions = useMemo(() => {
     const set = new Set(apiListings.map((c) => c.makeName));
@@ -111,16 +123,36 @@ const Home = () => {
     return list.sort(sorters[sort]);
   }, [query, make, minPrice, maxPrice, sort, apiListings]);
 
-  const toggleSaved = (carId: string) => {
+  const toggleSaved = async (carId: string) => {
+    if (!user) {
+      toast.error(t("favorites.loginRequired", "Please log in to save favorites."));
+      return;
+    }
+
+    const isSaved = savedCarIds.has(String(carId));
+
     setSavedCarIds((prev) => {
       const next = new Set(prev);
-      if (next.has(carId)) {
-        next.delete(carId);
-      } else {
-        next.add(carId);
-      }
+      if (isSaved) next.delete(String(carId));
+      else next.add(String(carId));
       return next;
     });
+
+    try {
+      if (isSaved) {
+        await removeFavorite(String(carId));
+      } else {
+        await addFavorite(String(carId));
+      }
+    } catch (err) {
+      setSavedCarIds((prev) => {
+        const next = new Set(prev);
+        if (isSaved) next.add(String(carId));
+        else next.delete(String(carId));
+        return next;
+      });
+      toast.error(t("favorites.toggleError", "Failed to update favorites."));
+    }
   };
 
   const currency = useMemo(
@@ -414,13 +446,13 @@ const Home = () => {
                         {/* Save button — floats over the image */}
                         <button
                           type="button"
-                          onClick={() => toggleSaved(car.id)}
+                          onClick={() => toggleSaved(String(car.id))}
                           className="absolute end-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-background/80 backdrop-blur-sm border border-border/60 hover:bg-background transition-colors"
                           aria-label={t("home.browse.save")}
                         >
                           <Heart
                             className={`h-4 w-4 transition-colors ${
-                              savedCarIds.has(car.id)
+                              savedCarIds.has(String(car.id))
                                 ? "fill-destructive text-destructive"
                                 : "text-muted-foreground"
                             }`}

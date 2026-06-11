@@ -105,7 +105,7 @@ const CarsPending = () => {
     () =>
       new Intl.NumberFormat(locale, {
         style: "currency",
-        currency: "SAR",
+        currency: "EGP",
         minimumFractionDigits: 0,
         maximumFractionDigits: 0,
       }),

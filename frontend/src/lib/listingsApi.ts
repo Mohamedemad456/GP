@@ -139,6 +139,9 @@ export type UpdateListingRequest = {
   color: string;
   description: string;
   location: EgyptLocation;
+  contactPhoneNumber: string;
+  whatsAppNumber: string;
+  preferredContactMethod: number;
 };
 
 /** Matches backend RejectListingDto */
@@ -251,6 +254,9 @@ export const updateListing = (listingId: string, data: UpdateListingRequest) =>
       Color: data.color,
       Description: data.description,
       Location: data.location,
+      ContactPhoneNumber: data.contactPhoneNumber,
+      WhatsAppNumber: data.whatsAppNumber,
+      PreferredContactMethod: data.preferredContactMethod,
     })
     .then((r) => r.data);
 

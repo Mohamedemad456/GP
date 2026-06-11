@@ -70,7 +70,7 @@ namespace Karna.Core.Application.Services
 				IsActive = true
 			};
 
-			var dataSpec = new ConditionChecklistCategoryListSpecification(categorySpecParams, activeOnly: true, applyPaging: true);
+			var dataSpec = new ConditionChecklistCategoryListSpecification(categorySpecParams, activeOnly: true, applyPaging: specParams.IsPagingRequested);
 			var countSpec = new ConditionChecklistCategoryListSpecification(categorySpecParams, activeOnly: true, applyPaging: false);
 
 			var categories = await repo.GetAllWithSpecAsync(dataSpec);
