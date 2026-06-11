@@ -11,7 +11,7 @@ namespace Karna.APIs.Controllers.Controllers
 {
     [Route("api/Favorite")]
     [Authorize(Roles = "User")]
-    internal class FavoriteController(IFavoriteService _service) : ApiControllerBase
+    public class FavoriteController(IFavoriteService _service) : ApiControllerBase
     {
         [HttpPost("{listingId:guid}")]
         public async Task<IActionResult> AddFavorite(Guid listingId)

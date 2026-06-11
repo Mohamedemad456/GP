@@ -10,6 +10,7 @@ import {
   ShieldCheck,
   LogOut,
   Loader2,
+  Heart,
 } from "lucide-react";
 import {
   Button,
@@ -176,6 +177,10 @@ const Navbar = memo(() => {
                     <LayoutDashboard className="size-4" />
                     {t("navigation.sellerDashboard")}
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/favorites")}>
+                    <Heart className="size-4" />
+                    {t("navigation.favorites", "Favorites")}
+                  </DropdownMenuItem>
                   {isAdmin && (
                     <DropdownMenuItem onClick={() => navigate("/admin")}>
                       <ShieldCheck className="size-4" />
@@ -327,6 +332,16 @@ const Navbar = memo(() => {
                       <Button variant="outline" className="w-full justify-start gap-2">
                         <LayoutDashboard className="size-4" />
                         {t("navigation.sellerDashboard")}
+                      </Button>
+                    </Link>
+                    <Link
+                      to="/favorites"
+                      onClick={() => setIsOpen(false)}
+                      className="block"
+                    >
+                      <Button variant="outline" className="w-full justify-start gap-2">
+                        <Heart className="size-4" />
+                        {t("navigation.favorites", "Favorites")}
                       </Button>
                     </Link>
                     {isAdmin && (

@@ -33,6 +33,7 @@ const EditListing = lazy(() => import("@/pages/(seller)/edit-listing"));
 const FeedPage = lazy(() => import("@/pages/(buyer)/feed"));
 const CarDetailsPage = lazy(() => import("@/pages/(buyer)/car-details"));
 const ProfilePage = lazy(() => import("@/pages/(buyer)/profile"));
+const FavoritesPage = lazy(() => import("@/pages/(buyer)/favorites"));
 
 function App() {
   const storedLanguage =
@@ -63,6 +64,7 @@ function App() {
               <Route element={<PrivateRoute />}>
                 <Route path="profile" element={<ProfilePage />} />
                 <Route path="feed" element={<FeedPage />} />
+                <Route path="favorites" element={<FavoritesPage />} />
                 <Route path="cars/:id" element={<CarDetailsPage />} />
               </Route>
             </Route>
