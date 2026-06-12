@@ -50,9 +50,12 @@ What you should cover here
 - What the model and AI services require to work correctly
 
 #### Chapter 3: Software Design — Partial
+No diagrammatic ownership in Chapter 3. Mohamed Seif’s architecture and pipeline diagrams belong in Chapter 4 (Implementation) per the documentation guidelines, which reserve Chapter 3 for ERD, use case, sequence, and activity diagrams only.
+
+#### Chapter 4: Implementation — Full Ownership for ML/AI/Data Pipeline Parts
+##### 4.1 Software Architecture (Server-side ML/AI)
 - ML model architecture diagram
 - AI service architecture / chatbot flow
-- Data cleaning and ML pipeline diagram
 - System-level technical diagram for:
   - frontend → backend → ML service
   - frontend → backend/AI route or chatbot route
@@ -62,17 +65,10 @@ What you should document:
 - Model family and inference pipeline
 - Confidence / interval / negotiation-range logic
 - Explainability / top factors flow
-- Retrain and evaluation workflow if included diagrammatically
 
-#### Chapter 4: Implementation — Full Ownership for ML/AI/Data Pipeline Parts
-- ML service implementation
-- AI service implementation
-- End-to-end prediction pipeline
-- Explainability pipeline
-- Retraining pipeline
-- Data cleaning pipeline and processed dataset generation
-- Data versioning and manifests
-- Model evaluation/export pipeline
+##### 4.2 Workflow / Pseudocode (ML/AI Pipeline)
+- Data cleaning and ML pipeline diagram
+- Retrain and evaluation workflow if included diagrammatically
 
 What you should explicitly cover:
 - `ml-service` FastAPI service
