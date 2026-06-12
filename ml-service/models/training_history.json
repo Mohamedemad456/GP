@@ -213,5 +213,48 @@
       "cv_per_mm_pct_over_50pct": 1.55,
       "cv_per_mm_supported_pct_over_50pct": 0.66
     }
+  },
+  {
+    "timestamp": "2026-06-12T07:58:30.904216+00:00",
+    "model_id": "v2_2026-06-12_012",
+    "version": "v2.1.5",
+    "stage": "production",
+    "gate_outcome": "promote",
+    "gate_passed": true,
+    "holdout_mape_pct": 11.133111667590075,
+    "holdout_mae": 146007.7670339836,
+    "cv_mape_pct": 11.855899073949635,
+    "elapsed_sec": 1150.74,
+    "promoted": true,
+    "diagnostics_summary": {
+      "holdout_per_mm_total": 414,
+      "holdout_per_mm_supported": 86,
+      "holdout_per_mm_pct_under_15pct": 71.74,
+      "holdout_per_mm_pct_over_15pct": 28.26,
+      "holdout_per_mm_supported_pct_over_15pct": 8.14,
+      "holdout_per_mm_pct_under_20pct": 85.27,
+      "holdout_per_mm_pct_over_20pct": 14.73,
+      "holdout_per_mm_supported_pct_over_20pct": 1.16,
+      "holdout_per_mm_pct_under_30pct": 93.48,
+      "holdout_per_mm_pct_over_30pct": 6.52,
+      "holdout_per_mm_supported_pct_over_30pct": 0.0,
+      "holdout_per_mm_pct_under_50pct": 98.55,
+      "holdout_per_mm_pct_over_50pct": 1.45,
+      "holdout_per_mm_supported_pct_over_50pct": 0.0,
+      "cv_per_mm_total": 453,
+      "cv_per_mm_supported": 305,
+      "cv_per_mm_pct_under_15pct": 69.98,
+      "cv_per_mm_pct_over_15pct": 30.02,
+      "cv_per_mm_supported_pct_over_15pct": 21.97,
+      "cv_per_mm_pct_under_20pct": 83.44,
+      "cv_per_mm_pct_over_20pct": 16.56,
+      "cv_per_mm_supported_pct_over_20pct": 9.51,
+      "cv_per_mm_pct_under_30pct": 95.81,
+      "cv_per_mm_pct_over_30pct": 4.19,
+      "cv_per_mm_supported_pct_over_30pct": 1.64,
+      "cv_per_mm_pct_under_50pct": 98.68,
+      "cv_per_mm_pct_over_50pct": 1.32,
+      "cv_per_mm_supported_pct_over_50pct": 0.66
+    }
   }
 ]

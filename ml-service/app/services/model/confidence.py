@@ -103,9 +103,6 @@ def confidence_label_from_signals(
         if n_support < 10:
             if not excellent_mape:
                 label = _degrade_label(label)
-        elif n_support < 20 and label == "high":
-            if not excellent_mape:
-                label = "medium"
     else:
         # Combo never seen in training data — model is generalizing beyond
         # its evidence. Degrade one step (high→medium, medium→low).
@@ -114,14 +111,14 @@ def confidence_label_from_signals(
     if is_quantile and width_pct is not None:
         if excellent_mape:
             # Proven accuracy → tolerate wider intervals
+            if width_pct > 2.5:
+                return "low"
+            if width_pct > 2.0:
+                label = _degrade_label(label)
+        else:
             if width_pct > 2.0:
                 return "low"
             if width_pct > 1.5:
-                label = _degrade_label(label)
-        else:
-            if width_pct > 1.5:
-                return "low"
-            if width_pct > 1.0:
                 label = _degrade_label(label)
 
     return label

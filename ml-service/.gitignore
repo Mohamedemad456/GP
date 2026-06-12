@@ -3,6 +3,7 @@
 .env.example
 # Data
 
+Chapter4*
 # data/raw/*.*
 # data/cleaned/*.*
 # data/processed/*.*
