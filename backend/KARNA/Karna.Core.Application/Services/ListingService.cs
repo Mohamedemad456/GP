@@ -764,9 +764,14 @@ namespace Karna.Core.Application.Services
 			if (currentUser is null)
 				return new ApiResponse<MyListingDetailsDto> { Success = false, Message = _localizer.GetErrorMessage("UserNotFound") };
 
-			// 2. Load listing — owner-scoped, no status gate, includes Make/Model/Photos/ListingDefects
+			// 2. Load listing — owner-scoped or admin, no status gate, includes Make/Model/Photos/ListingDefects
 			var listingRepo = _unitOfWork.GetRepository<Listing>();
-			var spec = new SellerListingDetailsSpecification(listingId, currentUser.Id);
+            
+			// Check if the user is Admin
+			bool isAdmin = _currentUserService.IsInRole("Admin");
+			Guid? targetSellerId = isAdmin ? null : currentUser.Id;
+
+			var spec = new SellerListingDetailsSpecification(listingId, targetSellerId);
 			var listing = await listingRepo.GetWithSpecAsync(spec);
 
 			if (listing is null)
