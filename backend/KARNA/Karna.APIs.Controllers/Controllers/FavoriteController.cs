@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Karna.APIs.Controllers.Controllers._Base;
@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Karna.APIs.Controllers.Controllers
 {
-    [Route("api/Favorite")]
     [Authorize(Roles = "User")]
     public class FavoriteController(IFavoriteService _service) : ApiControllerBase
     {
