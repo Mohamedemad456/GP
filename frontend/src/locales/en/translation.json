@@ -997,6 +997,29 @@
         "description": "Your listing has been submitted for review. You will be notified once it is approved."
       }
     },
+    "editListing": {
+      "title": "Edit Listing",
+      "subtitle": "Update your vehicle information and description.",
+      "generatingPrice": "Generating price...",
+      "pricingSection": {
+        "title": "AI Price Recommendation",
+        "description": "Our model analysed your listing and suggests the following price range. Choose the fair price or enter your own.",
+        "lowerRange": "Lower Range",
+        "fairPrice": "Fair Price",
+        "upperRange": "Upper Range",
+        "confidence": "Confidence",
+        "acceptFairPrice": "Use the AI fair price",
+        "yourPrice": "Your Price (EGP)",
+        "pricePlaceholder": "e.g. 450000",
+        "rangeHint": "Suggested range: {{lower}} – {{upper}}",
+        "settingPrice": "Setting price...",
+        "setPrice": "Set Price"
+      },
+      "errors": {
+        "invalidPrice": "Please enter a valid price.",
+        "fixErrors": "Please fill in all missing values before saving."
+      }
+    },
     "myListings": {
       "title": "My Listings",
       "subtitle": "You have {{count}} listings",

@@ -61,6 +61,15 @@ namespace Karna.APIs.Controllers.Controllers
 			var result = await _activityLogService.GetLogsAsync(specParams);
 			return Ok(result);
 		}
+
+		[HttpPost("listings/re-evaluate-market")]
+		public async Task<IActionResult> ReEvaluateMarket()
+		{
+			var result = await _adminService.TriggerMarketReEvaluationAsync();
+			if (!result.Success)
+				return BadRequest(result);
+			return Ok(result);
+		}
 	}
 }
 

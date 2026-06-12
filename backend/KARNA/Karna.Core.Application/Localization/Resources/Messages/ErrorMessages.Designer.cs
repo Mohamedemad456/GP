@@ -160,11 +160,83 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please enter a valid price greater than zero..
+        /// </summary>
+        internal static string InvalidListingPrice {
+            get {
+                return ResourceManager.GetString("InvalidListingPrice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This listing cannot be deleted.
         /// </summary>
         internal static string ListingCannotBeDeleted {
             get {
                 return ResourceManager.GetString("ListingCannotBeDeleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please complete all required vehicle details before generating price..
+        /// </summary>
+        internal static string ListingDataIncompleteForPricing {
+            get {
+                return ResourceManager.GetString("ListingDataIncompleteForPricing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This listing is no longer available..
+        /// </summary>
+        internal static string ListingDeleted {
+            get {
+                return ResourceManager.GetString("ListingDeleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please complete all required listing details before submitting..
+        /// </summary>
+        internal static string ListingIncompleteData {
+            get {
+                return ResourceManager.GetString("ListingIncompleteData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to At least 3 photos are required to submit a listing..
+        /// </summary>
+        internal static string ListingInsufficientPhotos {
+            get {
+                return ResourceManager.GetString("ListingInsufficientPhotos", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please add a condition checklist before submitting..
+        /// </summary>
+        internal static string ListingMissingChecklist {
+            get {
+                return ResourceManager.GetString("ListingMissingChecklist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please generate ML pricing before submitting..
+        /// </summary>
+        internal static string ListingMissingPricing {
+            get {
+                return ResourceManager.GetString("ListingMissingPricing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This listing is no longer available..
+        /// </summary>
+        internal static string ListingNotAvailable {
+            get {
+                return ResourceManager.GetString("ListingNotAvailable", resourceCulture);
             }
         }
         
@@ -178,11 +250,47 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Listing must be in Active state..
+        /// </summary>
+        internal static string ListingNotInActiveState {
+            get {
+                return ResourceManager.GetString("ListingNotInActiveState", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Listing must be in Draft state to modify the checklist..
         /// </summary>
         internal static string ListingNotInDraftState {
             get {
                 return ResourceManager.GetString("ListingNotInDraftState", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Listing must be in Pending state..
+        /// </summary>
+        internal static string ListingNotInPendingState {
+            get {
+                return ResourceManager.GetString("ListingNotInPendingState", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Listing must be in Draft or Pending state to generate a price..
+        /// </summary>
+        internal static string ListingNotInValidStateForPricing {
+            get {
+                return ResourceManager.GetString("ListingNotInValidStateForPricing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Listing cannot be updated in its current state..
+        /// </summary>
+        internal static string ListingNotInValidStateForUpdate {
+            get {
+                return ResourceManager.GetString("ListingNotInValidStateForUpdate", resourceCulture);
             }
         }
         
@@ -205,11 +313,38 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The listing&apos;s make or model could not be found..
+        /// </summary>
+        internal static string MakeOrModelNotFound {
+            get {
+                return ResourceManager.GetString("MakeOrModelNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The pricing service is temporarily unavailable. Please try again later..
+        /// </summary>
+        internal static string MLServiceUnavailable {
+            get {
+                return ResourceManager.GetString("MLServiceUnavailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Model not found.
         /// </summary>
         internal static string ModelNotFound {
             get {
                 return ResourceManager.GetString("ModelNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please generate a price suggestion first before accepting..
+        /// </summary>
+        internal static string NoPriceGeneratedYet {
+            get {
+                return ResourceManager.GetString("NoPriceGeneratedYet", resourceCulture);
             }
         }
         

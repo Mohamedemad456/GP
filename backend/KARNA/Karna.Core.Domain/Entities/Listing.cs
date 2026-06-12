@@ -53,5 +53,7 @@ namespace Karna.Core.Domain.Entities
         public ICollection<ListingPhoto> Photos { get; set; } = new List<ListingPhoto>();
 
 		public ICollection<ListingStatusHistory> StatusHistories { get; set; } = new List<ListingStatusHistory>();
+        public ICollection<Favorite> Favorites { get; set; } = new List<Favorite>();
+
     }
 }

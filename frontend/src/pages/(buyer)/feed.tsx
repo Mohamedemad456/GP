@@ -20,6 +20,9 @@ import {
 } from "@gp/design-system";
 import { Eye, Heart, Search, SlidersHorizontal, Car } from "lucide-react";
 import { getApprovedListings, type BuyerListingDto } from "@/lib/listingsApi";
+import { getFavorites, addFavorite, removeFavorite } from "@/lib/favoritesApi";
+import { toast } from "sonner";
+import { useAuth } from "@/context/AuthContext";
 
 export default function FeedPage() {
   const { t, i18n } = useTranslation();
@@ -29,7 +32,7 @@ export default function FeedPage() {
   const [condition, setCondition] = useState("all");
   const [maxPrice, setMaxPrice] = useState("");
   const [sortBy, setSortBy] = useState("newest");
-  const [wishlistedIds, setWishlistedIds] = useState<Set<number>>(new Set());
+  const [wishlistedIds, setWishlistedIds] = useState<Set<string>>(new Set());
 
   const locale = i18n.language?.startsWith("ar") ? "ar-SA" : "en-US";
   const currency = useMemo(
@@ -45,6 +48,7 @@ export default function FeedPage() {
 
   const [apiListings, setApiListings] = useState<BuyerListingDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuth();
 
   const BASE_URL: string =
     import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5082";
@@ -58,14 +62,22 @@ export default function FeedPage() {
   }
 
   useEffect(() => {
-    getApprovedListings({ pageSize: 100 })
-      .then((res) => {
-        if (res.success && res.data) {
-          setApiListings(res.data.data);
-        }
-      })
-      .finally(() => setIsLoading(false));
-  }, []);
+    const fetchListings = getApprovedListings({ pageSize: 100 }).then((res) => {
+      if (res.success && res.data) {
+        setApiListings(res.data.data);
+      }
+    });
+
+    const fetchFavs = user
+      ? getFavorites({ pageSize: 100 }).then((res) => {
+          if (res.success && res.data) {
+            setWishlistedIds(new Set(res.data.data.map((fav) => String(fav.id))));
+          }
+        }).catch(() => {})
+      : Promise.resolve();
+
+    Promise.all([fetchListings, fetchFavs]).finally(() => setIsLoading(false));
+  }, [user]);
 
   const makes = useMemo(
     () => Array.from(new Set(apiListings.map((listing) => listing.makeName))),
@@ -111,17 +123,39 @@ export default function FeedPage() {
     });
   }, [condition, fuelType, make, maxPrice, query, sortBy, apiListings]);
 
-  const toggleWishlist = useCallback((listingId: number) => {
+  const toggleWishlist = useCallback(async (listingId: string) => {
+    if (!user) {
+      toast.error(t("favorites.loginRequired", "Please log in to save favorites."));
+      return;
+    }
+
+    const isWishlisted = wishlistedIds.has(listingId);
+    
+    // Optimistic update
     setWishlistedIds((prev) => {
       const next = new Set(prev);
-      if (next.has(listingId)) {
-        next.delete(listingId);
-      } else {
-        next.add(listingId);
-      }
+      if (isWishlisted) next.delete(listingId);
+      else next.add(listingId);
       return next;
     });
-  }, []);
+
+    try {
+      if (isWishlisted) {
+        await removeFavorite(listingId.toString());
+      } else {
+        await addFavorite(listingId.toString());
+      }
+    } catch (err) {
+      // Revert on error
+      setWishlistedIds((prev) => {
+        const next = new Set(prev);
+        if (isWishlisted) next.add(listingId);
+        else next.delete(listingId);
+        return next;
+      });
+      toast.error(t("favorites.toggleError", "Failed to update favorites."));
+    }
+  }, [user, wishlistedIds, t]);
 
   if (isLoading) {
     return <PageLoader />;
@@ -279,7 +313,7 @@ export default function FeedPage() {
           ) : (
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {listings.map((listing) => {
-                const isWishlisted = wishlistedIds.has(Number(listing.id));
+                const isWishlisted = wishlistedIds.has(String(listing.id));
                 const imageUrl = resolvePhotoUrl(listing.primaryPhotoUrl);
 
                 return (
@@ -324,7 +358,7 @@ export default function FeedPage() {
                         <Button
                           type="button"
                           variant="outline"
-                          onClick={() => toggleWishlist(Number(listing.id))}
+                          onClick={() => toggleWishlist(String(listing.id))}
                           className="gap-2"
                         >
                           <Heart

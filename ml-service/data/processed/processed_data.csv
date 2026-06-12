@@ -3244,6 +3244,7 @@ Fiat,Shahin,2008,18,Manual,petrol,200000.0,11111.111111111111,Cairo,1400,80,Hatc
 Mini,Cooper,2023,3,Automatic,petrol,60000.0,20000.0,Maadi,1500,136,Hatchback,FWD,4,european,city,1800000,14.403297222866392
 Mercedes,C180,2019,7,Automatic,petrol,150000.0,21428.571428571428,Nasr City,1600,156,Sedan,RWD,5,european,executive,2200000,14.603967918328545
 BMW,520i,2018,8,Automatic,petrol,180000.0,22500.0,Nasr City,2000,184,Sedan,RWD,5,european,executive,2000000,14.508657738524219
+BMW,X5,2025,1,Automatic,electric,5000.0,5000.0,Nasr City,3000,340,SUV,AWD,7,european,luxury_suv,6200000,15.64005985001532
 Ford,Kuga,2015,11,Automatic,petrol,70000.0,6363.636363636364,New Cairo,1600,125,Sedan,FWD,5,american,family,800000,13.592367006650065
 Daewoo,Nubira,2004,22,Automatic,petrol,117000.0,5318.181818181818,Alexandria,1600,100,Sedan,FWD,5,korean,family,270000,12.506177237980511
 Mitsubishi,Lancer,2015,11,Automatic,petrol,273000.0,24818.18181818182,October & Zayed,1600,113,Sedan,FWD,5,japanese,family,600000,13.304684934198283
@@ -3336,7 +3337,7 @@ Mercedes,E200,2023,3,Automatic,petrol,100000.0,33333.333333333336,New Cairo,2000
 MG,ZS,2021,5,Automatic,petrol,145000.0,29000.0,Giza,1500,106,SUV,FWD,5,chinese,suv,820000,13.617059619240436
 Toyota,Yaris,2008,18,Automatic,petrol,105000.0,5833.333333333333,New Cairo,1500,107,Hatchback,FWD,5,japanese,city,470000,13.060487973686241
 Fiat,Siena,2000,26,Manual,petrol,305000.0,11730.76923076923,Nasr City,1400,80,Hatchback,FWD,5,european,city,150000,11.918390573078392
-Kia,Sportage,2022,4,Automatic,petrol,20000.0,5000.0,October & Zayed,1600,177,SUV,FWD,5,korean,suv,1825000,14.417090544998729
+Kia,Sportage,2022,4,Automatic,petrol,20000.0,5000.0,October & Zayed,1600,177,SUV,FWD,5,korean,suv,1800000,14.403297222866392
 BMW,740,2009,17,Automatic,petrol,190000.0,11176.470588235294,Sharqia,3000,340,Sedan,RWD,5,european,luxury,950000,13.764217263576723
 Mitsubishi,Lancer,2016,10,Automatic,petrol,180000.0,18000.0,October & Zayed,1600,113,Sedan,FWD,5,japanese,family,740000,13.514405465180353
 Seat,Ibiza,2013,13,Automatic,petrol,200000.0,15384.615384615385,Nasr City,1000,95,Hatchback,FWD,5,european,city,550000,13.217673557208654
@@ -3447,7 +3448,6 @@ Skoda,Felicia,1997,29,Manual,petrol,150000.0,5172.413793103448,Other/Unknown,130
 Mercedes,C300,2020,6,Automatic,petrol,140000.0,23333.333333333332,New Cairo,2000,258,Sedan,RWD,5,european,executive,2650000,14.790070197962406
 Hyundai,Avante,2024,2,Automatic,petrol,23700.0,11850.0,Sharqia,1600,120,Sedan,FWD,5,korean,family,1600000,14.28551418721001
 Suzuki,Van,2017,9,Manual,petrol,200000.0,22222.222222222223,New Cairo,1200,83,Hatchback,FWD,5,japanese,city,370000,12.821258284620408
-Jeep,Renegade,2017,9,Automatic,petrol,150000.0,16666.666666666668,Other/Unknown,1400,150,Crossover,FWD,5,american,crossover,750000,13.527828485512494
 Kia,Pride,1999,27,Manual,petrol,199000.0,7370.37037037037,Giza,1600,120,Sedan,FWD,5,korean,family,120000,11.695247021764184
 Mercedes,E180,2019,7,Automatic,petrol,85000.0,12142.857142857143,Alexandria,1600,156,Sedan,RWD,5,european,executive,2800000,14.845129975145433
 Mercedes,C180,2016,10,Automatic,petrol,178000.0,17800.0,Other/Unknown,1600,156,Sedan,RWD,5,european,executive,1800000,14.403297222866392
@@ -3818,6 +3818,7 @@ Renault,Megane,2023,3,Automatic,petrol,49000.0,16333.333333333334,New Cairo,1500
 Volkswagen,Tiguan,2021,5,Automatic,petrol,80000.0,16000.0,Alexandria,1400,150,SUV,FWD,5,european,suv,1850000,14.430696197054507
 Speranza,A516,2009,17,Manual,petrol,170000.0,10000.0,Other/Unknown,1600,109,Sedan,FWD,5,chinese,family,210000,12.254862809699606
 Land Rover,Range Rover Sport,2021,5,Automatic,petrol,115000.0,23000.0,New Cairo,3000,395,SUV,4WD,5,european,luxury_suv,5000000,15.424948470398375
+Mercedes,S580,2023,3,Automatic,petrol,4000.0,1333.3333333333333,New Cairo,1600,156,Sedan,RWD,5,european,executive,11000000,16.213405830762646
 Citroën,C5,2020,6,Automatic,petrol,79000.0,13166.666666666666,Nasr City,1600,120,Sedan,FWD,5,european,executive,1150000,13.955272500339433
 Audi,Q7,2021,5,Automatic,petrol,150000.0,30000.0,New Cairo,3000,340,SUV,AWD,7,european,luxury_suv,3000000,14.914122846632385
 Toyota,Yaris,2015,11,Automatic,petrol,120000.0,10909.09090909091,Cairo,1500,107,Hatchback,FWD,5,japanese,city,640000,13.369223455335854
@@ -3962,7 +3963,6 @@ Chevrolet,Lanos,2009,17,Manual,petrol,200000.0,11764.70588235294,Giza,1500,86,Se
 Toyota,Corona,1984,42,Manual,petrol,140000.0,3333.3333333333335,Giza,1600,120,Sedan,FWD,5,japanese,family,170000,12.043553716032399
 Fiat,Shahin,2006,20,Manual,petrol,50000.0,2500.0,Sharqia,1400,80,Hatchback,FWD,5,european,city,200000,12.206072645530174
 Speranza,A113,2010,16,Manual,petrol,110000.0,6875.0,Cairo,1300,65,Hatchback,FWD,5,chinese,city,210000,12.254862809699606
-Daewoo,Lanos,1998,28,Manual,petrol,200000.0,7142.857142857143,Other/Unknown,1500,86,Sedan,FWD,5,korean,city,240000,12.388394202324129
 Geely,Emgrand 7,2014,12,Manual,petrol,214000.0,17833.333333333332,Alexandria,1800,132,Sedan,FWD,5,chinese,family,270000,12.506177237980511
 Daewoo,Juliet,2000,26,Manual,petrol,238000.0,9153.846153846154,Other/Unknown,1600,100,Sedan,FWD,5,korean,family,285000,12.560244459250788
 Mercedes,C200,2014,12,Automatic,petrol,245000.0,20416.666666666668,Other/Unknown,1500,184,Sedan,RWD,5,european,executive,1100000,13.9108207377686
@@ -4160,7 +4160,6 @@ Hyundai,Atos,1998,28,Manual,petrol,155000.0,5535.714285714285,Giza,1000,57,Hatch
 Hyundai,Accent,1997,29,Manual,petrol,200000.0,6896.551724137931,Upper Egypt,1600,123,Sedan,FWD,5,korean,city,160000,11.982929094215963
 Chevrolet,Aveo,2006,20,Manual,petrol,154000.0,7700.0,Nasr City,1400,100,Sedan,FWD,5,american,city,200000,12.206072645530174
 Nissan,Sunny,2012,14,Automatic,petrol,290000.0,20714.285714285714,Gharbia,1600,110,Sedan,FWD,5,japanese,family,530000,13.180632285528304
-Hyundai,Accent,2000,26,Manual,petrol,197000.0,7576.923076923077,Nasr City,1600,123,Sedan,FWD,5,korean,city,215000,12.2783933071098
 Opel,Astra,2017,9,Automatic,petrol,188000.0,20888.88888888889,Cairo,1400,150,Hatchback,FWD,5,european,family,630000,13.353475098367715
 Peugeot,405,1995,31,Manual,petrol,150000.0,4838.709677419355,Giza,1600,90,Sedan,FWD,5,european,family,90000,11.407564949312402
 Daihatsu,Terios,2007,19,Automatic,petrol,177000.0,9315.78947368421,Cairo,1500,105,SUV,4WD,5,japanese,suv,520000,13.16158409055761
@@ -4190,6 +4189,7 @@ BMW,118,2026,0,Automatic,petrol,1.0,1.0,New Cairo,1500,136,Hatchback,RWD,5,europ
 Skoda,Octavia,1998,28,Automatic,petrol,190000.0,6785.714285714285,Giza,1500,150,Sedan,FWD,5,european,family,360000,12.793859310432293
 Audi,A3,2015,11,Automatic,petrol,245000.0,22272.727272727272,New Cairo,1500,150,Sedan,FWD,5,european,executive,870000,13.676248490630767
 Volkswagen,Golf,2015,11,Automatic,petrol,200000.0,18181.81818181818,New Cairo,1400,150,Hatchback,FWD,5,european,family,825000,13.623138665316818
+Mini,Countryman S,2015,11,Automatic,petrol,150000.0,13636.363636363636,Dakahlia,2000,178,Crossover,AWD,5,european,crossover,1250000,14.038654109278484
 BMW,X3,2015,11,Automatic,petrol,188000.0,17090.909090909092,New Cairo,2000,184,SUV,AWD,5,european,luxury_suv,1400000,14.151982794585487
 BMW,520i,2014,12,Automatic,petrol,189000.0,15750.0,New Cairo,2000,184,Sedan,RWD,5,european,executive,1390000,14.144814305106875
 BMW,316,2014,12,Automatic,petrol,140000.0,11666.666666666666,New Cairo,1600,116,Sedan,RWD,5,european,executive,980000,13.795307850646754
@@ -4480,7 +4480,6 @@ Renault,Megane,2022,4,Automatic,petrol,140000.0,35000.0,Heliopolis,1500,115,Hatc
 Mercedes,S580,2021,5,Automatic,petrol,28294.0,5658.8,Heliopolis,1600,156,Sedan,RWD,5,european,executive,7500000,15.830413578506539
 Peugeot,307,2007,19,Automatic,petrol,310000.0,16315.78947368421,Coastal & Resorts,1400,95,Sedan,FWD,5,european,family,350000,12.765688433465597
 Speranza,A113,2012,14,Manual,petrol,179000.0,12785.714285714286,New Cairo,1300,65,Hatchback,FWD,5,chinese,city,230000,12.345834587905333
-Nissan,Qashqai,2018,8,Automatic,petrol,180000.0,22500.0,Heliopolis,1500,163,SUV,FWD,5,japanese,suv,790000,13.579788224443204
 Mini,Cooper,2024,2,Automatic,petrol,7000.0,3500.0,Nasr City,1500,136,Hatchback,FWD,4,european,city,1850000,14.430696197054507
 Opel,Insignia,2019,7,Automatic,petrol,170000.0,24285.714285714286,Heliopolis,1500,165,Sedan,FWD,5,european,executive,1050000,13.864300722133706
 Volkswagen,Jetta,2009,17,Automatic,petrol,100000.0,5882.35294117647,Nasr City,1400,150,Sedan,FWD,5,european,family,670000,13.415032991367148
@@ -4711,7 +4710,6 @@ Speranza,A516,2010,16,Automatic,petrol,226000.0,14125.0,Dakahlia,1600,109,Sedan,
 Mitsubishi,Mirage,2000,26,Automatic,petrol,30000.0,1153.8461538461538,Cairo,1600,113,Hatchback,FWD,5,japanese,city,275000,12.524526376648708
 Mercedes,GLC,2024,2,Automatic,petrol,75000.0,37500.0,October & Zayed,1500,197,SUV,4WD,5,european,luxury_suv,3350000,15.02447090380125
 Volkswagen,Golf,2025,1,Automatic,petrol,20000.0,20000.0,New Cairo,1400,150,Hatchback,FWD,5,european,family,1700000,14.346138809026444
-Daewoo,Nubira,2002,24,Automatic,petrol,240000.0,10000.0,Cairo,1600,100,Sedan,FWD,5,korean,family,290000,12.577636201962656
 Jeep,Grand Cherokee,2022,4,Automatic,petrol,13000.0,3250.0,New Cairo,3600,293,SUV,4WD,5,american,luxury_suv,4950000,15.414898134544874
 Jaguar,F-Pace,2024,2,Automatic,petrol,28000.0,14000.0,Nasr City,2000,250,SUV,AWD,5,european,luxury_suv,4000000,15.201804919084164
 Peugeot,508,2017,9,Automatic,petrol,159000.0,17666.666666666668,New Cairo,1600,165,Sedan,FWD,5,european,executive,780000,13.567049198665774
@@ -5093,7 +5091,6 @@ Land Rover,Range Rover Sport,2024,2,Automatic,petrol,3000.0,1500.0,New Cairo,300
 Kia,Rio,2015,11,Automatic,petrol,187000.0,17000.0,Nasr City,1400,100,Sedan,FWD,5,korean,city,570000,13.253391639810733
 Chevrolet,Aveo,2010,16,Manual,petrol,252000.0,15750.0,Canal Zone,1400,100,Sedan,FWD,5,american,city,330000,12.706847933442663
 Hyundai,Elantra,2022,4,Automatic,petrol,144000.0,36000.0,Nasr City,1600,128,Sedan,FWD,5,korean,family,1100000,13.9108207377686
-Alfa Romeo,Giulia,2020,6,Automatic,petrol,70000.0,11666.666666666666,New Cairo,2000,200,Sedan,RWD,5,european,executive,1450000,14.187074114396758
 Changan,Benni Mini,2016,10,Automatic,petrol,117000.0,11700.0,Other/Unknown,1000,68,Hatchback,FWD,4,chinese,city,315000,12.66032791780777
 Audi,Q7,2022,4,Automatic,petrol,61000.0,15250.0,Heliopolis,3000,340,SUV,AWD,7,european,luxury_suv,3900000,15.176487111099874
 Hyundai,Verna,2013,13,Manual,petrol,96000.0,7384.615384615385,Nasr City,1600,123,Sedan,FWD,5,korean,city,425000,12.959844447906553
@@ -5121,6 +5118,7 @@ Land Rover,Discovery,2020,6,Automatic,petrol,43000.0,7166.666666666667,New Cairo
 Hyundai,Tucson,2022,4,Automatic,petrol,65000.0,16250.0,New Cairo,1600,177,SUV,FWD,5,korean,suv,1750000,14.375126345899696
 Nissan,Juke,2021,5,Automatic,petrol,118000.0,23600.0,New Cairo,1000,117,Crossover,FWD,5,japanese,crossover,1050000,13.864300722133706
 BMW,740,2015,11,Automatic,petrol,148000.0,13454.545454545454,October & Zayed,3000,340,Sedan,RWD,5,european,luxury,2500000,14.73180128983843
+Mini,Countryman S,2014,12,Automatic,petrol,92000.0,7666.666666666667,Other/Unknown,2000,178,Crossover,AWD,5,european,crossover,920000,13.732128949025222
 Audi,Q3,2022,4,Automatic,petrol,56000.0,14000.0,New Cairo,1500,150,SUV,FWD,5,european,luxury_suv,2250000,14.626440774180603
 Mercedes,GLC43,2025,1,Automatic,petrol,5000.0,5000.0,New Cairo,1600,156,Sedan,RWD,5,european,executive,6950000,15.754252217540975
 Kia,Sorento,2019,7,Automatic,petrol,138000.0,19714.285714285714,October & Zayed,2400,173,SUV,AWD,7,korean,suv,1200000,13.997832114758229
@@ -5402,6 +5400,7 @@ Chevrolet,Aveo,2010,16,Manual,petrol,380000.0,23750.0,October & Zayed,1400,100,S
 Maserati,Grecale,2023,3,Automatic,diesel,59000.0,19666.666666666668,New Cairo,2000,300,SUV,AWD,5,european,luxury_suv,3900000,15.176487111099874
 Mercedes,C180,2024,2,Automatic,petrol,13000.0,6500.0,Giza,1600,156,Sedan,RWD,5,european,executive,3450000,15.053884789007542
 Peugeot,307,2005,21,Automatic,petrol,350000.0,16666.666666666668,Sharqia,1400,95,Sedan,FWD,5,european,family,370000,12.821258284620408
+Mercedes,GT43,2022,4,Automatic,petrol,28000.0,7000.0,New Cairo,1600,156,Coupe,RWD,5,european,sport,6200000,15.64005985001532
 Audi,A6,2024,2,Automatic,petrol,40000.0,20000.0,New Cairo,2000,190,Sedan,AWD,5,european,luxury,3900000,15.176487111099874
 Mini,Cooper,2019,7,Automatic,petrol,142000.0,20285.714285714286,Maadi,1500,136,Hatchback,FWD,4,european,city,1090000,13.901688254205327
 Hyundai,Elantra,1994,32,Automatic,petrol,230000.0,7187.5,Nasr City,1600,128,Sedan,FWD,5,korean,family,190000,12.154779351142624
@@ -5766,7 +5765,6 @@ Toyota,Corolla,2019,7,Automatic,petrol,133000.0,19000.0,New Cairo,1600,122,Sedan
 Hyundai,Avante,2025,1,Automatic,petrol,2000.0,2000.0,Dakahlia,1600,120,Sedan,FWD,5,korean,family,1600000,14.28551418721001
 Daewoo,Lanos,2002,24,Manual,petrol,176000.0,7333.333333333333,Maadi,1500,86,Sedan,FWD,5,korean,city,245000,12.409013489526863
 Mazda,323,1982,44,Manual,petrol,100880.0,2292.7272727272725,Cairo,1600,98,Sedan,FWD,5,japanese,family,40000,10.596634733096073
-Geely,Starray,2025,1,Automatic,petrol,40000.0,40000.0,Nasr City,1500,110,MPV,FWD,7,chinese,mpv,1350000,14.115615150414612
 Daewoo,Lanos,1999,27,Manual,petrol,290000.0,10740.74074074074,Other/Unknown,1500,86,Sedan,FWD,5,korean,city,230000,12.345834587905333
 Chevrolet,Aveo,2007,19,Manual,petrol,144500.0,7605.263157894737,Other/Unknown,1400,100,Sedan,FWD,5,american,city,360000,12.793859310432293
 Kia,Sorento,2019,7,Automatic,petrol,115000.0,16428.571428571428,Sharqia,2400,173,SUV,AWD,7,korean,suv,1400000,14.151982794585487
@@ -5779,7 +5777,7 @@ Mercedes,E240,2003,23,Automatic,petrol,210000.0,9130.434782608696,New Cairo,1600
 Geely,Pandino,2013,13,Automatic,petrol,114000.0,8769.23076923077,New Cairo,1500,110,Sedan,FWD,5,chinese,family,320000,12.676076274775909
 Chevrolet,Aveo,2008,18,Automatic,petrol,200000.0,11111.111111111111,Qalyubia,1400,100,Sedan,FWD,5,american,city,400000,12.89921982609012
 Opel,Corsa,2005,21,Manual,petrol,163000.0,7761.9047619047615,Other/Unknown,1200,75,Hatchback,FWD,5,european,city,260000,12.468436909997665
-Audi,Q2,2020,6,Automatic,petrol,63000.0,10500.0,Giza,1000,115,Crossover,FWD,5,european,luxury_suv,1390000,14.144814305106875
+Audi,Q2,2020,6,Automatic,petrol,63000.0,10500.0,Giza,1000,115,Crossover,FWD,5,european,luxury_suv,1300000,14.077874822431765
 Seat,Ibiza,2009,17,Automatic,petrol,340000.0,20000.0,New Cairo,1000,95,Hatchback,FWD,5,european,city,400000,12.89921982609012
 Fiat,Tempra,1998,28,Manual,cng,240000.0,8571.42857142857,Sharqia,1600,90,Sedan,FWD,5,european,family,115000,11.652687407345388
 Volvo,XC90,2021,5,Automatic,petrol,100000.0,20000.0,Giza,2000,300,SUV,AWD,7,european,luxury_suv,2450000,14.71159858252091
@@ -8067,6 +8065,17 @@ Skoda,Octavia,2026,0,Automatic,petrol,10.0,10.0,New Cairo,1395,150,Sedan,FWD,5,e
 Mitsubishi,Pajero,2017,9,Automatic,petrol,130000.0,14444.444444444445,Nasr City,3000,178,SUV,4WD,7,japanese,suv,1790000,14.397726177816939
 Peugeot,2008,2021,5,Automatic,petrol,160000.0,32000.0,Nasr City,1200,130,Crossover,FWD,5,european,crossover,850000,13.652991628466498
 Mercedes,C180,2013,13,Automatic,petrol,200000.0,15384.615384615385,Nasr City,1600,156,Sedan,RWD,5,european,executive,1250000,14.038654109278484
+Mercedes,300,2020,6,Automatic,diesel,88000.0,14666.666666666666,Cairo,3000,188,Sedan,RWD,5,european,executive,2600000,14.77102200299171
+Nissan,Qashqai,2022,4,Automatic,petrol,17000.0,4250.0,Other/Unknown,1500,163,SUV,FWD,5,japanese,suv,1400000,14.151982794585487
+Kia,K3,2022,4,Automatic,petrol,14999.0,3749.75,Cairo,1600,120,Sedan,FWD,5,korean,family,1295000,14.074021253115776
+Nissan,Sunny,2013,13,Automatic,petrol,140000.0,10769.23076923077,Canal Zone,1600,110,Sedan,FWD,5,japanese,family,360000,12.793859310432293
+BYD,F3,2023,3,Manual,cng,83500.0,27833.333333333332,Giza,1500,109,Sedan,FWD,5,chinese,family,600000,13.304684934198283
+Nissan,Sunny,2016,10,Automatic,petrol,250000.0,25000.0,Giza,1600,110,Sedan,FWD,5,japanese,family,450000,13.017002861746503
+Kia,Cerato,2006,20,Automatic,petrol,230000.0,11500.0,Cairo,1600,123,Sedan,FWD,5,korean,family,430000,12.971540487669746
+Skoda,Octavia A7,2015,11,Automatic,petrol,125000.0,11363.636363636364,Cairo,1500,150,Sedan,FWD,5,european,family,980000,13.795307850646754
+Renault,Fluence,2013,13,Automatic,petrol,166000.0,12769.23076923077,Giza,1600,100,Sedan,FWD,5,european,family,450000,13.017002861746503
+Skoda,Octavia A5,2006,20,Automatic,petrol,350000.0,17500.0,Nasr City,1500,150,Sedan,FWD,5,european,family,460000,13.038981768465277
+Mercedes,CLE300,2024,2,Automatic,petrol,0.0,0.0,New Cairo,1600,156,Sedan,RWD,5,european,executive,5350000,15.49260711887219
 Jeep,Grand Cherokee,2018,8,Automatic,petrol,200000.0,25000.0,New Cairo,3600,293,SUV,4WD,5,american,luxury_suv,1725000,14.360737608447597
 Chery,Tiggo 8,2024,2,Automatic,petrol,89000.0,44500.0,Nasr City,1500,197,SUV,FWD,7,chinese,suv,930000,13.742939865129438
 Nissan,Sunny,2026,0,Automatic,petrol,4000.0,4000.0,Nasr City,1600,110,Sedan,FWD,5,japanese,family,745000,13.521139497361697
@@ -8089,6 +8098,16 @@ Mercedes,E200,2026,0,Automatic,petrol,0.0,0.0,New Cairo,2000,184,Sedan,RWD,5,eur
 Chery,Arrizo 5,2023,3,Automatic,petrol,65000.0,21666.666666666668,Heliopolis,1500,115,Sedan,FWD,5,chinese,family,535000,13.190022025878143
 Suzuki,Ciaz,2022,4,Automatic,petrol,130000.0,32500.0,Nasr City,1500,105,Sedan,FWD,5,japanese,family,730000,13.500799813124575
 Mercedes,E200,2022,4,Automatic,petrol,75000.0,18750.0,Giza,2000,184,Sedan,RWD,5,european,executive,3550000,15.082458161451598
+BYD,Song Plus,2025,1,Automatic,electric,0.0,0.0,Nasr City,0,200,Sedan,FWD,5,chinese,family,2150000,14.580978400103845
+Skoda,Octavia A4,1998,28,Manual,petrol,219000.0,7821.428571428572,Other/Unknown,1500,150,Sedan,FWD,5,european,family,300000,12.611537753638338
+Nissan,Sunny,2017,9,Automatic,petrol,109923.0,12213.666666666666,Gharbia,1600,110,Sedan,FWD,5,japanese,family,470000,13.060487973686241
+Peugeot,308 SW,2011,15,Automatic,petrol,300009.0,20000.6,Cairo,1400,95,Sedan,FWD,5,european,family,395000,12.886641043883259
+Ford,Focus,2018,8,Automatic,petrol,179000.0,22375.0,Cairo,1500,150,Hatchback,FWD,5,american,family,675000,13.422467969854667
+MG,5,2021,5,Automatic,diesel,70000.0,14000.0,Alexandria,1500,169,Sedan,FWD,5,chinese,family,715000,13.480037821676145
+Jeep,Grand Cherokee,2001,25,Automatic,petrol,119999.0,4799.96,Cairo,3600,293,SUV,4WD,5,american,luxury_suv,490000,13.102160670086809
+Kia,Picanto,2015,11,Automatic,petrol,125000.0,11363.636363636364,Cairo,1000,67,Hatchback,FWD,5,korean,city,520000,13.16158409055761
+Renault,Sandero Stepway,2013,13,Manual,petrol,179998.0,13846.0,Upper Egypt,1600,115,Hatchback,FWD,5,european,crossover,355000,12.779873068457553
+Mitsubishi,Xpander,2023,3,Automatic,petrol,92000.0,30666.666666666668,Upper Egypt,1500,105,MPV,FWD,7,japanese,mpv,1200000,13.997832114758229
 Land Rover,Range Rover Vogue,2024,2,Automatic,petrol,19000.0,9500.0,Giza,3000,400,SUV,4WD,5,european,luxury_suv,12750000,16.36104182956871
 Porsche,Cayenne,2025,1,Automatic,petrol,0.0,0.0,Giza,3000,340,SUV,AWD,5,european,luxury_suv,12700000,16.35711255142882
 Hyundai,Avante,2007,19,Automatic,petrol,98000.0,5157.894736842105,Qalyubia,1600,120,Sedan,FWD,5,korean,family,650000,13.38472764187182
@@ -8557,7 +8576,9 @@ Land Rover,Range Rover,2008,18,Automatic,petrol,260000.0,14444.444444444445,Giza
 Kia,Rio,2016,10,Automatic,cng,156000.0,15600.0,Heliopolis,1400,100,Sedan,FWD,5,korean,city,680000,13.42984807715229
 Kia,Carens,2011,15,Automatic,petrol,260000.0,17333.333333333332,Giza,1600,130,MPV,FWD,7,korean,mpv,630000,13.353475098367715
 Renault,Sandero,2013,13,Automatic,petrol,75000.0,5769.2307692307695,Heliopolis,1600,84,Hatchback,FWD,5,european,city,450000,13.017002861746503
+Citroën,C Elysee,2019,7,Automatic,petrol,73000.0,10428.57142857143,Cairo,1200,82,Sedan,FWD,5,european,family,615000,13.329377546788654
 Kia,Cerato,2017,9,Automatic,petrol,164000.0,18222.222222222223,Cairo,1600,123,Sedan,FWD,5,korean,family,850000,13.652991628466498
+Kia,Rio,2013,13,Automatic,petrol,210000.0,16153.846153846154,Sharqia,1400,100,Sedan,FWD,5,korean,city,500000,13.122363377404328
 Mercedes,C180,2025,1,Automatic,petrol,0.0,0.0,Alexandria,1600,156,Sedan,RWD,5,european,executive,3600000,15.096444403426338
 JAC,S2,2016,10,Automatic,petrol,147600.0,14760.0,Giza,1500,109,Crossover,FWD,5,chinese,crossover,440000,12.994530005894443
 Renault,Kadjar,2020,6,Automatic,petrol,160000.0,26666.666666666668,Cairo,1600,163,SUV,FWD,5,european,suv,830000,13.62918097977278
@@ -8598,6 +8619,7 @@ Chery,Tiggo 8 Pro Max,2026,0,Automatic,petrol,0.0,0.0,New Cairo,1500,113,SUV,FWD
 Soueast,S05,2026,0,Automatic,petrol,0.0,0.0,New Cairo,1500,113,SUV,FWD,5,chinese,suv,1110000,13.919870573288517
 Volkswagen,Tiguan,2026,0,Automatic,petrol,0.0,0.0,New Cairo,1400,150,SUV,FWD,5,european,suv,2660000,14.793836680757881
 MG,HS,2026,0,Automatic,hybrid,0.0,0.0,New Cairo,1500,162,SUV,FWD,5,chinese,suv,1690000,14.340239086899256
+Cupra,Formentor,2026,0,Automatic,petrol,0.0,0.0,New Cairo,1500,150,Crossover,FWD,5,european,crossover,2210000,14.608503073493935
 Hyundai,Elantra,2008,18,Automatic,petrol,400000.0,22222.222222222223,Other/Unknown,1600,128,Sedan,FWD,5,korean,family,500000,13.122363377404328
 Mercedes,C180,2013,13,Automatic,petrol,238000.0,18307.69230769231,Cairo,1600,156,Sedan,RWD,5,european,executive,1150000,13.955272500339433
 Chevrolet,Aveo,2010,16,Manual,petrol,252000.0,15750.0,Canal Zone,1400,100,Sedan,FWD,5,american,city,360000,12.793859310432293
@@ -8678,7 +8700,6 @@ Avatr,12,2025,1,Automatic,electric,0.0,0.0,New Cairo,0,578,Sedan,AWD,5,chinese,l
 Citroën,C Elysee,2020,6,Automatic,petrol,125999.0,20999.833333333332,Giza,1200,82,Sedan,FWD,5,european,family,460000,13.038981768465277
 Kia,Grand Cerato,2019,7,Automatic,petrol,111000.0,15857.142857142857,Gharbia,1600,120,Sedan,FWD,5,korean,family,1055000,13.869051324892304
 Skoda,Octavia A5,2007,19,Automatic,petrol,235000.0,12368.421052631578,Dakahlia,1500,150,Sedan,FWD,5,european,family,650000,13.38472764187182
-MG,ZS,2026,0,Automatic,petrol,0.0,0.0,Nasr City,1500,106,SUV,FWD,5,chinese,suv,1295000,14.074021253115776
 BMW,316,2015,11,Automatic,petrol,229000.0,20818.18181818182,Alexandria,1600,116,Sedan,RWD,5,european,executive,1050000,13.864300722133706
 Chevrolet,Cruze,2016,10,Automatic,cng,183000.0,18300.0,Cairo,1600,124,Sedan,FWD,5,american,family,520000,13.16158409055761
 MG,HS,2026,0,Automatic,petrol,2000.0,2000.0,Giza,1500,162,SUV,FWD,5,chinese,suv,1000550,13.81606040676971
@@ -8723,12 +8744,14 @@ MG,ZS,2025,1,Automatic,petrol,22000.0,22000.0,Giza,1500,106,SUV,FWD,5,chinese,su
 Kia,Sorento,2023,3,Automatic,hybrid,0.0,0.0,Giza,2400,173,SUV,AWD,7,korean,suv,1880000,14.446782334806132
 Renault,Kadjar,2019,7,Automatic,petrol,180000.0,25714.285714285714,Giza,1600,163,SUV,FWD,5,european,suv,960000,13.77468856344402
 Hyundai,Tucson,2021,5,Automatic,diesel,99000.0,19800.0,Upper Egypt,1600,177,SUV,FWD,5,korean,suv,1550000,14.253765488895429
-Suzuki,Ciaz,2024,2,Automatic,petrol,0.0,0.0,Nasr City,1500,105,Sedan,FWD,5,japanese,family,880000,13.687677186454389
 Mercedes,CLA180,2016,10,Automatic,petrol,115000.0,11500.0,Cairo,1400,136,Coupe,FWD,5,european,sport,1200000,13.997832114758229
 Peugeot,2008,2022,4,Automatic,petrol,92000.0,23000.0,Giza,1200,130,Crossover,FWD,5,european,crossover,1120000,13.928839243271277
 Daewoo,Nubira,2000,26,Automatic,petrol,131999.0,5076.884615384615,Alexandria,1600,100,Sedan,FWD,5,korean,family,320000,12.676076274775909
 Chery,Tiggo 3,2019,7,Automatic,petrol,119000.0,17000.0,Cairo,1500,113,SUV,FWD,5,chinese,suv,600000,13.304684934198283
 Renault,Megane,2026,0,Automatic,petrol,0.0,0.0,Giza,1500,115,Hatchback,FWD,5,european,family,1240000,14.03062193758122
+Nissan,Patrol,2026,0,Automatic,petrol,0.0,0.0,New Cairo,4000,275,SUV,4WD,8,japanese,luxury_suv,8500000,15.955576721460545
+Mercedes,Vito,2026,0,Automatic,petrol,0.0,0.0,New Cairo,2100,136,Van,RWD,8,european,van,5900000,15.590462908875947
+Toyota,Land Cruiser,2026,0,Automatic,petrol,0.0,0.0,New Cairo,4000,271,SUV,4WD,8,japanese,luxury_suv,9000000,16.012735135300492
 Mercedes,E300,2024,2,Automatic,hybrid,0.0,0.0,New Cairo,2000,258,Sedan,RWD,5,european,executive,5250000,15.473738634567807
 Mazda,3,2020,6,Automatic,petrol,40000.0,6666.666666666667,New Cairo,1500,120,Sedan,FWD,5,japanese,family,1000000,13.815510557964274
 Chevrolet,Optra,2018,8,Automatic,petrol,95000.0,11875.0,Cairo,1600,109,Sedan,FWD,5,american,family,530000,13.180632285528304
@@ -8752,7 +8775,6 @@ Audi,A3,2023,3,Automatic,petrol,27000.0,9000.0,Giza,1500,150,Sedan,FWD,5,europea
 Nissan,Qashqai,2016,10,Automatic,petrol,109000.0,10900.0,Cairo,1500,163,SUV,FWD,5,japanese,suv,735000,13.507625778194974
 BMW,316,2015,11,Automatic,petrol,180000.0,16363.636363636364,New Cairo,1600,116,Sedan,RWD,5,european,executive,1050000,13.864300722133706
 Renault,Fluence,2010,16,Automatic,petrol,227000.0,14187.5,Giza,1600,100,Sedan,FWD,5,european,family,430000,12.971540487669746
-Alfa Romeo,Giulia,2026,0,Automatic,petrol,0.0,0.0,New Cairo,2000,200,Sedan,RWD,5,european,executive,3390000,15.036340479356634
 Fiat,Grand Punto,2010,16,Manual,petrol,285000.0,17812.5,Cairo,1400,77,Hatchback,FWD,5,european,city,320000,12.676076274775909
 MG,5,2020,6,Automatic,petrol,145000.0,24166.666666666668,Cairo,1500,169,Sedan,FWD,5,chinese,family,695000,13.45166712454693
 Chery,Arrizo 5,2023,3,Automatic,petrol,90000.0,30000.0,Qalyubia,1500,115,Sedan,FWD,5,chinese,family,550000,13.217673557208654
@@ -9140,7 +9162,6 @@ Volkswagen,Polo,2009,17,Manual,petrol,200000.0,11764.70588235294,Giza,1000,95,Ha
 Kia,Cerato,2021,5,Automatic,petrol,125000.0,25000.0,Cairo,1600,123,Sedan,FWD,5,korean,family,1000000,13.815510557964274
 Peugeot,3008,2020,6,Automatic,petrol,167999.0,27999.833333333332,Giza,1200,130,SUV,FWD,5,european,suv,1100000,13.9108207377686
 Skoda,Superb,2024,2,Automatic,petrol,26000.0,13000.0,New Cairo,1800,180,Sedan,FWD,5,european,executive,2200000,14.603967918328545
-MG,GT,2026,0,Automatic,petrol,0.0,0.0,New Cairo,1500,143,Sedan,FWD,5,chinese,family,1250000,14.038654109278484
 Renault,Logan,2017,9,Automatic,petrol,83000.0,9222.222222222223,Alexandria,1600,84,Sedan,FWD,5,european,family,510000,13.142166004700508
 Toyota,Corolla,2026,0,Automatic,petrol,0.0,0.0,New Cairo,1600,122,Sedan,FWD,5,japanese,family,1560000,14.26019637922572
 Nissan,Sunny,2013,13,Automatic,petrol,236000.0,18153.846153846152,Other/Unknown,1600,110,Sedan,FWD,5,japanese,family,490000,13.102160670086809
@@ -9184,6 +9205,7 @@ Fiat,Tipo,2021,5,Automatic,petrol,54000.0,10800.0,Alexandria,1600,110,Sedan,FWD,
 Chery,Tiggo 7 Pro,2022,4,Automatic,petrol,200000.0,50000.0,Canal Zone,1500,156,SUV,FWD,5,chinese,suv,900000,13.710150042306449
 Chery,Tiggo 8 Pro,2024,2,Automatic,petrol,0.0,0.0,Cairo,2000,254,SUV,FWD,7,chinese,suv,1300000,14.077874822431765
 Proton,Saga,2010,16,Manual,petrol,205000.0,12812.5,Cairo,1300,95,Sedan,FWD,5,other,city,320000,12.676076274775909
+Kaiyi,X7,2026,0,Automatic,petrol,0.0,0.0,Nasr City,2000,204,SUV,FWD,5,chinese,suv,1435000,14.176675407175859
 Renault,Logan,2015,11,Automatic,petrol,190000.0,17272.727272727272,Cairo,1600,84,Sedan,FWD,5,european,family,450000,13.017002861746503
 Peugeot,307 SW,2007,19,Automatic,petrol,222000.0,11684.21052631579,Cairo,1400,95,Sedan,FWD,5,european,family,370000,12.821258284620408
 Volkswagen,Passat,2008,18,Automatic,diesel,170000.0,9444.444444444445,Cairo,1800,150,Sedan,FWD,5,european,executive,750000,13.527828485512494
@@ -9282,6 +9304,7 @@ Suzuki,Swift Dzire,2021,5,Manual,petrol,114000.0,22800.0,Nasr City,1200,83,Hatch
 Cupra,Formentor,2022,4,Automatic,petrol,76000.0,19000.0,Cairo,1500,150,Crossover,FWD,5,european,crossover,1880000,14.446782334806132
 Hyundai,Tucson,2024,2,Automatic,diesel,17000.0,8500.0,Cairo,1600,177,SUV,FWD,5,korean,suv,1650000,14.316285845876763
 Mercedes,E200,2026,0,Automatic,electric,0.0,0.0,Cairo,2000,184,Sedan,RWD,5,european,executive,5300000,15.483217378522351
+Seat,Cordoba,2001,25,Manual,petrol,200000.0,8000.0,Nasr City,1600,100,Sedan,FWD,5,european,family,220000,12.301382825334498
 Peugeot,5008,2022,4,Automatic,petrol,90000.0,22500.0,Cairo,1200,130,SUV,FWD,7,european,suv,1600000,14.28551418721001
 Renault,Duster,2011,15,Manual,cng,207000.0,13800.0,Cairo,1600,114,Crossover,FWD,5,european,crossover,450000,13.017002861746503
 Toyota,Corolla,2009,17,Automatic,petrol,400000.0,23529.41176470588,New Cairo,1600,122,Sedan,FWD,5,japanese,family,450000,13.017002861746503
@@ -9444,10 +9467,9 @@ Chery,Tiggo 3,2023,3,Automatic,petrol,89000.0,29666.666666666668,Cairo,1500,113,
 Nissan,Qashqai,2017,9,Automatic,cng,240000.0,26666.666666666668,Cairo,1500,163,SUV,FWD,5,japanese,suv,760000,13.541073712262515
 Hyundai,Avante,2007,19,Automatic,petrol,200000.0,10526.315789473685,Other/Unknown,1600,120,Sedan,FWD,5,korean,family,575000,13.262125319779487
 Mercedes,E200,2020,6,Automatic,cng,77000.0,12833.333333333334,Giza,2000,184,Sedan,RWD,5,european,executive,3150000,14.962913010801817
-GMC,Yukon,2025,1,Automatic,petrol,0.0,0.0,New Cairo,5300,355,SUV,4WD,9,american,luxury_suv,10750000,16.190416312537945
 Kia,Picanto,2015,11,Automatic,petrol,120000.0,10909.09090909091,Heliopolis,1000,67,Hatchback,FWD,5,korean,city,520000,13.16158409055761
+Mercedes,GT43,2021,5,Automatic,diesel,35000.0,7000.0,Giza,1600,156,Coupe,RWD,5,european,sport,12000000,16.300417207752275
 Chery,Tiggo 3,2019,7,Automatic,petrol,104000.0,14857.142857142857,Qalyubia,1500,113,SUV,FWD,5,chinese,suv,600000,13.304684934198283
-Mercedes,GLC43,2026,0,Automatic,petrol,0.0,0.0,New Cairo,1600,156,Sedan,RWD,5,european,executive,7800000,15.86963429165982
 Changan,CS55,2026,0,Automatic,petrol,0.0,0.0,Dakahlia,1500,156,SUV,FWD,5,chinese,suv,1240000,14.03062193758122
 Hyundai,Elantra HD,2009,17,Automatic,petrol,220000.0,12941.176470588236,Giza,1600,122,Sedan,FWD,5,korean,family,520000,13.16158409055761
 Mazda,3,2017,9,Automatic,diesel,139000.0,15444.444444444445,Heliopolis,1500,120,Sedan,FWD,5,japanese,family,760000,13.541073712262515
@@ -9932,7 +9954,6 @@ Porsche,Macan,2022,4,Automatic,petrol,6500.0,1625.0,Giza,2000,265,Crossover,AWD,
 BMW,218i,2020,6,Automatic,cng,175000.0,29166.666666666668,Nasr City,1500,136,Coupe,FWD,4,european,executive,1100000,13.9108207377686
 Kia,Sportage,2024,2,Automatic,petrol,60000.0,30000.0,Giza,1600,177,SUV,FWD,5,korean,suv,2050000,14.53335035111459
 Renault,Sandero Stepway,2020,6,Automatic,diesel,147088.0,24514.666666666668,Cairo,1600,115,Hatchback,FWD,5,european,crossover,560000,13.235692062711331
-Geely,Starray,2025,1,Automatic,petrol,45000.0,45000.0,Cairo,1500,110,MPV,FWD,7,chinese,mpv,1500000,14.22097566607244
 Nissan,Sunny,2016,10,Manual,petrol,190000.0,19000.0,Coastal & Resorts,1600,110,Sedan,FWD,5,japanese,family,415000,12.936033799212835
 Suzuki,Swift Dzire,2022,4,Manual,petrol,140000.0,35000.0,Giza,1200,83,Hatchback,FWD,5,japanese,city,620000,13.337474757021274
 Nissan,Patrol,2024,2,Automatic,petrol,6000.0,3000.0,New Cairo,4000,275,SUV,4WD,8,japanese,luxury_suv,7000000,15.761420707019587
@@ -9969,6 +9990,7 @@ Mercedes,E200,2022,4,Automatic,petrol,90000.0,22500.0,New Cairo,2000,184,Sedan,R
 Jetour,Dashing,2026,0,Automatic,petrol,0.0,0.0,Nasr City,1500,156,Sedan,FWD,5,chinese,family,1385000,14.141210697603576
 Nissan,Qashqai,2016,10,Automatic,cng,132000.0,13200.0,Giza,1500,163,SUV,FWD,5,japanese,suv,750000,13.527828485512494
 Jetour,T2,2026,0,Automatic,petrol,0.0,0.0,Nasr City,2000,254,SUV,AWD,7,chinese,suv,2040000,14.528460365820399
+Renault,Clio,2005,21,Manual,petrol,300000.0,14285.714285714286,Cairo,1000,90,Hatchback,FWD,5,european,city,190000,12.154779351142624
 BMW,M4,2026,0,Automatic,petrol,0.0,0.0,New Cairo,3000,510,Coupe,RWD,4,european,sport,8950000,16.007164090251038
 Opel,Astra,2008,18,Automatic,petrol,238000.0,13222.222222222223,Giza,1400,150,Hatchback,FWD,5,european,family,420000,12.948009990259552
 Toyota,Land Cruiser,2026,0,Automatic,petrol,0.0,0.0,New Cairo,4000,271,SUV,4WD,8,japanese,luxury_suv,4000000,15.201804919084164
@@ -10221,6 +10243,8 @@ Lada,2107,2009,17,Manual,petrol,150000.0,8823.529411764706,New Cairo,1600,75,Sed
 Chevrolet,Spark,2008,18,Manual,petrol,86000.0,4777.777777777777,Canal Zone,1000,68,Hatchback,FWD,4,american,city,230000,12.345834587905333
 Kia,Cerato,2011,15,Automatic,diesel,230000.0,15333.333333333334,Sharqia,1600,123,Sedan,FWD,5,korean,family,580000,13.270783382522602
 MG,5,2021,5,Automatic,diesel,67000.0,13400.0,Giza,1500,169,Sedan,FWD,5,chinese,family,620000,13.337474757021274
+Nissan,X-Trail,2009,17,Automatic,petrol,430000.0,25294.117647058825,Nasr City,1700,158,SUV,AWD,7,japanese,suv,500000,13.122363377404328
+Mini,Cooper,2026,0,Automatic,petrol,4000.0,4000.0,New Cairo,1500,136,Hatchback,FWD,4,european,city,3150000,14.962913010801817
 Kia,Rio,2014,12,Automatic,petrol,115000.0,9583.333333333334,Nasr City,1400,100,Sedan,FWD,5,korean,city,640000,13.369223455335854
 Renault,Logan,2017,9,Automatic,petrol,90000.0,10000.0,Dakahlia,1600,84,Sedan,FWD,5,european,family,480000,13.081541382884074
 Hyundai,Elantra MD,2012,14,Automatic,petrol,190000.0,13571.42857142857,Upper Egypt,1600,120,Sedan,FWD,5,korean,family,650000,13.38472764187182
@@ -10262,8 +10286,10 @@ Opel,Insignia,2018,8,Automatic,petrol,185000.0,23125.0,Giza,1500,165,Sedan,FWD,5
 Chevrolet,Optra,2014,12,Automatic,diesel,133000.0,11083.333333333334,Alexandria,1600,109,Sedan,FWD,5,american,family,475000,13.071070083016778
 Skoda,Kodiaq,2022,4,Automatic,petrol,20040.0,5010.0,Alexandria,2000,190,SUV,AWD,7,european,suv,2250000,14.626440774180603
 Mitsubishi,Lancer Puma,1991,35,Manual,diesel,285000.0,8142.857142857143,Dakahlia,1600,113,Sedan,FWD,5,japanese,family,135000,11.813030057420567
+Mercedes,C180,2022,4,Automatic,petrol,60000.0,15000.0,Giza,1600,156,Sedan,RWD,5,european,executive,3950000,15.189226136877304
 Kia,Cerato,2005,21,Automatic,petrol,190000.0,9047.619047619048,Upper Egypt,1600,123,Sedan,FWD,5,korean,family,450000,13.017002861746503
 Skoda,Kodiaq,2024,2,Automatic,petrol,90000.0,45000.0,Giza,2000,190,SUV,AWD,7,european,suv,2200000,14.603967918328545
+BMW,X3,2017,9,Automatic,petrol,88000.0,9777.777777777777,Cairo,2000,184,SUV,AWD,5,european,luxury_suv,1980000,14.498607402670718
 Hyundai,Accent,2017,9,Automatic,petrol,135000.0,15000.0,Cairo,1600,123,Sedan,FWD,5,korean,city,695000,13.45166712454693
 Renault,Megane,2021,5,Automatic,petrol,85000.0,17000.0,New Cairo,1500,115,Hatchback,FWD,5,european,family,860000,13.664687668229691
 Mercedes,GLA200,2020,6,Automatic,petrol,19000.0,3166.6666666666665,Cairo,1400,163,Crossover,FWD,5,european,luxury_suv,2350000,14.669925886120343
@@ -10318,7 +10344,11 @@ Hyundai,Accent RB,2022,4,Automatic,petrol,13000.0,3250.0,Cairo,1600,123,Sedan,FW
 Dodge,Ram,2026,0,Automatic,petrol,0.0,0.0,New Cairo,3600,305,Pickup,4WD,5,american,truck,6600000,15.702580206996654
 BMW,523,2006,20,Automatic,diesel,160000.0,8000.0,Cairo,2500,177,Sedan,RWD,5,european,executive,750000,13.527828485512494
 Renault,Fluence,2014,12,Automatic,petrol,150000.0,12500.0,New Cairo,1600,100,Sedan,FWD,5,european,family,530000,13.180632285528304
+Jeep,Grand Cherokee,2024,2,Automatic,petrol,23000.0,11500.0,Maadi,3600,293,SUV,4WD,5,american,luxury_suv,4390000,15.294839785051353
+Mercedes,C180,2020,6,Automatic,petrol,111000.0,18500.0,Nasr City,1600,156,Sedan,RWD,5,european,executive,1980000,14.498607402670718
 Hyundai,Matrix,2008,18,Automatic,petrol,195000.0,10833.333333333334,Cairo,1600,120,MPV,FWD,5,korean,mpv,415000,12.936033799212835
+BMW,X6,2024,2,Automatic,petrol,36000.0,18000.0,New Cairo,3000,340,SUV,AWD,5,european,luxury_suv,7000000,15.761420707019587
+Mercedes,C180,2012,14,Automatic,petrol,210000.0,15000.0,New Cairo,1600,156,Sedan,RWD,5,european,executive,1185000,13.985253332551368
 BMW,523,2006,20,Automatic,diesel,160000.0,8000.0,Cairo,2500,177,Sedan,RWD,5,european,executive,700000,13.458835614025542
 Hyundai,Tucson,2021,5,Automatic,petrol,128000.0,25600.0,Cairo,1600,177,SUV,FWD,5,korean,suv,1500000,14.22097566607244
 Chevrolet,Optra,2025,1,Automatic,petrol,8700.0,8700.0,Upper Egypt,1600,109,Sedan,FWD,5,american,family,760000,13.541073712262515
@@ -10328,6 +10358,7 @@ Kia,Sportage,2021,5,Automatic,petrol,37000.0,7400.0,Cairo,1600,177,SUV,FWD,5,kor
 Kia,Carens,2018,8,Automatic,petrol,173000.0,21625.0,Cairo,1600,130,MPV,FWD,7,korean,mpv,890000,13.698976741708323
 Changan,CS55,2026,0,Automatic,cng,0.0,0.0,Cairo,1500,156,SUV,FWD,5,chinese,suv,980000,13.795307850646754
 Chevrolet,Aveo,2010,16,Manual,petrol,160000.0,10000.0,Other/Unknown,1400,100,Sedan,FWD,5,american,city,365000,12.80765263256463
+Audi,A5,2022,4,Automatic,petrol,83000.0,20750.0,New Cairo,2000,190,Coupe,AWD,4,european,executive,2425000,14.70134208235372
 Jetour,X90,2024,2,Automatic,petrol,8000.0,4000.0,Cairo,2000,230,SUV,AWD,7,chinese,suv,1375000,14.133964289082808
 MG,HS,2025,1,Automatic,petrol,57000.0,57000.0,Cairo,1500,162,SUV,FWD,5,chinese,suv,1365000,14.126664986601197
 Renault,Logan,2016,10,Manual,petrol,168000.0,16800.0,Giza,1600,84,Sedan,FWD,5,european,family,350000,12.765688433465597
@@ -10346,6 +10377,7 @@ Hyundai,Verna,2012,14,Automatic,petrol,210000.0,15000.0,Giza,1600,123,Sedan,FWD,
 Mitsubishi,Lancer Puma,2014,12,Automatic,petrol,150000.0,12500.0,Gharbia,1600,113,Sedan,FWD,5,japanese,family,575000,13.262125319779487
 Speranza,A113,2009,17,Manual,petrol,190000.0,11176.470588235294,New Cairo,1300,65,Hatchback,FWD,5,chinese,city,230000,12.345834587905333
 Hyundai,Accent HCI,2020,6,Automatic,diesel,90000.0,15000.0,Nasr City,1500,100,Hatchback,FWD,5,korean,city,800000,13.592367006650065
+Mercedes,G63,2021,5,Automatic,petrol,53000.0,10600.0,New Cairo,4000,577,SUV,4WD,5,european,luxury_suv,9850000,16.10298201314827
 Mitsubishi,Eclipse Cross,2024,2,Automatic,diesel,40000.0,20000.0,Other/Unknown,1500,163,SUV,AWD,5,japanese,suv,1450000,14.187074114396758
 Kia,Sephia,2000,26,Manual,petrol,263000.0,10115.384615384615,Giza,1600,120,Sedan,FWD,5,korean,family,230000,12.345834587905333
 Chery,Tiggo 3,2021,5,Automatic,petrol,93000.0,18600.0,Giza,1500,113,SUV,FWD,5,chinese,suv,650000,13.38472764187182
@@ -10519,7 +10551,6 @@ BMW,520i,2012,14,Automatic,petrol,240000.0,17142.85714285714,Giza,2000,184,Sedan
 MG,5,2020,6,Automatic,petrol,142000.0,23666.666666666668,Cairo,1500,169,Sedan,FWD,5,chinese,family,638000,13.366093562326927
 Mercedes,GLA200,2022,4,Automatic,diesel,60000.0,15000.0,Giza,1400,163,Crossover,FWD,5,european,luxury_suv,2100000,14.557447902693651
 Jetour,X90,2024,2,Automatic,petrol,15000.0,7500.0,Nasr City,2000,230,SUV,AWD,7,chinese,suv,1390000,14.144814305106875
-Soueast,S07,2026,0,Automatic,petrol,2600.0,2600.0,Giza,2000,197,SUV,AWD,7,chinese,suv,1425000,14.169682371684887
 Peugeot,2008,2021,5,Automatic,petrol,174000.0,34800.0,Maadi,1200,130,Crossover,FWD,5,european,crossover,970000,13.785051350479566
 Peugeot,406,1999,27,Automatic,petrol,244000.0,9037.037037037036,Giza,1400,95,Sedan,FWD,5,european,family,260000,12.468436909997665
 Mitsubishi,Eclipse Cross,2025,1,Automatic,petrol,9000.0,9000.0,Canal Zone,1500,163,SUV,AWD,5,japanese,suv,1430000,14.17318500223609
@@ -10725,7 +10756,6 @@ Hyundai,Avante,2024,2,Automatic,petrol,23000.0,11500.0,Canal Zone,1600,120,Sedan
 Chevrolet,Cruze,2010,16,Automatic,petrol,290000.0,18125.0,Canal Zone,1600,124,Sedan,FWD,5,american,family,410000,12.92391243868049
 Mercedes,C180,2006,20,Automatic,petrol,250000.0,12500.0,Giza,1600,156,Sedan,RWD,5,european,executive,670000,13.415032991367148
 Jeep,Cherokee,2022,4,Automatic,petrol,38000.0,9500.0,Giza,2400,184,SUV,4WD,5,american,suv,3750000,15.137266397946593
-BMW,X3,2016,10,Automatic,petrol,180000.0,18000.0,Giza,2000,184,SUV,AWD,5,european,luxury_suv,1450000,14.187074114396758
 Nissan,Sunny,2008,18,Automatic,petrol,360000.0,20000.0,Maadi,1600,110,Sedan,FWD,5,japanese,family,450000,13.017002861746503
 Toyota,Corolla,2009,17,Automatic,cng,240000.0,14117.64705882353,Cairo,1600,122,Sedan,FWD,5,japanese,family,650000,13.38472764187182
 Mercedes,E350,2018,8,Automatic,petrol,90000.0,11250.0,Other/Unknown,3500,302,Sedan,RWD,5,european,executive,2500000,14.73180128983843
@@ -10758,7 +10788,6 @@ BMW,320i,2019,7,Automatic,petrol,135000.0,19285.714285714286,Nasr City,2000,184,
 Peugeot,308,2016,10,Automatic,petrol,257000.0,25700.0,Cairo,1200,130,Hatchback,FWD,5,european,family,570000,13.253391639810733
 Kia,Carens,2014,12,Automatic,cng,220000.0,18333.333333333332,Giza,1600,130,MPV,FWD,7,korean,mpv,730000,13.500799813124575
 MG,6,2025,1,Automatic,petrol,24000.0,24000.0,Heliopolis,1500,169,Sedan,FWD,5,chinese,executive,1180000,13.981024996441848
-Jeep,Wrangler,2012,14,Automatic,petrol,165000.0,11785.714285714286,Cairo,2000,268,SUV,4WD,5,american,suv,1100000,13.9108207377686
 Peugeot,308,2009,17,Automatic,petrol,16000.0,941.1764705882352,Cairo,1200,130,Hatchback,FWD,5,european,family,550000,13.217673557208654
 Honda,CRV,2024,2,Automatic,diesel,20000.0,10000.0,Nasr City,1500,190,SUV,AWD,5,japanese,suv,2400000,14.690979295318174
 Chevrolet,N300,2014,12,Manual,petrol,420000.0,35000.0,Alexandria,1600,110,Sedan,FWD,5,american,family,350000,12.765688433465597
@@ -11425,7 +11454,6 @@ Chevrolet,Optra,2017,9,Automatic,petrol,198000.0,22000.0,Giza,1600,109,Sedan,FWD
 Renault,Sandero Stepway,2016,10,Automatic,petrol,62000.0,6200.0,Cairo,1600,115,Hatchback,FWD,5,european,crossover,600000,13.304684934198283
 Peugeot,307,2006,20,Automatic,petrol,200000.0,10000.0,Heliopolis,1400,95,Sedan,FWD,5,european,family,450000,13.017002861746503
 Daihatsu,Terios,2013,13,Automatic,diesel,330000.0,25384.615384615383,Giza,1500,105,SUV,4WD,5,japanese,suv,620000,13.337474757021274
-Mercedes,C180,2020,6,Automatic,diesel,83500.0,13916.666666666666,Giza,1600,156,Sedan,RWD,5,european,executive,2150000,14.580978400103845
 Chevrolet,Lanos,2010,16,Manual,cng,464802.0,29050.125,Giza,1500,86,Sedan,FWD,5,american,city,250000,12.429216196844383
 Mini,Cooper,2015,11,Automatic,petrol,180000.0,16363.636363636364,Giza,1500,136,Hatchback,FWD,4,european,city,750000,13.527828485512494
 Chery,Envy,2018,8,Manual,petrol,223000.0,27875.0,Other/Unknown,1500,113,Sedan,FWD,5,chinese,family,300000,12.611537753638338
@@ -11471,6 +11499,7 @@ Mercedes,C180,2012,14,Automatic,diesel,167000.0,11928.57142857143,Giza,1600,156,
 Land Rover,Range Rover Evoque,2015,11,Automatic,petrol,60000.0,5454.545454545455,Cairo,1500,249,Crossover,AWD,5,european,luxury_suv,2200000,14.603967918328545
 MG,ZS,2025,1,Automatic,petrol,44000.0,44000.0,Nasr City,1500,106,SUV,FWD,5,chinese,suv,1100000,13.9108207377686
 Opel,Astra,2015,11,Automatic,petrol,158000.0,14363.636363636364,Cairo,1400,150,Hatchback,FWD,5,european,family,570000,13.253391639810733
+Subaru,Legacy,2012,14,Automatic,petrol,250000.0,17857.14285714286,New Cairo,2500,170,Sedan,AWD,5,japanese,family,580000,13.270783382522602
 Nissan,Sunny,2026,0,Automatic,petrol,9600.0,9600.0,Heliopolis,1600,110,Sedan,FWD,5,japanese,family,650000,13.38472764187182
 Kia,Sorento,2019,7,Automatic,petrol,131000.0,18714.285714285714,Giza,2400,173,SUV,AWD,7,korean,suv,1280000,14.0623706358958
 Peugeot,207,2008,18,Automatic,cng,163500.0,9083.333333333334,Giza,1400,95,Hatchback,FWD,5,european,city,340000,12.736700896592344
@@ -11672,7 +11701,6 @@ Renault,Fluence,2017,9,Automatic,petrol,197594.0,21954.88888888889,New Cairo,160
 Fiat,Tempra,1998,28,Manual,petrol,341500.0,12196.42857142857,Cairo,1600,90,Sedan,FWD,5,european,family,125000,11.736069016284437
 Hyundai,I30,2009,17,Automatic,petrol,219000.0,12882.35294117647,Cairo,1600,120,Sedan,FWD,5,korean,family,510000,13.142166004700508
 Kia,Sportage,2020,6,Automatic,petrol,80000.0,13333.333333333334,Cairo,1600,177,SUV,FWD,5,korean,suv,1410000,14.15910026235435
-Kia,Sportage,2022,4,Automatic,diesel,20000.0,5000.0,Giza,1600,177,SUV,FWD,5,korean,suv,1800000,14.403297222866392
 Hyundai,Elantra MD,2014,12,Automatic,petrol,150000.0,12500.0,Cairo,1600,120,Sedan,FWD,5,korean,family,700000,13.458835614025542
 Geely,Emgrand 7,2014,12,Manual,petrol,33000.0,2750.0,Cairo,1800,132,Sedan,FWD,5,chinese,family,300000,12.611537753638338
 BMW,316,2014,12,Automatic,petrol,154000.0,12833.333333333334,Cairo,1600,116,Sedan,RWD,5,european,executive,1000000,13.815510557964274
@@ -11771,9 +11799,9 @@ Skoda,Octavia A4,1999,27,Automatic,petrol,298000.0,11037.037037037036,New Cairo,
 Kia,Carens,2015,11,Automatic,petrol,180000.0,16363.636363636364,Alexandria,1600,130,MPV,FWD,7,korean,mpv,850000,13.652991628466498
 Daewoo,Nubira 2,1999,27,Manual,petrol,250000.0,9259.25925925926,Giza,1600,100,Sedan,FWD,5,korean,family,230000,12.345834587905333
 Fiat,Grand Punto,2016,10,Automatic,petrol,139000.0,13900.0,Canal Zone,1400,77,Hatchback,FWD,5,european,city,450000,13.017002861746503
-DFSK,EAGLE 580,2019,7,Automatic,diesel,130000.0,18571.428571428572,Upper Egypt,1500,150,SUV,FWD,7,chinese,suv,650000,13.38472764187182
 Mercedes,E200,1988,38,Automatic,petrol,280000.0,7368.421052631579,Cairo,2000,184,Sedan,RWD,5,european,executive,320000,12.676076274775909
 Brilliance,FRV,2012,14,Manual,petrol,300000.0,21428.571428571428,Giza,1600,116,Hatchback,FWD,5,chinese,family,250000,12.429216196844383
+DFSK,EAGLE 580,2019,7,Automatic,diesel,130000.0,18571.428571428572,Upper Egypt,1500,150,SUV,FWD,7,chinese,suv,650000,13.38472764187182
 Mercedes,200,1976,50,Manual,petrol,90000.0,1800.0,Cairo,2000,136,Sedan,RWD,5,european,executive,125000,11.736069016284437
 Hyundai,Elantra,2012,14,Automatic,petrol,250000.0,17857.14285714286,Upper Egypt,1600,128,Sedan,FWD,5,korean,family,600000,13.304684934198283
 MG,RX5,2025,1,Automatic,petrol,1400.0,1400.0,Gharbia,1500,169,SUV,FWD,5,chinese,suv,1450000,14.187074114396758
@@ -11883,7 +11911,6 @@ Renault,Taliant,2025,1,Automatic,petrol,52500.0,52500.0,New Cairo,1600,100,Sedan
 Mitsubishi,Lancer,2016,10,Automatic,petrol,205000.0,20500.0,Giza,1600,113,Sedan,FWD,5,japanese,family,620000,13.337474757021274
 Speranza,A113,2010,16,Manual,petrol,100000.0,6250.0,Other/Unknown,1300,65,Hatchback,FWD,5,chinese,city,210000,12.254862809699606
 Seat,Tarraco,2021,5,Automatic,cng,150000.0,30000.0,New Cairo,1500,150,SUV,FWD,7,european,suv,1650000,14.316285845876763
-Subaru,Impreza,2007,19,Automatic,cng,259000.0,13631.578947368422,Giza,1498,107,Sedan,AWD,5,japanese,family,410000,12.92391243868049
 Volkswagen,Passat,2009,17,Automatic,petrol,157000.0,9235.29411764706,Giza,1800,150,Sedan,FWD,5,european,executive,700000,13.458835614025542
 Chery,Arrizo 5,2022,4,Automatic,cng,260000.0,65000.0,Maadi,1500,115,Sedan,FWD,5,chinese,family,530000,13.180632285528304
 Chevrolet,Aveo,2013,13,Manual,cng,160000.0,12307.692307692309,Giza,1400,100,Sedan,FWD,5,american,city,400000,12.89921982609012
@@ -12074,7 +12101,6 @@ Chevrolet,Optra,2013,13,Automatic,petrol,129000.0,9923.076923076924,Sharqia,1600
 Chery,A15,2007,19,Manual,petrol,111200.0,5852.631578947368,Cairo,1500,92,Sedan,FWD,5,chinese,family,130000,11.77528972943772
 BMW,X3,2007,19,Automatic,petrol,315000.0,16578.947368421053,Nasr City,2000,184,SUV,AWD,5,european,luxury_suv,690000,13.444446876573442
 Nissan,Sentra,2023,3,Automatic,diesel,99000.0,33000.0,New Cairo,1600,122,Sedan,FWD,5,japanese,family,875000,13.681979165339751
-Nissan,Sunny,2023,3,Automatic,petrol,65000.0,21666.666666666668,Nasr City,1600,110,Sedan,FWD,5,japanese,family,695000,13.45166712454693
 Mercedes,C250,2010,16,Automatic,petrol,235000.0,14687.5,Dakahlia,1800,204,Sedan,RWD,5,european,executive,1250000,14.038654109278484
 Chery,Envy,2017,9,Manual,petrol,215000.0,23888.88888888889,Cairo,1500,113,Sedan,FWD,5,chinese,family,295000,12.594730635321957
 Hyundai,Avante,2014,12,Automatic,petrol,170000.0,14166.666666666666,Canal Zone,1600,120,Sedan,FWD,5,korean,family,770000,13.554145793829866
@@ -12283,7 +12309,6 @@ Peugeot,308,2011,15,Automatic,petrol,160000.0,10666.666666666666,Alexandria,1200
 Jeep,Cherokee,1996,30,Automatic,petrol,385000.0,12833.333333333334,Cairo,2400,184,SUV,4WD,5,american,suv,280000,12.542544882151386
 Daewoo,Nubira 2,2002,24,Manual,petrol,280000.0,11666.666666666666,Cairo,1600,100,Sedan,FWD,5,korean,family,250000,12.429216196844383
 Toyota,Corolla,2015,11,Automatic,petrol,149000.0,13545.454545454546,Giza,1600,122,Sedan,FWD,5,japanese,family,882000,13.68994733498893
-Renault,Logan,2016,10,Automatic,petrol,132000.0,13200.0,Cairo,1600,84,Sedan,FWD,5,european,family,410000,12.92391243868049
 Kia,K3,2013,13,Automatic,petrol,120000.0,9230.76923076923,Cairo,1600,120,Sedan,FWD,5,korean,family,870000,13.676248490630767
 BMW,X3,2006,20,Automatic,petrol,280000.0,14000.0,Cairo,2000,184,SUV,AWD,5,european,luxury_suv,660000,13.399995114002609
 Chevrolet,Captiva,2021,5,Automatic,petrol,70000.0,14000.0,Nasr City,1500,150,SUV,FWD,7,american,suv,930000,13.742939865129438
@@ -13752,13 +13777,14 @@ Hyundai,Tucson,2020,6,Automatic,petrol,13000.0,2166.6666666666665,Sharqia,1600,1
 Skoda,Octavia,2015,11,Automatic,petrol,100000.0,9090.90909090909,Sharqia,1500,150,Sedan,FWD,5,european,family,950000,13.764217263576723
 Mitsubishi,Lancer EX Shark,2016,10,Automatic,petrol,190000.0,19000.0,Giza,1600,113,Sedan,FWD,5,japanese,family,690000,13.444446876573442
 Mercedes,C300,2011,15,Automatic,petrol,105000.0,7000.0,Giza,2000,258,Sedan,RWD,5,european,executive,1200000,13.997832114758229
+Mitsubishi,Lancer EX Shark,2016,10,Automatic,petrol,190000.0,19000.0,Giza,1600,113,Sedan,FWD,5,japanese,family,690000,13.444446876573442
 Mercedes,GLC300,2025,1,Automatic,petrol,0.0,0.0,Nasr City,2000,258,SUV,4WD,5,european,luxury_suv,5750000,15.564710412773533
 BMW,320i,2024,2,Automatic,petrol,11000.0,5500.0,New Cairo,2000,184,Sedan,RWD,5,european,executive,3100000,14.946912669455374
 Mercedes,E200,2023,3,Automatic,petrol,16000.0,5333.333333333333,New Cairo,2000,184,Sedan,RWD,5,european,executive,4350000,15.285686403064867
 Mercedes,E200,2024,2,Automatic,petrol,0.0,0.0,New Cairo,2000,184,Sedan,RWD,5,european,executive,5450000,15.511126166639427
 Mercedes,C180,2025,1,Automatic,petrol,0.0,0.0,New Cairo,1600,156,Sedan,RWD,5,european,executive,4300000,15.27412558066379
-Skoda,Kodiaq,2024,2,Automatic,petrol,0.0,0.0,Heliopolis,2000,190,SUV,AWD,7,european,suv,3100000,14.946912669455374
 Mercedes,C180,2022,4,Automatic,petrol,13000.0,3250.0,New Cairo,1600,156,Sedan,RWD,5,european,executive,3350000,15.02447090380125
+Skoda,Kodiaq,2024,2,Automatic,petrol,0.0,0.0,Heliopolis,2000,190,SUV,AWD,7,european,suv,3100000,14.946912669455374
 Mercedes,E200,2024,2,Automatic,petrol,0.0,0.0,New Cairo,2000,184,Sedan,RWD,5,european,executive,5600000,15.538277155705378
 Mercedes,E200,2022,4,Automatic,petrol,15000.0,3750.0,New Cairo,2000,184,Sedan,RWD,5,european,executive,4200000,15.250595083253597
 Mercedes,E200,2025,1,Automatic,petrol,0.0,0.0,New Cairo,2000,184,Sedan,RWD,5,european,executive,5750000,15.564710412773533

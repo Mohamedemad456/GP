@@ -228,6 +228,9 @@
   <data name="ListingNotAvailable" xml:space="preserve">
     <value>This listing is no longer available.</value>
   </data>
+  <data name="ListingDeleted" xml:space="preserve">
+    <value>This listing is no longer available.</value>
+  </data>
   <data name="CannotDeactivateSelf" xml:space="preserve">
     <value>You cannot deactivate your own account.</value>
   </data>

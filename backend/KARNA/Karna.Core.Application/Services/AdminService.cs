@@ -9,6 +9,8 @@ using Karna.Core.Application.Specifications.Admin;
 using Karna.Core.Application.Specifications.Listings;
 using Karna.Core.Domain.Entities;
 using Karna.Core.Domain.Enums;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Karna.Core.Application.Services
 {
@@ -17,7 +19,9 @@ namespace Karna.Core.Application.Services
 		ICurrentUserService _currentUserService,
 		ILocalizationService _localizer,
 		IAdminActivityLogService _activityLogService,
-		IIdentityService _identityService
+		IIdentityService _identityService,
+		IServiceScopeFactory _serviceScopeFactory,
+		ILogger<AdminService> _logger
 	) : IAdminService
 	{
 		public async Task<ApiResponse<Pagination<UserListDto>>> GetUsersAsync(UserListSpecParams specParams)
@@ -219,6 +223,47 @@ namespace Karna.Core.Application.Services
 				Success = true,
 				Message = _localizer.GetMessage("ListingRejected"),
 				Data = listing.ToDto()
+			};
+		}
+
+		public async Task<ApiResponseDto> TriggerMarketReEvaluationAsync()
+		{
+			// 1. Resolve current admin
+			var adminUser = await ResolveCurrentAdminAsync();
+			if (adminUser is null)
+				return new ApiResponseDto { Success = false, Message = _localizer.GetErrorMessage("Unauthorized") };
+
+			// 2. Log admin activity
+			await _activityLogService.LogAsync(
+				adminUser.Id,
+				"MarketReEvaluation",
+				"Listing",
+				Guid.Empty,
+				"Triggered market re-evaluation for all eligible listings");
+
+			// 3. Save the log immediately
+			await _unitOfWork.CompleteAsync();
+
+			// 4. Fire background job with a new DI scope
+			_ = Task.Run(async () =>
+			{
+				try
+				{
+					await using var scope = _serviceScopeFactory.CreateAsyncScope();
+					var service = scope.ServiceProvider.GetRequiredService<IMarketReevaluationService>();
+					await service.RunAsync();
+				}
+				catch (Exception ex)
+				{
+					_logger.LogError(ex, "Background market re-evaluation job failed.");
+				}
+			});
+
+			// 5. Return immediately
+			return new ApiResponseDto
+			{
+				Success = true,
+				Message = _localizer.GetMessage("MarketReEvaluationStarted")
 			};
 		}
 

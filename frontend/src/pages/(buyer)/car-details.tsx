@@ -32,6 +32,9 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getListingById, type ListingDetailsDto } from "@/lib/listingsApi";
+import { getFavorites, addFavorite, removeFavorite } from "@/lib/favoritesApi";
+import { toast } from "sonner";
+import { useAuth } from "@/context/AuthContext";
 
 export default function CarDetailsPage() {
   const { t, i18n } = useTranslation();
@@ -40,6 +43,8 @@ export default function CarDetailsPage() {
 
   const [listing, setListing] = useState<ListingDetailsDto | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const { user } = useAuth();
 
   const BASE_URL: string =
     import.meta.env.VITE_API_BASE_URL ?? "http://localhost:5082";
@@ -54,14 +59,45 @@ export default function CarDetailsPage() {
 
   useEffect(() => {
     if (!id) return;
-    getListingById(id)
-      .then((res) => {
-        if (res.success && res.data) {
-          setListing(res.data);
-        }
-      })
-      .finally(() => setIsLoading(false));
-  }, [id]);
+    
+    const fetchListing = getListingById(id).then((res) => {
+      if (res.success && res.data) {
+        setListing(res.data);
+      }
+    });
+
+    const fetchFavs = user
+      ? getFavorites({ pageSize: 100 }).then((res) => {
+          if (res.success && res.data) {
+            setIsFavorite(res.data.data.some((fav) => String(fav.id) === id));
+          }
+        }).catch(() => {})
+      : Promise.resolve();
+
+    Promise.all([fetchListing, fetchFavs]).finally(() => setIsLoading(false));
+  }, [id, user]);
+
+  const toggleFavorite = async () => {
+    if (!user) {
+      toast.error(t("favorites.loginRequired", "Please log in to save favorites."));
+      return;
+    }
+    if (!id) return;
+
+    const currentlyFavorite = isFavorite;
+    setIsFavorite(!currentlyFavorite);
+
+    try {
+      if (currentlyFavorite) {
+        await removeFavorite(id);
+      } else {
+        await addFavorite(id);
+      }
+    } catch (err) {
+      setIsFavorite(currentlyFavorite);
+      toast.error(t("favorites.toggleError", "Failed to update favorites."));
+    }
+  };
   const locale = i18n.language?.startsWith("ar") ? "ar-SA" : "en-US";
 
   const currency = useMemo(
@@ -299,14 +335,23 @@ export default function CarDetailsPage() {
 
                 <Separator />
 
-
-
-                <a href={`tel:${listing.contactPhoneNumber}`} className="block">
-                  <Button className="w-full gap-2 bg-primary text-primary-foreground hover:glow-primary">
-                    <Phone className="size-4 shrink-0" />
-                    {t("buyer.details.callSeller", "Call Seller")}
+                <div className="flex gap-2">
+                  <a href={`tel:${listing.contactPhoneNumber}`} className="block flex-1">
+                    <Button className="w-full gap-2 bg-primary text-primary-foreground hover:glow-primary">
+                      <Phone className="size-4 shrink-0" />
+                      {t("buyer.details.callSeller", "Call")}
+                    </Button>
+                  </a>
+                  <Button
+                    variant="outline"
+                    onClick={toggleFavorite}
+                    className="shrink-0 aspect-square p-2"
+                  >
+                    <Heart
+                      className={cn("size-5", isFavorite ? "fill-destructive text-destructive" : "text-muted-foreground")}
+                    />
                   </Button>
-                </a>
+                </div>
               </CardContent>
             </Card>
           </motion.div>

@@ -61,6 +61,15 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This listing is already in your favorites..
+        /// </summary>
+        public static string AlreadyInFavorites {
+            get {
+                return ResourceManager.GetString("AlreadyInFavorites", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Condition checklist updated successfully..
         /// </summary>
         public static string ChecklistUpdated {
@@ -178,6 +187,15 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Listing approved successfully..
+        /// </summary>
+        public static string ListingApproved {
+            get {
+                return ResourceManager.GetString("ListingApproved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Listing archived successfully..
         /// </summary>
         public static string ListingArchived {
@@ -210,6 +228,33 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         public static string ListingDeletedReason {
             get {
                 return ResourceManager.GetString("ListingDeletedReason", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Listing marked as sold successfully..
+        /// </summary>
+        public static string ListingMarkedAsSold {
+            get {
+                return ResourceManager.GetString("ListingMarkedAsSold", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Listing rejected..
+        /// </summary>
+        public static string ListingRejected {
+            get {
+                return ResourceManager.GetString("ListingRejected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Listing submitted for review successfully..
+        /// </summary>
+        public static string ListingSubmitted {
+            get {
+                return ResourceManager.GetString("ListingSubmitted", resourceCulture);
             }
         }
         
@@ -354,6 +399,24 @@ namespace Karna.Core.Application.Localization.Resources.Messages {
         public static string PhotosUploaded {
             get {
                 return ResourceManager.GetString("PhotosUploaded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Price generated successfully..
+        /// </summary>
+        public static string PriceGenerated {
+            get {
+                return ResourceManager.GetString("PriceGenerated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Listing price set successfully..
+        /// </summary>
+        public static string PriceSet {
+            get {
+                return ResourceManager.GetString("PriceSet", resourceCulture);
             }
         }
         
