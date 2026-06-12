@@ -249,4 +249,7 @@
   <data name="UserDeactivated" xml:space="preserve">
     <value>User deactivated successfully.</value>
   </data>
+  <data name="MarketReEvaluationStarted" xml:space="preserve">
+    <value>Market re-evaluation has been triggered. Eligible listings will be re-priced in the background.</value>
+  </data>
 </root>

@@ -25,6 +25,7 @@ namespace Karna.Core.Application.DependencyInjection
             services.AddScoped<IAdminActivityLogService, AdminActivityLogService>();
             services.AddScoped<IAdminService, AdminService>();
             services.AddScoped<IFavoriteService, FavoriteService>();
+            services.AddScoped<IMarketReevaluationService, MarketReevaluationService>();
 
 
 

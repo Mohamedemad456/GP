@@ -249,4 +249,7 @@
   <data name="UserDeactivated" xml:space="preserve">
     <value>تم تعطيل المستخدم بنجاح.</value>
   </data>
+  <data name="MarketReEvaluationStarted" xml:space="preserve">
+    <value>تم بدء إعادة تقييم السوق. سيتم إعادة تسعير الإعلانات المؤهلة في الخلفية.</value>
+  </data>
 </root>

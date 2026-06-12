@@ -21,6 +21,7 @@ namespace Karna.Infrastructure.Persistence._Data
 		public DbSet<AdminActivityLog> AdminActivityLogs { get; set; } = null!;
 		public DbSet<PricingHistory> PricingHistories { get; set; } = null!;
         public DbSet<Favorite> Favorites { get; set; } = null!;
+        public DbSet<Notification> Notifications { get; set; } = null!;
 
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
