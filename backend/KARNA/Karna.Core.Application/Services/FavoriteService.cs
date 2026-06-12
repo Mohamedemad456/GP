@@ -30,7 +30,19 @@ namespace Karna.Core.Application.Services
                     Message = _localizer.GetErrorMessage("Unauthorized")
                 };
 
-            var userId = _currentUserService.UserId;
+            var userRepo = _unitOfWork.GetRepository<User>();
+            var currentUser = await userRepo.GetAsync(
+                u => u.IdentityUserId == _currentUserService.UserId);
+
+            if (currentUser is null)
+                return new ApiResponseDto
+                {
+                    Success = false,
+                    Message = _localizer.GetErrorMessage("UserNotFound")
+                };
+
+            var userId = currentUser.Id;
+
 
             var listingRepo = _unitOfWork.GetRepository<Listing>();
             var favoriteRepo = _unitOfWork.GetRepository<Favorite>();
@@ -98,7 +110,21 @@ namespace Karna.Core.Application.Services
                 };
             }
 
-            var userId = _currentUserService.UserId;
+            var userRepo = _unitOfWork.GetRepository<User>();
+            var currentUser = await userRepo.GetAsync(
+                u => u.IdentityUserId == _currentUserService.UserId);
+
+            if (currentUser is null)
+            {
+                return new ApiResponse<Pagination<BuyerListingDto>>
+                {
+                    Success = false,
+                    Message = _localizer.GetErrorMessage("UserNotFound")
+                };
+            }
+
+            var userId = currentUser.Id;
+
 
             var favoriteRepo = _unitOfWork.GetRepository<Favorite>();
 
@@ -140,7 +166,20 @@ namespace Karna.Core.Application.Services
                 };
             }
 
-            var userId = _currentUserService.UserId;
+            var userRepo = _unitOfWork.GetRepository<User>();
+            var currentUser = await userRepo.GetAsync(
+                u => u.IdentityUserId == _currentUserService.UserId);
+
+            if (currentUser is null)
+            {
+                return new ApiResponseDto
+                {
+                    Success = false,
+                    Message = _localizer.GetErrorMessage("UserNotFound")
+                };
+            }
+
+            var userId = currentUser.Id;
 
             var favoriteRepo = _unitOfWork.GetRepository<Favorite>();
 
