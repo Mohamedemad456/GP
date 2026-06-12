@@ -53,34 +53,46 @@ What you should cover here
 No diagrammatic ownership in Chapter 3. Mohamed Seif’s architecture and pipeline diagrams belong in Chapter 4 (Implementation) per the documentation guidelines, which reserve Chapter 3 for ERD, use case, sequence, and activity diagrams only.
 
 #### Chapter 4: Implementation — Full Ownership for ML/AI/Data Pipeline Parts
-##### 4.1 Software Architecture (Server-side ML/AI)
-- ML model architecture diagram
-- AI service architecture / chatbot flow
-- System-level technical diagram for:
-  - frontend → backend → ML service
-  - frontend → backend/AI route or chatbot route
-  - internal ML prediction flow
 
-What you should document:
+##### 4.1 Software Architecture (Server-side ML/AI)
+
+**Diagrams to include:**
+- ML model architecture diagram (model family and the ensamble, feature engineering, training, evaluation)
+- ML service architecture (FastAPI, model registry, health, metrics endpoint)
+- ML Admin Dashboard (Streamlit UI for model registry, comparison, activation, coverage)
+- AI service architecture / chatbot flow (LLM provider routing, grounding, memory)
+- Internal data pipeline (raw → cleaned → engineered → versioned training data)
+- System communication diagram (frontend → backend → ML service / AI service)
+
+**Text to write (descriptions of architecture and behavior):**
 - Model family and inference pipeline
-- Confidence / interval / negotiation-range logic
-- Explainability / top factors flow
+- Feature engineering approach and spec-merge
+- Evaluation metrics methodology (MAPE, RMSE, R², per make-model diagnostics)
+- Confidence label computation (MAPE tier, support count, interval width, exact-combo flag)
+- Negotiation interval / range logic (formula, multipliers, minimum bands, rounding)
+- Explainability / SHAP top factors flow (ensemble-aware factor selection, description mapping)
+- AI context engineering (system prompt design, fed car data, persona grounding)
+- Model registry and promotion gate (registry scan, activation, metadata)
+- ML Admin Dashboard UI (Streamlit: registry overview, model details, comparison, activation, coverage explorer, fallback reasoning)
 
 ##### 4.2 Workflow / Pseudocode (ML/AI Pipeline)
-- Data cleaning and ML pipeline diagram
-- Retrain and evaluation workflow if included diagrammatically
 
-What you should explicitly cover:
-- `ml-service` FastAPI service
-- prediction endpoint behavior
-- model loading, health, metrics, explainability
-- data cleaning scripts and versioned pipeline
-- production inference flow
-- retrain orchestration runner
-- `ai-service` FastAPI chatbot service
-- provider fallback logic
-- grounding / lookup behavior
-- in-memory chat memory and current limitations
+**Diagrams to include:**
+- Data cleaning and ML pipeline diagram
+- Retrain and evaluation workflow
+- Production prediction request flow
+- Chatbot message handling flow
+
+**Text to write (step-by-step process descriptions):**
+- Data cleaning scripts and versioned pipeline execution
+- Production inference flow (request → validation → routing → prediction → response)
+- Prediction endpoint behavior (fallback routing, confidence downgrade, price rounding)
+- Model loading at startup, health checks, Prometheus metrics export
+- Retrain orchestration runner (trigger, train, evaluate, export, promotion gate)
+- Model activation workflow via Admin Dashboard (scan registry, compare, promote, activate)
+- AI-service provider fallback logic (primary → secondary LLM on failure)
+- Grounding / lookup behavior (car specs search, price context injection)
+- In-memory chat memory and current limitations
 
 #### Chapter 5: Testing — ML/AI Ownership
 - ML-service tests

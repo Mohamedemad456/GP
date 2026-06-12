@@ -1,8 +1,8 @@
 {
   "schema_version": "2.0",
-  "active_model_id": "v2_2026-06-11_011",
-  "active_version": "v2.1.4",
-  "promoted_at": "2026-06-11T02:06:11.063807+00:00",
+  "active_model_id": "v2_2026-06-12_012",
+  "active_version": "v2.1.5",
+  "promoted_at": "2026-06-12T07:58:30.894298+00:00",
   "models": {
     "huber_baseline_v1.0.0": {
       "model_id": "huber_baseline_v1.0.0",
@@ -348,7 +348,7 @@
       "model_id": "v2_2026-06-11_011",
       "framework": "ensemble",
       "version": "v2.1.4",
-      "stage": "production",
+      "stage": "archived",
       "pkl_path": "models/pickles/ensemble_2026-06-11_011.joblib",
       "meta_path": "models/metadata/ensemble_2026-06-11_011.json",
       "metrics": {
@@ -409,6 +409,74 @@
         "cv_per_mm_supported_pct_over_30pct": 2.99,
         "cv_per_mm_pct_under_50pct": 98.45,
         "cv_per_mm_pct_over_50pct": 1.55,
+        "cv_per_mm_supported_pct_over_50pct": 0.66
+      }
+    },
+    "v2_2026-06-12_012": {
+      "model_id": "v2_2026-06-12_012",
+      "framework": "ensemble",
+      "version": "v2.1.5",
+      "stage": "production",
+      "pkl_path": "models/pickles/ensemble_2026-06-12_012.joblib",
+      "meta_path": "models/metadata/ensemble_2026-06-12_012.json",
+      "metrics": {
+        "MAE": 146007.7670339836,
+        "RMSE": 478288.99053575104,
+        "R2": 0.927793019745646,
+        "MAPE_pct": 11.133111667590075,
+        "Within_10pct": 61.915125136017416,
+        "Within_15pct": 77.72941603191875,
+        "Coverage_80_pct": 72.94160319187523,
+        "Coverage_90_pct": 86.21690243017774,
+        "Mean_width_pct": 34.3653791387834,
+        "cv_MAE": 145810.1394725195,
+        "cv_RMSE": 455369.9127050869,
+        "cv_R2": 0.9333956036975223,
+        "cv_MAPE_pct": 11.855899073949635,
+        "cv_Within_10pct": 62.110990206746465,
+        "cv_Within_15pct": 77.56982227058397
+      },
+      "artifacts": {
+        "xgb_pkl": "models/pickles/xgb_quantile_2026-06-12_012.joblib",
+        "lgbm_pkl": "models/pickles/lgbm_quantile_2026-06-12_012.joblib",
+        "encoders_pkl": "models/pickles/label_encoders_2026-06-12_012.joblib",
+        "make_model_mape_csv": "models/metadata/make_model_mape.csv"
+      },
+      "source_notebook": null,
+      "registered_at": "2026-06-12T07:58:30.880794+00:00",
+      "tags": [
+        "v2",
+        "retrain",
+        "frozen_recipe"
+      ],
+      "diagnostics_summary": {
+        "holdout_per_mm_total": 414,
+        "holdout_per_mm_supported": 86,
+        "holdout_per_mm_pct_under_15pct": 71.74,
+        "holdout_per_mm_pct_over_15pct": 28.26,
+        "holdout_per_mm_supported_pct_over_15pct": 8.14,
+        "holdout_per_mm_pct_under_20pct": 85.27,
+        "holdout_per_mm_pct_over_20pct": 14.73,
+        "holdout_per_mm_supported_pct_over_20pct": 1.16,
+        "holdout_per_mm_pct_under_30pct": 93.48,
+        "holdout_per_mm_pct_over_30pct": 6.52,
+        "holdout_per_mm_supported_pct_over_30pct": 0.0,
+        "holdout_per_mm_pct_under_50pct": 98.55,
+        "holdout_per_mm_pct_over_50pct": 1.45,
+        "holdout_per_mm_supported_pct_over_50pct": 0.0,
+        "cv_per_mm_total": 453,
+        "cv_per_mm_supported": 305,
+        "cv_per_mm_pct_under_15pct": 69.98,
+        "cv_per_mm_pct_over_15pct": 30.02,
+        "cv_per_mm_supported_pct_over_15pct": 21.97,
+        "cv_per_mm_pct_under_20pct": 83.44,
+        "cv_per_mm_pct_over_20pct": 16.56,
+        "cv_per_mm_supported_pct_over_20pct": 9.51,
+        "cv_per_mm_pct_under_30pct": 95.81,
+        "cv_per_mm_pct_over_30pct": 4.19,
+        "cv_per_mm_supported_pct_over_30pct": 1.64,
+        "cv_per_mm_pct_under_50pct": 98.68,
+        "cv_per_mm_pct_over_50pct": 1.32,
         "cv_per_mm_supported_pct_over_50pct": 0.66
       }
     }
