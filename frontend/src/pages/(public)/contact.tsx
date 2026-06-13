@@ -54,7 +54,7 @@ const Contact = () => {
       icon: Mail,
       title: t("contact.info.email.title"),
       content: t("contact.info.email.content"),
-      link: "mailto:info@sayarti.com",
+      link: "mailto:info@Karna.com",
     },
     {
       icon: Phone,
