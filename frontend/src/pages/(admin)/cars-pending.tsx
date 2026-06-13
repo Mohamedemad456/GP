@@ -13,6 +13,19 @@ import {
   User,
   X,
   XCircle,
+  Palette,
+  Fuel,
+  Settings2,
+  GaugeCircle,
+  Phone,
+  MessageCircle,
+  Sparkles,
+  ShieldCheck,
+  Scale,
+  MapPin,
+  ClipboardList,
+  CheckCircle,
+  BrainCircuit,
 } from "lucide-react";
 import {
   Badge,
@@ -37,6 +50,7 @@ import {
   TableHeader,
   TableRow,
   Textarea,
+  ImageCarousel,
 } from "@gp/design-system";
 
 import { useToast } from "@/hooks/use-toast";
@@ -48,13 +62,21 @@ import {
 import { approveListing, rejectListing } from "@/lib/adminApi";
 import { getAllMakes, type MakeDto } from "@/lib/makesApi";
 import { getAllModels, type ModelDto } from "@/lib/modelsApi";
+import { getMyListingDetails, type MyListingDetailsDto } from "@/lib/listingsApi";
 
 type DateFilter = {
   from: string;
   to: string;
 };
 
-const PAGE_SIZE_OPTIONS = [5, 10] as const;
+function resolvePhotoUrl(url: string | null): string | null {
+  if (!url) return null;
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  if (url.startsWith("/")) return `http://localhost:9090${url}`;
+  return `http://localhost:9090/${url}`;
+}
+
+const PAGE_SIZE_OPTIONS = [5, 10, 20, 50] as const;
 const arabicFontStyle = {
   fontFamily: "'Cairo', 'Tajawal', 'IBM Plex Arabic', sans-serif",
 } as const;
@@ -150,6 +172,8 @@ const CarsPending = () => {
     null,
   );
   const [rejectReason, setRejectReason] = useState("");
+  const [selectedListingDetails, setSelectedListingDetails] = useState<MyListingDetailsDto | null>(null);
+  const [isDetailsLoading, setIsDetailsLoading] = useState(false);
 
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
   const activeFilterCount = [
@@ -189,6 +213,21 @@ const CarsPending = () => {
     }, 400);
     return () => clearTimeout(timer);
   }, [sellerFilterInput]);
+
+  useEffect(() => {
+    if (selectedListing) {
+      setIsDetailsLoading(true);
+      getMyListingDetails(selectedListing.id)
+        .then((response) => {
+          if (response.success && response.data) {
+            setSelectedListingDetails(response.data);
+          }
+        })
+        .finally(() => setIsDetailsLoading(false));
+    } else {
+      setSelectedListingDetails(null);
+    }
+  }, [selectedListing]);
 
   const fetchFilters = useCallback(async () => {
     try {
@@ -686,14 +725,114 @@ const CarsPending = () => {
 
               <Separator />
 
-              <div className="rounded-2xl border border-warning/25 bg-warning/5 p-4">
-                <p className="text-sm font-medium text-foreground">
-                  {t("admin.carsPending.compactNotice")}
-                </p>
-                <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                  {t("admin.carsPending.compactNoticeDescription")}
-                </p>
-              </div>
+              {isDetailsLoading ? (
+                <div className="flex justify-center p-4">
+                  <Loader2 className="size-6 animate-spin text-muted-foreground" />
+                </div>
+              ) : selectedListingDetails ? (
+                <div className="space-y-4 animate-in fade-in zoom-in-95 duration-200">
+                  <h3 className="font-semibold text-foreground text-sm flex items-center gap-2">
+                    <SlidersHorizontal className="size-4" />
+                    {t("admin.carsPending.additionalDetails", "Additional Details")}
+                  </h3>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <DetailRow icon={Palette} label={t("admin.carsPending.color", "Color")} value={selectedListingDetails.color} />
+                    <DetailRow icon={Fuel} label={t("admin.carsPending.fuelType", "Fuel Type")} value={selectedListingDetails.fuelType} />
+                    <DetailRow icon={Settings2} label={t("admin.carsPending.transmission", "Transmission")} value={selectedListingDetails.transmission} />
+                    <DetailRow icon={GaugeCircle} label={t("admin.carsPending.engineSize", "Engine Size")} value={`${(selectedListingDetails.engineSize / 1000).toFixed(1)} L`} />
+                    <DetailRow icon={Phone} label={t("admin.carsPending.contactPhone", "Contact Phone")} value={selectedListingDetails.contactPhoneNumber} />
+                    {selectedListingDetails.whatsAppNumber && (
+                      <DetailRow icon={MessageCircle} label={t("admin.carsPending.whatsapp", "WhatsApp")} value={selectedListingDetails.whatsAppNumber} />
+                    )}
+                    <DetailRow icon={MapPin} label={t("admin.carsPending.location", "Location")} value={selectedListingDetails.locationName || "—"} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <p className="text-xs font-medium text-muted-foreground">{t("admin.carsPending.description", "Description")}</p>
+                    <p className="text-sm bg-muted/20 p-3 rounded-xl border border-border/50 text-foreground whitespace-pre-wrap">
+                      {selectedListingDetails.description || "—"}
+                    </p>
+                  </div>
+
+                  <Separator className="my-4" />
+
+                  <h3 className="font-semibold text-foreground text-sm flex items-center gap-2">
+                    <BrainCircuit className="size-4 text-primary" />
+                    {t("admin.carsPending.mlEvaluation", "ML Evaluation & Pricing")}
+                  </h3>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <DetailRow 
+                      icon={ShieldCheck} 
+                      label={t("admin.carsPending.conditionGrade", "Condition Grade")} 
+                      value={selectedListingDetails.conditionGrade || "—"} 
+                    />
+                    <DetailRow 
+                      icon={Sparkles} 
+                      label={t("admin.carsPending.confidenceLevel", "Confidence Level")} 
+                      value={selectedListingDetails.confidenceLevel || "—"} 
+                    />
+                    <DetailRow 
+                      icon={DollarSign} 
+                      label={t("admin.carsPending.mlFairPrice", "Fair Price")} 
+                      value={formatPrice(selectedListingDetails.fairPrice, currencyFormatter)} 
+                    />
+                    <DetailRow 
+                      icon={Scale} 
+                      label={t("admin.carsPending.negotiationRange", "Negotiation Range")} 
+                      value={
+                        selectedListingDetails.negotiationRangeLower && selectedListingDetails.negotiationRangeUpper
+                          ? `${formatPrice(selectedListingDetails.negotiationRangeLower, currencyFormatter)} - ${formatPrice(selectedListingDetails.negotiationRangeUpper, currencyFormatter)}`
+                          : "—"
+                      } 
+                    />
+                  </div>
+
+                  {/* Photos Carousel */}
+                  {selectedListingDetails.photos && selectedListingDetails.photos.length > 0 && (
+                    <>
+                      <Separator className="my-4" />
+                      <h3 className="font-semibold text-foreground text-sm flex items-center gap-2 mb-3">
+                        <Palette className="size-4 text-primary" />
+                        {t("admin.carsPending.photos", "Photos")}
+                      </h3>
+                      <div className="aspect-16/9 w-full overflow-hidden rounded-2xl bg-muted/30">
+                        <ImageCarousel
+                          images={selectedListingDetails.photos
+                            .sort((a, b) => a.displayOrder - b.displayOrder)
+                            .map((p) => resolvePhotoUrl(p.photoUrl))
+                            .filter(Boolean) as string[]}
+                          altBase={`${selectedListingDetails.makeName} ${selectedListingDetails.modelName}`}
+                        />
+                      </div>
+                    </>
+                  )}
+
+                  {/* Condition Defects */}
+                  {selectedListingDetails.checklistCategories && selectedListingDetails.checklistCategories.length > 0 && (
+                    <>
+                      <Separator className="my-4" />
+                      <h3 className="font-semibold text-foreground text-sm flex items-center gap-2 mb-3">
+                        <ClipboardList className="size-4 text-primary" />
+                        {t("admin.carsPending.conditionDefects", "Condition Defects")}
+                      </h3>
+                      <div className="space-y-3">
+                        {selectedListingDetails.checklistCategories.map((cat) => (
+                          <div key={cat.categoryId} className="rounded-xl border border-border/50 bg-muted/10 p-3">
+                            <p className="mb-2 text-xs font-semibold text-foreground">{cat.categoryName}</p>
+                            <div className="flex flex-wrap gap-2">
+                              {cat.selectedItems.map((item) => (
+                                <Badge key={item.id} variant="destructive" className="gap-1.5 text-xs font-normal">
+                                  <XCircle className="size-3" />
+                                  {item.name}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+              ) : null}
             </div>
 
             <DialogFooter>

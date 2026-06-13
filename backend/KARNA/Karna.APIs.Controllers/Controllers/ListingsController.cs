@@ -27,7 +27,7 @@ namespace Karna.APIs.Controllers.Controllers
 		}
 
 		[HttpGet("my-listings/{id}")]
-		[Authorize(Roles = "User")]
+		[Authorize(Roles = "User,Admin")]
 		public async Task<IActionResult> GetMyListingDetails(Guid id)
 		{
 			var result = await _listingService.GetMyListingDetailsAsync(id);

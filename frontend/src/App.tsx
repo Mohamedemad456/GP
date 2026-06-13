@@ -25,6 +25,7 @@ const CarsPending = lazy(() => import("@/pages/(admin)/cars-pending"));
 const AdminMakes = lazy(() => import("@/pages/(admin)/makes"));
 const AdminModels = lazy(() => import("@/pages/(admin)/models"));
 const AdminConditions = lazy(() => import("@/pages/(admin)/conditions"));
+const AdminReEvaluation = lazy(() => import("@/pages/(admin)/re-evaluation"));
 const SellerLayout = lazy(() => import("@/pages/(seller)/SellerLayout"));
 const SellerAnalytics = lazy(() => import("@/pages/(seller)/analytics"));
 const SellerMyListings = lazy(() => import("@/pages/(seller)/my-listings"));
@@ -83,6 +84,7 @@ function App() {
                 <Route path="makes" element={<AdminMakes />} />
                 <Route path="models" element={<AdminModels />} />
                 <Route path="conditions" element={<AdminConditions />} />
+                <Route path="re-evaluation" element={<AdminReEvaluation />} />
               </Route>
             </Route>
             <Route element={<PrivateRoute allowedRoles={["user", "admin"]} />}>
