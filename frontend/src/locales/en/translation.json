@@ -214,7 +214,7 @@
       "testimonial2": {
         "name": "Michael Chen",
         "role": "First-time Buyer",
-        "content": "As someone new to buying cars, I was nervous. But Sayarti made everything simple and transparent. Highly recommend!"
+        "content": "As someone new to buying cars, I was nervous. But Karna made everything simple and transparent. Highly recommend!"
       },
       "testimonial3": {
         "name": "Emma Williams",
@@ -223,14 +223,14 @@
       }
     },
     "whyChoose": {
-      "title": "Why Choose Sayarti",
+      "title": "Why Choose Karna",
       "subtitle": "Your trusted partner in finding the perfect vehicle",
       "reason1": "Wide selection of verified vehicles from trusted dealers",
       "reason2": "Transparent pricing with no hidden fees",
       "reason3": "Expert support team available 24/7",
       "reason4": "Secure and easy transaction process",
       "cardTitle": "Trusted by Thousands",
-      "cardDescription": "Join over 50,000 satisfied customers who found their perfect car through Sayarti",
+      "cardDescription": "Join over 50,000 satisfied customers who found their perfect car through Karna",
       "learnMore": "Learn More"
     },
     "cta": {
@@ -242,7 +242,7 @@
   },
   "about": {
     "hero": {
-      "title": "About Sayarti",
+      "title": "About Karna",
       "subtitle": "Your trusted partner in finding the perfect vehicle"
     },
     "stats": {
@@ -253,7 +253,7 @@
     },
     "mission": {
       "title": "Our Mission",
-      "description": "At Sayarti, we're dedicated to revolutionizing the car buying experience. We believe that finding your perfect vehicle should be simple, transparent, and stress-free.",
+      "description": "At Karna, we're dedicated to revolutionizing the car buying experience. We believe that finding your perfect vehicle should be simple, transparent, and stress-free.",
       "description2": "Our platform connects buyers with trusted dealers, providing verified listings, competitive pricing, and exceptional customer support every step of the way.",
       "cardTitle": "Building Trust",
       "cardDescription": "We've built our reputation on trust, transparency, and exceptional service. Every vehicle on our platform is verified, and every dealer is carefully vetted."
@@ -325,7 +325,7 @@
       "description": "Reach out to us through any of these channels",
       "email": {
         "title": "Email",
-        "content": "info@sayarti.com"
+        "content": "info@Karna.com"
       },
       "phone": {
         "title": "Phone",
@@ -1182,7 +1182,7 @@
     "emailLabel": "Email",
     "phoneLabel": "Phone",
     "socialLabel": "Follow us",
-    "copyright": "© {{year}} Sayarti. All rights reserved."
+    "copyright": "© {{year}} Karna. All rights reserved."
   },
   "MarketReEvaluationStarted": "Market re-evaluation has been started in the background.",
   "ReEvaluationFailed": "Failed to start market re-evaluation.",
