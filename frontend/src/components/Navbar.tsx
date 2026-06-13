@@ -26,6 +26,7 @@ import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { useAuth } from "@/context/AuthContext";
 import { logoutUser } from "@/lib/authApi";
+import { NotificationCenter } from "./notifications/NotificationCenter";
 
 const Navbar = memo(() => {
   const [isOpen, setIsOpen] = useState(false);
@@ -148,6 +149,7 @@ const Navbar = memo(() => {
             }`}
           >
             <LanguageSwitcher />
+            {isLoggedIn && <NotificationCenter />}
             {isLoggedIn ? (
               <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>

@@ -22,6 +22,7 @@ import {
   Separator,
   ScrollArea,
   PaginationBar,
+  ImageCarousel,
 } from "@gp/design-system";
 import { useToast } from "@/hooks/use-toast";
 
@@ -37,6 +38,7 @@ import {
 } from "@/lib/listingsApi";
 import { getActiveMakes } from "@/lib/makesApi";
 import { getActiveModels } from "@/lib/modelsApi";
+import { MLMetadataCard } from "@/components/seller/MLMetadataCard";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -85,37 +87,8 @@ const statusColors: Record<string, string> = {
   Archived: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200",
 };
 
-const SORT_FIELD_OPTIONS: { value: SortField; label: string }[] = [
-  { value: "createdAt", label: "Date Created" },
-  { value: "updatedAt", label: "Last Updated" },
-  { value: "price", label: "Price" },
-  { value: "year", label: "Year" },
-  { value: "mileage", label: "Mileage" },
-];
-
-const SORT_DIR_OPTIONS: { value: SortDirection; label: string }[] = [
-  { value: "desc", label: "Descending" },
-  { value: "asc", label: "Ascending" },
-];
-
-// ─── Image Gallery ────────────────────────────────────────────────────────────
-
-const ImageGallery = memo(({ photoUrl }: { photoUrl: string | null }) => {
-  const url = resolvePhotoUrl(photoUrl);
-
-  return (
-    <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-muted">
-      {url ? (
-        <img src={url} alt="Listing photo" className="size-full object-cover" />
-      ) : (
-        <div className="flex size-full items-center justify-center">
-          <ImageIcon className="size-10 text-muted-foreground/30" />
-        </div>
-      )}
-    </div>
-  );
-});
-ImageGallery.displayName = "ImageGallery";
+// SORT_FIELD_OPTIONS and SORT_DIR_OPTIONS are defined inside the component
+// so they can use the t() hook for translations.
 
 // ─── Listing Detail Modal ─────────────────────────────────────────────────────
 
@@ -177,14 +150,14 @@ const ListingDetailModal = memo(
 
     return (
       <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-        <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col p-0 gap-0">
-          <DialogHeader className="px-6 pt-6 pb-4 shrink-0">
-            <DialogTitle>
+        <DialogContent className="w-full max-w-lg sm:max-w-2xl max-h-[92dvh] flex flex-col p-0 gap-0 overflow-hidden">
+          <DialogHeader className="px-4 sm:px-6 pt-5 pb-3 shrink-0 border-b border-border/60">
+            <DialogTitle className="pr-8">
               {isLoadingDetails ? (
-                <Skeleton className="h-6 w-64" />
+                <Skeleton className="h-6 w-48 sm:w-64" />
               ) : listing ? (
-                <div className="flex items-center justify-between gap-4">
-                  <span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="font-bold">
                     {listing.year} {listing.makeName} {listing.modelName}
                   </span>
                   <Badge className={statusColors[listing.status] || statusColors.Draft}>
@@ -192,32 +165,48 @@ const ListingDetailModal = memo(
                   </Badge>
                 </div>
               ) : (
-                "Loading..."
+                t("Loading", "Loading...")
               )}
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="flex items-center gap-2 text-xs">
               {isLoadingDetails ? (
-                <Skeleton className="h-4 w-40 mt-1" />
+                <Skeleton className="h-4 w-32 mt-1" />
               ) : (
-                listing && `${listing.locationName}`
+                listing && listing.locationName
               )}
             </DialogDescription>
           </DialogHeader>
 
-          <ScrollArea className="flex-1 overflow-auto px-6 pb-6">
+          <ScrollArea className="flex-1 overflow-auto">
+            <div className="px-4 sm:px-6 pb-4">
             {isLoadingDetails ? (
-              <div className="space-y-4 p-3">
-                <Skeleton className="aspect-video w-full rounded-lg" />
+              <div className="space-y-4 py-4">
+                <Skeleton className="aspect-video w-full rounded-xl" />
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                   {Array.from({ length: 6 }).map((_, i) => (
-                    <Skeleton key={i} className="h-16 rounded-lg" />
+                    <Skeleton key={i} className="h-16 rounded-xl" />
                   ))}
                 </div>
               </div>
             ) : listing ? (
-              <div className="space-y-5 p-3">
-                {/* Primary Photo */}
-                <ImageGallery photoUrl={listing.photos[0]?.photoUrl || null} />
+              <div className="space-y-4 pt-4">
+                {/* Photo Carousel */}
+                <div className="-mx-4 sm:-mx-6">
+                  {listing.photos.length > 0 ? (
+                    <ImageCarousel
+                      images={listing.photos
+                        .slice()
+                        .sort((a, b) => a.displayOrder - b.displayOrder)
+                        .map((p) => resolvePhotoUrl(p.photoUrl))
+                        .filter((url): url is string => url !== null)}
+                      altBase={`${listing.makeName} ${listing.modelName}`}
+                    />
+                  ) : (
+                    <div className="flex aspect-video w-full items-center justify-center bg-muted">
+                      <ImageIcon className="size-12 text-muted-foreground/30" />
+                    </div>
+                  )}
+                </div>
 
                 <Separator />
 
@@ -244,7 +233,7 @@ const ListingDetailModal = memo(
                       style={{ width: `${listing.progress.completionPercentage}%` }}
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  <div className="grid grid-cols-2 gap-2 xs:grid-cols-4">
                     <ProgressStep label={t("seller.listings.detail.basicInfo") || "Basic Info"} done={listing.progress.hasBasicInfo} />
                     <ProgressStep label={t("seller.listings.detail.photos") || "Photos"} done={listing.progress.hasPhotos} />
                     <ProgressStep label={t("seller.listings.detail.condition") || "Condition"} done={listing.progress.hasConditionChecklist} />
@@ -257,7 +246,7 @@ const ListingDetailModal = memo(
                 {/* Vehicle Information */}
                 <div className="space-y-3">
                   <h3 className="text-sm font-semibold text-foreground">{t("seller.listings.detail.vehicleDetails") || "Vehicle Details"}</h3>
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                     <DetailItem label={t("seller.listings.detail.make") || "Make"} value={listing.makeName} />
                     <DetailItem label={t("seller.listings.detail.model") || "Model"} value={listing.modelName} />
                     <DetailItem label={t("seller.listings.detail.year") || "Year"} value={listing.year.toString()} />
@@ -272,10 +261,27 @@ const ListingDetailModal = memo(
 
                 <Separator />
 
+                {listing.fairPrice != null && (
+                  <>
+                    <MLMetadataCard 
+                      metadata={{
+                        fairPrice: listing.fairPrice,
+                        negotiationRangeLower: listing.negotiationRangeLower,
+                        negotiationRangeUpper: listing.negotiationRangeUpper,
+                        confidenceLevel: listing.confidenceLevel,
+                        modelVersion: listing.modelVersion,
+                        predictedAt: listing.predictedAt
+                      }}
+                      currentPrice={listing.listingPrice ?? 0}
+                    />
+                    <Separator />
+                  </>
+                )}
+
                 {/* Pricing */}
                 <div className="space-y-3">
                   <h3 className="text-sm font-semibold text-foreground">{t("seller.listings.detail.pricing") || "Pricing"}</h3>
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     <DetailItem
                       label={t("seller.listings.detail.listingPrice") || "Listing Price"}
                       value={fmtCurrency(listing.listingPrice)}
@@ -314,7 +320,7 @@ const ListingDetailModal = memo(
                 {/* Dates */}
                 <div className="space-y-3">
                   <h3 className="text-sm font-semibold text-foreground">{t("seller.listings.detail.listingDetails") || "Listing Details"}</h3>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     <DetailItem label={t("seller.listings.detail.createdAt") || "Created"} value={fmtDate(listing.createdAt)} />
                     {listing.updatedAt && (
                       <DetailItem label={t("seller.listings.detail.updatedAt") || "Last Updated"} value={fmtDate(listing.updatedAt)} />
@@ -339,7 +345,7 @@ const ListingDetailModal = memo(
                 {/* Contact Info */}
                 <div className="space-y-3">
                   <h3 className="text-sm font-semibold text-foreground">{t("seller.listings.detail.contactInfo") || "Contact Information"}</h3>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     <DetailItem label={t("seller.listings.detail.phone") || "Phone"} value={listing.contactPhoneNumber} />
                     {listing.whatsAppNumber && (
                       <DetailItem label={t("seller.listings.detail.whatsapp") || "WhatsApp"} value={listing.whatsAppNumber} />
@@ -378,32 +384,35 @@ const ListingDetailModal = memo(
 
                 <Separator />
 
-                {/* Action Buttons */}
-                <div className="flex flex-wrap gap-2 pt-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => onEdit(listing.id)}
-                    className="gap-1.5"
-                  >
-                    <Edit2 className="size-4" />
-                    Edit
-                  </Button>
-
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    onClick={handleDelete}
-                    disabled={isDeleting}
-                    className="gap-1.5"
-                  >
-                    <Trash2 className="size-4" />
-                    {isDeleting ? "Deleting..." : "Delete"}
-                  </Button>
-                </div>
               </div>
             ) : null}
+            </div>
           </ScrollArea>
+
+          {/* Sticky action footer */}
+          {listing && !isLoadingDetails && (
+            <div className="shrink-0 border-t border-border/60 bg-background/95 backdrop-blur-sm px-4 sm:px-6 py-3 flex flex-col-reverse sm:flex-row gap-2 sm:justify-between">
+              <Button
+                size="sm"
+                variant="destructive"
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="gap-1.5 w-full sm:w-auto"
+              >
+                <Trash2 className="size-4" />
+                {isDeleting ? t("Deleting", "Deleting...") : t("seller.listings.detail.delete", "Delete")}
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => onEdit(listing.id)}
+                className="gap-1.5 w-full sm:w-auto"
+              >
+                <Edit2 className="size-4" />
+                {t("seller.listings.detail.edit", "Edit")}
+              </Button>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     );
@@ -471,6 +480,7 @@ const ListingCardSkeleton = () => (
 
 const MyListingCard = memo(
   ({ listing, onClick }: { listing: MyListingDto; onClick: () => void }) => {
+    const { t } = useTranslation();
     const photoUrl = resolvePhotoUrl(listing.primaryPhotoUrl);
 
     return (
@@ -514,7 +524,7 @@ const MyListingCard = memo(
           {/* Additional Info */}
           <div className="mt-3 space-y-2">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-muted-foreground">Completion</span>
+              <span className="text-muted-foreground">{t("seller.myListings.card.completion", "Completion")}</span>
               <div className="flex items-center gap-2">
                 <div className="h-1.5 w-16 overflow-hidden rounded-full bg-muted">
                   <div
@@ -528,7 +538,7 @@ const MyListingCard = memo(
               </div>
             </div>
             <div className="text-xs text-muted-foreground">
-              Last updated: {fmtDate(listing.updatedAt || listing.createdAt)}
+              {t("seller.myListings.card.lastUpdated", "Last updated")}: {fmtDate(listing.updatedAt || listing.createdAt)}
             </div>
           </div>
         </CardContent>
@@ -702,7 +712,7 @@ const SellerMyListings = () => {
           onClick={() => navigate("/seller/add-listing")}
           className="gap-2 shrink-0"
         >
-          + New Listing
+          + {t("seller.myListings.newListing", "New Listing")}
         </Button>
       </div>
 
@@ -719,16 +729,16 @@ const SellerMyListings = () => {
               }}
             >
               <SelectTrigger>
-                <SelectValue placeholder="All Statuses" />
+                <SelectValue placeholder={t("seller.myListings.filter.allStatuses", "All Statuses")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="Draft">Draft</SelectItem>
-                <SelectItem value="Pending">Pending</SelectItem>
-                <SelectItem value="Active">Active</SelectItem>
-                <SelectItem value="Rejected">Rejected</SelectItem>
-                <SelectItem value="Sold">Sold</SelectItem>
-                <SelectItem value="Archived">Archived</SelectItem>
+                <SelectItem value="all">{t("seller.myListings.filter.allStatuses", "All Statuses")}</SelectItem>
+                <SelectItem value="Draft">{t("seller.myListings.filter.draft", "Draft")}</SelectItem>
+                <SelectItem value="Pending">{t("seller.myListings.filter.pending", "Pending")}</SelectItem>
+                <SelectItem value="Active">{t("seller.myListings.filter.active", "Active")}</SelectItem>
+                <SelectItem value="Rejected">{t("seller.myListings.filter.rejected", "Rejected")}</SelectItem>
+                <SelectItem value="Sold">{t("seller.myListings.filter.sold", "Sold")}</SelectItem>
+                <SelectItem value="Archived">{t("seller.myListings.filter.archived", "Archived")}</SelectItem>
               </SelectContent>
             </Select>
 
@@ -741,10 +751,10 @@ const SellerMyListings = () => {
               }}
             >
               <SelectTrigger>
-                <SelectValue placeholder="All Makes" />
+                <SelectValue placeholder={t("seller.myListings.filter.allMakes", "All Makes")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Makes</SelectItem>
+                <SelectItem value="all">{t("seller.myListings.filter.allMakes", "All Makes")}</SelectItem>
                 {makes.map((make) => (
                   <SelectItem key={make.id} value={make.id}>
                     {make.name}
@@ -763,10 +773,10 @@ const SellerMyListings = () => {
               disabled={makeFilter === "all"}
             >
               <SelectTrigger>
-                <SelectValue placeholder="All Models" />
+                <SelectValue placeholder={t("seller.myListings.filter.allModels", "All Models")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Models</SelectItem>
+                <SelectItem value="all">{t("seller.myListings.filter.allModels", "All Models")}</SelectItem>
                 {models.map((model) => (
                   <SelectItem key={model.id} value={model.id}>
                     {model.name}
@@ -786,7 +796,7 @@ const SellerMyListings = () => {
               <RefreshCw
                 className={`size-4 ${isLoading ? "animate-spin" : ""}`}
               />
-              Refresh
+              {t("seller.myListings.filter.refresh", "Refresh")}
             </Button>
           </div>
 
@@ -802,14 +812,14 @@ const SellerMyListings = () => {
             >
               <SelectTrigger className="gap-1.5">
                 <ArrowUpDown className="size-3.5 text-muted-foreground" />
-                <SelectValue placeholder="Sort by" />
+                <SelectValue placeholder={t("seller.myListings.sort.sortBy", "Sort by")} />
               </SelectTrigger>
               <SelectContent>
-                {SORT_FIELD_OPTIONS.map((opt) => (
-                  <SelectItem key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </SelectItem>
-                ))}
+                <SelectItem value="createdAt">{t("seller.myListings.sort.dateCreated", "Date Created")}</SelectItem>
+                <SelectItem value="updatedAt">{t("seller.myListings.sort.lastUpdated", "Last Updated")}</SelectItem>
+                <SelectItem value="price">{t("seller.myListings.sort.price", "Price")}</SelectItem>
+                <SelectItem value="year">{t("seller.myListings.sort.year", "Year")}</SelectItem>
+                <SelectItem value="mileage">{t("seller.myListings.sort.mileage", "Mileage")}</SelectItem>
               </SelectContent>
             </Select>
 
@@ -822,14 +832,11 @@ const SellerMyListings = () => {
               }}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Direction" />
+                <SelectValue placeholder={t("seller.myListings.sort.direction", "Direction")} />
               </SelectTrigger>
               <SelectContent>
-                {SORT_DIR_OPTIONS.map((opt) => (
-                  <SelectItem key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </SelectItem>
-                ))}
+                <SelectItem value="desc">{t("seller.myListings.sort.descending", "Descending")}</SelectItem>
+                <SelectItem value="asc">{t("seller.myListings.sort.ascending", "Ascending")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -838,7 +845,7 @@ const SellerMyListings = () => {
           {hasActiveFilters && (
             <div className="mt-3 flex items-center justify-between">
               <p className="text-xs text-muted-foreground">
-                Showing filtered results
+                {t("seller.myListings.filter.filteredResults", "Showing filtered results")}
               </p>
               <Button
                 variant="ghost"
@@ -846,7 +853,7 @@ const SellerMyListings = () => {
                 onClick={clearFilters}
                 className="text-xs"
               >
-                Clear Filters
+                {t("seller.myListings.filter.clearFilters", "Clear Filters")}
               </Button>
             </div>
           )}
@@ -875,7 +882,7 @@ const SellerMyListings = () => {
               className="mt-4 gap-2"
               onClick={() => navigate("/seller/add-listing")}
             >
-              + New Listing
+              + {t("seller.myListings.newListing", "New Listing")}
             </Button>
           </CardContent>
         </Card>

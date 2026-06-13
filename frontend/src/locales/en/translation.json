@@ -76,7 +76,8 @@
     "submit": "Submit",
     "cancel": "Cancel",
     "save": "Save",
-    "delete": "Delete"
+    "delete": "Delete",
+    "back": "Back"
   },
   "chatbot": {
     "openLabel": "Open AI assistant",
@@ -359,7 +360,8 @@
       "makes": "Car Makes",
       "models": "Car Models",
       "conditions": "Conditions",
-      "logout": "Logout"
+      "logout": "Logout",
+      "reEvaluateMarket": "Market Re-Evaluation"
     },
     "header": {
       "dashboard": "Dashboard"
@@ -664,7 +666,17 @@
       "rejectTitle": "Reject listing",
       "rejectDescription": "Add an optional note for the seller before rejecting this listing.",
       "rejectReason": "Reason",
-      "rejectReasonPlaceholder": "Explain what needs to be corrected..."
+      "rejectReasonPlaceholder": "Explain what needs to be corrected...",
+      "additionalDetails": "Additional Details",
+      "contactPhone": "Contact Phone",
+      "whatsapp": "WhatsApp",
+      "mlEvaluation": "ML Evaluation & Pricing",
+      "confidenceLevel": "Confidence Level",
+      "mlFairPrice": "Fair Price",
+      "negotiationRange": "Negotiation Range",
+      "location": "Location",
+      "noImages": "No images available",
+      "conditionDefects": "Condition Defects"
     },
     "activityLogs": {
       "title": "Activity Logs",
@@ -893,7 +905,8 @@
         "dropzone": "Click or drag & drop to upload images",
         "formats": "PNG, JPG, WEBP up to {{maxSize}}MB each",
         "uploaded": "uploaded",
-        "cover": "Cover"
+        "cover": "Cover",
+        "uploadAlt": "Upload {{number}}"
       },
       "vehicleInfo": {
         "title": "Vehicle Information",
@@ -901,7 +914,17 @@
       },
       "pricing": {
         "title": "Pricing",
-        "description": "Set your asking price in EGP"
+        "description": "Generate a fair market price based on your vehicle's condition, mileage, and market data.",
+        "generateTitle": "Ready to price your vehicle?",
+        "generateDesc": "Our AI model will analyze market data, vehicle condition, and specifications to suggest a fair competitive price.",
+        "generateBtn": "Generate Price",
+        "lowerRange": "Lower Range",
+        "fairPrice": "Fair Price",
+        "upperRange": "Upper Range",
+        "highPriceWarningTitle": "Price is above market range",
+        "highPriceWarningDesc": "Setting a price higher than the recommended upper range may significantly reduce buyer interest and make it harder to sell your vehicle.",
+        "lowPriceWarningTitle": "Price is below market range",
+        "lowPriceWarningDesc": "This is an excellent deal for buyers! Your vehicle should sell very quickly."
       },
       "descriptionSection": {
         "title": "Description",
@@ -919,7 +942,8 @@
         "selectedTitle": "Selected condition items",
         "availableDefects": "{{count}} defects available",
         "emptySelections": "Choose a category and defect to build the vehicle condition checklist.",
-        "removeSelection": "Remove {{defect}}"
+        "removeSelection": "Remove {{defect}}",
+        "skip": "Skip (No defects)"
       },
       "fields": {
         "make": "Make",
@@ -938,7 +962,8 @@
         "description": "Description",
         "contactPhoneNumber": "Contact Phone Number",
         "whatsAppNumber": "WhatsApp Number",
-        "preferredContactMethod": "Preferred Contact Method"
+        "preferredContactMethod": "Preferred Contact Method",
+        "yourPrice": "Your Final Price"
       },
       "placeholders": {
         "make": "Select make",
@@ -964,13 +989,14 @@
         "description": "Describe your vehicle's features, condition, history, and any notable aspects...",
         "contactPhoneNumber": "e.g. +966 5X XXX XXXX",
         "whatsAppNumber": "e.g. +966 5X XXX XXXX",
-        "preferredContactMethod": "Select preferred contact method"
+        "preferredContactMethod": "Select preferred contact method",
+        "price": "Enter your selling price"
       },
       "minChars": "min characters",
       "errors": {
         "required": "This field is required",
         "invalidMileage": "Mileage must be a positive number",
-        "invalidPrice": "Price must be greater than 0",
+        "invalidPrice": "Please enter a valid price",
         "descriptionTooShort": "Description must be at least 20 characters",
         "minImages": "Please upload at least {{min}} images",
         "loadMakesFailed": "Failed to load makes. Please refresh the page.",
@@ -984,7 +1010,10 @@
         "photosFailed": "The listing was created, but photos could not be uploaded.",
         "createListingFirst": "Create the listing details before continuing.",
         "invalidImageType": "Only image files can be uploaded.",
-        "imageTooLarge": "Each photo must be {{max}}MB or less."
+        "imageTooLarge": "Each photo must be {{max}}MB or less.",
+        "generatePriceFailed": "Failed to generate price",
+        "generatePriceFirst": "Please generate and set a price first.",
+        "setPriceFailed": "Failed to set price"
       },
       "contactMethods": {
         "phone": "Phone",
@@ -994,8 +1023,22 @@
       "footerNote": "Review your details and submit when everything looks right.",
       "success": {
         "title": "Listing submitted!",
-        "description": "Your listing has been submitted for review. You will be notified once it is approved."
-      }
+        "description": "Your listing has been submitted for review. You will be notified once it is approved.",
+        "priceGenerated": "Price generated successfully"
+      },
+      "colors": {
+        "white": "White",
+        "black": "Black",
+        "silver": "Silver",
+        "gray": "Gray",
+        "red": "Red",
+        "blue": "Blue",
+        "green": "Green",
+        "brown": "Brown",
+        "beige": "Beige",
+        "other": "Other"
+      },
+      "submitting": "Submitting…"
     },
     "editListing": {
       "title": "Edit Listing",
@@ -1027,6 +1070,36 @@
       "empty": {
         "title": "No Listings Yet",
         "subtitle": "Create your first listing to get started"
+      },
+      "newListing": "New Listing",
+      "card": {
+        "completion": "Completion",
+        "lastUpdated": "Last updated"
+      },
+      "filter": {
+        "allStatuses": "All Statuses",
+        "draft": "Draft",
+        "pending": "Pending",
+        "active": "Active",
+        "rejected": "Rejected",
+        "sold": "Sold",
+        "archived": "Archived",
+        "allMakes": "All Makes",
+        "allModels": "All Models",
+        "refresh": "Refresh",
+        "filteredResults": "Showing filtered results",
+        "clearFilters": "Clear Filters"
+      },
+      "sort": {
+        "sortBy": "Sort by",
+        "dateCreated": "Date Created",
+        "lastUpdated": "Last Updated",
+        "price": "Price",
+        "year": "Year",
+        "mileage": "Mileage",
+        "direction": "Direction",
+        "descending": "Descending",
+        "ascending": "Ascending"
       }
     }
   },
@@ -1093,7 +1166,13 @@
       "approvedAt": "Approved At",
       "soldAt": "Sold At",
       "rejectionReason": "Rejection Reason",
-      "approvedByAdminId": "Approved By Admin ID"
+      "approvedByAdminId": "Approved By Admin ID",
+      "goodDeal": "Good Deal",
+      "na": "N/A",
+      "callSeller": "Call",
+      "sellerInfo": "Seller Info",
+      "preferredContact": "Preferred:",
+      "timeline": "Timeline"
     }
   },
   "footer": {
@@ -1104,5 +1183,36 @@
     "phoneLabel": "Phone",
     "socialLabel": "Follow us",
     "copyright": "© {{year}} Sayarti. All rights reserved."
-  }
+  },
+  "MarketReEvaluationStarted": "Market re-evaluation has been started in the background.",
+  "ReEvaluationFailed": "Failed to start market re-evaluation.",
+  "NotificationUpdateFailed": "Failed to update notification.",
+  "Notifications": "Notifications",
+  "MarkAllAsRead": "Mark all as read",
+  "Loading": "Loading...",
+  "NoNotifications": "No notifications",
+  "Unread": "Unread",
+  "MarketEvaluation": "Market Evaluation",
+  "SignificantChange": "Significant Change",
+  "BasedOnModel": "Based on model version:",
+  "FairMarketPrice": "Fair Market Price",
+  "ConfidenceLevel": "Confidence Level",
+  "SuggestedNegotiationRange": "Suggested Negotiation Range",
+  "MarketReEvaluation": "Market Re-Evaluation",
+  "ReEvaluationDescription": "Trigger a background job to re-evaluate all listings via the ML model. This will update the Fair Price, Negotiation Ranges, and other ML metadata for all active listings.",
+  "ControlPanel": "Control Panel",
+  "ControlPanelDesc": "Manually trigger the market re-evaluation process.",
+  "WarningSignificantChanges": "Warning: Significant Changes",
+  "WarningSignificantChangesDesc": "This operation will scan all listings. Sellers will be automatically notified if their listing's fair price changes by 10% or more.",
+  "Starting": "Starting...",
+  "ReEvaluateMarketButton": "Re-Evaluate Market",
+  "ConfirmReEvaluation": "Confirm Market Re-Evaluation",
+  "ConfirmReEvaluationMessage": "Are you sure you want to trigger a full market re-evaluation?",
+  "WillRunInBackground": "This process will run in the background.",
+  "WillNotModifyListingPrice": "It will never modify the seller's original Listing Price.",
+  "WillNotifySellers": "It will notify sellers of significant changes.",
+  "Cancel": "Cancel",
+  "Confirming": "Confirming...",
+  "ConfirmAndStart": "Confirm and Start",
+  "MLDashboard": "ML Dashboard"
 }

@@ -928,7 +928,7 @@ const fetchAllActiveModels = useCallback(async () => {
                 >
                   <img
                     src={preview}
-                    alt={`Upload ${i + 1}`}
+                    alt={t("seller.addListing.images.uploadAlt", { number: i + 1 })}
                     className="size-full object-cover"
                   />
                   <button
@@ -1379,9 +1379,9 @@ const fetchAllActiveModels = useCallback(async () => {
                 <SelectContent>
                   {COLORS.map((color) => (
                     <SelectItem key={color} value={color}>
-                      {color}
+                      {t(`seller.addListing.colors.${color.toLowerCase()}`, color)}
                     </SelectItem>
-                  ))}
+                  ))}  
                 </SelectContent>
               </Select>
             </FormField>

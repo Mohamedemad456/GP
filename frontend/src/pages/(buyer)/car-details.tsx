@@ -200,7 +200,7 @@ export default function CarDetailsPage() {
               variant="success"
               className="text-xs uppercase tracking-wide"
             >
-              Good Deal
+              {t("buyer.details.goodDeal", "Good Deal")}
             </Badge>
           )}
           <Badge
@@ -222,7 +222,7 @@ export default function CarDetailsPage() {
             className="font-heading text-2xl font-bold text-primary sm:text-3xl"
             dir="ltr"
           >
-            {listing.listingPrice !== null ? currency.format(listing.listingPrice) : "N/A"}
+            {listing.listingPrice !== null ? currency.format(listing.listingPrice) : t("buyer.details.na", "N/A")}
           </p>
         </div>
 
@@ -329,7 +329,7 @@ export default function CarDetailsPage() {
                     className="font-heading text-2xl font-bold text-primary"
                     dir="ltr"
                   >
-                    {listing.listingPrice !== null ? currency.format(listing.listingPrice) : "N/A"}
+                    {listing.listingPrice !== null ? currency.format(listing.listingPrice) : t("buyer.details.na", "N/A")}
                   </p>
                 </div>
 

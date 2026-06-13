@@ -12,6 +12,7 @@ import {
   Languages,
   Database,
   ActivitySquare,
+  TrendingUp,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
@@ -118,6 +119,11 @@ const AdminLayout = memo(() => {
                     label: t("admin.sidebar.activityLogs"),
                     icon: ActivitySquare,
                     to: "/admin/activity-logs",
+                  },
+                  {
+                    label: t("admin.sidebar.reEvaluateMarket", "Market Re-Evaluation"),
+                    icon: TrendingUp,
+                    to: "/admin/re-evaluation",
                   },
                 ].map((item) => (
                   <SidebarMenuItem key={item.to}>

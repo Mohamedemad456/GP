@@ -76,7 +76,8 @@
     "submit": "إرسال",
     "cancel": "إلغاء",
     "save": "حفظ",
-    "delete": "حذف"
+    "delete": "حذف",
+    "back": "رجوع"
   },
   "chatbot": {
     "openLabel": "فتح المساعد الذكي",
@@ -359,7 +360,8 @@
       "makes": "ماركات السيارات",
       "models": "موديلات السيارات",
       "conditions": "الحالات",
-      "logout": "تسجيل الخروج"
+      "logout": "تسجيل الخروج",
+      "reEvaluateMarket": "إعادة تقييم السوق"
     },
     "header": {
       "dashboard": "لوحة التحكم"
@@ -624,7 +626,7 @@
       "makeModel": "الماركة / الموديل",
       "fuelType": "نوع الوقود",
       "transmission": "ناقل الحركة",
-      "engineSize": "حجم المحرك",
+      "engineSize": "سعة المحرك",
       "color": "اللون",
       "conditionGrade": "درجة الحالة",
       "pricing": "التسعير",
@@ -664,7 +666,17 @@
       "rejectTitle": "رفض الإعلان",
       "rejectDescription": "أضف ملاحظة اختيارية للبائع قبل رفض هذا الإعلان.",
       "rejectReason": "السبب",
-      "rejectReasonPlaceholder": "اشرح ما الذي يحتاج إلى تصحيح..."
+      "rejectReasonPlaceholder": "اشرح ما الذي يحتاج إلى تصحيح...",
+      "additionalDetails": "تفاصيل إضافية",
+      "contactPhone": "رقم الهاتف",
+      "whatsapp": "واتساب",
+      "mlEvaluation": "تقييم الذكاء الاصطناعي والتسعير",
+      "confidenceLevel": "مستوى الثقة",
+      "mlFairPrice": "السعر العادل",
+      "negotiationRange": "نطاق التفاوض",
+      "location": "الموقع",
+      "noImages": "لا توجد صور متاحة",
+      "conditionDefects": "عيوب الحالة"
     },
     "activityLogs": {
       "title": "سجلات النشاط",
@@ -893,7 +905,8 @@
         "dropzone": "انقر أو اسحب وأفلت لرفع الصور",
         "formats": "PNG، JPG، WEBP بحجم أقصى {{maxSize}} ميغابايت لكل صورة",
         "uploaded": "مرفوعة",
-        "cover": "الغلاف"
+        "cover": "الغلاف",
+        "uploadAlt": "صورة {{number}}"
       },
       "vehicleInfo": {
         "title": "معلومات المركبة",
@@ -901,7 +914,17 @@
       },
       "pricing": {
         "title": "التسعير",
-        "description": "حدد السعر المطلوب بالجنيه المصري" 
+        "description": "احصل على سعر عادل للسوق بناءً على حالة سيارتك والمسافة المقطوعة وبيانات السوق.",
+        "generateTitle": "هل أنت مستعد لتسعير سيارتك؟",
+        "generateDesc": "سيقوم نموذج الذكاء الاصطناعي بتحليل بيانات السوق وحالة السيارة والمواصفات لاقتراح سعر تنافسي عادل.",
+        "generateBtn": "إنشاء السعر",
+        "lowerRange": "الحد الأدنى",
+        "fairPrice": "السعر العادل",
+        "upperRange": "الحد الأعلى",
+        "highPriceWarningTitle": "السعر أعلى من نطاق السوق",
+        "highPriceWarningDesc": "تحديد سعر أعلى من الحد الأعلى الموصى به قد يقلل بشكل كبير من اهتمام المشترين ويجعل بيع سيارتك أصعب.",
+        "lowPriceWarningTitle": "السعر أقل من نطاق السوق",
+        "lowPriceWarningDesc": "هذه صفقة ممتازة للمشترين! يجب أن تُباع سيارتك بسرعة كبيرة."
       },
       "descriptionSection": {
         "title": "الوصف",
@@ -919,7 +942,8 @@
         "selectedTitle": "العناصر المحددة",
         "availableDefects": "{{count}} عيب متاح",
         "emptySelections": "اختر فئة ثم عيباً لبناء قائمة حالة المركبة.",
-        "removeSelection": "إزالة {{defect}}"
+        "removeSelection": "إزالة {{defect}}",
+        "skip": "تخطي (لا يوجد عيوب)"
       },
       "fields": {
         "make": "الماركة",
@@ -938,7 +962,8 @@
         "description": "الوصف",
         "contactPhoneNumber": "رقم هاتف الاتصال",
         "whatsAppNumber": "رقم WhatsApp",
-        "preferredContactMethod": "وسيلة الاتصال المفضلة"
+        "preferredContactMethod": "وسيلة الاتصال المفضلة",
+        "yourPrice": "سعرك النهائي"
       },
       "placeholders": {
         "make": "اختر الماركة",
@@ -964,13 +989,14 @@
         "description": "صف ميزات مركبتك وحالتها وتاريخها وأي جوانب ملحوظة...",
         "contactPhoneNumber": "مثال: +966 5X XXX XXXX",
         "whatsAppNumber": "مثال: +966 5X XXX XXXX",
-        "preferredContactMethod": "اختر وسيلة الاتصال المفضلة"
+        "preferredContactMethod": "اختر وسيلة الاتصال المفضلة",
+        "price": "أدخل سعر البيع"
       },
       "minChars": "حد أدنى من الأحرف",
       "errors": {
         "required": "هذا الحقل مطلوب",
         "invalidMileage": "المسافة المقطوعة يجب أن تكون رقماً إيجابياً",
-        "invalidPrice": "السعر يجب أن يكون أكبر من 0",
+        "invalidPrice": "يرجى إدخال سعر صحيح",
         "descriptionTooShort": "الوصف يجب أن يكون 20 حرفاً على الأقل",
         "minImages": "يرجى رفع {{min}} صور على الأقل",
         "loadMakesFailed": "فشل تحميل الماركات. يرجى تحديث الصفحة.",
@@ -984,7 +1010,10 @@
         "photosFailed": "تم إنشاء الإعلان، لكن تعذر رفع الصور.",
         "createListingFirst": "أنشئ تفاصيل الإعلان قبل المتابعة.",
         "invalidImageType": "يمكن رفع ملفات الصور فقط.",
-        "imageTooLarge": "يجب ألا يتجاوز حجم كل صورة {{max}} ميغابايت."
+        "imageTooLarge": "يجب ألا يتجاوز حجم كل صورة {{max}} ميغابايت.",
+        "generatePriceFailed": "فشل في إنشاء السعر",
+        "generatePriceFirst": "يرجى إنشاء السعر وتحديده أولاً.",
+        "setPriceFailed": "فشل في تحديد السعر"
       },
       "contactMethods": {
         "phone": "هاتف",
@@ -994,8 +1023,22 @@
       "footerNote": "راجع التفاصيل ثم أرسل الإعلان عندما يصبح كل شيء جاهزاً.",
       "success": {
         "title": "تم إرسال الإعلان!",
-        "description": "تم إرسال إعلانك للمراجعة. سيتم إعلامك عند الموافقة عليه."
-      }
+        "description": "تم إرسال إعلانك للمراجعة. سيتم إعلامك عند الموافقة عليه.",
+        "priceGenerated": "تم إنشاء السعر بنجاح"
+      },
+      "colors": {
+        "white": "أبيض",
+        "black": "أسود",
+        "silver": "فضي",
+        "gray": "رمادي",
+        "red": "أحمر",
+        "blue": "أزرق",
+        "green": "أخضر",
+        "brown": "بني",
+        "beige": "بيج",
+        "other": "أخرى"
+      },
+      "submitting": "جاري الإرسال…"
     },
     "editListing": {
       "title": "تعديل الإعلان",
@@ -1027,6 +1070,36 @@
       "empty": {
         "title": "لا توجد إعلانات بعد",
         "subtitle": "أنشئ إعلانك الأول للبدء"
+      },
+      "newListing": "إعلان جديد",
+      "card": {
+        "completion": "الاكتمال",
+        "lastUpdated": "آخر تحديث"
+      },
+      "filter": {
+        "allStatuses": "جميع الحالات",
+        "draft": "مسودة",
+        "pending": "قيد المراجعة",
+        "active": "نشط",
+        "rejected": "مرفوض",
+        "sold": "مُباع",
+        "archived": "مؤرشف",
+        "allMakes": "جميع الماركات",
+        "allModels": "جميع الطرازات",
+        "refresh": "تحديث",
+        "filteredResults": "عرض النتائج المصفاة",
+        "clearFilters": "مسح الفلاتر"
+      },
+      "sort": {
+        "sortBy": "ترتيب حسب",
+        "dateCreated": "تاريخ الإنشاء",
+        "lastUpdated": "آخر تحديث",
+        "price": "السعر",
+        "year": "السنة",
+        "mileage": "المسافة المقطوعة",
+        "direction": "الاتجاه",
+        "descending": "تنازلي",
+        "ascending": "تصاعدي"
       }
     }
   },
@@ -1093,7 +1166,13 @@
       "approvedAt": "تاريخ الموافقة",
       "soldAt": "تاريخ البيع",
       "rejectionReason": "سبب الرفض",
-      "approvedByAdminId": "تمت الموافقة بواسطة"
+      "approvedByAdminId": "تمت الموافقة بواسطة",
+      "goodDeal": "صفقة جيدة",
+      "na": "غير متوفر",
+      "callSeller": "اتصال",
+      "sellerInfo": "معلومات البائع",
+      "preferredContact": "المفضل:",
+      "timeline": "الجدول الزمني"
     }
   },
   "footer": {
@@ -1104,5 +1183,36 @@
     "phoneLabel": "الهاتف",
     "socialLabel": "تابعنا",
     "copyright": "© {{year}} سيارتي. جميع الحقوق محفوظة."
-  }
+  },
+  "MarketReEvaluationStarted": "بدأت عملية إعادة تقييم السوق في الخلفية.",
+  "ReEvaluationFailed": "فشل في بدء إعادة تقييم السوق.",
+  "NotificationUpdateFailed": "فشل في تحديث الإشعار.",
+  "Notifications": "الإشعارات",
+  "MarkAllAsRead": "تحديد الكل كمقروء",
+  "Loading": "جاري التحميل...",
+  "NoNotifications": "لا توجد إشعارات",
+  "Unread": "غير مقروء",
+  "MarketEvaluation": "تقييم السوق",
+  "SignificantChange": "تغيير كبير",
+  "BasedOnModel": "بناءً على إصدار النموذج:",
+  "FairMarketPrice": "السعر العادل للسوق",
+  "ConfidenceLevel": "مستوى الثقة",
+  "SuggestedNegotiationRange": "نطاق التفاوض المقترح",
+  "MarketReEvaluation": "إعادة تقييم السوق",
+  "ReEvaluationDescription": "قم بتشغيل مهمة في الخلفية لإعادة تقييم جميع الإعلانات عبر نموذج تعلم الآلة. سيؤدي هذا إلى تحديث السعر العادل ونطاقات التفاوض والبيانات الوصفية الأخرى لجميع الإعلانات النشطة.",
+  "ControlPanel": "لوحة التحكم",
+  "ControlPanelDesc": "قم بتشغيل عملية إعادة تقييم السوق يدوياً.",
+  "WarningSignificantChanges": "تحذير: تغييرات كبيرة",
+  "WarningSignificantChangesDesc": "ستقوم هذه العملية بمسح جميع الإعلانات. سيتم إخطار البائعين تلقائياً إذا تغير السعر العادل لإعلانهم بنسبة 10٪ أو أكثر.",
+  "Starting": "جاري البدء...",
+  "ReEvaluateMarketButton": "إعادة تقييم السوق",
+  "ConfirmReEvaluation": "تأكيد إعادة تقييم السوق",
+  "ConfirmReEvaluationMessage": "هل أنت متأكد أنك تريد بدء إعادة تقييم شاملة للسوق؟",
+  "WillRunInBackground": "ستعمل هذه العملية في الخلفية.",
+  "WillNotModifyListingPrice": "لن يتم تعديل السعر الأصلي الذي حدده البائع أبداً.",
+  "WillNotifySellers": "سيتم إخطار البائعين بالتغييرات الكبيرة.",
+  "Cancel": "إلغاء",
+  "Confirming": "جاري التأكيد...",
+  "ConfirmAndStart": "تأكيد وبدء",
+  "MLDashboard": "لوحة تحكم تعلم الآلة"
 }
