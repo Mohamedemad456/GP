@@ -1,0 +1,3 @@
+# Data directory
+# Raw and processed data are gitignored.
+# Only lookup CSVs are committed.

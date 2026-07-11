@@ -1,0 +1,68 @@
+{
+  "version": "v1.1.0",
+  "model_id": "ensemble_robust_average_v1.1.0",
+  "framework": "ensemble",
+  "ensemble_method": "weighted_average",
+  "training_date": "2026-05-12T12:42:55.350366Z",
+  "target_col": "price_egp",
+  "is_log_target": false,
+  "feature_cols": [
+    "year",
+    "mileage_km",
+    "mileage_per_year",
+    "engine_cc",
+    "horsepower",
+    "seating_capacity",
+    "make",
+    "model",
+    "transmission",
+    "fuel",
+    "location",
+    "body_type",
+    "drivetrain",
+    "brand_origin",
+    "car_segment"
+  ],
+  "cat_cols": [
+    "make",
+    "model",
+    "transmission",
+    "fuel",
+    "location",
+    "body_type",
+    "drivetrain",
+    "brand_origin",
+    "car_segment"
+  ],
+  "num_cols": [
+    "year",
+    "mileage_km",
+    "mileage_per_year",
+    "engine_cc",
+    "horsepower",
+    "seating_capacity"
+  ],
+  "quantiles": {
+    "lower": 0.05,
+    "median": 0.5,
+    "upper": 0.95
+  },
+  "metrics": {
+    "MAE": 133592.67602071384,
+    "RMSE": 473138.30447933066,
+    "R2": 0.888248658585996,
+    "MAPE_pct": 12.77460984102739,
+    "Within_10pct": 61.266386346772194,
+    "Within_15pct": 76.5767994063814,
+    "Coverage_80_pct": 86.79198614889934,
+    "Mean_width_pct": 77.26649956531303
+  },
+  "plot_dir": "models/plots/v1.1.0",
+  "source_notebook": "06_ensemble_experiments",
+  "train_config_path": "models/configs/train_config_v1.1.0.json",
+  "data_version": "baseline_2026-05-12",
+  "n_train": 14150,
+  "n_cal": 3032,
+  "n_test": 3032,
+  "architecture_note": "Weighted Average XGB+LGBM 50/50 (corrected from Robust Average label — requires >=3 models)"
+}

@@ -1,0 +1,4 @@
+tag_a,tag_b,rows_a,rows_b,combinable,duplicate_groups,duplicate_pct_of_b,net_new_if_combined,n_issues,n_warnings,issues,warnings
+2026-05-25_001,2026-05-25_002,12748,12810,True,12746,99.5,64,0,0,,
+2026-05-25_001,2026-05-28_001,12748,19451,True,2070,10.6,17381,0,0,,
+2026-05-25_002,2026-05-28_001,12810,19451,True,2075,10.7,17376,0,0,,

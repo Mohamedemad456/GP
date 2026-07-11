@@ -1,0 +1,17 @@
+﻿/.vs
+GPENV
+.env
+__pycache__
+logs/
+*.log
+*.jsonl
+
+.vscode
+_normalize_all_brands.py
+_extract_make_model.py
+*.bak
+dockerfileml
+# *.ok
+
+# *.ubj
+# pickles

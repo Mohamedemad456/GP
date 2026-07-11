@@ -1,0 +1,26 @@
+{
+  "version_id": "v1.0.0",
+  "fit_date": "2026-04-26T13:03:34.474249+00:00",
+  "fit_split": "E_stratified_by_price_range",
+  "fit_target": "price_egp_log",
+  "numeric_features": [
+    "year",
+    "car_age",
+    "mileage_km",
+    "mileage_per_year",
+    "engine_cc",
+    "horsepower",
+    "seating_capacity"
+  ],
+  "categorical_features": [
+    "make",
+    "model",
+    "transmission",
+    "fuel",
+    "location",
+    "body_type",
+    "drivetrain",
+    "brand_origin",
+    "car_segment"
+  ]
+}

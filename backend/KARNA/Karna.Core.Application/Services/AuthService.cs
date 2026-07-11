@@ -1,0 +1,368 @@
+using FluentValidation;
+using Karna.Core.Application.Abstraction.DTOs._Common;
+using Karna.Core.Application.Abstraction.DTOs.Auth;
+using Karna.Core.Application.Abstraction.DTOs.Identity;
+using Karna.Core.Application.Abstraction.External;
+using Karna.Core.Application.Abstraction.Persistence;
+using Karna.Core.Application.Abstraction.Services;
+using Karna.Core.Application.Abstraction.Settings;
+using Karna.Core.Domain.Entities;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
+using System.Security.Claims;
+namespace Karna.Core.Application.Services
+{
+	internal sealed class AuthService(
+		IIdentityService _identityService,
+		IUnitOfWork _unitOfWork,
+		ITokenService _tokenService,
+		IValidator<LoginDto> _loginValidator,
+        IValidator<RegisterDto> _registerValidator,
+		IValidator<ChangePasswordDto> _changePasswordValidator,
+        IOptions<JwtSettings> _jwtSettings,
+		ILocalizationService _localizer,
+        ICurrentUserService _currentUserService,
+        IHttpContextAccessor _httpContextAccessor
+    ) : IAuthService
+	{
+		public async Task<ApiResponse<TokenResponseDto>> LoginAsync(LoginDto loginDto, string? deviceInfo = null)
+		{
+			var validationResult = await _loginValidator.ValidateAsync(loginDto);
+			if (!validationResult.IsValid)
+			{
+				return new ApiResponse<TokenResponseDto>
+				{
+					Success = false,
+					Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage))
+				};
+			}
+
+			var user = await _identityService.FindUserByEmailAsync(loginDto.Email);
+			if (user is null || !user.IsActive)
+			{
+				return new ApiResponse<TokenResponseDto>
+				{
+					Success = false,
+					Message = _localizer.GetErrorMessage("InvalidCredentials")
+				};
+			}
+
+			if (await _identityService.IsLockedOutAsync(user.UserId))
+			{
+				return new ApiResponse<TokenResponseDto>
+				{
+					Success = false,
+					Message = _localizer.GetErrorMessage("AccountLocked")
+				};
+			}
+
+			if (!await _identityService.CheckPasswordAsync(user.UserId, loginDto.Password))
+			{
+				await _identityService.RecordAccessFailedAsync(user.UserId);
+				return new ApiResponse<TokenResponseDto>
+				{
+					Success = false,
+					Message = _localizer.GetErrorMessage("InvalidCredentials")
+				};
+			}
+
+			await _identityService.ResetAccessFailedCountAsync(user.UserId);
+			return await GenerateAndSaveTokensAsync(user, deviceInfo);
+		}
+
+		private async Task<ApiResponse<TokenResponseDto>> RefreshTokenAsync(RefreshTokenRequestDto dto)
+		{
+			var principal = _tokenService.GetPrincipalFromExpiredToken(dto.AccessToken);
+			var userId = principal?.FindFirstValue(ClaimTypes.NameIdentifier);
+
+			if (principal is null || userId is null)
+			{
+				return new ApiResponse<TokenResponseDto>
+				{
+					Success = false,
+					Message = _localizer.GetErrorMessage("InvalidCredentials")
+				};
+			}
+
+			var incomingHash = _tokenService.HashToken(dto.RefreshToken);
+			var parsedUserId = Guid.Parse(userId);
+			var repo = _unitOfWork.GetRepository<RefreshToken>();
+
+			var storedToken = await repo.GetAsync(rt =>
+				rt.IdentityUserId == parsedUserId &&
+				rt.TokenHashed == incomingHash &&
+				!rt.IsRevoked);
+
+			if (storedToken is null)
+			{
+				return new ApiResponse<TokenResponseDto>
+				{
+					Success = false,
+					Message = _localizer.GetErrorMessage("InvalidCredentials")
+				};
+			}
+
+			if (storedToken.ExpiresAt <= DateTime.UtcNow)
+			{
+				storedToken.IsRevoked = true;
+				repo.Update(storedToken);
+				await _unitOfWork.CompleteAsync();
+
+				return new ApiResponse<TokenResponseDto>
+				{
+					Success = false,
+					Message = _localizer.GetErrorMessage("InvalidCredentials")
+				};
+			}
+
+			storedToken.IsRevoked = true;
+			repo.Update(storedToken);
+
+			var user = await _identityService.FindUserByIdAsync(parsedUserId);
+			if (user is null || !user.IsActive)
+			{
+				return new ApiResponse<TokenResponseDto>
+				{
+					Success = false,
+					Message = _localizer.GetErrorMessage("InvalidCredentials")
+				};
+			}
+
+			return await GenerateAndSaveTokensAsync(user, storedToken.DeviceInfo);
+		}
+
+		public async Task<ApiResponse<TokenResponseDto>> RefreshFromCookieAsync()
+		{
+			var httpContext = _httpContextAccessor.HttpContext;
+
+			var accessToken = httpContext?.Request.Cookies["AccessToken"];
+			var refreshToken = httpContext?.Request.Cookies["RefreshToken"];
+
+			if (string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(refreshToken))
+			{
+				return new ApiResponse<TokenResponseDto>
+				{
+					Success = false,
+					Message = _localizer.GetErrorMessage("InvalidCredentials")
+				};
+			}
+
+			return await RefreshTokenAsync(new RefreshTokenRequestDto
+			{
+				AccessToken = accessToken,
+				RefreshToken = refreshToken
+			});
+		}
+
+		public async Task<ApiResponseDto> LogoutAsync(Guid userId)
+		{
+			var repo = _unitOfWork.GetRepository<RefreshToken>();
+			var activeTokens = await repo.FindAsync(rt =>
+				rt.IdentityUserId == userId && !rt.IsRevoked);
+
+			var latest = activeTokens
+				.OrderByDescending(rt => rt.CreatedAt)
+				.FirstOrDefault();
+
+			if (latest is not null)
+			{
+				latest.IsRevoked = true;
+				repo.Update(latest);
+				await _unitOfWork.CompleteAsync();
+			}
+
+			ClearTokenCookies();
+
+			return new ApiResponseDto
+			{
+				Success = true,
+				Message = _localizer.GetMessage("LogoutSuccess")
+			};
+		}
+
+		public async Task<ApiResponseDto> LogoutFromAllDevicesAsync(Guid userId)
+		{
+			var repo = _unitOfWork.GetRepository<RefreshToken>();
+			var activeTokens = await repo.FindAsync(rt =>
+				rt.IdentityUserId == userId && !rt.IsRevoked);
+
+			foreach (var token in activeTokens)
+			{
+				token.IsRevoked = true;
+				repo.Update(token);
+			}
+
+			await _unitOfWork.CompleteAsync();
+
+			ClearTokenCookies();
+
+			return new ApiResponseDto
+			{
+				Success = true,
+				Message = _localizer.GetMessage("LogoutSuccess")
+			};
+		}
+
+		private async Task<ApiResponse<TokenResponseDto>> GenerateAndSaveTokensAsync(UserIdentityDto user, string? deviceInfo, string messageKey = "LoginSuccess")
+		{
+			var roles = await _identityService.GetUserRolesAsync(user.UserId);
+			var accessToken = _tokenService.GenerateToken(user.UserId, user.Email!, user.UserName!, roles);
+			var rawRefreshToken = _tokenService.GenerateRefreshToken();
+			var repo = _unitOfWork.GetRepository<RefreshToken>();
+
+			await repo.AddAsync(new RefreshToken
+			{
+				IdentityUserId = user.UserId,
+				TokenHashed = _tokenService.HashToken(rawRefreshToken),
+				ExpiresAt = DateTime.UtcNow.AddDays(_jwtSettings.Value.RefreshTokenExpirationDays),
+				DeviceInfo = deviceInfo
+			});
+
+			await _unitOfWork.CompleteAsync();
+
+			SetTokenCookies(accessToken, rawRefreshToken);
+
+			return new ApiResponse<TokenResponseDto>
+			{
+				Success = true,
+				Message = _localizer.GetMessage(messageKey),
+				Data = new TokenResponseDto
+				{
+					AccessToken = accessToken,
+					RefreshToken = rawRefreshToken,
+					Expiration = DateTime.UtcNow.AddMinutes(_jwtSettings.Value.ExpirationMinutes)
+				}
+			};
+		}
+        public async Task<ApiResponse<TokenResponseDto>> RegisterAsync(RegisterDto registerDto, string? deviceInfo = null)
+
+        {
+        
+            var validationResult = await _registerValidator.ValidateAsync(registerDto);
+            if (!validationResult.IsValid)
+            {
+                return new ApiResponse<TokenResponseDto>
+                {
+                    Success = false,
+                    Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage))
+                };
+            }
+
+            var existingUser = await _identityService.FindUserByEmailAsync(registerDto.Email);
+            if (existingUser.Found)
+            {
+                return new ApiResponse<TokenResponseDto>
+                {
+                    Success = false,
+                    Message = _localizer.GetValidationMessage("EmailAlreadyInUse")
+                };
+            }
+
+            var (succeeded, createdUser, errors) = await _identityService.CreateUserAsync(registerDto.Email,
+																							registerDto.Password,
+																							registerDto.PhoneNumber);
+
+            if (!succeeded || createdUser is null)
+            {
+                return new ApiResponse<TokenResponseDto>
+                {
+                    Success = false,
+                    Message = string.Join("; ", errors)
+                };
+            }
+			try
+			{
+				await _identityService.AddToRoleAsync(createdUser.UserId, "User");
+
+				var domainUser = new User
+				{
+					IdentityUserId = createdUser.UserId,
+					Name = registerDto.Name,
+					WhatsAppNumber = registerDto.WhatsAppNumber
+				};
+
+				await _unitOfWork.GetRepository<User>().AddAsync(domainUser);
+				await _unitOfWork.CompleteAsync();
+			}
+			catch (Exception)
+            {
+				await _identityService.DeleteUserAsync(createdUser.UserId);
+				return new ApiResponse<TokenResponseDto>
+				{
+					Success = false,
+					Message = _localizer.GetErrorMessage("RegistrationFailed")
+				};
+			}
+
+            return await GenerateAndSaveTokensAsync(createdUser, deviceInfo, "RegisterSuccess");
+
+
+
+        }
+
+		public async Task<ApiResponseDto> ChangePasswordAsync(ChangePasswordDto dto)
+		{
+			var userId = _currentUserService.UserId;
+
+			var validationResult = await _changePasswordValidator.ValidateAsync(dto);
+            if (!validationResult.IsValid)
+            {
+                return new ApiResponseDto
+                {
+                    Success = false,
+                    Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage))
+                };
+            }
+
+            var (succeeded, errors) = await _identityService.ChangePassAsync(userId, dto.OldPassword, dto.NewPassword);
+
+            if (!succeeded)
+            {
+                return new ApiResponseDto
+                {
+                    Success = false,
+                    Message = string.Join("; ", errors)
+                };
+            }
+
+            return new ApiResponseDto
+            {
+                Success = true,
+                Message = _localizer.GetMessage("PasswordChanged")
+            };
+        }
+
+		private void SetTokenCookies(string accessToken, string refreshToken)
+		{
+			var httpContext = _httpContextAccessor.HttpContext;
+			if (httpContext == null) return;
+
+			var cookieOptions = new CookieOptions
+			{
+				HttpOnly = true,
+				Secure = true,
+				SameSite = SameSiteMode.None,
+				Expires = DateTime.UtcNow.AddDays(_jwtSettings.Value.RefreshTokenExpirationDays) 
+			};
+
+			httpContext.Response.Cookies.Append("AccessToken", accessToken, cookieOptions);
+			httpContext.Response.Cookies.Append("RefreshToken", refreshToken, cookieOptions);
+		}
+
+		private void ClearTokenCookies()
+		{
+			var httpContext = _httpContextAccessor.HttpContext;
+			if (httpContext == null) return;
+
+			var cookieOptions = new CookieOptions
+			{
+				HttpOnly = true,
+				Secure = true,
+				SameSite = SameSiteMode.None
+			};
+
+			httpContext.Response.Cookies.Delete("AccessToken", cookieOptions);
+			httpContext.Response.Cookies.Delete("RefreshToken", cookieOptions);
+		}
+    }
+}

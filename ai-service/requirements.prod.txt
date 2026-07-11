@@ -1,0 +1,16 @@
+# ── Core framework ───────────────────────────────────────────────
+fastapi==0.128.0
+uvicorn==0.40.0
+pydantic==2.12.5
+pydantic-settings==2.12.0
+python-dotenv==1.2.1
+
+# ── LLM providers ───────────────────────────────────────────────
+openai==2.16.0
+google-genai==1.62.0
+sambanova==1.6.1
+
+# ── Config / utilities ──────────────────────────────────────────
+PyYAML==6.0.3
+httpx==0.28.1
+rapidfuzz==3.14.1

@@ -1,0 +1,72 @@
+groups:
+  - name: ml-service-alerts
+    rules:
+      - alert: HighPredictionErrorRate
+        expr: |
+          sum(rate(prediction_errors_total[5m])) / sum(rate(prediction_requests_total[5m])) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High prediction error rate ({{ $value | humanizePercentage }})"
+          description: "Prediction error rate exceeds 5% for more than 2 minutes. Check service logs for details."
+
+      - alert: ElevatedPredictionErrorRate
+        expr: |
+          sum(rate(prediction_errors_total[5m])) / sum(rate(prediction_requests_total[5m])) > 0.01
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Elevated prediction error rate ({{ $value | humanizePercentage }})"
+          description: "Prediction error rate exceeds 1% for more than 5 minutes. Monitor closely."
+
+      - alert: HighPredictionLatencyP95
+        expr: |
+          histogram_quantile(0.95, sum(rate(prediction_duration_seconds_bucket[5m])) by (le)) > 2.0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High prediction latency p95 ({{ $value }}s)"
+          description: "95th percentile prediction latency exceeds 2 seconds for more than 5 minutes."
+
+      - alert: HighHTTPLatencyP95
+        expr: |
+          histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le)) > 5.0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High HTTP latency p95 ({{ $value }}s)"
+          description: "95th percentile HTTP latency exceeds 5 seconds for more than 5 minutes."
+
+      - alert: HighLowConfidenceRate
+        expr: |
+          sum(rate(prediction_requests_total{confidence="low"}[10m])) / sum(rate(prediction_requests_total[10m])) > 0.3
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High low-confidence prediction rate ({{ $value | humanizePercentage }})"
+          description: "More than 30% of predictions have low confidence. May indicate model drift or unusual input distribution."
+
+      - alert: MLServiceDown
+        expr: up{job="ml-service"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "ML Service is down"
+          description: "Prometheus cannot reach the ML service /metrics endpoint. The service may be crashed or unreachable."
+
+      - alert: HighServerErrorRate
+        expr: |
+          sum(rate(http_request_duration_seconds_count{status_code=~"5.."}[5m]))
+          / sum(rate(http_request_duration_seconds_count[5m])) > 0.05
+        for: 3m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High 5xx error rate ({{ $value | humanizePercentage }})"
+          description: "Server error rate (5xx) exceeds 5%. Check application error logs immediately."

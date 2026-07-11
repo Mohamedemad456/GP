@@ -1,0 +1,2 @@
+dataset_tag,split_name,target_col,framework,MAE,RMSE,R2,MAPE_pct,Within_10pct,Within_15pct,Coverage_80_pct,Coverage_90_pct,Mean_width_pct
+2026-06-03_008,price_stratified,price_egp_log,WeightedEnsemble,150593.86325308098,605558.621958141,0.8875250419963173,11.32582524124563,61.24000000000001,76.75999999999999,85.76,85.76,61.54542372219617

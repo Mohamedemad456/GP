@@ -1,0 +1,62 @@
+[
+  {
+    "Name": "Engine",
+    "NameAr": "المحرك"
+  },
+  {
+    "Name": "Transmission",
+    "NameAr": "ناقل الحركة"
+  },
+  {
+    "Name": "Brakes",
+    "NameAr": "الفرامل"
+  },
+  {
+    "Name": "Suspension",
+    "NameAr": "نظام التعليق"
+  },
+  {
+    "Name": "Exterior Body",
+    "NameAr": "الهيكل الخارجي"
+  },
+  {
+    "Name": "Interior",
+    "NameAr": "المقصورة الداخلية"
+  },
+  {
+    "Name": "Electrical System",
+    "NameAr": "النظام الكهربائي"
+  },
+  {
+    "Name": "Lights",
+    "NameAr": "الإضاءة"
+  },
+  {
+    "Name": "Tires & Wheels",
+    "NameAr": "الإطارات والجنوط"
+  },
+  {
+    "Name": "Air Conditioning",
+    "NameAr": "التكييف"
+  },
+  {
+    "Name": "Exhaust System",
+    "NameAr": "نظام العادم"
+  },
+  {
+    "Name": "Fluids & Leaks",
+    "NameAr": "السوائل والتسريبات"
+  },
+  {
+    "Name": "Safety Features",
+    "NameAr": "أنظمة الأمان"
+  },
+  {
+    "Name": "Glass & Mirrors",
+    "NameAr": "الزجاج والمرايا"
+  },
+  {
+    "Name": "Underbody",
+    "NameAr": "أسفل السيارة"
+  }
+]

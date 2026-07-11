@@ -13,6 +13,7 @@ services:
     environment:
       - CHOKIDAR_USEPOLLING=true
       - WATCHPACK_POLLING=true
+      - VITE_API_BASE_URL=http://localhost:9090
 
   design-system-storybook:
     build:
@@ -28,3 +29,91 @@ services:
       - CHOKIDAR_USEPOLLING=true
       - WATCHPACK_POLLING=true
 
+  # =======================
+  # AI Service (FastAPI)
+  # =======================
+  ai-service:
+    container_name: karna_ai_service
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./ai-service/logs:/app/logs:Z
+      - ./ai-service/app:/app/app:Z
+      - ./ai-service/data:/app/data:Z
+    env_file:
+      - .env
+    environment:
+      - PYTHONUNBUFFERED=1
+      - TZ=Africa/Cairo
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    restart: unless-stopped
+
+  # =======================
+  # Backend (.NET API)
+  # =======================
+  backend:
+    container_name: karna_backend
+    build:
+      context: ./backend/KARNA
+      dockerfile: Karna.APIs/Dockerfile
+      target: build
+    volumes:
+      - ./backend/KARNA:/src
+    working_dir: /src/Karna.APIs
+    entrypoint:
+      - dotnet
+    command:
+      - run
+      - --urls=http://0.0.0.0:8080
+    ports:
+      - "9090:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: Server=db;Database=KarnaDb;User=sa;Password=Karna@Pass123;TrustServerCertificate=True
+      Urls__ApiBaseUrl: http://localhost:9090
+      MLApiSettings__BaseUrl: http://ml-service:8001
+    depends_on:
+      - db
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+
+  # =======================
+  # ML Service (FastAPI)
+  # =======================
+  ml-service:
+    container_name: karna_ml_service
+    build:
+      context: ./ml-service
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+      - "8502:8501"
+    volumes:
+      - ./ml-service:/app:Z
+    env_file:
+      - .env
+    environment:
+      - PYTHONUNBUFFERED=1
+      - ADMIN_API_BASE=http://localhost:8001/admin
+    restart: unless-stopped
+
+  # =======================
+  # Database (SQL Server)
+  # =======================
+  db:
+    container_name: karna_db
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "Karna@Pass123"
+    ports:
+      - "1433:1433"
+    volumes:
+      - karna_db_data:/var/opt/mssql
+
+volumes:
+  karna_db_data:

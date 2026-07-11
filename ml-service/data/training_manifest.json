@@ -1,0 +1,23 @@
+{
+  "current_training_version": "2026-06-03_001",
+  "versions": {
+    "2026-06-03_001": {
+      "tag": "2026-06-03_001",
+      "created_at": "2026-06-03T00:20:22",
+      "path": "data/processed/training_versions/training_2026-06-03_001.csv",
+      "rows": 29656,
+      "fingerprint": "sha256:820a2fa8d39c563a462a36572eaf66cff7a25acf97aea0e7fe2db62a41a6562e",
+      "source_processed_tags": [
+        "2026-05-25_002",
+        "2026-05-28_001"
+      ],
+      "excluded_tags": [],
+      "pre_dedup_rows": 32261,
+      "post_dedup_rows": 30186,
+      "duplicates_removed": 2075,
+      "post_rare_filter_rows": 29656,
+      "rare_dropped": 530,
+      "make_model_combos": 431
+    }
+  }
+}

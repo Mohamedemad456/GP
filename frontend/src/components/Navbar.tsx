@@ -1,27 +1,69 @@
-import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Car } from "lucide-react";
-import { Button } from "@/lib";
+import { memo, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import {
+  Menu,
+  X,
+  Car,
+  ChevronDown,
+  UserCircle2,
+  LayoutDashboard,
+  ShieldCheck,
+  LogOut,
+  Loader2,
+  Heart,
+} from "lucide-react";
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@gp/design-system";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "./LanguageSwitcher";
+import { useAuth } from "@/context/AuthContext";
+import { logoutUser } from "@/lib/authApi";
+import { NotificationCenter } from "./notifications/NotificationCenter";
 
-const Navbar = () => {
+const Navbar = memo(() => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { t, i18n } = useTranslation();
+  const { user, clearUser } = useAuth();
 
   // Detect RTL language
   const isRTL = i18n.language?.startsWith("ar") ?? false;
+  const isLoggedIn = !!user;
+  const isAdmin = user?.role === "admin";
 
   const navLinks = [
     { name: t("navigation.home"), path: "/" },
+    ...(isLoggedIn ? [{ name: t("navigation.feed"), path: "/feed" }] : []),
     { name: t("navigation.about"), path: "/about" },
     { name: t("navigation.contact"), path: "/contact" },
   ];
 
-  
   const isActive = (path: string) => location.pathname === path;
+
+  const handleLogout = async () => {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+    try {
+      await logoutUser();
+    } catch {
+      // Always sign out client-side even if the server call fails.
+    } finally {
+      clearUser();
+      setIsOpen(false);
+      setIsLoggingOut(false);
+      navigate("/login", { replace: true });
+    }
+  };
 
   return (
     <motion.nav
@@ -88,69 +130,91 @@ const Navbar = () => {
               >
                 <Link
                   to={link.path}
-                  className={`text-sm font-medium transition-smooth relative group font-heading ${
+                  className={`block py-2 px-3 text-sm font-medium transition-smooth font-heading border-b-2 min-w-18 text-center ${
                     isActive(link.path)
-                      ? "text-primary"
-                      : "text-muted-foreground hover:text-foreground"
+                      ? "text-primary border-primary"
+                      : "border-transparent text-muted-foreground hover:text-foreground hover:border-primary/30"
                   }`}
                 >
                   {link.name}
-                  <motion.span
-                    className={`absolute -bottom-1 w-full h-0.5 bg-primary ${
-                      isRTL ? "right-0" : "left-0"
-                    }`}
-                    initial={{ scaleX: isActive(link.path) ? 1 : 0 }}
-                    whileHover={{ scaleX: 1 }}
-                    transition={{ duration: 0.3 }}
-                    style={{ originX: isRTL ? 1 : 0 }}
-                  />
                 </Link>
               </motion.div>
             ))}
           </motion.div>
 
-          {/* Auth Buttons */}
+          {/* Auth / Account */}
           <div
             className={`hidden md:flex items-center gap-3 ${
               isRTL ? "flex-row-reverse mr-auto" : "ml-auto"
             }`}
           >
-            {!isRTL ? (
-              <>
-                <LanguageSwitcher />
-                <Link to="/login">
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+            <LanguageSwitcher />
+            {isLoggedIn && <NotificationCenter />}
+            {isLoggedIn ? (
+              <DropdownMenu modal={false}>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2 border-primary/25 bg-background/70 hover:bg-primary/10 hover:border-primary/40"
                   >
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="transition-smooth hover:bg-primary hover:text-primary-foreground hover:border-primary font-sans"
-                    >
-                      {t("navigation.login")}
-                    </Button>
-                  </motion.div>
-                </Link>
-                <Link to="/signup">
-                  <motion.div
-                    whileHover={{
-                      scale: 1.05,
-                      boxShadow: "0 0 20px hsl(var(--primary) / 0.4)",
-                    }}
-                    whileTap={{ scale: 0.95 }}
+                    <UserCircle2 className="size-4 text-primary" />
+                    <span className="max-w-36 truncate">{user?.email}</span>
+                    <ChevronDown className="size-4 text-muted-foreground" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align={isRTL ? "start" : "end"} className="w-64">
+                  <DropdownMenuLabel className="space-y-0.5">
+                    <p className="text-xs font-medium text-muted-foreground">
+                      {t("navigation.account")}
+                    </p>
+                    <p className="truncate text-sm font-semibold">{user?.email}</p>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate("/profile")}>
+                    <UserCircle2 className="size-4" />
+                    {t("navigation.profile")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/seller")}>
+                    <LayoutDashboard className="size-4" />
+                    {t("navigation.sellerDashboard")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/favorites")}>
+                    <Heart className="size-4" />
+                    {t("navigation.favorites", "Favorites")}
+                  </DropdownMenuItem>
+                  {isAdmin && (
+                    <DropdownMenuItem onClick={() => navigate("/admin")}>
+                      <ShieldCheck className="size-4" />
+                      {t("navigation.adminDashboard")}
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    variant="destructive"
+                    onClick={handleLogout}
+                    disabled={isLoggingOut}
                   >
-                    <Button
-                      size="sm"
-                      className="bg-primary text-primary-foreground hover:glow-primary transition-smooth font-sans"
-                    >
-                      {t("auth.signUp")}
-                    </Button>
-                  </motion.div>
-                </Link>
-              </>
+                    {isLoggingOut
+                      ? <Loader2 className="size-4 animate-spin" />
+                      : <LogOut className="size-4" />}
+                    {t("navigation.logout")}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <>
+                <Link to="/login">
+                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="transition-smooth hover:bg-primary hover:text-primary-foreground hover:border-primary font-sans"
+                    >
+                      {t("navigation.login")}
+                    </Button>
+                  </motion.div>
+                </Link>
                 <Link to="/signup">
                   <motion.div
                     whileHover={{
@@ -167,21 +231,6 @@ const Navbar = () => {
                     </Button>
                   </motion.div>
                 </Link>
-                <Link to="/login">
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="transition-smooth hover:bg-primary hover:text-primary-foreground hover:border-primary font-sans"
-                    >
-                      {t("navigation.login")}
-                    </Button>
-                  </motion.div>
-                </Link>
-                <LanguageSwitcher />
               </>
             )}
           </div>
@@ -265,24 +314,87 @@ const Navbar = () => {
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.3 }}
               >
-                <Link
-                  to="/login"
-                  onClick={() => setIsOpen(false)}
-                  className="block"
-                >
-                  <Button variant="outline" className="w-full">
-                    {t("navigation.login")}
-                  </Button>
-                </Link>
-                <Link
-                  to="/signup"
-                  onClick={() => setIsOpen(false)}
-                  className="block"
-                >
-                  <Button className="w-full bg-primary text-primary-foreground">
-                    {t("auth.signUp")}
-                  </Button>
-                </Link>
+                {isLoggedIn ? (
+                  <>
+                    <Link
+                      to="/profile"
+                      onClick={() => setIsOpen(false)}
+                      className="block"
+                    >
+                      <Button variant="outline" className="w-full justify-start gap-2">
+                        <UserCircle2 className="size-4" />
+                        {t("navigation.profile")}
+                      </Button>
+                    </Link>
+                    <Link
+                      to="/seller"
+                      onClick={() => setIsOpen(false)}
+                      className="block"
+                    >
+                      <Button variant="outline" className="w-full justify-start gap-2">
+                        <LayoutDashboard className="size-4" />
+                        {t("navigation.sellerDashboard")}
+                      </Button>
+                    </Link>
+                    <Link
+                      to="/favorites"
+                      onClick={() => setIsOpen(false)}
+                      className="block"
+                    >
+                      <Button variant="outline" className="w-full justify-start gap-2">
+                        <Heart className="size-4" />
+                        {t("navigation.favorites", "Favorites")}
+                      </Button>
+                    </Link>
+                    {isAdmin && (
+                      <Link
+                        to="/admin"
+                        onClick={() => setIsOpen(false)}
+                        className="block"
+                      >
+                        <Button
+                          variant="outline"
+                          className="w-full justify-start gap-2"
+                        >
+                          <ShieldCheck className="size-4" />
+                          {t("navigation.adminDashboard")}
+                        </Button>
+                      </Link>
+                    )}
+                    <Button
+                      variant="destructive"
+                      className="w-full justify-start gap-2"
+                      onClick={handleLogout}
+                      disabled={isLoggingOut}
+                    >
+                      {isLoggingOut
+                        ? <Loader2 className="size-4 animate-spin" />
+                        : <LogOut className="size-4" />}
+                      {t("navigation.logout")}
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      to="/login"
+                      onClick={() => setIsOpen(false)}
+                      className="block"
+                    >
+                      <Button variant="outline" className="w-full">
+                        {t("navigation.login")}
+                      </Button>
+                    </Link>
+                    <Link
+                      to="/signup"
+                      onClick={() => setIsOpen(false)}
+                      className="block"
+                    >
+                      <Button className="w-full bg-primary text-primary-foreground">
+                        {t("auth.signUp")}
+                      </Button>
+                    </Link>
+                  </>
+                )}
               </motion.div>
             </motion.div>
           </motion.div>
@@ -290,6 +402,8 @@ const Navbar = () => {
       </AnimatePresence>
     </motion.nav>
   );
-};
+});
+
+Navbar.displayName = "Navbar";
 
 export default Navbar;

@@ -1,0 +1,289 @@
+[
+  {
+    "Name": "Alfa Romeo",
+    "NameAr": "ألفا روميو",
+    "LogoUrl": "icons/Makes/alfa-romeo.png",
+    "Country": "Italy",
+    "CountryAr": "إيطاليا"
+  },
+  {
+    "Name": "Audi",
+    "NameAr": "أودي",
+    "LogoUrl": "icons/Makes/audi.png",
+    "Country": "Germany",
+    "CountryAr": "ألمانيا"
+  },
+  {
+    "Name": "BMW",
+    "NameAr": "بي إم دبليو",
+    "LogoUrl": "icons/Makes/bmw.png",
+    "Country": "Germany",
+    "CountryAr": "ألمانيا"
+  },
+  {
+    "Name": "BYD",
+    "NameAr": "بي واي دي",
+    "LogoUrl": "icons/Makes/byd.png",
+    "Country": "China",
+    "CountryAr": "الصين"
+  },
+  {
+    "Name": "Brilliance",
+    "NameAr": "بريليانس",
+    "LogoUrl": "icons/Makes/brilliance.png",
+    "Country": "China",
+    "CountryAr": "الصين"
+  },
+  {
+    "Name": "Cadillac",
+    "NameAr": "كاديلاك",
+    "LogoUrl": "icons/Makes/cadillac.png",
+    "Country": "USA",
+    "CountryAr": "الولايات المتحدة"
+  },
+  {
+    "Name": "Chery",
+    "NameAr": "شيري",
+    "LogoUrl": "icons/Makes/chery.png",
+    "Country": "China",
+    "CountryAr": "الصين"
+  },
+  {
+    "Name": "Chevrolet",
+    "NameAr": "شيفروليه",
+    "LogoUrl": "icons/Makes/chevrolet.png",
+    "Country": "USA",
+    "CountryAr": "الولايات المتحدة"
+  },
+  {
+    "Name": "Citroën",
+    "NameAr": "سيتروين",
+    "LogoUrl": "icons/Makes/citroen.png",
+    "Country": "France",
+    "CountryAr": "فرنسا"
+  },
+  {
+    "Name": "Cupra",
+    "NameAr": "كوبرا",
+    "LogoUrl": "icons/Makes/cupra.png",
+    "Country": "Spain",
+    "CountryAr": "إسبانيا"
+  },
+  {
+    "Name": "DS",
+    "NameAr": "دي إس",
+    "LogoUrl": "icons/Makes/ds.png",
+    "Country": "France",
+    "CountryAr": "فرنسا"
+  },
+  {
+    "Name": "Daewoo",
+    "NameAr": "دايو",
+    "LogoUrl": "icons/Makes/daewoo.png",
+    "Country": "South Korea",
+    "CountryAr": "كوريا الجنوبية"
+  },
+  {
+    "Name": "Fiat",
+    "NameAr": "فيات",
+    "LogoUrl": "icons/Makes/fiat.png",
+    "Country": "Italy",
+    "CountryAr": "إيطاليا"
+  },
+  {
+    "Name": "Ford",
+    "NameAr": "فورد",
+    "LogoUrl": "icons/Makes/ford.png",
+    "Country": "USA",
+    "CountryAr": "الولايات المتحدة"
+  },
+  {
+    "Name": "GMC",
+    "NameAr": "جي إم سي",
+    "LogoUrl": "icons/Makes/gmc.png",
+    "Country": "USA",
+    "CountryAr": "الولايات المتحدة"
+  },
+  {
+    "Name": "Geely",
+    "NameAr": "جيلي",
+    "LogoUrl": "icons/Makes/geely.png",
+    "Country": "China",
+    "CountryAr": "الصين"
+  },
+  {
+    "Name": "Haval",
+    "NameAr": "هافال",
+    "LogoUrl": "icons/Makes/haval.png",
+    "Country": "China",
+    "CountryAr": "الصين"
+  },
+  {
+    "Name": "Honda",
+    "NameAr": "هوندا",
+    "LogoUrl": "icons/Makes/honda.png",
+    "Country": "Japan",
+    "CountryAr": "اليابان"
+  },
+  {
+    "Name": "Hyundai",
+    "NameAr": "هيونداي",
+    "LogoUrl": "icons/Makes/hyundai.png",
+    "Country": "South Korea",
+    "CountryAr": "كوريا الجنوبية"
+  },
+  {
+    "Name": "Isuzu",
+    "NameAr": "إيسوزو",
+    "LogoUrl": "icons/Makes/isuzu.png",
+    "Country": "Japan",
+    "CountryAr": "اليابان"
+  },
+  {
+    "Name": "JAC",
+    "NameAr": "جاك",
+    "LogoUrl": "icons/Makes/jac.png",
+    "Country": "China",
+    "CountryAr": "الصين"
+  },
+  {
+    "Name": "Jaguar",
+    "NameAr": "جاكوار",
+    "LogoUrl": "icons/Makes/jaguar.png",
+    "Country": "United Kingdom",
+    "CountryAr": "المملكة المتحدة"
+  },
+  {
+    "Name": "Jeep",
+    "NameAr": "جيب",
+    "LogoUrl": "icons/Makes/jeep.png",
+    "Country": "USA",
+    "CountryAr": "الولايات المتحدة"
+  },
+  {
+    "Name": "Kia",
+    "NameAr": "كيا",
+    "LogoUrl": "icons/Makes/kia.png",
+    "Country": "South Korea",
+    "CountryAr": "كوريا الجنوبية"
+  },
+  {
+    "Name": "Land Rover",
+    "NameAr": "لاند روفر",
+    "LogoUrl": "icons/Makes/land-rover.png",
+    "Country": "United Kingdom",
+    "CountryAr": "المملكة المتحدة"
+  },
+  {
+    "Name": "Lotus",
+    "NameAr": "لوتس",
+    "LogoUrl": "icons/Makes/lotus.png",
+    "Country": "United Kingdom",
+    "CountryAr": "المملكة المتحدة"
+  },
+  {
+    "Name": "MG",
+    "NameAr": "إم جي",
+    "LogoUrl": "icons/Makes/mg.png",
+    "Country": "United Kingdom",
+    "CountryAr": "المملكة المتحدة"
+  },
+  {
+    "Name": "Maserati",
+    "NameAr": "مازيراتي",
+    "LogoUrl": "icons/Makes/maserati.png",
+    "Country": "Italy",
+    "CountryAr": "إيطاليا"
+  },
+  {
+    "Name": "Mazda",
+    "NameAr": "مازدا",
+    "LogoUrl": "icons/Makes/mazda.png",
+    "Country": "Japan",
+    "CountryAr": "اليابان"
+  },
+  {
+    "Name": "Mercedes",
+    "NameAr": "مرسيدس",
+    "LogoUrl": "icons/Makes/mercedes.png",
+    "Country": "Germany",
+    "CountryAr": "ألمانيا"
+  },
+  {
+    "Name": "Mini",
+    "NameAr": "ميني",
+    "LogoUrl": "icons/Makes/mini.png",
+    "Country": "United Kingdom",
+    "CountryAr": "المملكة المتحدة"
+  },
+  {
+    "Name": "Mitsubishi",
+    "NameAr": "ميتسوبيشي",
+    "LogoUrl": "icons/Makes/mitsubishi.png",
+    "Country": "Japan",
+    "CountryAr": "اليابان"
+  },
+  {
+    "Name": "Nissan",
+    "NameAr": "نيسان",
+    "LogoUrl": "icons/Makes/nissan.png",
+    "Country": "Japan",
+    "CountryAr": "اليابان"
+  },
+  {
+    "Name": "Opel",
+    "NameAr": "أوبل",
+    "LogoUrl": "icons/Makes/opel.png",
+    "Country": "Germany",
+    "CountryAr": "ألمانيا"
+  },
+  {
+    "Name": "Peugeot",
+    "NameAr": "بيجو",
+    "LogoUrl": "icons/Makes/peugeot.png",
+    "Country": "France",
+    "CountryAr": "فرنسا"
+  },
+  {
+    "Name": "Porsche",
+    "NameAr": "بورشه",
+    "LogoUrl": "icons/Makes/porsche.png",
+    "Country": "Germany",
+    "CountryAr": "ألمانيا"
+  },
+  {
+    "Name": "Renault",
+    "NameAr": "رينو",
+    "LogoUrl": "icons/Makes/renault.png",
+    "Country": "France",
+    "CountryAr": "فرنسا"
+  },
+  {
+    "Name": "Skoda",
+    "NameAr": "سكودا",
+    "LogoUrl": "icons/Makes/skoda.png",
+    "Country": "Czech Republic",
+    "CountryAr": "التشيك"
+  },
+  {
+    "Name": "Subaru",
+    "NameAr": "سوبارو",
+    "LogoUrl": "icons/Makes/subaru.png",
+    "Country": "Japan",
+    "CountryAr": "اليابان"
+  },
+  {
+    "Name": "Toyota",
+    "NameAr": "تويوتا",
+    "LogoUrl": "icons/Makes/toyota.png",
+    "Country": "Japan",
+    "CountryAr": "اليابان"
+  },
+  {
+    "Name": "Volkswagen",
+    "NameAr": "فولكس فاجن",
+    "LogoUrl": "icons/Makes/volkswagen.png",
+    "Country": "Germany",
+    "CountryAr": "ألمانيا"
+  }
+]

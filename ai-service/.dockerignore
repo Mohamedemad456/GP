@@ -1,0 +1,27 @@
+# ── Python ───────────────────────────────────────────────────────
+__pycache__/
+venv/
+.venv/
+env/
+GPENV/
+.vscode/
+tests/
+.pytest_cache/
+notebooks/
+*.ipynb
+.git/
+.gitignore
+
+# Docker (don't send Dockerfile into the build context)
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# ── Environment secrets ─────────────────────────────────────────
+.env
+.env.*
+
+# ── Documentation ────────────────────────────────────────────────
+README.md
+docs/
+*.md

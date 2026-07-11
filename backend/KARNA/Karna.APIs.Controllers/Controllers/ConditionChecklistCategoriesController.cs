@@ -1,0 +1,88 @@
+using Karna.APIs.Controllers.Controllers._Base;
+using Karna.Core.Application.Abstraction.DTOs._Common;
+using Karna.Core.Application.Abstraction.DTOs.ConditionChecklistCategory;
+using Karna.Core.Application.Abstraction.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Karna.APIs.Controllers.Controllers
+{
+	[Authorize(Roles = "Admin")]
+	public class ConditionChecklistCategoriesController(IConditionChecklistCategoryService _conditionCategoryService) : ApiControllerBase
+	{
+		[HttpGet("All")]
+		public async Task<IActionResult> GetAll([FromQuery] ConditionChecklistCategorySpecParams specParams)
+		{
+			var result = await _conditionCategoryService.GetAllAsync(specParams);
+			return Ok(result);
+		}
+
+		[HttpGet("{id:guid}")]
+		public async Task<IActionResult> GetById(Guid id)
+		{
+			var result = await _conditionCategoryService.GetByIdAsync(id);
+			if (!result.Success)
+				return NotFound(result);
+
+			return Ok(result);
+		}
+
+		[AllowAnonymous]
+		[HttpGet("active")]
+		public async Task<IActionResult> GetActive([FromQuery] PaginationSpecParams specParams)
+		{
+			var result = await _conditionCategoryService.GetAllActiveAsync(specParams);
+			return Ok(result);
+		}
+
+		[HttpPost("Create")]
+		public async Task<IActionResult> Create([FromBody] CreateConditionChecklistCategoryDto dto)
+		{
+			var result = await _conditionCategoryService.CreateAsync(dto);
+			if (!result.Success)
+				return BadRequest(result);
+
+			return Ok(result);
+		}
+
+		[HttpPut("Update/{id:guid}")]
+		public async Task<IActionResult> Update(Guid id, [FromBody] UpdateConditionChecklistCategoryDto dto)
+		{
+			var result = await _conditionCategoryService.UpdateAsync(id, dto);
+			if (!result.Success)
+				return BadRequest(result);
+
+			return Ok(result);
+		}
+
+		[HttpPatch("activate/{id:guid}")]
+		public async Task<IActionResult> Activate(Guid id)
+		{
+			var result = await _conditionCategoryService.ActivateAsync(id);
+			if (!result.Success)
+				return BadRequest(result);
+
+			return Ok(result);
+		}
+
+		[HttpPatch("deactivate/{id:guid}")]
+		public async Task<IActionResult> Deactivate(Guid id)
+		{
+			var result = await _conditionCategoryService.DeactivateAsync(id);
+			if (!result.Success)
+				return BadRequest(result);
+
+			return Ok(result);
+		}
+
+		[HttpDelete("Delete/{id:guid}")]
+		public async Task<IActionResult> Delete(Guid id)
+		{
+			var result = await _conditionCategoryService.DeleteAsync(id);
+			if (!result.Success)
+				return BadRequest(result);
+
+			return Ok(result);
+		}
+	}
+}

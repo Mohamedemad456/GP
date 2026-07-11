@@ -1,0 +1,51 @@
+# Environment
+.env
+.env.example
+# Data
+
+Chapter4*
+# data/raw/*.*
+# data/cleaned/*.*
+# data/processed/*.*
+# !data/processed/processed_data.csv
+# data/processed/*.parquet
+# data/lookups/*
+
+# # Models
+# *.pkl
+# *.joblib
+# *.ok
+# *.ubj
+
+# # Versioned model export folders (keep registries/metadata JSON tracked)
+# models/v*/
+# *.pkl
+# *.joblib
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Virtual environment
+venv/
+.venv/
+
+_normalize_all_brands.py
+_extract_make_model.py
+
+archive
+
+preprocessors
